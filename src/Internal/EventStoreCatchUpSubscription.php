@@ -124,7 +124,7 @@ abstract class EventStoreCatchUpSubscription
         $this->resolveLinkTos = $settings->resolveLinkTos();
         $this->readBatchSize = $settings->readBatchSize();
         $this->maxPushQueueSize = $settings->maxLiveQueueSize();
-        //$this->verboseLogging = $settings->verboseLogging(); // @todo
+        $this->verbose = $settings->verboseLogging();
         $this->subscriptionName = $settings->subscriptionName() ?? '';
         $this->connectListener = function (): void {
         };
@@ -236,11 +236,11 @@ abstract class EventStoreCatchUpSubscription
     private function loadHistoricalEventsAsync(): Promise
     {
         if ($this->verbose) {
-            $this->log->debug(
+            $this->log->debug(\sprintf(
                 'Catch-up Subscription %s to %s: running...',
                 $this->subscriptionName,
                 $this->isSubscribedToAll ? '<all>' : $this->streamId
-            );
+            ));
         }
 
         $this->stopped = false;
