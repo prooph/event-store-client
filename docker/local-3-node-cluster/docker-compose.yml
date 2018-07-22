@@ -1,0 +1,95 @@
+version: "3"
+
+services:
+
+  php:
+    image: prooph/php:7.2-cli
+    volumes:
+      - ./..:/app
+    command: tail -f /dev/null
+    networks:
+      clusternetwork:
+        ipv4_address: 172.16.0.16
+
+  eventstore1:
+   image: eventstore/eventstore:release-4.1.0
+   env_file:
+     - common-variables.env
+   environment:
+     - EVENTSTORE_GOSSIP_SEED=172.16.0.12:2112,172.16.0.13:2112
+     - EVENTSTORE_NODE_PRIORITY=3
+     - EVENTSTORE_INT_IP=172.16.0.11
+     - EVENTSTORE_EXT_HTTP_PORT=2113
+     - EVENTSTORE_EXT_TCP_PORT=1113
+     - EVENTSTORE_EXT_HTTP_PREFIXES=http://*:2113/
+   ports:
+     - 1113:1113
+     - 2113:2113
+   volumes:
+     - "~/Data/eventstore3node/node1:/var/lib/eventstore"
+   restart: always
+   healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:2113/stats || exit 1"]
+      interval: 5s
+      timeout: 2s
+   networks:
+     clusternetwork:
+       ipv4_address: 172.16.0.11
+
+  eventstore2:
+   image: eventstore/eventstore:release-4.1.0
+   env_file:
+     - common-variables.env
+   environment:
+     - EVENTSTORE_GOSSIP_SEED=172.16.0.12:2112,172.16.0.13:2112
+     - EVENTSTORE_NODE_PRIORITY=2
+     - EVENTSTORE_INT_IP=172.16.0.12
+     - EVENTSTORE_EXT_HTTP_PORT=2123
+     - EVENTSTORE_EXT_TCP_PORT=1123
+     - EVENTSTORE_EXT_HTTP_PREFIXES=http://*:2123/
+   ports:
+     - 1123:1123
+     - 2123:2123
+   volumes:
+     - "~/Data/eventstore3node/node2:/var/lib/eventstore"
+   restart: always
+   healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:2123/stats || exit 1"]
+      interval: 5s
+      timeout: 2s
+   networks:
+     clusternetwork:
+       ipv4_address: 172.16.0.12
+
+  eventstore3:
+   image: eventstore/eventstore:release-4.1.0
+   env_file:
+     - common-variables.env
+   environment:
+     - EVENTSTORE_GOSSIP_SEED=172.16.0.11:2112,172.16.0.13:2112
+     - EVENTSTORE_NODE_PRIORITY=1
+     - EVENTSTORE_INT_IP=172.16.0.13
+     - EVENTSTORE_EXT_HTTP_PORT=2133
+     - EVENTSTORE_EXT_TCP_PORT=1133
+     - EVENTSTORE_EXT_HTTP_PREFIXES=http://*:2133/
+   ports:
+     - 1133:1133
+     - 2133:2133
+   volumes:
+     - "~/Data/eventstore3node/node3:/var/lib/eventstore"
+   restart: always
+   healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:2133/stats || exit 1"]
+      interval: 5s
+      timeout: 2s
+   networks:
+     clusternetwork:
+       ipv4_address: 172.16.0.13
+
+networks:
+  clusternetwork:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.0.0/24

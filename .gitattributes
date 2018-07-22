@@ -7,4 +7,5 @@
 .gitignore        export-ignore
 .php_cs           export-ignore
 .travis.yml       export-ignore
+ClientMessageDtos.proto export-ignore
 phpunit.xml.dist  export-ignore
