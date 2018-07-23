@@ -15,17 +15,19 @@ namespace Prooph\EventStoreClient\Internal\ByteBuffer;
 use SplFixedArray;
 
 /** @internal */
-final class Buffer extends AbstractBuffer
+class Buffer
 {
     /** @var SplFixedArray */
     private $buffer;
-    /** @var LengthMap */
-    private $lengthMap;
-
-    private function __construct()
-    {
-        $this->lengthMap = new LengthMap();
-    }
+    /** @var array */
+    private $lengthMap = [
+        'n' => 2,
+        'N' => 4,
+        'v' => 2,
+        'V' => 4,
+        'c' => 1,
+        'C' => 1,
+    ];
 
     public static function fromString(string $string): Buffer
     {
@@ -106,35 +108,35 @@ final class Buffer extends AbstractBuffer
     {
         $format = 'C';
 
-        return $this->extract($format, $offset, $this->lengthMap->lengthFor($format));
+        return $this->extract($format, $offset, $this->lengthFor($format));
     }
 
     public function readInt16BE($offset): int
     {
         $format = 'n';
 
-        return $this->extract($format, $offset, $this->lengthMap->lengthFor($format));
+        return $this->extract($format, $offset, $this->lengthFor($format));
     }
 
     public function readInt16LE($offset): int
     {
         $format = 'v';
 
-        return $this->extract($format, $offset, $this->lengthMap->lengthFor($format));
+        return $this->extract($format, $offset, $this->lengthFor($format));
     }
 
     public function readInt32BE($offset): int
     {
         $format = 'N';
 
-        return $this->extract($format, $offset, $this->lengthMap->lengthFor($format));
+        return $this->extract($format, $offset, $this->lengthFor($format));
     }
 
     public function readInt32LE($offset): int
     {
         $format = 'V';
 
-        return $this->extract($format, $offset, $this->lengthMap->lengthFor($format));
+        return $this->extract($format, $offset, $this->lengthFor($format));
     }
 
     private function initializeStructs(int $length, string $content): void
@@ -149,8 +151,9 @@ final class Buffer extends AbstractBuffer
     private function insert(string $format, $value, int $offset)
     {
         $bytes = \pack($format, $value);
+        $length = \strlen($bytes);
 
-        for ($i = 0; $i < \strlen($bytes); $i++) {
+        for ($i = 0; $i < $length; $i++) {
             $this->buffer[$offset++] = $bytes[$i];
         }
     }
@@ -176,5 +179,10 @@ final class Buffer extends AbstractBuffer
                 \sprintf('%d exceeded limit of %d', $actual, $expectedMax)
             );
         }
+    }
+
+    private function lengthFor($format): int
+    {
+        return $this->lengthMap[$format];
     }
 }

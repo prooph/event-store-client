@@ -306,6 +306,7 @@ class EventStoreConnectionLogicHandler
         $this->connectingPhase = ConnectingPhase::connectionEstablishing();
 
         $this->connection = new TcpPackageConnection(
+            $this->settings->log(),
             $endPoint,
             UuidGenerator::generate(),
             $this->settings->useSslConnection(),
@@ -431,12 +432,21 @@ class EventStoreConnectionLogicHandler
             $this->authInfo = new AuthInfo(UuidGenerator::generate(), $elapsed);
 
             Loop::defer(function (): Generator {
+                $login = null;
+                $pass = null;
+
+                if ($this->settings->defaultUserCredentials()) {
+                    $login = $this->settings->defaultUserCredentials()->username();
+                    $pass = $this->settings->defaultUserCredentials()->password();
+                }
+
                 yield $this->connection->sendAsync(new TcpPackage(
                     TcpCommand::authenticate(),
                     TcpFlags::authenticated(),
                     $this->authInfo->correlationId(),
                     '',
-                    $this->settings->defaultUserCredentials()
+                    $login,
+                    $pass
                 ));
             });
         } else {

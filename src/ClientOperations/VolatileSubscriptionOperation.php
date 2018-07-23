@@ -33,12 +33,21 @@ class VolatileSubscriptionOperation extends AbstractSubscriptionOperation
         $message->setEventStreamId($this->streamId);
         $message->setResolveLinkTos($this->resolveLinkTos);
 
+        $login = null;
+        $pass = null;
+
+        if ($this->userCredentials) {
+            $login = $this->userCredentials->username();
+            $pass = $this->userCredentials->password();
+        }
+
         return new TcpPackage(
             TcpCommand::subscribeToStream(),
             $this->userCredentials ? TcpFlags::authenticated() : TcpFlags::none(),
             $this->correlationId,
             $message->serializeToString(),
-            $this->userCredentials
+            $login,
+            $pass
         );
     }
 

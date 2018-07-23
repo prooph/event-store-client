@@ -85,12 +85,21 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
         $message->setSubscriptionId($this->groupName);
         $message->setAllowedInFlightMessages($this->bufferSize);
 
+        $login = null;
+        $pass = null;
+
+        if ($this->userCredentials) {
+            $login = $this->userCredentials->username();
+            $pass = $this->userCredentials->password();
+        }
+
         return new TcpPackage(
             TcpCommand::connectToPersistentSubscription(),
             $this->userCredentials ? TcpFlags::authenticated() : TcpFlags::none(),
             $this->correlationId,
             $message->serializeToString(),
-            $this->userCredentials
+            $login,
+            $pass
         );
     }
 
@@ -180,12 +189,21 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
         $message->setSubscriptionId($this->subscriptionId);
         $message->setProcessedEventIds($ids);
 
+        $login = null;
+        $pass = null;
+
+        if ($this->userCredentials) {
+            $login = $this->userCredentials->username();
+            $pass = $this->userCredentials->password();
+        }
+
         $package = new TcpPackage(
             TcpCommand::persistentSubscriptionAckEvents(),
             $this->userCredentials ? TcpFlags::authenticated() : TcpFlags::none(),
             $this->correlationId,
             $message->serializeToString(),
-            $this->userCredentials
+            $login,
+            $pass
         );
 
         $this->enqueueSend($package);
@@ -213,12 +231,21 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
         $message->setMessage($reason);
         $message->setAction($action->value());
 
+        $login = null;
+        $pass = null;
+
+        if ($this->userCredentials) {
+            $login = $this->userCredentials->username();
+            $pass = $this->userCredentials->password();
+        }
+
         $package = new TcpPackage(
             TcpCommand::persistentSubscriptionNakEvents(),
             $this->userCredentials ? TcpFlags::authenticated() : TcpFlags::none(),
             $this->correlationId,
             $message->serializeToString(),
-            $this->userCredentials
+            $login,
+            $pass
         );
 
         $this->enqueueSend($package);

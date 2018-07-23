@@ -76,12 +76,21 @@ abstract class AbstractOperation implements ClientOperation
 
     public function createNetworkPackage(string $correlationId): TcpPackage
     {
+        $login = null;
+        $pass = null;
+
+        if ($this->credentials) {
+            $login = $this->credentials->username();
+            $pass = $this->credentials->password();
+        }
+
         return new TcpPackage(
             $this->requestCommand,
             $this->credentials ? TcpFlags::authenticated() : TcpFlags::none(),
             $correlationId,
             $this->createRequestDto()->serializeToString(),
-            $this->credentials ?? null
+            $login,
+            $pass
         );
     }
 
