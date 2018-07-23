@@ -206,6 +206,10 @@ final class EventStoreAsyncNodeConnection implements
             throw new InvalidArgumentException('Stream cannot be empty');
         }
 
+        if ($count < 1) {
+            throw new InvalidArgumentException('Count must be positive');
+        }
+
         if ($count > Consts::MaxReadSize) {
             throw new InvalidArgumentException(\sprintf(
                 'Count should be less than %s. For larger reads you should page.',
@@ -240,6 +244,10 @@ final class EventStoreAsyncNodeConnection implements
             throw new InvalidArgumentException('Stream cannot be empty');
         }
 
+        if ($count < 1) {
+            throw new InvalidArgumentException('Count must be positive');
+        }
+
         if ($count > Consts::MaxReadSize) {
             throw new InvalidArgumentException(\sprintf(
                 'Count should be less than %s. For larger reads you should page.',
@@ -269,6 +277,10 @@ final class EventStoreAsyncNodeConnection implements
         bool $resolveLinkTos = true,
         UserCredentials $userCredentials = null
     ): Promise {
+        if ($count < 1) {
+            throw new InvalidArgumentException('Count must be positive');
+        }
+
         if ($count > Consts::MaxReadSize) {
             throw new InvalidArgumentException(\sprintf(
                 'Count should be less than %s. For larger reads you should page.',
@@ -297,6 +309,10 @@ final class EventStoreAsyncNodeConnection implements
         bool $resolveLinkTos = true,
         UserCredentials $userCredentials = null
     ): Promise {
+        if ($count < 1) {
+            throw new InvalidArgumentException('Count must be positive');
+        }
+
         if ($count > Consts::MaxReadSize) {
             throw new InvalidArgumentException(\sprintf(
                 'Count should be less than %s. For larger reads you should page.',
