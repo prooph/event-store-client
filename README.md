@@ -27,6 +27,16 @@ In the docker-folder you'll find three different docker-compose setups (single n
 
 For a short overview please see the annotated Quickstart in the `examples` folder.
 
+## Unit tests
+
+Run the server with memory database
+
+```console
+./run-node.sh --run-projections=all --mem-db
+```
+
+Before next run, restart the server. This way you can always start with a clean server.
+
 ## Documentation
 
 Documentation is [in the doc tree](docs/), and can be compiled using [bookdown](http://bookdown.io).
