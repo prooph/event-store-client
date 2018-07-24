@@ -25,7 +25,7 @@ before_script:
   - tar xf EventStore-OSS-Ubuntu-14.04-v4.1.1-hotfix1.tar.gz
   - cd EventStore-OSS-Ubuntu-14.04-v4.1.1-hotfix1
   - echo starting event-store
-  - ./run-node.sh --run-projections=all --db ESData > /dev/null &
+  - ./run-node.sh --run-projections=all --mem-db
   - cd ..
   - mkdir -p "$HOME/.php-cs-fixer"
   - phpenv config-rm xdebug.ini
