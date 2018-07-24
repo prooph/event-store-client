@@ -3,7 +3,7 @@
 PHP 7.2 Event Store Client Implementation.
 
 [![Build Status](https://travis-ci.org/prooph/event-store-client.svg?branch=master)](https://travis-ci.org/prooph/event-store-client)
-[![Coverage Status](https://coveralls.io/repos/prooph/event-store-client/badge.svg?branch=master&service=github)](https://coveralls.io/github/prooph/event-store-client?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/prooph/event-store-client/badge.svg?branch=master)](https://coveralls.io/github/prooph/event-store-client?branch=master)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/prooph/improoph)
 
 ## Overview
