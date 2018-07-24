@@ -20,6 +20,7 @@ use Prooph\EventStoreClient\Internal\EventStoreSyncNodeConnection;
 use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\UserCredentials;
 
+/** @internal */
 class Connection
 {
     public static function createAsync(): EventStoreAsyncConnection

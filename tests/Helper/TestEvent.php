@@ -15,6 +15,7 @@ namespace ProophTest\EventStoreClient\Helper;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventId;
 
+/** @internal */
 class TestEvent
 {
     public static function new(EventId $eventId = null, string $data = null, string $metadata = null): EventData
