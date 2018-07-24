@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Transport\Tcp;
 
 use Amp\ByteStream\ClosedException;
+use Amp\ByteStream\StreamException;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Socket\ClientConnectContext;
@@ -165,6 +166,8 @@ class TcpPackageConnection
         try {
             return $this->connection->write($package->asBytes());
         } catch (ClosedException $e) {
+            ($this->connectionClosed)($this, $e);
+        } catch (StreamException $e) {
             ($this->connectionClosed)($this, $e);
         }
     }
