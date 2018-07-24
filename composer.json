@@ -28,7 +28,7 @@
     "amphp/log": "^1.0.0",
     "amphp/parallel": "^0.2.5",
     "amphp/socket": "^0.10.9",
-    "amphp/uri": "^1.1.3",
+    "amphp/uri": "^0.1.3",
     "google/protobuf": "^3.6",
     "ramsey/uuid": "^3.7.3"
   },
