@@ -165,9 +165,7 @@ class TcpPackageConnection
     {
         try {
             return $this->connection->write($package->asBytes());
-        } catch (ClosedException $e) {
-            ($this->connectionClosed)($this, $e);
-        } catch (StreamException $e) {
+        } catch (ClosedException | StreamException $e) {
             ($this->connectionClosed)($this, $e);
         }
     }
