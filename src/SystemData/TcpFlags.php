@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\SystemData;
 
+/** @internal */
 final class TcpFlags
 {
     public const OPTIONS = [

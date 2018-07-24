@@ -14,6 +14,7 @@ namespace Prooph\EventStoreClient\SystemData;
 
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 
+/** @internal */
 class TcpPackage
 {
     public const CommandOffset = 0;
