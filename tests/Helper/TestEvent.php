@@ -26,4 +26,16 @@ class TestEvent
 
         return new EventData($eventId, 'TestEvent', false, $data ?? $eventId->toString(), $metadata ?? 'metadata');
     }
+
+    /** @return EventData[] */
+    public static function newAmount(int $amount): array
+    {
+        $events = [];
+
+        for ($i = 0; $i < $amount; $i++) {
+            $events[] = self::new();
+        }
+
+        return $events;
+    }
 }
