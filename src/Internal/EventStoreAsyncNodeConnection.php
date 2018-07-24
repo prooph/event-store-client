@@ -83,7 +83,7 @@ final class EventStoreAsyncNodeConnection implements
 
     public function connectionSettings(): ConnectionSettings
     {
-        return $this->connectionSettings();
+        return $this->settings;
     }
 
     public function clusterSettings(): ?ClusterSettings
@@ -144,15 +144,11 @@ final class EventStoreAsyncNodeConnection implements
     public function appendToStreamAsync(
         string $stream,
         int $expectedVersion,
-        array $events,
+        array $events = [],
         UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
-        }
-
-        if (empty($events)) {
-            throw new InvalidArgumentException('No events given');
         }
 
         $deferred = new Deferred();
@@ -754,10 +750,6 @@ final class EventStoreAsyncNodeConnection implements
         array $events,
         ?UserCredentials $userCredentials
     ): Promise {
-        if (empty($events)) {
-            throw new InvalidArgumentException('No events given');
-        }
-
         $deferred = new Deferred();
 
         $this->enqueueOperation(new TransactionalWriteOperation(

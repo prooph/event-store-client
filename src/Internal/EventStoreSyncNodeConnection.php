@@ -86,7 +86,7 @@ final class EventStoreSyncNodeConnection implements
     public function appendToStream(
         string $stream,
         int $expectedVersion,
-        array $events,
+        array $events = [],
         UserCredentials $userCredentials = null
     ): WriteResult {
         return Promise\wait($this->asyncConnection->appendToStreamAsync(

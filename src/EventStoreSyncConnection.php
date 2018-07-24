@@ -43,7 +43,7 @@ interface EventStoreSyncConnection
     public function appendToStream(
         string $stream,
         int $expectedVersion,
-        array $events,
+        array $events = [],
         UserCredentials $userCredentials = null
     ): WriteResult;
 

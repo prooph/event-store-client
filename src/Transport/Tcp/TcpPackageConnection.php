@@ -212,7 +212,7 @@ class TcpPackageConnection
                 $this->log->error(\sprintf(
                     'TcpPackageConnection: [%s, %s]. Invalid TCP frame received',
                     $this->remoteEndPoint,
-                    $this->connection
+                    $this->connectionId
                 ));
 
                 $this->close();

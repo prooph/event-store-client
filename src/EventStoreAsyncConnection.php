@@ -48,7 +48,7 @@ interface EventStoreAsyncConnection
     public function appendToStreamAsync(
         string $stream,
         int $expectedVersion,
-        array $events,
+        array $events = [],
         UserCredentials $userCredentials = null
     ): Promise;
 

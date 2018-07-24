@@ -70,6 +70,8 @@ class AppendToStreamOperation extends AbstractOperation
 
     protected function createRequestDto(): Message
     {
+        $dtos = [];
+
         foreach ($this->events as $event) {
             $dtos[] = NewEventConverter::convert($event);
         }

@@ -9,19 +9,22 @@
   ~ file that was distributed with this source code.
   -->
 
-<phpunit backupGlobals="false"
-         backupStaticAttributes="false"
-         colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         processIsolation="false"
-         stopOnFailure="false"
-         bootstrap="vendor/autoload.php"
-         timeoutForSmallTests="2"
-         enforceTimeLimit="true"
-         failOnWarning="true"
-         failOnRisky="true"
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"
+        backupGlobals="false"
+        backupStaticAttributes="false"
+        colors="true"
+        convertErrorsToExceptions="true"
+        convertNoticesToExceptions="true"
+        convertWarningsToExceptions="true"
+        processIsolation="false"
+        stopOnFailure="false"
+        bootstrap="vendor/autoload.php"
+        timeoutForSmallTests="2"
+        enforceTimeLimit="true"
+        failOnWarning="true"
+        failOnRisky="true"
 >
     <testsuite name="Prooph EventStoreClient Test Suite">
         <directory>./tests</directory>
@@ -32,4 +35,15 @@
             <directory>./src/</directory>
         </whitelist>
     </filter>
+
+    <listeners>
+        <listener class="Amp\PHPUnit\LoopReset" />
+    </listeners>
+
+    <php>
+        <env name="ES_HOST" value="localhost"/>
+        <env name="ES_PORT" value="1113"/>
+        <env name="ES_USER" value="admin"/>
+        <env name="ES_PASS" value="changeit"/>
+    </php>
 </phpunit>

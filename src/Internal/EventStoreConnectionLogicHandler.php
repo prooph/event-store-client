@@ -259,7 +259,11 @@ class EventStoreConnectionLogicHandler
     private function closeConnection(string $reason, Throwable $exception = null): void
     {
         if ($this->state->equals(ConnectionState::closed())) {
-            $this->logDebug('CloseConnection IGNORED because is ESConnection is CLOSED, reason %s, exception %s', $reason, $exception->getMessage());
+            if ($exception) {
+                $this->logDebug('CloseConnection IGNORED because is ESConnection is CLOSED, reason %s, exception %s', $reason, $exception->getMessage());
+            } else {
+                $this->logDebug('CloseConnection IGNORED because is ESConnection is CLOSED, reason %s', $reason);
+            }
 
             return;
         }
