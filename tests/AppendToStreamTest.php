@@ -187,9 +187,9 @@ class AppendToStreamTest extends TestCase
             $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::Any, $events);
             $this->assertSame(5, $result->nextExpectedVersion());
 
-            /** @var WriteResult $result */
-            $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::Any, $events);
-            $this->assertSame(0, $result->nextExpectedVersion());
+            /** @var WriteResult $f */
+            $f = yield $connection->appendToStreamAsync($stream, ExpectedVersion::Any, $events);
+            $this->assertSame(0, $f->nextExpectedVersion());
 
             $connection->close();
         });
@@ -276,7 +276,6 @@ class AppendToStreamTest extends TestCase
                 $this->fail($e->getMessage());
             }
 
-            /** @var WriteResult $result */
             try {
                 $this->expectException(StreamDeletedException::class);
                 yield $connection->appendToStreamAsync($stream, ExpectedVersion::Any, [TestEvent::new()]);
