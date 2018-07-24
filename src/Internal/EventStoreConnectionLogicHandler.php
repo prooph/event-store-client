@@ -577,11 +577,13 @@ class EventStoreConnectionLogicHandler
 
         if ($this->heartbeatInfo->isIntervalStage()) {
             Loop::defer(function (): Generator {
-                yield $this->connection->sendAsync(new TcpPackage(
-                    TcpCommand::heartbeatRequestCommand(),
-                    TcpFlags::none(),
-                    UuidGenerator::generate()
-                ));
+                if (! $this->connection->isClosed()) {
+                    yield $this->connection->sendAsync(new TcpPackage(
+                        TcpCommand::heartbeatRequestCommand(),
+                        TcpFlags::none(),
+                        UuidGenerator::generate()
+                    ));
+                }
             });
             $this->heartbeatInfo = new HeartbeatInfo($this->heartbeatInfo->lastPackageNumber(), false, $elapsed);
         } else {
@@ -766,11 +768,13 @@ class EventStoreConnectionLogicHandler
 
         if ($package->command()->equals(TcpCommand::heartbeatRequestCommand())) {
             Loop::defer(function () use ($package): Generator {
-                yield $this->connection->sendAsync(new TcpPackage(
-                    TcpCommand::heartbeatResponseCommand(),
-                    TcpFlags::none(),
-                    $package->correlationId()
-                ));
+                if (! $this->connection->isClosed()) {
+                    yield $this->connection->sendAsync(new TcpPackage(
+                        TcpCommand::heartbeatResponseCommand(),
+                        TcpFlags::none(),
+                        $package->correlationId()
+                    ));
+                }
             });
 
             return;
