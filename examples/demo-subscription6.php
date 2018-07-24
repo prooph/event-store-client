@@ -66,11 +66,11 @@ Loop::run(function () {
         'test-persistent-subscription',
         function (EventStorePersistentSubscription $subscription, ResolvedEvent $event, int $retry) use ($stopWatch, &$i): Promise {
             echo 'incoming event: ' . $event->originalEventNumber() . '@' . $event->originalStreamName() . PHP_EOL;
-            echo 'data: ' . $event->originalEvent()->data() . PHP_EOL;
+            echo 'data: ' . ($event->originalEvent() ? $event->originalEvent()->data() : '<null>') . PHP_EOL;
             echo 'retry: ' . $retry . PHP_EOL;
             echo 'no: ' . ++$i . ', elapsed: ' . $stopWatch->elapsed() . PHP_EOL;
 
-            return new Success('tadataa');
+            return new Success();
         },
         function () {
             echo 'dropped' . PHP_EOL;

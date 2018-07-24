@@ -70,7 +70,7 @@ Loop::run(function () {
             echo 'retry: ' . $retry . PHP_EOL;
             echo 'no: ' . ++$i . ', elapsed: ' . $stopWatch->elapsed() . PHP_EOL;
 
-            return new Success('tadataa');
+            return new Success();
         },
         function () {
             echo 'dropped' . PHP_EOL;

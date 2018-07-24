@@ -13,8 +13,6 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\SystemData;
 
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Exception\UnexpectedValueException;
-use Prooph\EventStoreClient\Internal\ByteBuffer\Buffer;
 
 class TcpPackage
 {
@@ -40,45 +38,33 @@ class TcpPackage
     /** @var string|null */
     private $pass;
 
-    public static function fromRawData(string $data): TcpPackage
+    public static function fromRawData(string $bytes): TcpPackage
     {
-        $buffer = Buffer::fromString($data);
-
-        $messageLength = $buffer->readInt32LE(0);
+        list('m' => $messageLength, 'c' => $command, 'f' => $flags) = \unpack('Vm/Cc/Cf/', $bytes, self::CommandOffset);
 
         if ($messageLength < self::MandatorySize) {
             throw new InvalidArgumentException('RawData too short, length: ' . $messageLength);
         }
 
-        $command = TcpCommand::fromValue($buffer->readInt8(self::DataOffset));
-        $flags = TcpFlags::fromValue($buffer->readInt8(self::DataOffset + self::FlagsOffset));
-        $correlationId = \bin2hex($buffer->read(self::DataOffset + self::CorrelationOffset, self::AuthOffset - self::CorrelationOffset));
         $headerSize = self::MandatorySize;
-
+        $command = TcpCommand::fromValue($command);
+        $flags = TcpFlags::fromValue($flags);
         $login = null;
         $pass = null;
 
-        if ($flags->equals(TcpFlags::authenticated())) {
-            $loginLen = self::DataOffset + self::AuthOffset;
+        if (TcpFlags::Authenticated === $flags) {
+            list('l' => $loginLen) = \unpack('Cl/', $bytes, self::DataOffset + self::FlagsOffset);
+            list('l' => $login) = \unpack('a' . $loginLen . 'l/', $bytes, self::DataOffset + self::FlagsOffset + 1);
 
-            if (self::AuthOffset + 1 + $loginLen + 1 >= $messageLength) {
-                throw new UnexpectedValueException('Login length is too big, it does not fit into TcpPackage');
-            }
-
-            $login = $buffer->read(self::DataOffset + self::AuthOffset + 1, $loginLen);
-
-            $passLen = self::DataOffset + self::AuthOffset + 1 + $loginLen;
-
-            if (self::AuthOffset + 1 + $loginLen + 1 + $passLen > $messageLength) {
-                throw new UnexpectedValueException('Password length is too big, it does not fit into TcpPackage');
-            }
-
-            $pass = $buffer->read($passLen + 1, $passLen);
+            list('p' => $passLen) = \unpack('Cp/', $bytes, self::DataOffset + self::FlagsOffset + 1 + $loginLen);
+            list('p' => $pass) = \unpack('a' . $loginLen . 'p/', $bytes, self::DataOffset + self::FlagsOffset + 2 + $loginLen);
 
             $headerSize += 1 + $loginLen + 1 + $passLen;
-        }
 
-        $data = $buffer->read(self::DataOffset + $headerSize, $messageLength - $headerSize);
+            list('c' => $correlationId, 'd' => $data) = \unpack('H32c/a' . ($messageLength - $headerSize) . 'd/', $bytes, self::DataOffset + self::CorrelationOffset + 2 + $loginLen + $passLen);
+        } else {
+            list('c' => $correlationId, 'd' => $data) = \unpack('H32c/a' . ($messageLength - $headerSize) . 'd/', $bytes, self::DataOffset + self::CorrelationOffset);
+        }
 
         return new self($command, $flags, $correlationId, $data, $login, $pass);
     }
@@ -123,27 +109,28 @@ class TcpPackage
                 ));
             }
 
-            $buffer = Buffer::withSize($messageLen + 2 + $loginLen + $passLen + self::DataOffset);
-
-            $buffer->writeInt32LE($messageLen + 2 + $loginLen + $passLen, 0);
-            $buffer->writeInt8($this->command->value(), self::DataOffset);
-            $buffer->writeInt8(TcpFlags::Authenticated, self::DataOffset + self::FlagsOffset);
-            $buffer->write(\pack('H*', $this->correlationId), self::DataOffset + self::CorrelationOffset);
-            $buffer->writeInt8($loginLen, self::DataOffset + self::AuthOffset);
-            $buffer->write($this->login, self::DataOffset + self::AuthOffset + 1);
-            $buffer->writeInt8($passLen, self::DataOffset + self::AuthOffset + 1 + $loginLen);
-            $buffer->write($this->pass, self::DataOffset + self::AuthOffset + 1 + $loginLen + 1);
-            $buffer->write($this->data, self::DataOffset + self::AuthOffset + 2 + $loginLen + $passLen);
-        } else {
-            $buffer = Buffer::withSize($messageLen + self::DataOffset);
-            $buffer->writeInt32LE($messageLen, 0);
-            $buffer->writeInt8($this->command->value(), self::DataOffset);
-            $buffer->writeInt8(TcpFlags::None, self::DataOffset + self::FlagsOffset);
-            $buffer->write(\pack('H*', $this->correlationId), self::DataOffset + self::CorrelationOffset);
-            $buffer->write($this->data, self::DataOffset + self::AuthOffset);
+            return \pack(
+                'VCCH32Ca' . $loginLen . 'Ca' . $passLen . 'a' . $dataLen,
+                $messageLen + 2 + $loginLen + $passLen,
+                $this->command->value(),
+                TcpFlags::Authenticated,
+                $this->correlationId,
+                $loginLen,
+                $this->login,
+                $passLen,
+                $this->pass,
+                $this->data
+            );
         }
 
-        return (string) $buffer;
+        return \pack(
+            'VCCH32a' . $dataLen,
+            $messageLen,
+            $this->command->value(),
+            TcpFlags::None,
+            $this->correlationId,
+            $this->data
+        );
     }
 
     public function command(): TcpCommand
