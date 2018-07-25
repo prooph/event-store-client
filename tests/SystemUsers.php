@@ -10,18 +10,11 @@
 
 declare(strict_types=1);
 
-namespace Prooph\EventStoreClient\Internal;
+namespace ProophTest\EventStoreClient;
 
-use Prooph\EventStoreClient\Position;
-use Prooph\EventStoreClient\RecordedEvent;
-
-interface ResolvedEvent
+class SystemUsers
 {
-    public function originalEvent(): ?RecordedEvent;
-
-    public function originalPosition(): ?Position;
-
-    public function originalStreamName(): string;
-
-    public function originalEventNumber(): int;
+    public const Admin = 'admin';
+    public const Operations = 'ops';
+    public const DefaultAdminPassword = 'changeit';
 }

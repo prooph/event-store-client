@@ -14,19 +14,19 @@ namespace Prooph\EventStoreClient;
 
 class CommitEventRecord
 {
-    /** @var EventRecord */
+    /** @var RecordedEvent */
     private $event;
     /** @var int */
     public $commitPosition;
 
     /** @internal */
-    public function __construct(EventRecord $event, int $commitPosition)
+    public function __construct(RecordedEvent $event, int $commitPosition)
     {
         $this->event = $event;
         $this->commitPosition = $commitPosition;
     }
 
-    public function event(): EventRecord
+    public function event(): RecordedEvent
     {
         return $this->event;
     }

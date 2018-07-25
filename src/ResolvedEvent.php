@@ -21,12 +21,12 @@ class ResolvedEvent implements InternalResolvedEvent
 {
     /**
      * The event, or the resolved link event if this is a link event
-     * @var EventRecord|null
+     * @var RecordedEvent|null
      */
     private $event;
     /**
      * The link event if this ResolvedEvent is a link event.
-     * @var EventRecord|null
+     * @var RecordedEvent|null
      */
     private $link;
     /**
@@ -34,7 +34,7 @@ class ResolvedEvent implements InternalResolvedEvent
      *
      * If this ResolvedEvent represents a link event, the Link
      * will be the OriginalEvent otherwise it will be the event.
-     * @var EventRecord|null
+     * @var RecordedEvent|null
      */
     private $originalEvent;
     /**
@@ -49,7 +49,7 @@ class ResolvedEvent implements InternalResolvedEvent
     private $originalPosition;
 
     /** @internal */
-    public function __construct(?EventRecord $event, ?EventRecord $link, ?Position $originalPosition)
+    public function __construct(?RecordedEvent $event, ?RecordedEvent $link, ?Position $originalPosition)
     {
         $this->event = $event;
         $this->link = $link;
@@ -58,17 +58,17 @@ class ResolvedEvent implements InternalResolvedEvent
         $this->originalPosition = $originalPosition;
     }
 
-    public function event(): ?EventRecord
+    public function event(): ?RecordedEvent
     {
         return $this->event;
     }
 
-    public function link(): ?EventRecord
+    public function link(): ?RecordedEvent
     {
         return $this->link;
     }
 
-    public function originalEvent(): ?EventRecord
+    public function originalEvent(): ?RecordedEvent
     {
         return $this->originalEvent;
     }

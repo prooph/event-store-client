@@ -14,7 +14,7 @@ namespace Prooph\EventStoreClient;
 
 use DateTimeImmutable;
 
-class EventRecord
+class RecordedEvent
 {
     /** @var string */
     protected $eventStreamId;

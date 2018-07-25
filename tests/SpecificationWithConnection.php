@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\Loop;
+use Amp\Success;
 use Generator;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use ProophTest\EventStoreClient\Helper\Connection;
@@ -41,7 +42,14 @@ trait SpecificationWithConnection
 
             yield from $test();
 
-            $this->conn->close();
+            yield from $this->end();
         });
+    }
+
+    protected function end(): Generator
+    {
+        $this->conn->close();
+
+        yield new Success();
     }
 }

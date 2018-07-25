@@ -38,7 +38,7 @@ class PersistentSubscriptionResolvedEvent implements InternalResolvedEvent
         return $this->event;
     }
 
-    public function originalEvent(): ?EventRecord
+    public function originalEvent(): ?RecordedEvent
     {
         return $this->event->originalEvent();
     }

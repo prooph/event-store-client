@@ -15,17 +15,17 @@ namespace Prooph\EventStoreClient\Internal;
 use DateTimeImmutable;
 use DateTimeZone;
 use Prooph\EventStoreClient\EventId;
-use Prooph\EventStoreClient\EventRecord;
 use Prooph\EventStoreClient\Messages\ClientMessages\EventRecord as EventRecordMessage;
 use Prooph\EventStoreClient\Messages\ClientMessages\ResolvedEvent as ResolvedEventMessage;
 use Prooph\EventStoreClient\Messages\ClientMessages\ResolvedIndexedEvent as ResolvedIndexedEventMessage;
 use Prooph\EventStoreClient\Position;
+use Prooph\EventStoreClient\RecordedEvent;
 use Prooph\EventStoreClient\ResolvedEvent;
 
 /** @internal */
 class EventMessageConverter
 {
-    public static function convertEventRecordMessageToEventRecord(EventRecordMessage $message): EventRecord
+    public static function convertEventRecordMessageToEventRecord(EventRecordMessage $message): RecordedEvent
     {
         $epoch = (string) $message->getCreatedEpoch();
         $date = \substr($epoch, 0, -3);
@@ -37,7 +37,7 @@ class EventMessageConverter
             new DateTimeZone('UTC')
         );
 
-        return new EventRecord(
+        return new RecordedEvent(
             $message->getEventStreamId(),
             $message->getEventNumber(),
             EventId::fromBinary($message->getEventId()),
