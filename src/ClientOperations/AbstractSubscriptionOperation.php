@@ -129,9 +129,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 
         $this->correlationId = $correlationId;
 
-        Loop::defer(function () use ($connection): Generator {
-            yield $connection->sendAsync($this->createSubscriptionPackage());
-        });
+        $connection->send($this->createSubscriptionPackage());
 
         return true;
     }
@@ -309,9 +307,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
                  && null !== $this->subscription
                  && null !== $connection
              ) {
-                Loop::defer(function () use ($connection): Generator {
-                    yield $connection->sendAsync($this->createUnsubscriptionPackage());
-                });
+                $connection->send($this->createUnsubscriptionPackage());
             }
 
             if (null !== $this->subscription) {

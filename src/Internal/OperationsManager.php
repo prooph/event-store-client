@@ -12,16 +12,13 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Amp\ByteStream\ClosedException;
 use Amp\Promise;
-use Generator;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\Exception\ConnectionClosedException;
 use Prooph\EventStoreClient\Exception\OperationTimedOutException;
 use Prooph\EventStoreClient\Exception\RetriesLimitReachedException;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
 use SplQueue;
-use function Amp\call;
 
 /** @internal */
 class OperationsManager
@@ -196,7 +193,7 @@ class OperationsManager
         $this->totalOperationCount = \count($this->activeOperations) + \count($this->waitingOperations);
     }
 
-    public function executeOperation(OperationItem $operation, TcpPackageConnection $connection): Promise
+    public function executeOperation(OperationItem $operation, TcpPackageConnection $connection): void
     {
         $operation->setConnectionId($connection->connectionId());
         $operation->setLastUpdated(DateTimeUtil::utcNow());
@@ -204,20 +201,14 @@ class OperationsManager
         $correlationId = $operation->correlationId();
         $this->activeOperations[$correlationId] = $operation;
 
-        return call(function () use ($operation, $connection, $correlationId): Generator {
-            $package = $operation->operation()->createNetworkPackage($correlationId);
+        $package = $operation->operation()->createNetworkPackage($correlationId);
 
-            try {
-                $this->logDebug('ExecuteOperation package %s, %s, %s',
-                    $package->command(),
-                    $package->correlationId(),
-                    $operation
-                );
-                yield $connection->sendAsync($package);
-            } catch (ClosedException $e) {
-                $operation->operation()->fail(ConnectionClosedException::withName($this->connectionName));
-            }
-        });
+        $this->logDebug('ExecuteOperation package %s, %s, %s',
+            $package->command(),
+            $package->correlationId(),
+            $operation
+        );
+        $connection->send($package);
     }
 
     public function enqueueOperation(OperationItem $operation): void

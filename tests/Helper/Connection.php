@@ -34,11 +34,12 @@ class Connection
 
         $settingsBuilder = new ConnectionSettingsBuilder();
         $settingsBuilder->setDefaultUserCredentials(new UserCredentials($user, $pass));
+        $settingsBuilder->setHeartbeatInterval(4999);
+        $settingsBuilder->setHeartbeatTimeout(4500);
 
         return EventStoreConnectionBuilder::createAsyncFromIpEndPoint(
             new IpEndPoint($host, $port),
-            $settingsBuilder->build(),
-            'test-connection'
+            $settingsBuilder->build()
         );
     }
 

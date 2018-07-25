@@ -160,13 +160,17 @@ class TcpPackageConnection
         });
     }
 
-    public function sendAsync(TcpPackage $package): Promise
+    public function send(TcpPackage $package): void
     {
-        try {
-            return $this->connection->write($package->asBytes());
-        } catch (StreamException $e) {
-            ($this->connectionClosed)($this, $e);
-        }
+        Loop::defer(function () use ($package): void {
+            $promise = $this->connection->write($package->asBytes());
+
+            $promise->onResolve(function (?StreamException $e): void {
+                if ($e) {
+                    ($this->connectionClosed)($this, $e);
+                }
+            });
+        });
     }
 
     private function incomingMessageArrived(string $data): void
