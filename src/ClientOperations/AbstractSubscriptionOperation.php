@@ -64,7 +64,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
     private $subscriptionDropped;
     /** @var bool */
     private $verboseLogging;
-    /** @var callable(\Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection $connection) */
+    /** @var callable(?\Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection $connection) */
     protected $getConnection;
     /** @var int */
     private $maxQueueSize = 2000;

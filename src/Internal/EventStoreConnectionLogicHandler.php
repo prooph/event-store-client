@@ -652,7 +652,7 @@ class EventStoreConnectionLogicHandler
                     $message->eventAppeared(),
                     $message->subscriptionDropped(),
                     $this->settings->verboseLogging(),
-                    function (): TcpPackageConnection {
+                    function (): ?TcpPackageConnection {
                         return $this->connection;
                     }
                 );
