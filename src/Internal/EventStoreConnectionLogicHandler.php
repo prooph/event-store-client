@@ -167,10 +167,6 @@ class EventStoreConnectionLogicHandler
                 $this->handleTcpPackage($message->tcpPackageConnection(), $message->tcpPackage());
             }
         );
-
-        $this->timerTickWatcherId = Loop::repeat(Consts::TimerPeriod, function (): void {
-            $this->timerTick();
-        });
     }
 
     public function totalOperationCount(): int
@@ -191,6 +187,9 @@ class EventStoreConnectionLogicHandler
 
         switch ($this->state->value()) {
             case ConnectionState::Init:
+                $this->timerTickWatcherId = Loop::repeat(Consts::TimerPeriod, function (): void {
+                    $this->timerTick();
+                });
                 $this->endPointDiscoverer = $endPointDiscoverer;
                 $this->state = ConnectionState::connecting();
                 $this->connectingPhase = ConnectingPhase::reconnecting();
@@ -272,7 +271,10 @@ class EventStoreConnectionLogicHandler
 
         $this->state = ConnectionState::closed();
 
-        Loop::cancel($this->timerTickWatcherId);
+        if ($this->timerTickWatcherId) {
+            Loop::cancel($this->timerTickWatcherId);
+        }
+
         $this->operations->cleanUp();
         $this->subscriptions->cleanUp();
         $this->closeTcpConnection($reason);

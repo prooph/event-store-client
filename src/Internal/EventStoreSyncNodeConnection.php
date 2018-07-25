@@ -76,7 +76,7 @@ final class EventStoreSyncNodeConnection implements
     public function deleteStream(
         string $stream,
         int $expectedVersion,
-        bool $hardDelete,
+        bool $hardDelete = false,
         UserCredentials $userCredentials = null
     ): void {
         Promise\wait($this->asyncConnection->deleteStreamAsync($stream, $expectedVersion, $hardDelete, $userCredentials));

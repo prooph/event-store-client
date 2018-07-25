@@ -29,7 +29,7 @@ interface EventStoreSyncConnection
     public function deleteStream(
         string $stream,
         int $expectedVersion,
-        bool $hardDelete,
+        bool $hardDelete = false,
         UserCredentials $userCredentials = null
     ): void;
 

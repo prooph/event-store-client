@@ -112,7 +112,7 @@ final class EventStoreAsyncNodeConnection implements
     public function deleteStreamAsync(
         string $stream,
         int $expectedVersion,
-        bool $hardDelete,
+        bool $hardDelete = false,
         UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {

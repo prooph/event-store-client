@@ -34,7 +34,7 @@ interface EventStoreAsyncConnection
     public function deleteStreamAsync(
         string $stream,
         int $expectedVersion,
-        bool $hardDelete,
+        bool $hardDelete = false,
         UserCredentials $userCredentials = null
     ): Promise;
 
