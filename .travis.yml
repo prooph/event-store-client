@@ -37,10 +37,12 @@ script:
   - if [[ $EXECUTE_CS_CHECK == 'true' ]]; then ./vendor/bin/php-cs-fixer fix -v --diff --dry-run; fi
   - if [[ $EXECUTE_CS_CHECK == 'true' ]]; then ./vendor/bin/docheader check examples/ src/ tests/; fi
 
-after_success:
-  - if [[ $TEST_COVERAGE == 'true' ]]; then php vendor/bin/coveralls -v; fi
+after_script:
   - echo stopping event-store
   - wget --http-user="admin" --http-password="changeit" --post-data='' http://localhost:2113/admin/shutdown
+
+after_success:
+  - if [[ $TEST_COVERAGE == 'true' ]]; then php vendor/bin/coveralls -v; fi
 
 notifications:
   webhooks:

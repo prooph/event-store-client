@@ -67,7 +67,7 @@ class AppendingToImplicitlyCreatedStreamTest extends TestCase
 
             /** @var TailWriter $tailWriter */
             $tailWriter = yield $writer->append($events);
-            $tailWriter->then($events[0], ExpectedVersion::Any);
+            yield $tailWriter->then($events[0], ExpectedVersion::Any);
 
             $total = yield EventsStream::count($connection, $stream);
 
