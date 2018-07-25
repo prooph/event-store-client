@@ -21,7 +21,7 @@ use Prooph\EventStoreClient\ExpectedVersion;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 
-class deletingstream extends TestCase
+class deleting_stream extends TestCase
 {
     /**
      * @test

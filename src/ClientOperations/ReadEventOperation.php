@@ -125,7 +125,11 @@ class ReadEventOperation extends AbstractOperation
             $link = EventMessageConverter::convertEventRecordMessageToEventRecord($link);
         }
 
-        $resolvedEvent = new ResolvedEvent($event, $link, null);
+        if ($event) {
+            $resolvedEvent = new ResolvedEvent($event, $link, null);
+        } else {
+            $resolvedEvent = null;
+        }
 
         return new EventReadResult(
             EventReadStatus::byValue($response->getResult()),

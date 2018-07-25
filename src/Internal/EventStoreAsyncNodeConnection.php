@@ -41,6 +41,7 @@ use Prooph\EventStoreClient\EventStoreAsyncTransaction;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
 use Prooph\EventStoreClient\Exception\MaxQueueSizeLimitReachedException;
+use Prooph\EventStoreClient\Exception\OutOfRangeException;
 use Prooph\EventStoreClient\Exception\UnexpectedValueException;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\Message\CloseConnectionMessage;
@@ -174,6 +175,10 @@ final class EventStoreAsyncNodeConnection implements
     ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
+        }
+
+        if ($eventNumber < -1) {
+            throw new OutOfRangeException('Event number is out of range');
         }
 
         $deferred = new Deferred();
