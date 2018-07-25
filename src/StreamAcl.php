@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient;
 
 use Prooph\EventStoreClient\Common\SystemMetadata;
-use Webmozart\Assert\Assert;
+use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 
 class StreamAcl
 {
@@ -54,11 +54,19 @@ class StreamAcl
         array $metaReadRoles,
         array $metaWriteRoles
     ) {
-        Assert::allStringNotEmpty($readRoles);
-        Assert::allStringNotEmpty($writeRoles);
-        Assert::allStringNotEmpty($deleteRoles);
-        Assert::allStringNotEmpty($metaReadRoles);
-        Assert::allStringNotEmpty($metaWriteRoles);
+        $check = function (array $data): void {
+            foreach ($data as $value) {
+                if (! is_string($value) || '' === $value) {
+                    throw new InvalidArgumentException('Invalid roles given, expected an array of strings');
+                }
+            }
+        };
+
+        $check($readRoles);
+        $check($writeRoles);
+        $check($deleteRoles);
+        $check($metaReadRoles);
+        $check($metaWriteRoles);
 
         $this->readRoles = $readRoles;
         $this->writeRoles = $writeRoles;
