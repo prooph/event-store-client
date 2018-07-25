@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Loop;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
 use Prooph\EventStoreClient\ExpectedVersion;
@@ -22,13 +21,15 @@ use ProophTest\EventStoreClient\Helper\EventsStream;
 use ProophTest\EventStoreClient\Helper\StreamWriter;
 use ProophTest\EventStoreClient\Helper\TailWriter;
 use ProophTest\EventStoreClient\Helper\TestEvent;
+use function Amp\call;
+use function Amp\Promise\wait;
 
 class appending_to_implicitly_created_stream extends TestCase
 {
     /** @test */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0em1_idempotent(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0em1_idempotent';
 
             $connection = Connection::createAsync();
@@ -48,13 +49,13 @@ class appending_to_implicitly_created_stream extends TestCase
             $this->assertCount($total, $events);
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function sequence_0em1_1e0_2e1_3e2_4e3_4e4_0any_idempotent(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_4e4_0any_idempotent';
 
             $connection = Connection::createAsync();
@@ -74,13 +75,13 @@ class appending_to_implicitly_created_stream extends TestCase
             $this->assertCount($total, $events);
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e5_non_idempotent(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e5_non_idempotent';
 
             $connection = Connection::createAsync();
@@ -99,13 +100,13 @@ class appending_to_implicitly_created_stream extends TestCase
             } finally {
                 $connection->close();
             }
-        });
+        }));
     }
 
     /** @test */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e4_wev(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e4_wev';
 
             $connection = Connection::createAsync();
@@ -124,13 +125,13 @@ class appending_to_implicitly_created_stream extends TestCase
             } finally {
                 $connection->close();
             }
-        });
+        }));
     }
 
     /** @test */
     public function sequence_0em1_0e0_non_idempotent(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_0e0_non_idempotent';
 
             $connection = Connection::createAsync();
@@ -151,13 +152,13 @@ class appending_to_implicitly_created_stream extends TestCase
             $this->assertCount($total - 1, $events);
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function sequence_0em1_0any_idempotent(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_0any_idempotent';
 
             $connection = Connection::createAsync();
@@ -178,13 +179,13 @@ class appending_to_implicitly_created_stream extends TestCase
             $this->assertCount($total, $events);
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function sequence_0em1_0em1_idempotent(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_0em1_idempotent';
 
             $connection = Connection::createAsync();
@@ -205,13 +206,13 @@ class appending_to_implicitly_created_stream extends TestCase
             $this->assertCount($total, $events);
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function sequence_0em1_1e0_2e1_1any_1any_idempotent(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_1any_1any_idempotent';
 
             $connection = Connection::createAsync();
@@ -234,13 +235,13 @@ class appending_to_implicitly_created_stream extends TestCase
             $this->assertCount($total, $events);
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function sequence_S_0em1_1em1_E_S_0em1_E_idempotent(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_0em1_E_idempotent';
 
             $connection = Connection::createAsync();
@@ -257,13 +258,13 @@ class appending_to_implicitly_created_stream extends TestCase
             $this->assertCount($total, $events);
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function sequence_S_0em1_1em1_E_S_0any_E_idempotent(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_0any_E_idempotent';
 
             $connection = Connection::createAsync();
@@ -280,13 +281,13 @@ class appending_to_implicitly_created_stream extends TestCase
             $this->assertCount($total, $events);
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function sequence_S_0em1_1em1_E_S_1e0_E_idempotent(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_1e0_E_idempotent';
 
             $connection = Connection::createAsync();
@@ -303,13 +304,13 @@ class appending_to_implicitly_created_stream extends TestCase
             $this->assertCount($total, $events);
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function sequence_S_0em1_1em1_E_S_1any_E_idempotent(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_1any_E_idempotent';
 
             $connection = Connection::createAsync();
@@ -327,13 +328,13 @@ class appending_to_implicitly_created_stream extends TestCase
             $this->assertCount($total, $events);
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function sequence_S_0em1_1em1_E_S_0em1_1em1_2em1_E_idempotancy_fail(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_0em1_1em1_2em1_E_idempotancy_fail';
 
             $connection = Connection::createAsync();
@@ -353,6 +354,6 @@ class appending_to_implicitly_created_stream extends TestCase
             } finally {
                 $connection->close();
             }
-        });
+        }));
     }
 }

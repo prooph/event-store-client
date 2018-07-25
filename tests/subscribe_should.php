@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\Deferred;
-use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
@@ -21,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\ExpectedVersion;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
+use function Amp\call;
 use function Amp\Promise\timeout;
 
 class subscribe_should extends TestCase
@@ -30,7 +30,7 @@ class subscribe_should extends TestCase
     /** @test */
     public function be_able_to_subscribe_to_non_existing_stream_and_then_catch_new_event(): void
     {
-        Loop::run(function () {
+        Promise\wait(call(function () {
             $stream = 'subscribe_should_be_able_to_subscribe_to_non_existing_stream_and_then_catch_created_event';
 
             $appeared = new Deferred();
@@ -61,6 +61,6 @@ class subscribe_should extends TestCase
             }
 
             $connection->close();
-        });
+        }));
     }
 }

@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Loop;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\DeleteResult;
 use Prooph\EventStoreClient\Exception\StreamDeletedException;
@@ -20,6 +19,8 @@ use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
 use Prooph\EventStoreClient\ExpectedVersion;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
+use function Amp\call;
+use function Amp\Promise\wait;
 
 class deleting_stream extends TestCase
 {
@@ -29,7 +30,7 @@ class deleting_stream extends TestCase
      */
     public function which_doesnt_exists_should_success_when_passed_empty_stream_expected_version(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'which_already_exists_should_success_when_passed_empty_stream_expected_version';
 
             $connection = Connection::createAsync();
@@ -39,7 +40,7 @@ class deleting_stream extends TestCase
             yield $connection->deleteStreamAsync($stream, ExpectedVersion::EmptyStream, true);
 
             $connection->close();
-        });
+        }));
     }
 
     /**
@@ -48,7 +49,7 @@ class deleting_stream extends TestCase
      */
     public function which_doesnt_exists_should_success_when_passed_any_for_expected_version(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'which_already_exists_should_success_when_passed_any_for_expected_version';
 
             $connection = Connection::createAsync();
@@ -58,13 +59,13 @@ class deleting_stream extends TestCase
             yield $connection->deleteStreamAsync($stream, ExpectedVersion::Any, true);
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function with_invalid_expected_version_should_fail(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'with_invalid_expected_version_should_fail';
 
             $connection = Connection::createAsync();
@@ -77,13 +78,13 @@ class deleting_stream extends TestCase
             } finally {
                 $connection->close();
             }
-        });
+        }));
     }
 
     /** @test */
     public function should_return_log_position_when_writing(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'delete_should_return_log_position_when_writing';
 
             $connection = Connection::createAsync();
@@ -99,13 +100,13 @@ class deleting_stream extends TestCase
             $this->assertGreaterThan(0, $delete->logPosition()->commitPosition());
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function which_was_already_deleted_should_fail(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'which_was_allready_deleted_should_fail';
 
             $connection = Connection::createAsync();
@@ -120,6 +121,6 @@ class deleting_stream extends TestCase
             } finally {
                 $connection->close();
             }
-        });
+        }));
     }
 }

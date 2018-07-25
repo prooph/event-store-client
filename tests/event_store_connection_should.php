@@ -12,13 +12,14 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Loop;
 use Amp\Success;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
 use Prooph\EventStoreClient\Position;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
+use function Amp\call;
+use function Amp\Promise\wait;
 
 class event_store_connection_should extends TestCase
 {
@@ -48,7 +49,7 @@ class event_store_connection_should extends TestCase
      */
     public function throw_invalid_operation_on_every_api_call_if_connect_was_not_called(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $connection = Connection::createAsync();
 
             $s = 'stream';
@@ -120,6 +121,6 @@ class event_store_connection_should extends TestCase
             } catch (\Throwable $e) {
                 $this->assertInstanceOf(InvalidOperationException::class, $e);
             }
-        });
+        }));
     }
 }

@@ -36,10 +36,6 @@
         </whitelist>
     </filter>
 
-    <listeners>
-        <listener class="ProophTest\EventStoreClient\Helper\LoopReset" />
-    </listeners>
-
     <php>
         <env name="ES_HOST" value="localhost"/>
         <env name="ES_PORT" value="1113"/>

@@ -12,11 +12,12 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Loop;
 use Amp\Success;
 use Generator;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use ProophTest\EventStoreClient\Helper\Connection;
+use function Amp\call;
+use function Amp\Promise\wait;
 
 trait SpecificationWithConnection
 {
@@ -31,7 +32,7 @@ trait SpecificationWithConnection
 
     protected function executeCallback(callable $test): void
     {
-        Loop::run(function () use ($test) {
+        wait(call(function () use ($test) {
             $this->conn = Connection::createAsync();
 
             yield $this->conn->connectAsync();
@@ -43,7 +44,7 @@ trait SpecificationWithConnection
             yield from $test();
 
             yield from $this->end();
-        });
+        }));
     }
 
     protected function end(): Generator

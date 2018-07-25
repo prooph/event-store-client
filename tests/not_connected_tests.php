@@ -13,13 +13,14 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\Deferred;
-use Amp\Loop;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\ConnectionSettingsBuilder;
 use Prooph\EventStoreClient\EventStoreConnectionBuilder;
 use Prooph\EventStoreClient\IpEndPoint;
+use function Amp\call;
 use function Amp\Promise\timeout;
+use function Amp\Promise\wait;
 
 class not_connected_tests extends TestCase
 {
@@ -29,7 +30,7 @@ class not_connected_tests extends TestCase
      */
     public function should_timeout_connection_after_configured_amount_time_on_conenct(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $settingsBuilder = (new ConnectionSettingsBuilder())
                 ->limitReconnectionsTo(0)
                 ->setReconnectionDelayTo(0)
@@ -74,6 +75,6 @@ class not_connected_tests extends TestCase
             } catch (TimeoutException $e) {
                 $this->fail('Connection timeout took too long');
             }
-        });
+        }));
     }
 }

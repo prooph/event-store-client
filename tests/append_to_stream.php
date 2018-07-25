@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Loop;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\StreamDeletedException;
@@ -21,23 +20,25 @@ use Prooph\EventStoreClient\StreamEventsSlice;
 use Prooph\EventStoreClient\WriteResult;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
+use function Amp\call;
+use function Amp\Promise\wait;
 
 class append_to_stream extends TestCase
 {
     /** @test */
     public function cannot_append_to_stream_without_name(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $connection = Connection::createAsync();
             $this->expectException(InvalidArgumentException::class);
             yield $connection->appendToStreamAsync('', ExpectedVersion::Any, []);
-        });
+        }));
     }
 
     /** @test */
     public function should_allow_appending_zero_events_to_stream_with_no_problems(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream1 = 'should_allow_appending_zero_events_to_stream_with_no_problems1';
             $stream2 = 'should_allow_appending_zero_events_to_stream_with_no_problems2';
 
@@ -78,13 +79,13 @@ class append_to_stream extends TestCase
             $this->assertCount(0, $slice->events());
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function should_create_stream_with_no_stream_exp_ver_on_first_write_if_does_not_exist(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'should_create_stream_with_no_stream_exp_ver_on_first_write_if_does_not_exist';
 
             $connection = Connection::createAsync();
@@ -101,13 +102,13 @@ class append_to_stream extends TestCase
             $this->assertCount(1, $slice->events());
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function should_create_stream_with_any_exp_ver_on_first_write_if_does_not_exist(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'should_create_stream_with_any_exp_ver_on_first_write_if_does_not_exist';
 
             $connection = Connection::createAsync();
@@ -123,13 +124,13 @@ class append_to_stream extends TestCase
             $this->assertCount(1, $slice->events());
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function multiple_idempotent_writes(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'multiple_idempotent_writes';
 
             $connection = Connection::createAsync();
@@ -146,13 +147,13 @@ class append_to_stream extends TestCase
             $this->assertSame(3, $result->nextExpectedVersion());
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function multiple_idempotent_writes_with_same_id_bug_case(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'multiple_idempotent_writes_with_same_id_bug_case';
 
             $connection = Connection::createAsync();
@@ -167,13 +168,13 @@ class append_to_stream extends TestCase
             $this->assertSame(5, $result->nextExpectedVersion());
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function in_wtf_multiple_case_of_multiple_writes_expected_version_any_per_all_same_id(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'in_wtf_multiple_case_of_multiple_writes_expected_version_any_per_all_same_id';
 
             $connection = Connection::createAsync();
@@ -192,13 +193,13 @@ class append_to_stream extends TestCase
             $this->assertSame(0, $f->nextExpectedVersion());
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function in_slightly_reasonable_multiple_case_of_multiple_writes_with_expected_version_per_all_same_id(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'in_slightly_reasonable_multiple_case_of_multiple_writes_with_expected_version_per_all_same_id';
 
             $connection = Connection::createAsync();
@@ -217,13 +218,13 @@ class append_to_stream extends TestCase
             $this->assertSame(5, $f->nextExpectedVersion());
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function should_fail_writing_with_correct_exp_ver_to_deleted_stream(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'should_fail_writing_with_correct_exp_ver_to_deleted_stream';
 
             $connection = Connection::createAsync();
@@ -238,13 +239,13 @@ class append_to_stream extends TestCase
             } finally {
                 $connection->close();
             }
-        });
+        }));
     }
 
     /** @test */
     public function should_return_log_position_when_writing(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'should_return_log_position_when_writing';
 
             $connection = Connection::createAsync();
@@ -257,13 +258,13 @@ class append_to_stream extends TestCase
             $this->assertGreaterThan(0, $result->logPosition()->commitPosition());
 
             $connection->close();
-        });
+        }));
     }
 
     /** @test */
     public function should_fail_writing_with_any_exp_ver_to_deleted_stream(): void
     {
-        Loop::run(function () {
+        wait(call(function () {
             $stream = 'should_fail_writing_with_any_exp_ver_to_deleted_stream';
 
             $connection = Connection::createAsync();
@@ -282,6 +283,6 @@ class append_to_stream extends TestCase
             } finally {
                 $connection->close();
             }
-        });
+        }));
     }
 }
