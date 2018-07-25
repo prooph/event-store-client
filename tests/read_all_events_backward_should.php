@@ -129,15 +129,16 @@ class read_all_events_backward_should extends TestCase
         });
     }
 
+    /** @test */
     public function be_able_to_read_all_one_by_one_until_end_of_stream(): void
     {
         $this->executeCallback(function () {
             $all = [];
-            $position = $this->from;
+            $position = $this->endOfEvents;
 
             while (true) {
                 /** @var AllEventsSlice $slice */
-                $slice = yield $this->conn->readAllEventsForwardAsync($position, 1, false);
+                $slice = yield $this->conn->readAllEventsBackwardAsync($position, 1, false);
 
                 if ($slice->isEndOfStream()) {
                     break;
@@ -147,21 +148,22 @@ class read_all_events_backward_should extends TestCase
                 $position = $slice->nextPosition();
             }
 
-            $events = \array_slice($all, \count($all) - \count($this->testEvents));
+            $events = \array_slice($all, 0, \count($this->testEvents));
 
-            $this->assertTrue(EventDataComparer::allEqual($this->testEvents, $events));
+            $this->assertTrue(EventDataComparer::allEqual(\array_reverse($this->testEvents), $events));
         });
     }
 
+    /** @test */
     public function be_able_to_read_events_slice_at_time(): void
     {
         $this->executeCallback(function () {
             $all = [];
-            $position = $this->from;
+            $position = $this->endOfEvents;
 
             do {
                 /** @var AllEventsSlice $slice */
-                $slice = yield $this->conn->readAllEventsForwardAsync($position, 5, false);
+                $slice = yield $this->conn->readAllEventsBackwardAsync($position, 5, false);
 
                 foreach ($slice->events() as $event) {
                     $all[] = $event->event();
@@ -170,18 +172,19 @@ class read_all_events_backward_should extends TestCase
                 $position = $slice->nextPosition();
             } while (! $slice->isEndOfStream());
 
-            $events = \array_slice($all, \count($all) - \count($this->testEvents));
+            $events = \array_slice($all, 0, \count($this->testEvents));
 
-            $this->assertTrue(EventDataComparer::allEqual($this->testEvents, $events));
+            $this->assertTrue(EventDataComparer::allEqual(\array_reverse($this->testEvents), $events));
         });
     }
 
+    /** @test */
     public function throw_when_got_int_max_value_as_maxcount(): void
     {
         $this->executeCallback(function () {
             $this->expectException(InvalidArgumentException::class);
 
-            yield $this->conn->readAllEventsForwardAsync(Position::start(), \PHP_INT_MAX, false);
+            yield $this->conn->readAllEventsBackwardAsync(Position::start(), \PHP_INT_MAX, false);
         });
     }
 }
