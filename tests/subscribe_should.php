@@ -25,7 +25,7 @@ use function Amp\Promise\timeout;
 
 class subscribe_should extends TestCase
 {
-    private const Timeout = 2000;
+    private const Timeout = 10000;
 
     /** @test */
     public function be_able_to_subscribe_to_non_existing_stream_and_then_catch_new_event(): void
