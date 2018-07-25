@@ -21,7 +21,7 @@ use Prooph\EventStoreClient\EventStoreConnectionBuilder;
 use Prooph\EventStoreClient\IpEndPoint;
 use function Amp\Promise\timeout;
 
-class NotConnectedTest extends TestCase
+class not_connected_tests extends TestCase
 {
     /**
      * @test

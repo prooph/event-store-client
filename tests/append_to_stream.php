@@ -22,7 +22,7 @@ use Prooph\EventStoreClient\WriteResult;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 
-class AppendToStreamTest extends TestCase
+class appendtostream extends TestCase
 {
     /** @test */
     public function cannot_append_to_stream_without_name(): void

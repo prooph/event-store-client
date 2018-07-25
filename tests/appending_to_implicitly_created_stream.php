@@ -23,7 +23,7 @@ use ProophTest\EventStoreClient\Helper\StreamWriter;
 use ProophTest\EventStoreClient\Helper\TailWriter;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 
-class AppendingToImplicitlyCreatedStreamTest extends TestCase
+class appending_to_implicitly_created_stream extends TestCase
 {
     /** @test */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0em1_idempotent(): void

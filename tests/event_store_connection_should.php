@@ -20,7 +20,7 @@ use Prooph\EventStoreClient\Position;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 
-class EventStoreConnectionTest extends TestCase
+class event_store_connection_should extends TestCase
 {
     /**
      * @test

@@ -27,7 +27,7 @@
         failOnRisky="true"
 >
     <testsuite name="Prooph EventStoreClient Test Suite">
-        <directory>./tests</directory>
+        <directory suffix=".php">./tests</directory>
     </testsuite>
 
     <filter>
@@ -37,7 +37,7 @@
     </filter>
 
     <listeners>
-        <listener class="Amp\PHPUnit\LoopReset" />
+        <listener class="ProophTest\EventStoreClient\Helper\LoopReset" />
     </listeners>
 
     <php>
