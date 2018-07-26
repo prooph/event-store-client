@@ -26,7 +26,10 @@ use function Amp\Promise\wait;
 
 class appending_to_implicitly_created_stream extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0em1_idempotent(): void
     {
         wait(call(function () {
@@ -52,7 +55,10 @@ class appending_to_implicitly_created_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function sequence_0em1_1e0_2e1_3e2_4e3_4e4_0any_idempotent(): void
     {
         wait(call(function () {
@@ -78,7 +84,10 @@ class appending_to_implicitly_created_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e5_non_idempotent(): void
     {
         wait(call(function () {
@@ -103,7 +112,10 @@ class appending_to_implicitly_created_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e4_wev(): void
     {
         wait(call(function () {
@@ -128,7 +140,10 @@ class appending_to_implicitly_created_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function sequence_0em1_0e0_non_idempotent(): void
     {
         wait(call(function () {
@@ -155,7 +170,10 @@ class appending_to_implicitly_created_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function sequence_0em1_0any_idempotent(): void
     {
         wait(call(function () {
@@ -182,7 +200,10 @@ class appending_to_implicitly_created_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function sequence_0em1_0em1_idempotent(): void
     {
         wait(call(function () {
@@ -209,7 +230,10 @@ class appending_to_implicitly_created_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function sequence_0em1_1e0_2e1_1any_1any_idempotent(): void
     {
         wait(call(function () {
@@ -238,7 +262,10 @@ class appending_to_implicitly_created_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function sequence_S_0em1_1em1_E_S_0em1_E_idempotent(): void
     {
         wait(call(function () {
@@ -261,7 +288,10 @@ class appending_to_implicitly_created_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function sequence_S_0em1_1em1_E_S_0any_E_idempotent(): void
     {
         wait(call(function () {
@@ -284,7 +314,10 @@ class appending_to_implicitly_created_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function sequence_S_0em1_1em1_E_S_1e0_E_idempotent(): void
     {
         wait(call(function () {
@@ -307,7 +340,10 @@ class appending_to_implicitly_created_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function sequence_S_0em1_1em1_E_S_1any_E_idempotent(): void
     {
         wait(call(function () {
@@ -331,7 +367,10 @@ class appending_to_implicitly_created_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function sequence_S_0em1_1em1_E_S_0em1_1em1_2em1_E_idempotancy_fail(): void
     {
         wait(call(function () {

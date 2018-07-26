@@ -25,7 +25,10 @@ use function Amp\Promise\wait;
 
 class append_to_stream extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function cannot_append_to_stream_without_name(): void
     {
         wait(call(function () {
@@ -35,7 +38,10 @@ class append_to_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function should_allow_appending_zero_events_to_stream_with_no_problems(): void
     {
         wait(call(function () {
@@ -82,7 +88,10 @@ class append_to_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function should_create_stream_with_no_stream_exp_ver_on_first_write_if_does_not_exist(): void
     {
         wait(call(function () {
@@ -105,7 +114,10 @@ class append_to_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function should_create_stream_with_any_exp_ver_on_first_write_if_does_not_exist(): void
     {
         wait(call(function () {
@@ -127,7 +139,10 @@ class append_to_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function multiple_idempotent_writes(): void
     {
         wait(call(function () {
@@ -150,7 +165,10 @@ class append_to_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function multiple_idempotent_writes_with_same_id_bug_case(): void
     {
         wait(call(function () {
@@ -171,7 +189,10 @@ class append_to_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function in_wtf_multiple_case_of_multiple_writes_expected_version_any_per_all_same_id(): void
     {
         wait(call(function () {
@@ -196,7 +217,10 @@ class append_to_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function in_slightly_reasonable_multiple_case_of_multiple_writes_with_expected_version_per_all_same_id(): void
     {
         wait(call(function () {
@@ -221,7 +245,10 @@ class append_to_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function should_fail_writing_with_correct_exp_ver_to_deleted_stream(): void
     {
         wait(call(function () {
@@ -242,7 +269,10 @@ class append_to_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function should_return_log_position_when_writing(): void
     {
         wait(call(function () {
@@ -261,7 +291,10 @@ class append_to_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function should_fail_writing_with_any_exp_ver_to_deleted_stream(): void
     {
         wait(call(function () {

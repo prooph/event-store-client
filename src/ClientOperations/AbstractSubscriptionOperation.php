@@ -335,7 +335,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 
         if ($this->verboseLogging) {
             $this->log->debug(\sprintf(
-                'Subscription %s to %s: subscribed at CommitPosition: %d, EventNumber: %d',
+                'Subscription %s to %s: subscribed at CommitPosition: %d, EventNumber: %s',
                 $this->correlationId,
                 $this->streamId ? $this->streamId : '<all>',
                 $lastCommitPosition,
@@ -361,7 +361,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 
         if ($this->verboseLogging) {
             $this->log->debug(\sprintf(
-                'Subscription %s to %s: event appeared (%s, %d, %s @ %d)',
+                'Subscription %s to %s: event appeared (%s, %d, %s @ %s)',
                 $this->correlationId,
                 $this->streamId ? $this->streamId : '<all>',
                 $e->originalStreamName(),

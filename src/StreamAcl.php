@@ -48,11 +48,11 @@ class StreamAcl
     private $metaWriteRoles;
 
     public function __construct(
-        array $readRoles,
-        array $writeRoles,
-        array $deleteRoles,
-        array $metaReadRoles,
-        array $metaWriteRoles
+        array $readRoles = [],
+        array $writeRoles = [],
+        array $deleteRoles = [],
+        array $metaReadRoles = [],
+        array $metaWriteRoles = []
     ) {
         $check = function (array $data): void {
             foreach ($data as $value) {

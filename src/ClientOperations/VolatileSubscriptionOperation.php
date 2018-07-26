@@ -92,7 +92,7 @@ class VolatileSubscriptionOperation extends AbstractSubscriptionOperation
     public function __toString(): string
     {
         return \sprintf(
-            'StreamId: %s, ResolveLinkTos : %s',
+            'StreamId: %s, ResolveLinkTos: %s',
             $this->streamId,
             $this->resolveLinkTos ? 'yes' : 'no'
         );

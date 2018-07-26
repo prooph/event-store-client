@@ -50,7 +50,10 @@ class read_event_should extends TestCase
         yield $this->conn->deleteStreamAsync($this->deletedStream, -1, true);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function throw_if_stream_id_is_empty(): void
     {
         $this->executeCallback(function () {
@@ -59,7 +62,10 @@ class read_event_should extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function throw_if_event_number_is_less_than_minus_one(): void
     {
         $this->executeCallback(function () {
@@ -68,7 +74,10 @@ class read_event_should extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function notify_using_status_code_if_stream_not_found(): void
     {
         $this->executeCallback(function () {
@@ -82,7 +91,10 @@ class read_event_should extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function return_no_stream_if_requested_last_event_in_empty_stream(): void
     {
         $this->executeCallback(function () {
@@ -93,7 +105,10 @@ class read_event_should extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function notify_using_status_code_if_stream_was_deleted(): void
     {
         $this->executeCallback(function () {
@@ -107,7 +122,10 @@ class read_event_should extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function notify_using_status_code_if_stream_does_not_have_event(): void
     {
         $this->executeCallback(function () {
@@ -121,7 +139,10 @@ class read_event_should extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function return_existing_event(): void
     {
         $this->executeCallback(function () {
@@ -136,7 +157,10 @@ class read_event_should extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function retrieve_the_is_json_flag_properly(): void
     {
         $this->executeCallback(function () {
@@ -149,7 +173,10 @@ class read_event_should extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function return_last_event_in_stream_if_event_number_is_minus_one(): void
     {
         $this->executeCallback(function () {

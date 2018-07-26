@@ -658,7 +658,7 @@ class EventStoreConnectionLogicHandler
                 );
 
                 $this->logDebug(
-                    'StartSubscription %s %s, %s, %s, %s',
+                    'StartSubscription %s %s, %s, MaxRetries: %d, Timeout: %d',
                     $this->state->equals(ConnectionState::connected()) ? 'fire' : 'enqueue',
                     $operation->name(),
                     $operation,
@@ -708,11 +708,10 @@ class EventStoreConnectionLogicHandler
                 );
 
                 $this->logDebug(
-                    'StartSubscription %s, %s, %s, %s',
-                    //'StartSubscription %s %s, %s, %s, %s',
+                    'StartSubscription %s %s, %s, MaxRetries: %d, Timeout: %d',
                     $this->state->equals(ConnectionState::connected()) ? 'fire' : 'enqueue',
                     $operation->name(),
-                    //$operation,
+                    $operation,
                     $message->maxRetries(),
                     $message->timeout()
                 );
@@ -838,7 +837,8 @@ class EventStoreConnectionLogicHandler
             $result = $subscription->operation()->inspectPackage($package);
 
             $this->logDebug(
-                'HandleTcpPackage SUBSCRIPTION DECISION %s (%s), %s',
+                'HandleTcpPackage %s SUBSCRIPTION DECISION %s (%s), %s',
+                $package->correlationId(),
                 $result->decision(),
                 $result->description(),
                 $operation

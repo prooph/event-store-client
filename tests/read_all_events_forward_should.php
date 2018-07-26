@@ -83,7 +83,10 @@ class read_all_events_forward_should extends TestCase
         $this->conn->close();
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function return_empty_slice_if_asked_to_read_from_end(): void
     {
         $this->executeCallback(function () {
@@ -95,7 +98,10 @@ class read_all_events_forward_should extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function return_events_in_same_order_as_written(): void
     {
         $this->executeCallback(function () {
@@ -113,7 +119,10 @@ class read_all_events_forward_should extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function be_able_to_read_all_one_by_one_until_end_of_stream(): void
     {
         $this->executeCallback(function () {
@@ -138,7 +147,10 @@ class read_all_events_forward_should extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function be_able_to_read_events_slice_at_time(): void
     {
         $this->executeCallback(function () {
@@ -162,7 +174,10 @@ class read_all_events_forward_should extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function return_partial_slice_if_not_enough_events(): void
     {
         $this->executeCallback(function () {
@@ -182,7 +197,10 @@ class read_all_events_forward_should extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function throw_when_got_int_max_value_as_maxcount(): void
     {
         $this->executeCallback(function () {

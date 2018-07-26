@@ -62,7 +62,10 @@ class deleting_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function with_invalid_expected_version_should_fail(): void
     {
         wait(call(function () {
@@ -81,7 +84,10 @@ class deleting_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function should_return_log_position_when_writing(): void
     {
         wait(call(function () {
@@ -103,7 +109,10 @@ class deleting_stream extends TestCase
         }));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function which_was_already_deleted_should_fail(): void
     {
         wait(call(function () {

@@ -59,7 +59,7 @@ class LengthPrefixMessageFramer
         }
 
         if (0 === $this->packageLength) {
-            list(, $this->packageLength) = \unpack('V', \substr($data, 0, 4));
+            list('length' => $this->packageLength) = \unpack('Vlength', \substr($data, 0, 4));
             $this->packageLength += TcpPackage::DataOffset;
         }
 
@@ -78,13 +78,14 @@ class LengthPrefixMessageFramer
 
             $this->reset();
         } elseif ($dataLength > $this->packageLength) {
-            $message = \substr($data, 0, $this->packageLength);
+            $length = $this->packageLength;
+            $message = \substr($data, 0, $length);
 
             ($this->receivedHandler)($message);
 
             $this->reset();
 
-            $this->messageBuffer = \substr($data, $this->packageLength, $dataLength);
+            $this->messageBuffer = \substr($data, $length, $dataLength);
         } else {
             $this->messageBuffer = $data;
         }
