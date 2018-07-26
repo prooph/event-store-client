@@ -143,7 +143,7 @@ class AppendToStreamOperation extends AbstractOperation
 
     public function __toString(): string
     {
-        return \sprintf('Stream: %s, ExpectedVersion: %d, RequireMaster:',
+        return \sprintf('Stream: %s, ExpectedVersion: %d, RequireMaster: %s',
             $this->stream,
             $this->expectedVersion,
             $this->requireMaster ? 'yes' : 'no'

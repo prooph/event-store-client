@@ -24,12 +24,14 @@ trait SpecificationWithConnection
     /** @var EventStoreAsyncConnection */
     protected $conn;
 
-    protected function given(): void
+    protected function given(): Generator
     {
+        yield new Success();
     }
 
     abstract protected function when(): Generator;
 
+    /** @throws \Throwable */
     protected function executeCallback(callable $test): void
     {
         wait(call(function () use ($test) {
@@ -37,7 +39,7 @@ trait SpecificationWithConnection
 
             yield $this->conn->connectAsync();
 
-            $this->given();
+            yield from $this->given();
 
             yield from $this->when();
 

@@ -25,7 +25,6 @@ use Prooph\EventStoreClient\WriteResult;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use function Amp\call;
-use function Amp\Promise\all;
 use function Amp\Promise\wait;
 
 class append_to_stream extends TestCase
@@ -449,12 +448,9 @@ class append_to_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            $promises = [];
             for ($i = 0; $i < 5; $i++) {
-                $promises[] = $connection->appendToStreamAsync($stream, ExpectedVersion::Any, [TestEvent::new()]);
+                yield $connection->appendToStreamAsync($stream, ExpectedVersion::Any, [TestEvent::new()]);
             }
-
-            yield all($promises);
 
             yield $connection->appendToStreamAsync($stream, ExpectedVersion::StreamExists, [TestEvent::new()]);
 

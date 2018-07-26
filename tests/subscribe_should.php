@@ -106,13 +106,18 @@ class subscribe_should extends TestCase
 
             $connection->appendToStreamAsync($stream, ExpectedVersion::EmptyStream, [TestEvent::new()]);
 
-            $promise = Promise\all([$appeared1->promise(), $appeared2->promise()]);
+            try {
+                $result = yield timeout($appeared1->promise(), self::Timeout);
+                $this->assertTrue($result);
+            } catch (TimeoutException $e) {
+                $this->fail('Appeared1 countdown event timed out');
+            }
 
             try {
-                $result = yield timeout($promise, self::Timeout);
-                $this->assertEquals([true, true], $result);
+                $result = yield timeout($appeared2->promise(), self::Timeout);
+                $this->assertTrue($result);
             } catch (TimeoutException $e) {
-                $this->fail('Appeared countdown event timed out');
+                $this->fail('Appeared2 countdown event timed out');
             }
 
             $connection->close();
