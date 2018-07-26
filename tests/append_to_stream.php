@@ -13,14 +13,19 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStoreClient\ConditionalWriteResult;
+use Prooph\EventStoreClient\ConditionalWriteStatus;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\StreamDeletedException;
+use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\StreamEventsSlice;
+use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\WriteResult;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use function Amp\call;
+use function Amp\Promise\all;
 use function Amp\Promise\wait;
 
 class append_to_stream extends TestCase
@@ -316,6 +321,338 @@ class append_to_stream extends TestCase
             } finally {
                 $connection->close();
             }
+        }));
+    }
+
+    /**
+     * @test
+     * @throws \Throwable
+     */
+    public function should_fail_writing_with_invalid_exp_ver_to_deleted_stream(): void
+    {
+        wait(call(function () {
+            $stream = 'should_fail_writing_with_invalid_exp_ver_to_deleted_stream';
+
+            $connection = Connection::createAsync();
+
+            yield $connection->connectAsync();
+
+            yield $connection->deleteStreamAsync($stream, ExpectedVersion::EmptyStream, true);
+
+            $this->expectException(StreamDeletedException::class);
+            try {
+                yield $connection->appendToStreamAsync($stream, 5, [TestEvent::new()]);
+            } finally {
+                $connection->close();
+            }
+        }));
+    }
+
+    /**
+     * @test
+     * @doesNotPerformAssertions
+     * @throws \Throwable
+     */
+    public function should_append_with_correct_exp_ver_to_existing_stream(): void
+    {
+        wait(call(function () {
+            $stream = 'should_append_with_correct_exp_ver_to_existing_stream';
+
+            $connection = Connection::createAsync();
+
+            yield $connection->connectAsync();
+
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::EmptyStream, [TestEvent::new()]);
+
+            $connection->close();
+        }));
+    }
+
+    /**
+     * @test
+     * @throws \Throwable
+     */
+    public function should_append_with_any_exp_ver_to_existing_stream(): void
+    {
+        wait(call(function () {
+            $stream = 'should_append_with_any_exp_ver_to_existing_stream';
+
+            $connection = Connection::createAsync();
+
+            yield $connection->connectAsync();
+
+            /** @var WriteResult $result */
+            $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::EmptyStream, [TestEvent::new()]);
+            $this->assertSame(0, $result->nextExpectedVersion());
+
+            $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::Any, [TestEvent::new()]);
+            $this->assertSame(1, $result->nextExpectedVersion());
+
+            $connection->close();
+        }));
+    }
+
+    /**
+     * @test
+     * @throws \Throwable
+     */
+    public function should_fail_appending_with_wrong_exp_ver_to_existing_stream(): void
+    {
+        wait(call(function () {
+            $stream = 'should_fail_appending_with_wrong_exp_ver_to_existing_stream';
+
+            $connection = Connection::createAsync();
+
+            yield $connection->connectAsync();
+
+            try {
+                $this->expectException(WrongExpectedVersionException::class);
+                yield $connection->appendToStreamAsync($stream, 1, [TestEvent::new()]);
+            } finally {
+                $connection->close();
+            }
+        }));
+    }
+
+    /**
+     * @test
+     * @doesNotPerformAssertions
+     * @throws \Throwable
+     */
+    public function should_append_with_stream_exists_exp_ver_to_existing_stream(): void
+    {
+        wait(call(function () {
+            $stream = 'should_append_with_stream_exists_exp_ver_to_existing_stream';
+
+            $connection = Connection::createAsync();
+
+            yield $connection->connectAsync();
+
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::EmptyStream, [TestEvent::new()]);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::StreamExists, [TestEvent::new()]);
+
+            $connection->close();
+        }));
+    }
+
+    /**
+     * @test
+     * @doesNotPerformAssertions
+     * @throws \Throwable
+     */
+    public function should_append_with_stream_exists_exp_ver_to_stream_with_multiple_events(): void
+    {
+        wait(call(function () {
+            $stream = 'should_append_with_stream_exists_exp_ver_to_stream_with_multiple_events';
+
+            $connection = Connection::createAsync();
+
+            yield $connection->connectAsync();
+
+            $promises = [];
+            for ($i = 0; $i < 5; $i++) {
+                $promises[] = $connection->appendToStreamAsync($stream, ExpectedVersion::Any, [TestEvent::new()]);
+            }
+
+            yield all($promises);
+
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::StreamExists, [TestEvent::new()]);
+
+            $connection->close();
+        }));
+    }
+
+    /**
+     * @test
+     * @doesNotPerformAssertions
+     * @throws \Throwable
+     */
+    public function should_append_with_stream_exists_exp_ver_if_metadata_stream_exists(): void
+    {
+        wait(call(function () {
+            $stream = 'should_append_with_stream_exists_exp_ver_if_metadata_stream_exists';
+
+            $connection = Connection::createAsync();
+
+            yield $connection->connectAsync();
+
+            yield $connection->setStreamMetadataAsync(
+                $stream,
+                ExpectedVersion::Any,
+                new StreamMetadata(
+                    10
+                )
+            );
+
+            yield  $connection->appendToStreamAsync($stream, ExpectedVersion::StreamExists, [TestEvent::new()]);
+
+            $connection->close();
+        }));
+    }
+
+    /**
+     * @test
+     * @throws \Throwable
+     */
+    public function should_fail_appending_with_stream_exists_exp_ver_and_stream_does_not_exist(): void
+    {
+        wait(call(function () {
+            $stream = 'should_fail_appending_with_stream_exists_exp_ver_and_stream_does_not_exist';
+
+            $connection = Connection::createAsync();
+
+            yield $connection->connectAsync();
+
+            try {
+                $this->expectException(WrongExpectedVersionException::class);
+                yield $connection->appendToStreamAsync($stream, ExpectedVersion::StreamExists, [TestEvent::new()]);
+            } finally {
+                $connection->close();
+            }
+        }));
+    }
+
+    /**
+     * @test
+     * @throws \Throwable
+     */
+    public function should_fail_appending_with_stream_exists_exp_ver_to_hard_deleted_stream(): void
+    {
+        wait(call(function () {
+            $stream = 'should_fail_appending_with_stream_exists_exp_ver_and_stream_does_not_exist';
+
+            $connection = Connection::createAsync();
+
+            yield $connection->connectAsync();
+
+            yield $connection->deleteStreamAsync($stream, ExpectedVersion::EmptyStream, true);
+
+            try {
+                $this->expectException(StreamDeletedException::class);
+                yield $connection->appendToStreamAsync($stream, ExpectedVersion::StreamExists, [TestEvent::new()]);
+            } finally {
+                $connection->close();
+            }
+        }));
+    }
+
+    /**
+     * @test
+     * @throws \Throwable
+     */
+    public function should_fail_appending_with_stream_exists_exp_ver_to_soft_deleted_stream(): void
+    {
+        wait(call(function () {
+            $stream = 'should_fail_appending_with_stream_exists_exp_ver_to_soft_deleted_stream';
+
+            $connection = Connection::createAsync();
+
+            yield $connection->connectAsync();
+
+            yield $connection->deleteStreamAsync($stream, ExpectedVersion::EmptyStream, false);
+
+            try {
+                $this->expectException(StreamDeletedException::class);
+                yield $connection->appendToStreamAsync($stream, ExpectedVersion::StreamExists, [TestEvent::new()]);
+            } finally {
+                $connection->close();
+            }
+        }));
+    }
+
+    /**
+     * @test
+     * @throws \Throwable
+     */
+    public function can_append_multiple_events_at_once(): void
+    {
+        wait(call(function () {
+            $stream = 'can_append_multiple_events_at_once';
+
+            $connection = Connection::createAsync();
+
+            yield $connection->connectAsync();
+
+            $events = TestEvent::newAmount(100);
+
+            /** @var WriteResult $result */
+            $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::EmptyStream, $events);
+
+            $this->assertSame(99, $result->nextExpectedVersion());
+
+            $connection->close();
+        }));
+    }
+
+    /**
+     * @test
+     * @throws \Throwable
+     */
+    public function returns_failure_status_when_conditionally_appending_with_version_mismatch(): void
+    {
+        wait(call(function () {
+            $stream = 'returns_failure_status_when_conditionally_appending_with_version_mismatch';
+
+            $connection = Connection::createAsync();
+
+            yield $connection->connectAsync();
+
+            /** @var ConditionalWriteResult $result */
+            $result = yield $connection->conditionalAppendToStreamAsync($stream, 7, [TestEvent::new()]);
+
+            $this->assertTrue($result->status()->equals(ConditionalWriteStatus::versionMismatch()));
+
+            $connection->close();
+        }));
+    }
+
+    /**
+     * @test
+     * @throws \Throwable
+     */
+    public function returns_success_status_when_conditionally_appending_with_matching_version(): void
+    {
+        wait(call(function () {
+            $stream = 'returns_success_status_when_conditionally_appending_with_matching_version';
+
+            $connection = Connection::createAsync();
+
+            yield $connection->connectAsync();
+
+            /** @var ConditionalWriteResult $result */
+            $result = yield $connection->conditionalAppendToStreamAsync($stream, ExpectedVersion::Any, [TestEvent::new()]);
+
+            $this->assertTrue($result->status()->equals(ConditionalWriteStatus::succeeded()));
+            $this->assertNotNull($result->logPosition());
+            $this->assertNotNull($result->nextExpectedVersion());
+
+            $connection->close();
+        }));
+    }
+
+    /**
+     * @test
+     * @throws \Throwable
+     */
+    public function returns_failure_status_when_conditionally_appending_to_a_deleted_stream(): void
+    {
+        wait(call(function () {
+            $stream = 'returns_failure_status_when_conditionally_appending_to_a_deleted_stream';
+
+            $connection = Connection::createAsync();
+
+            yield $connection->connectAsync();
+
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::Any, [TestEvent::new()]);
+
+            yield $connection->deleteStreamAsync($stream, ExpectedVersion::Any, true);
+
+            /** @var ConditionalWriteResult $result */
+            $result = yield $connection->conditionalAppendToStreamAsync($stream, ExpectedVersion::Any, [TestEvent::new()]);
+
+            $this->assertTrue($result->status()->equals(ConditionalWriteStatus::streamDeleted()));
+
+            $connection->close();
         }));
     }
 }

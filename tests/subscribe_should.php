@@ -19,7 +19,6 @@ use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\Internal\VolatileEventStoreSubscription;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
