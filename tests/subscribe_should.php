@@ -38,7 +38,7 @@ class subscribe_should extends TestCase
     public function be_able_to_subscribe_to_non_existing_stream_and_then_catch_new_event(): void
     {
         wait(call(function () {
-            $stream = 'subscribe_should_be_able_to_subscribe_to_non_existing_stream_and_then_catch_created_event-' . UuidGenerator::generate();
+            $stream = 'subscribe_should_be_able_to_subscribe_to_non_existing_stream_and_then_catch_created_event';
 
             $appeared = new Deferred();
 
@@ -76,7 +76,7 @@ class subscribe_should extends TestCase
     public function allow_multiple_subscriptions_to_same_stream(): void
     {
         wait(call(function () {
-            $stream = 'subscribe_should_allow_multiple_subscriptions_to_same_stream-' . UuidGenerator::generate();
+            $stream = 'subscribe_should_allow_multiple_subscriptions_to_same_stream';
 
             $connection = Connection::createAsync();
 
@@ -127,7 +127,7 @@ class subscribe_should extends TestCase
     public function call_dropped_callback_after_unsubscribe_method_call(): void
     {
         wait(call(function () {
-            $stream = 'subscribe_should_call_dropped_callback_after_unsubscribe_method_call-' . UuidGenerator::generate();
+            $stream = 'subscribe_should_call_dropped_callback_after_unsubscribe_method_call';
 
             $connection = Connection::createAsync();
 
@@ -168,7 +168,7 @@ class subscribe_should extends TestCase
     public function catch_deleted_events_as_well(): void
     {
         wait(call(function () {
-            $stream = 'subscribe_should_catch_created_and_deleted_events_as_well-' . UuidGenerator::generate();
+            $stream = 'subscribe_should_catch_created_and_deleted_events_as_well';
 
             $connection = Connection::createAsync();
 
