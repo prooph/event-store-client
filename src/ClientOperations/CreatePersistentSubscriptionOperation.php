@@ -119,7 +119,7 @@ class CreatePersistentSubscriptionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response)
+    protected function transformResponse(Message $response): PersistentSubscriptionCreateResult
     {
         return new PersistentSubscriptionCreateResult(
             PersistentSubscriptionCreateStatus::success()

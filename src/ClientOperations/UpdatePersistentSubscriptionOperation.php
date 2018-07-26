@@ -119,7 +119,7 @@ class UpdatePersistentSubscriptionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response)
+    protected function transformResponse(Message $response): PersistentSubscriptionUpdateResult
     {
         /** @var UpdatePersistentSubscriptionCompleted $response */
         return new PersistentSubscriptionUpdateResult(

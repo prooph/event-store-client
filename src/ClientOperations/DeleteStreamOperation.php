@@ -117,7 +117,7 @@ class DeleteStreamOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response)
+    protected function transformResponse(Message $response): DeleteResult
     {
         /** @var DeleteStreamCompleted $response */
         return new DeleteResult(new Position(

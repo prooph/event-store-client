@@ -18,6 +18,7 @@ use Prooph\EventStoreClient\ClientOperations\CommitTransactionOperation;
 use Prooph\EventStoreClient\ClientOperations\StartTransactionOperation;
 use Prooph\EventStoreClient\ClientOperations\TransactionalWriteOperation;
 use Prooph\EventStoreClient\ClusterSettings;
+use Prooph\EventStoreClient\ConditionalWriteResult;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\EventReadResult;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
@@ -72,7 +73,9 @@ final class EventStoreSyncNodeConnection implements
         $this->asyncConnection->close();
     }
 
-    /** @throws \Throwable */
+    /**
+     * @throws \Throwable
+     */
     public function deleteStream(
         string $stream,
         int $expectedVersion,
@@ -82,7 +85,10 @@ final class EventStoreSyncNodeConnection implements
         Promise\wait($this->asyncConnection->deleteStreamAsync($stream, $expectedVersion, $hardDelete, $userCredentials));
     }
 
-    /** @throws \Throwable */
+    /**
+     * {@inheritdoc}
+     * @throws \Throwable
+     */
     public function appendToStream(
         string $stream,
         int $expectedVersion,
@@ -90,6 +96,24 @@ final class EventStoreSyncNodeConnection implements
         UserCredentials $userCredentials = null
     ): WriteResult {
         return Promise\wait($this->asyncConnection->appendToStreamAsync(
+            $stream,
+            $expectedVersion,
+            $events,
+            $userCredentials
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     * @throws \Throwable
+     */
+    public function conditionalAppendToStreamAsync(
+        string $stream,
+        int $expectedVersion,
+        array $events = [],
+        UserCredentials $userCredentials = null
+    ): ConditionalWriteResult {
+        return Promise\wait($this->asyncConnection->conditionalAppendToStreamAsync(
             $stream,
             $expectedVersion,
             $events,

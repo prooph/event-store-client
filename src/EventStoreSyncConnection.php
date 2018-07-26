@@ -48,6 +48,20 @@ interface EventStoreSyncConnection
     ): WriteResult;
 
     /**
+     * @param string $stream
+     * @param int $expectedVersion
+     * @param EventData[] $events
+     * @param UserCredentials|null $userCredentials
+     * @return ConditionalWriteResult
+     */
+    public function conditionalAppendToStreamAsync(
+        string $stream,
+        int $expectedVersion,
+        array $events = [],
+        UserCredentials $userCredentials = null
+    ): ConditionalWriteResult;
+
+    /**
      * for event number see StreamPosition
      */
     public function readEvent(

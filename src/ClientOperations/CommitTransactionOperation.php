@@ -107,7 +107,7 @@ class CommitTransactionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response)
+    protected function transformResponse(Message $response): WriteResult
     {
         /** @var TransactionCommitCompleted $response */
         return new WriteResult(

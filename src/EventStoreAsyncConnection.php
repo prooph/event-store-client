@@ -41,11 +41,25 @@ interface EventStoreAsyncConnection
     /**
      * @param string $stream
      * @param int $expectedVersion
-     * @param null|UserCredentials $userCredentials
      * @param EventData[] $events
+     * @param null|UserCredentials $userCredentials
      * @return Promise<WriteResult>
      */
     public function appendToStreamAsync(
+        string $stream,
+        int $expectedVersion,
+        array $events = [],
+        UserCredentials $userCredentials = null
+    ): Promise;
+
+    /**
+     * @param string $stream
+     * @param int $expectedVersion
+     * @param EventData[] $events
+     * @param UserCredentials|null $userCredentials
+     * @return Promise<ConditionalWriteResult>
+     */
+    public function conditionalAppendToStreamAsync(
         string $stream,
         int $expectedVersion,
         array $events = [],

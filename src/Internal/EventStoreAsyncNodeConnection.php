@@ -18,6 +18,7 @@ use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\ClientOperations\AppendToStreamOperation;
 use Prooph\EventStoreClient\ClientOperations\ClientOperation;
 use Prooph\EventStoreClient\ClientOperations\CommitTransactionOperation;
+use Prooph\EventStoreClient\ClientOperations\ConditionalAppendToStreamOperation;
 use Prooph\EventStoreClient\ClientOperations\CreatePersistentSubscriptionOperation;
 use Prooph\EventStoreClient\ClientOperations\DeletePersistentSubscriptionOperation;
 use Prooph\EventStoreClient\ClientOperations\DeleteStreamOperation;
@@ -135,13 +136,7 @@ final class EventStoreAsyncNodeConnection implements
         return $deferred->promise();
     }
 
-    /**
-     * @param string $stream
-     * @param int $expectedVersion
-     * @param EventData[] $events
-     * @param UserCredentials|null $userCredentials
-     * @return Promise
-     */
+    /** {@inheritdoc} */
     public function appendToStreamAsync(
         string $stream,
         int $expectedVersion,
@@ -155,6 +150,32 @@ final class EventStoreAsyncNodeConnection implements
         $deferred = new Deferred();
 
         $this->enqueueOperation(new AppendToStreamOperation(
+            $this->settings->log(),
+            $deferred,
+            $this->settings->requireMaster(),
+            $stream,
+            $expectedVersion,
+            $events,
+            $userCredentials
+        ));
+
+        return $deferred->promise();
+    }
+
+    /** {@inheritdoc} */
+    public function conditionalAppendToStreamAsync(
+        string $stream,
+        int $expectedVersion,
+        array $events = [],
+        UserCredentials $userCredentials = null
+    ): Promise {
+        if (empty($stream)) {
+            throw new InvalidArgumentException('Stream cannot be empty');
+        }
+
+        $deferred = new Deferred();
+
+        $this->enqueueOperation(new ConditionalAppendToStreamOperation(
             $this->settings->log(),
             $deferred,
             $this->settings->requireMaster(),

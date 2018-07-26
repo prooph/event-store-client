@@ -114,7 +114,7 @@ class StartTransactionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response)
+    protected function transformResponse(Message $response): EventStoreSyncTransaction
     {
         /** @var TransactionStartCompleted $response */
         return new EventStoreSyncTransaction(

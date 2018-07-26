@@ -14,16 +14,17 @@ namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
 use Google\Protobuf\Internal\Message;
-use Prooph\EventStoreClient\EventStoreAsyncTransaction;
+use Prooph\EventStoreClient\ConditionalWriteResult;
+use Prooph\EventStoreClient\ConditionalWriteStatus;
+use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\Exception\AccessDeniedException;
 use Prooph\EventStoreClient\Exception\InvalidTransactionException;
-use Prooph\EventStoreClient\Exception\StreamDeletedException;
 use Prooph\EventStoreClient\Exception\UnexpectedOperationResult;
-use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
-use Prooph\EventStoreClient\Internal\EventStoreAsyncTransactionConnection;
+use Prooph\EventStoreClient\Internal\NewEventConverter;
 use Prooph\EventStoreClient\Messages\ClientMessages\OperationResult;
-use Prooph\EventStoreClient\Messages\ClientMessages\TransactionStart;
-use Prooph\EventStoreClient\Messages\ClientMessages\TransactionStartCompleted;
+use Prooph\EventStoreClient\Messages\ClientMessages\WriteEvents;
+use Prooph\EventStoreClient\Messages\ClientMessages\WriteEventsCompleted;
+use Prooph\EventStoreClient\Position;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
@@ -31,7 +32,7 @@ use Prooph\EventStoreClient\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
-class StartAsyncTransactionOperation extends AbstractOperation
+class ConditionalAppendToStreamOperation extends AbstractOperation
 {
     /** @var bool */
     private $requireMaster;
@@ -39,8 +40,8 @@ class StartAsyncTransactionOperation extends AbstractOperation
     private $stream;
     /** @var int */
     private $expectedVersion;
-    /** @var EventStoreAsyncTransactionConnection */
-    protected $parentConnection;
+    /** @var EventData[] */
+    private $events;
 
     public function __construct(
         Logger $logger,
@@ -48,35 +49,44 @@ class StartAsyncTransactionOperation extends AbstractOperation
         bool $requireMaster,
         string $stream,
         int $expectedVersion,
-        EventStoreAsyncTransactionConnection $parentConnection,
+        array $events,
         ?UserCredentials $userCredentials
     ) {
         $this->requireMaster = $requireMaster;
         $this->stream = $stream;
         $this->expectedVersion = $expectedVersion;
-        $this->parentConnection = $parentConnection;
+        $this->events = $events;
 
         parent::__construct(
             $logger,
             $deferred,
             $userCredentials,
-            TcpCommand::transactionStart(),
-            TcpCommand::transactionStartCompleted(),
-            TransactionStartCompleted::class
+            TcpCommand::writeEvents(),
+            TcpCommand::writeEventsCompleted(),
+            WriteEventsCompleted::class
         );
     }
 
     protected function createRequestDto(): Message
     {
-        $message = new TransactionStart();
-        $message->setRequireMaster($this->requireMaster);
+        $dtos = [];
+
+        foreach ($this->events as $event) {
+            $dtos[] = NewEventConverter::convert($event);
+        }
+
+        $message = new WriteEvents();
         $message->setEventStreamId($this->stream);
         $message->setExpectedVersion($this->expectedVersion);
+        $message->setEvents($dtos);
+        $message->setRequireMaster($this->requireMaster);
+
+        return $message;
     }
 
     protected function inspectResponse(Message $response): InspectionResult
     {
-        /** @var TransactionStartCompleted $response */
+        /** @var WriteEventsCompleted $response */
         switch ($response->getResult()) {
             case OperationResult::Success:
                 $this->succeed($response);
@@ -84,29 +94,26 @@ class StartAsyncTransactionOperation extends AbstractOperation
                 return new InspectionResult(InspectionDecision::endOperation(), 'Success');
             case OperationResult::PrepareTimeout:
                 return new InspectionResult(InspectionDecision::retry(), 'PrepareTimeout');
-            case OperationResult::CommitTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'CommitTimeout');
             case OperationResult::ForwardTimeout:
                 return new InspectionResult(InspectionDecision::retry(), 'ForwardTimeout');
+            case OperationResult::CommitTimeout:
+                return new InspectionResult(InspectionDecision::retry(), 'CommitTimeout');
             case OperationResult::WrongExpectedVersion:
-                $exception = new WrongExpectedVersionException(\sprintf(
-                    'Start transaction failed due to WrongExpectedVersion. Stream: \'%s\', Expected version: \'%s\'',
-                    $this->stream,
-                    $this->expectedVersion
-                ));
-                $this->fail($exception);
+                $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'WrongExpectedVersion');
+                return new InspectionResult(InspectionDecision::endOperation(), 'ExpectedVersionMismatch');
             case OperationResult::StreamDeleted:
-                $this->fail(StreamDeletedException::with($this->stream));
+                $this->succeed($response);
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'StreamDeleted');
             case OperationResult::InvalidTransaction:
-                $this->fail(new InvalidTransactionException());
+                $exception = new InvalidTransactionException();
+                $this->fail($exception);
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'InvalidTransaction');
             case OperationResult::AccessDenied:
-                $this->fail(AccessDeniedException::toStream($this->stream));
+                $exception = AccessDeniedException::toStream($this->stream);
+                $this->fail($exception);
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');
             default:
@@ -114,25 +121,34 @@ class StartAsyncTransactionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response): EventStoreAsyncTransaction
+    protected function transformResponse(Message $response): ConditionalWriteResult
     {
-        /** @var TransactionStartCompleted $response */
-        return new EventStoreAsyncTransaction(
-            $response->getTransactionId(),
-            $this->credentials,
-            $this->parentConnection
+        /** @var WriteEventsCompleted $response */
+        if ($response->getResult() === OperationResult::WrongExpectedVersion) {
+            return ConditionalWriteResult::fail(ConditionalWriteStatus::versionMismatch());
+        }
+
+        if ($response->getResult() === OperationResult::StreamDeleted) {
+            return ConditionalWriteResult::fail(ConditionalWriteStatus::streamDeleted());
+        }
+
+        return ConditionalWriteResult::success(
+            $response->getLastEventNumber(),
+            new Position(
+                $response->getCommitPosition() ?? -1,
+                $response->getPreparePosition() ?? -1
+            )
         );
     }
 
     public function name(): string
     {
-        return 'StartAsyncTransaction';
+        return 'ConditionalAppendToStream';
     }
 
     public function __toString(): string
     {
-        return \sprintf(
-            'Stream: %s, ExpectedVersion: %d, RequireMaster: %s',
+        return \sprintf('Stream: %s, ExpectedVersion: %d, RequireMaster:',
             $this->stream,
             $this->expectedVersion,
             $this->requireMaster ? 'yes' : 'no'

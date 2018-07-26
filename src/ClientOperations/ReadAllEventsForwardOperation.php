@@ -99,7 +99,7 @@ class ReadAllEventsForwardOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response)
+    protected function transformResponse(Message $response): AllEventsSlice
     {
         /* @var ReadAllEventsCompleted $response */
         $records = $response->getEvents();

@@ -99,7 +99,7 @@ class DeletePersistentSubscriptionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response)
+    protected function transformResponse(Message $response): PersistentSubscriptionDeleteResult
     {
         /** @var DeletePersistentSubscriptionCompleted $response */
         if (0 === $response->getResult()) {

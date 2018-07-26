@@ -110,7 +110,7 @@ class ReadEventOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response)
+    protected function transformResponse(Message $response): EventReadResult
     {
         /* @var ReadEventCompleted $response */
         $eventMessage = $response->getEvent();
