@@ -26,7 +26,7 @@ class StartPersistentSubscriptionMessage implements Message
     private $streamId;
     /** @var int */
     private $bufferSize;
-    /** @var UserCredentials */
+    /** @var UserCredentials|null */
     private $userCredentials;
     /** @var callable */
     private $eventAppeared;
@@ -42,7 +42,7 @@ class StartPersistentSubscriptionMessage implements Message
         string $subscriptionId,
         string $streamId,
         int $bufferSize,
-        UserCredentials $userCredentials,
+        ?UserCredentials $userCredentials,
         callable $eventAppeared,
         ?callable $subscriptionDropped,
         int $maxRetries,
@@ -80,7 +80,7 @@ class StartPersistentSubscriptionMessage implements Message
         return $this->bufferSize;
     }
 
-    public function userCredentials(): UserCredentials
+    public function userCredentials(): ?UserCredentials
     {
         return $this->userCredentials;
     }

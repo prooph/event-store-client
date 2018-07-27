@@ -30,7 +30,7 @@ class EventStorePersistentSubscription extends AbstractEventStorePersistentSubsc
         string $streamId,
         callable $eventAppeared,
         ?callable $subscriptionDropped,
-        UserCredentials $userCredentials,
+        ?UserCredentials $userCredentials,
         Logger $logger,
         bool $verboseLogging,
         ConnectionSettings $settings,
@@ -57,7 +57,7 @@ class EventStorePersistentSubscription extends AbstractEventStorePersistentSubsc
         string $subscriptionId,
         string $streamId,
         int $bufferSize,
-        UserCredentials $userCredentials,
+        ?UserCredentials $userCredentials,
         callable $onEventAppeared,
         ?callable $onSubscriptionDropped,
         ConnectionSettings $settings

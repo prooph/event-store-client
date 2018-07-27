@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use Amp\Deferred;
 use Amp\Delayed;
 use Amp\Loop;
 use Amp\Promise;
@@ -47,7 +48,7 @@ abstract class AbstractEventStorePersistentSubscription
     private $eventAppeared;
     /** @var null|callable(self $subscription, SubscriptionDropReason $reason, Throwable $exception):void */
     private $subscriptionDropped;
-    /** @var UserCredentials */
+    /** @var UserCredentials|null */
     private $userCredentials;
     /** @var Logger */
     private $log;
@@ -82,7 +83,7 @@ abstract class AbstractEventStorePersistentSubscription
      * @param string $streamId
      * @param callable(self $subscription, ResolvedEvent $event, ?int $retryCount): Promise $eventAppeared
      * @param null|callable(self $subscription, SubscriptionDropReason $reason, Throwable $exception): void $subscriptionDropped
-     * @param UserCredentials $userCredentials
+     * @param UserCredentials|null $userCredentials
      * @param Logger $logger,
      * @param bool $verboseLogging
      * @param ConnectionSettings $settings
@@ -94,7 +95,7 @@ abstract class AbstractEventStorePersistentSubscription
         string $streamId,
         callable $eventAppeared,
         ?callable $subscriptionDropped,
-        UserCredentials $userCredentials,
+        ?UserCredentials $userCredentials,
         Logger $logger,
         bool $verboseLogging,
         ConnectionSettings $settings,
@@ -153,12 +154,14 @@ abstract class AbstractEventStorePersistentSubscription
             $this->settings
         );
 
-        $promise->onResolve(function (?Throwable $exeption, &$result) {
+        $deferred = new Deferred();
+
+        $promise->onResolve(function (?Throwable $exception, $result) use ($deferred) {
             $this->subscription = $result;
-            $result = $this;
+            $deferred->resolve($this);
         });
 
-        return $promise;
+        return $deferred->promise();
     }
 
     /**
@@ -167,7 +170,7 @@ abstract class AbstractEventStorePersistentSubscription
      * @param string $subscriptionId
      * @param string $streamId
      * @param int $bufferSize
-     * @param UserCredentials $userCredentials
+     * @param UserCredentials|null $userCredentials
      * @param callable(EventStoreSubscription $subscription, PersistentSubscriptionResolvedEvent $resolvedEvent): Promise $onEventAppeared,
      * @param null|callable(EventStoreSubscription $subscription, SubscriptionDropReason $reason, ?Throwable $exception): void $onSubscriptionDropped
      * @param ConnectionSettings $settings
@@ -177,7 +180,7 @@ abstract class AbstractEventStorePersistentSubscription
         string $subscriptionId,
         string $streamId,
         int $bufferSize,
-        UserCredentials $userCredentials,
+        ?UserCredentials $userCredentials,
         callable $onEventAppeared,
         ?callable $onSubscriptionDropped,
         ConnectionSettings $settings
