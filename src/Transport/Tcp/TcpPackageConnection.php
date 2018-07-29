@@ -115,7 +115,10 @@ class TcpPackageConnection
     {
         return call(function (): Generator {
             try {
-                $context = (new ClientConnectContext())->withConnectTimeout($this->timeout);
+                $context = (new ClientConnectContext())
+                    ->withConnectTimeout($this->timeout)
+                    ->withTcpNoDelay()
+
                 $uri = \sprintf('tcp://%s:%s', $this->remoteEndPoint->host(), $this->remoteEndPoint->port());
                 $this->connection = yield connect($uri, $context);
 

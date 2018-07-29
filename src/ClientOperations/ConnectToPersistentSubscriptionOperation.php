@@ -120,7 +120,7 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
             $message->mergeFromString($package->data());
 
             $event = EventMessageConverter::convertResolvedIndexedEventMessageToResolvedEvent($message->getEvent());
-            $this->eventAppeared(new PersistentSubscriptionResolvedEvent($event, $dto->getRetryCount()));
+            $this->eventAppeared(new PersistentSubscriptionResolvedEvent($event, $message->getRetryCount()));
 
             return new InspectionResult(InspectionDecision::doNothing(), 'StreamEventAppeared');
         }

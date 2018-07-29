@@ -116,9 +116,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 
     protected function enqueueSend(TcpPackage $package): void
     {
-        Loop::defer(function () use ($package): Generator {
-            yield ($this->getConnection)()->sendAsync($package);
-        });
+        ($this->getConnection)()->send($package);
     }
 
     public function subscribe(string $correlationId, TcpPackageConnection $connection): bool
@@ -356,7 +354,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
         }
 
         if (null === $this->subscription) {
-            throw new \Exception('Subscription not confirmed, but event appeared!');
+            throw new RuntimeException('Subscription not confirmed, but event appeared!');
         }
 
         if ($this->verboseLogging) {

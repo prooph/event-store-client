@@ -157,6 +157,12 @@ abstract class AbstractEventStorePersistentSubscription
         $deferred = new Deferred();
 
         $promise->onResolve(function (?Throwable $exception, $result) use ($deferred) {
+            if ($exception) {
+                $deferred->fail($exception);
+
+                return;
+            }
+
             $this->subscription = $result;
             $deferred->resolve($this);
         });
