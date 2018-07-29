@@ -23,6 +23,8 @@ use Generator;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\PackageFramingException;
 use Prooph\EventStoreClient\IpEndPoint;
+use Prooph\EventStoreClient\Messages\ClientMessages\PersistentSubscriptionStreamEventAppeared;
+use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Psr\Log\LoggerInterface as Logger;
 use function Amp\call;
@@ -116,8 +118,8 @@ class TcpPackageConnection
         return call(function (): Generator {
             try {
                 $context = (new ClientConnectContext())
-                    ->withConnectTimeout($this->timeout)
-                    ->withTcpNoDelay()
+                    ->withConnectTimeout($this->timeout);
+                    //->withTcpNoDelay();
 
                 $uri = \sprintf('tcp://%s:%s', $this->remoteEndPoint->host(), $this->remoteEndPoint->port());
                 $this->connection = yield connect($uri, $context);
@@ -163,16 +165,17 @@ class TcpPackageConnection
         });
     }
 
-    public function send(TcpPackage $package): void
+    public function enqueueSend(TcpPackage $package): void
     {
-        Loop::defer(function () use ($package): void {
+        Loop::defer(function () use ($package): Generator {
             $promise = $this->connection->write($package->asBytes());
-
             $promise->onResolve(function (?StreamException $e): void {
                 if ($e) {
                     ($this->connectionClosed)($this, $e);
                 }
             });
+
+            yield $promise;
         });
     }
 
@@ -201,7 +204,7 @@ class TcpPackageConnection
 
     public function startReceiving(): void
     {
-        Loop::onReadable($this->connection->getResource(), function (string $watcher): Generator {
+        Loop::repeat(0, function (string $watcher): Generator {
             Loop::disable($watcher);
 
             $data = yield $this->connection->read();

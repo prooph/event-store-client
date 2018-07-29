@@ -21,6 +21,7 @@ use Generator;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\EventStoreSubscription;
+use Prooph\EventStoreClient\Exception\RuntimeException;
 use Prooph\EventStoreClient\Exception\TimeoutException;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
 use Prooph\EventStoreClient\PersistentSubscriptionResolvedEvent;
@@ -299,9 +300,9 @@ abstract class AbstractEventStorePersistentSubscription
     private function enqueueSubscriptionDropNotification(SubscriptionDropReason $reason, ?Throwable $error): void
     {
         // if drop data was already set -- no need to enqueue drop again, somebody did that already
-        $dropData = new DropData($reason, $error);
+        if (null === $this->dropData) {
+            $this->dropData = new DropData($reason, $error);
 
-        if ($dropData !== $this->dropData) {
             $this->enqueue(
                 new PersistentSubscriptionResolvedEvent(self::$dropSubscriptionEvent, null)
             );
@@ -349,6 +350,11 @@ abstract class AbstractEventStorePersistentSubscription
                         $e = $this->queue->dequeue();
                         if ($e->event() === self::$dropSubscriptionEvent) {
                             // drop subscription artificial ResolvedEvent
+
+                            if (null === $this->dropData) {
+                                throw new RuntimeException('Drop reason not specified');
+                            }
+
                             $this->dropSubscription($this->dropData->reason(), $this->dropData->error());
 
                             return null;

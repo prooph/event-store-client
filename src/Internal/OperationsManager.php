@@ -100,12 +100,12 @@ class OperationsManager
 
     public function checkTimeoutsAndRetry(TcpPackageConnection $connection): void
     {
-        $retryOperations = new SplQueue();
-        $removeOperations = new SplQueue();
+        $retryOperations = [];
+        $removeOperations = [];
 
         foreach ($this->activeOperations as $operation) {
             if ($operation->connectionId() !== $connection->connectionId()) {
-                $retryOperations->enqueue($operation);
+                $retryOperations[] = $operation;
             } elseif ($operation->timeout() > 0
                 && DateTimeUtil::utcNow()->format('U.u') - $operation->lastUpdated()->format('U.u') > $this->settings->operationTimeout()
             ) {
@@ -118,20 +118,18 @@ class OperationsManager
 
                 if ($this->settings->failOnNoServerResponse()) {
                     $operation->operation()->fail(new OperationTimedOutException($err));
-                    $removeOperations->enqueue($operation);
+                    $removeOperations[] = $operation;
                 } else {
-                    $retryOperations->enqueue($operation);
+                    $retryOperations[] = $operation;
                 }
             }
         }
 
-        while (! $retryOperations->isEmpty()) {
-            $operation = $removeOperations->dequeue();
+        foreach ($retryOperations as $operation) {
             $this->scheduleOperationRetry($operation);
         }
 
-        while (! $removeOperations->isEmpty()) {
-            $operation = $removeOperations->dequeue();
+        foreach ($removeOperations as $operation) {
             $this->removeOperation($operation);
         }
 
@@ -208,7 +206,7 @@ class OperationsManager
             $package->correlationId(),
             $operation
         );
-        $connection->send($package);
+        $connection->enqueueSend($package);
     }
 
     public function enqueueOperation(OperationItem $operation): void

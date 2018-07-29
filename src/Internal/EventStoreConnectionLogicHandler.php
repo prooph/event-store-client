@@ -445,7 +445,7 @@ class EventStoreConnectionLogicHandler
                 $pass = $this->settings->defaultUserCredentials()->password();
             }
 
-            $this->connection->send(new TcpPackage(
+            $this->connection->enqueueSend(new TcpPackage(
                 TcpCommand::authenticate(),
                 TcpFlags::authenticated(),
                 $this->authInfo->correlationId(),
@@ -467,7 +467,7 @@ class EventStoreConnectionLogicHandler
         $message->setVersion(self::ClientVersion);
         $message->setConnectionName($this->esConnection->connectionName());
 
-        $this->connection->send(new TcpPackage(
+        $this->connection->enqueueSend(new TcpPackage(
             TcpCommand::identifyClient(),
             TcpFlags::none(),
             $this->identityInfo->correlationId(),
@@ -574,7 +574,7 @@ class EventStoreConnectionLogicHandler
         }
 
         if ($this->heartbeatInfo->isIntervalStage()) {
-            $this->connection->send(new TcpPackage(
+            $this->connection->enqueueSend(new TcpPackage(
                 TcpCommand::heartbeatRequestCommand(),
                 TcpFlags::none(),
                 UuidGenerator::generate()
@@ -761,7 +761,7 @@ class EventStoreConnectionLogicHandler
         }
 
         if ($package->command()->equals(TcpCommand::heartbeatRequestCommand())) {
-            $this->connection->send(new TcpPackage(
+            $this->connection->enqueueSend(new TcpPackage(
                 TcpCommand::heartbeatResponseCommand(),
                 TcpFlags::none(),
                 $package->correlationId()
