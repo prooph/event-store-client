@@ -116,7 +116,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 
     protected function enqueueSend(TcpPackage $package): void
     {
-        ($this->getConnection)()->send($package);
+        ($this->getConnection)()->enqueueSend($package);
     }
 
     public function subscribe(string $correlationId, TcpPackageConnection $connection): bool
@@ -127,7 +127,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 
         $this->correlationId = $correlationId;
 
-        $connection->send($this->createSubscriptionPackage());
+        $connection->enqueueSend($this->createSubscriptionPackage());
 
         return true;
     }
@@ -305,7 +305,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
                  && null !== $this->subscription
                  && null !== $connection
              ) {
-                $connection->send($this->createUnsubscriptionPackage());
+                $connection->enqueueSend($this->createUnsubscriptionPackage());
             }
 
             if (null !== $this->subscription) {
