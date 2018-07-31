@@ -24,7 +24,6 @@ use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use function Amp\Promise\timeout;
 
-/** @group by */
 class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestCase
 {
     use SpecificationWithConnection;
@@ -100,8 +99,8 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
             }
 
             try {
-                $r = yield timeout($this->eventsReceived->promise(), 5000);
-                $this->assertTrue($r);
+                $result = yield timeout($this->eventsReceived->promise(), 10000);
+                $this->assertTrue($result);
             } catch (TimeoutException $e) {
                 $this->fail('Timed out waiting for events');
             }
