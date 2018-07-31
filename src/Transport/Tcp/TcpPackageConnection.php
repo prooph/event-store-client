@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Transport\Tcp;
 
-use Amp\ByteStream\StreamException;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Socket\ClientConnectContext;
@@ -23,10 +22,9 @@ use Generator;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\PackageFramingException;
 use Prooph\EventStoreClient\IpEndPoint;
-use Prooph\EventStoreClient\Messages\ClientMessages\PersistentSubscriptionStreamEventAppeared;
-use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Psr\Log\LoggerInterface as Logger;
+use Throwable;
 use function Amp\call;
 use function Amp\Socket\connect;
 
@@ -119,7 +117,6 @@ class TcpPackageConnection
             try {
                 $context = (new ClientConnectContext())
                     ->withConnectTimeout($this->timeout);
-                    //->withTcpNoDelay();
 
                 $uri = \sprintf('tcp://%s:%s', $this->remoteEndPoint->host(), $this->remoteEndPoint->port());
                 $this->connection = yield connect($uri, $context);
@@ -144,7 +141,7 @@ class TcpPackageConnection
                     $e->getMessage()
                 ));
                 ($this->connectionClosed)($this, $e);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->isClosed = true;
                 $this->log->debug(\sprintf(
                     'TcpPackageConnection: connection [%s, %s] was closed with error %s',
@@ -168,14 +165,11 @@ class TcpPackageConnection
     public function enqueueSend(TcpPackage $package): void
     {
         Loop::defer(function () use ($package): Generator {
-            $promise = $this->connection->write($package->asBytes());
-            $promise->onResolve(function (?StreamException $e): void {
-                if ($e) {
-                    ($this->connectionClosed)($this, $e);
-                }
-            });
-
-            yield $promise;
+            try {
+                yield $this->connection->write($package->asBytes());
+            } catch (Throwable $e) {
+                ($this->connectionClosed)($this, $e);
+            }
         });
     }
 
@@ -187,7 +181,7 @@ class TcpPackageConnection
             $package = TcpPackage::fromRawData($data);
             $valid = true;
             ($this->handlePackage)($this, $package);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->connection->close();
             $message = \sprintf(
                 'TcpPackageConnection: [%s, %s]: Error when processing TcpPackage %s: %s. Connection will be closed',
@@ -204,33 +198,29 @@ class TcpPackageConnection
 
     public function startReceiving(): void
     {
-        Loop::repeat(0, function (string $watcher): Generator {
-            Loop::disable($watcher);
+        Loop::defer(function (): Generator {
+            while (true) {
+                $data = yield $this->connection->read();
 
-            $data = yield $this->connection->read();
+                if (null === $data) {
+                    // stream got closed
+                    return;
+                }
 
-            if (null === $data) {
-                // stream got closed
-                Loop::cancel($watcher);
+                try {
+                    $this->framer->unFrameData($data);
+                } catch (PackageFramingException $exception) {
+                    $this->log->error(\sprintf(
+                        'TcpPackageConnection: [%s, %s]. Invalid TCP frame received',
+                        $this->remoteEndPoint,
+                        $this->connectionId
+                    ));
 
-                return;
+                    $this->close();
+
+                    return;
+                }
             }
-
-            try {
-                $this->framer->unFrameData($data);
-            } catch (PackageFramingException $exception) {
-                $this->log->error(\sprintf(
-                    'TcpPackageConnection: [%s, %s]. Invalid TCP frame received',
-                    $this->remoteEndPoint,
-                    $this->connectionId
-                ));
-
-                $this->close();
-
-                return;
-            }
-
-            Loop::enable($watcher);
         });
     }
 

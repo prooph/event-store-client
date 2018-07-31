@@ -21,7 +21,6 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
-use Prooph\EventStoreClient\PersistentSubscriptionResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use function Amp\Promise\timeout;
 
@@ -31,9 +30,9 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
     use SpecificationWithConnection;
 
     /** string */
-    private $streamName; // = Guid.NewGuid().ToString();
+    private $streamName;
     /** string */
-    private $groupName; // = Guid.NewGuid().ToString();
+    private $groupName;
     /** @var int */
     private $bufferCount = 10;
     /** @var int */
@@ -77,10 +76,8 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
                 $this->streamName,
                 $this->groupName,
                 function ($s, $e): Promise {
-                    echo 'handling: ' . $e->originalStreamName() . ' @ ' . $e->originalEventNumber() . PHP_EOL;
                     ++$this->eventReceivedCount;
                     if ($this->eventReceivedCount === $this->eventWriteCount) {
-                        echo 'COMPLETED!!! ' . PHP_EOL;
                         $this->eventsReceived->resolve(true);
                     }
 
