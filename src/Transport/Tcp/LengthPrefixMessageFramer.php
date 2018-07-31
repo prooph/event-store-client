@@ -85,7 +85,8 @@ class LengthPrefixMessageFramer
 
             $this->reset();
 
-            $this->messageBuffer = \substr($data, $length, $dataLength);
+            // unframe the rest again
+            $this->unFrameData(\substr($data, $length, $dataLength));
         } else {
             $this->messageBuffer = $data;
         }
