@@ -367,7 +367,13 @@ abstract class AbstractEventStorePersistentSubscription
                         }
 
                         try {
-                            yield ($this->eventAppeared)($this, $e->event(), $e->retryCount());
+                            $promise = ($this->eventAppeared)($this, $e->event(), $e->retryCount());
+
+                            if (! $promise instanceof Promise) {
+                                throw new RuntimeException('Event appeared callback needs to return an ' . Promise::class);
+                            }
+
+                            yield $promise;
 
                             if ($this->autoAck) {
                                 $this->subscription->notifyEventsProcessed([$e->originalEvent()->eventId()]);

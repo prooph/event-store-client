@@ -17,6 +17,7 @@ use Amp\Promise;
 use Generator;
 use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
+use Prooph\EventStoreClient\Exception\RuntimeException;
 use Prooph\EventStoreClient\Exception\StreamDeletedException;
 use Prooph\EventStoreClient\ResolvedEvent;
 use Prooph\EventStoreClient\SliceReadStatus;
@@ -173,7 +174,13 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
 
             if ($e->originalEventNumber() > $this->lastProcessedEventNumber) {
                 try {
-                    yield ($this->eventAppeared)($this, $e);
+                    $promise = ($this->eventAppeared)($this, $e);
+
+                    if (! $promise instanceof Promise) {
+                        throw new RuntimeException('Event appeared callback needs to return an ' . Promise::class);
+                    }
+
+                    yield $promise;
                 } catch (\Throwable $ex) {
                     $this->dropSubscription(SubscriptionDropReason::eventHandlerException(), $ex);
 
