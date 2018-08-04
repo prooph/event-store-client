@@ -23,6 +23,7 @@ use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\Exception\RuntimeException;
 use Prooph\EventStoreClient\Exception\TimeoutException;
+use Prooph\EventStoreClient\Internal\ResolvedEvent as InternalResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
 use Prooph\EventStoreClient\PersistentSubscriptionResolvedEvent;
 use Prooph\EventStoreClient\ResolvedEvent;
@@ -197,11 +198,11 @@ abstract class AbstractEventStorePersistentSubscription
      * Acknowledge that a message have completed processing (this will tell the server it has been processed)
      * Note: There is no need to ack a message if you have Auto Ack enabled
      *
-     * @param ResolvedEvent $event
+     * @param InternalResolvedEvent $event
      *
      * @return void
      */
-    public function acknowledge(ResolvedEvent $event): void
+    public function acknowledge(InternalResolvedEvent $event): void
     {
         $this->subscription->notifyEventsProcessed([$event->originalEvent()->eventId()]);
     }
@@ -210,14 +211,14 @@ abstract class AbstractEventStorePersistentSubscription
      * Acknowledge that a message have completed processing (this will tell the server it has been processed)
      * Note: There is no need to ack a message if you have Auto Ack enabled
      *
-     * @param ResolvedEvent[] $event
+     * @param InternalResolvedEvent[] $event
      *
      * @return void
      */
     public function acknowledgeMultiple(array $events): void
     {
         $ids = \array_map(
-            function (ResolvedEvent $event): EventId {
+            function (InternalResolvedEvent $event): EventId {
                 return $event->originalEvent()->eventId();
             },
             $events
