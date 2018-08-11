@@ -25,7 +25,7 @@ abstract class DateTimeUtil
     public static function create(string $dateTimeString): DateTimeImmutable
     {
         return DateTimeImmutable::createFromFormat(
-            'Y-m-d\TH:i:s.u\Z',
+            'Y-m-d\TH:i:s.uP',
             $dateTimeString,
             new DateTimeZone('UTC')
         );
@@ -33,6 +33,6 @@ abstract class DateTimeUtil
 
     public static function format(DateTimeImmutable $dateTime): string
     {
-        return $dateTime->format('Y-m-d\TH:i:s.u\Z');
+        return $dateTime->format('Y-m-d\TH:i:s.uP');
     }
 }
