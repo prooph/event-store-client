@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-
 use Amp\Deferred;
 use Amp\Promise;
 use Amp\Success;
@@ -49,7 +48,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
             yield $this->connection->connectAsync();
 
             //Create 80000 events
-            for($i = 0; $i < 80; $i++) {
+            for ($i = 0; $i < 80; $i++) {
                 yield $this->connection->appendToStreamAsync(
                     $this->streamName,
                     ExpectedVersion::Any,
@@ -95,11 +94,11 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
             $this->connection->subscribeToAllFrom(
                 null,
                 $this->settings,
-                function($sub, ResolvedEvent$event) {
+                function ($sub, ResolvedEvent $event) {
                     if ($this->streamName === $event->originalStreamName()
                         && $event->originalEventNumber() % 1000 === 0
                     ) {
-                        \fwrite(\STDOUT, sprintf(
+                        \fwrite(\STDOUT, \sprintf(
                             "Processed %d events\n",
                             $event->originalEventNumber()
                         ));
@@ -141,9 +140,9 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
                 $this->streamName,
                 null,
                 $this->settings,
-                function($sub, ResolvedEvent $event) {
+                function ($sub, ResolvedEvent $event) {
                     if ($event->originalEventNumber() % 1000 === 0) {
-                        \fwrite(\STDOUT, sprintf(
+                        \fwrite(\STDOUT, \sprintf(
                             "Processed %d events\n",
                             $event->originalEventNumber()
                         ));
