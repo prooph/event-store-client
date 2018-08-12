@@ -854,4 +854,9 @@ final class EventStoreAsyncNodeConnection implements
             $this->settings->operationTimeout()
         ));
     }
+
+    public function __destruct()
+    {
+        $this->close();
+    }
 }

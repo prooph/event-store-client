@@ -281,8 +281,8 @@ abstract class EventStoreCatchUpSubscription
                     ));
                 }
 
-                $subscription = empty($this->streamId) ?
-                    yield $this->connection->subscribeToAllAsync(
+                $subscription = empty($this->streamId)
+                    ? yield $this->connection->subscribeToAllAsync(
                         $this->resolveLinkTos,
                         function (EventStoreSubscription $subscription, ResolvedEvent $e): Promise {
                             return $this->enqueuePushedEvent($subscription, $e);
@@ -305,6 +305,7 @@ abstract class EventStoreCatchUpSubscription
                     );
 
                 $this->subscription = $subscription;
+
                 yield $this->readMissedHistoricEventsAsync();
             } else {
                 $this->dropSubscription(SubscriptionDropReason::userInitiated(), null);

@@ -46,7 +46,7 @@ class CatchUpSubscriptionSettings
         int $readBatchSize,
         bool $verboseLogging,
         bool $resolveLinkTos,
-        string $subscriptionName
+        string $subscriptionName = ''
     ) {
         if ($readBatchSize < 1) {
             throw new InvalidArgumentException('Read batch size must be positive');

@@ -104,9 +104,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription
         });
     }
 
-    /**
-     * @return Promise<bool>
-     */
+    /** @return Promise<bool> */
     private function readEventsCallbackAsync(AllEventsSlice $slice, ?int $lastCommitPosition): Promise
     {
         return call(function () use ($slice, $lastCommitPosition): \Generator {
@@ -125,9 +123,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription
         });
     }
 
-    /**
-     * @return Promise<bool>
-     */
+    /** @return Promise<bool> */
     private function processEventsAsync(?int $lastCommitPosition, AllEventsSlice $slice): Promise
     {
         return call(function () use ($lastCommitPosition, $slice): \Generator {
@@ -149,7 +145,8 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription
                 : $slice->nextPosition()->greaterOrEquals(new Position($lastCommitPosition, $lastCommitPosition));
 
             if (! $done && $slice->isEndOfStream()) {
-                yield new Delayed(1000); // we are waiting for server to flush its data
+                // we are waiting for server to flush its data
+                yield new Delayed(1000);
             }
 
             return $done;

@@ -401,4 +401,9 @@ final class EventStoreSyncNodeConnection implements
     {
         $this->asyncConnection->detach($handler);
     }
+
+    public function __destruct()
+    {
+        $this->close();
+    }
 }
