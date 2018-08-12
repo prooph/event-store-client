@@ -634,7 +634,7 @@ final class EventStoreAsyncNodeConnection implements
     /** {@inheritdoc} */
     public function subscribeToAllFrom(
         ?Position $lastCheckpoint,
-        CatchUpSubscriptionSettings $settings = null,
+        ?CatchUpSubscriptionSettings $settings,
         callable $eventAppeared,
         callable $liveProcessingStarted = null,
         callable $subscriptionDropped = null,

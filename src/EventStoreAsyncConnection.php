@@ -195,15 +195,16 @@ interface EventStoreAsyncConnection
 
     /**
      * @param Position|null $lastCheckpoint
-     * @param CatchUpSubscriptionSettings $settings
+     * @param CatchUpSubscriptionSettings|null $settings
      * @param callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\Internal\ResolvedEvent $resolvedEvent): Promise $eventAppeared
      * @param null|callable(\Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription $subscription): void $liveProcessingStarted
      * @param null|callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\SubscriptionDropReason $reason, \Throwable $exception): void $subscriptionDropped
+     * @param UserCredentials|null $userCredentials
      * @return EventStoreAllCatchUpSubscription
      */
     public function subscribeToAllFrom(
         ?Position $lastCheckpoint,
-        CatchUpSubscriptionSettings $settings,
+        ?CatchUpSubscriptionSettings $settings,
         callable $eventAppeared,
         callable $liveProcessingStarted = null,
         callable $subscriptionDropped = null,
