@@ -13,13 +13,30 @@ In the future, there will be also a server implementation written in pure PHP us
 
 Asynchronous operations are done via [Amp](https://amphp.org/) and sync operation are also supported.
 
-You don't need any extra extensions, however it's recommended to install [uv](https://pecl.php.net/package/uv) and [protobuf](https://pecl.php.net/package/protobuf). 
+You need to [allegro/php-protobuf](https://github.com/allegro/php-protobuf/) PHP extension.
+
+The protobuf extension from Google will not work, because it doesn't support proto2, only proto3.
+
+It's also recommended to install [uv](https://pecl.php.net/package/uv). 
 
 ## Installation
 
 You can install prooph/event-store-client via composer by adding `"prooph/event-store-client": "dev-master"` as requirement to your composer.json.
 
 To install EventStore Server, check the manual at [https://eventstore.org/docs/getting-started/index.html](https://eventstore.org/docs/getting-started/index.html)
+
+To install allegro/php-protobuf:
+
+```
+git clone https://github.com/allegro/php-protobuf
+cd php-protobuf
+git checkout v0.12.3
+phpize
+./configure
+make
+sudo make install
+add "extensions=protobuf.so" to your php.ini
+```
 
 In the docker-folder you'll find three different docker-compose setups (single node, 3-node-cluster and 3-node-dns-cluster).
 

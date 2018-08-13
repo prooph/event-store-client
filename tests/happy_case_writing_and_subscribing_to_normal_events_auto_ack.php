@@ -75,6 +75,7 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
                 $this->groupName,
                 function ($s, $e): Promise {
                     ++$this->eventReceivedCount;
+
                     if ($this->eventReceivedCount === $this->eventWriteCount) {
                         $this->eventsReceived->resolve(true);
                     }

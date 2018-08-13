@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Google\Protobuf\Internal\Message;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\Exception\AccessDeniedException;
 use Prooph\EventStoreClient\Exception\UnexpectedOperationResult;
@@ -25,6 +24,7 @@ use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\UserCredentials;
+use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -59,21 +59,20 @@ class TransactionalWriteOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): Message
+    protected function createRequestDto(): ProtobufMessage
     {
-        foreach ($this->events as $event) {
-            $dtos[] = NewEventConverter::convert($event);
-        }
-
         $message = new TransactionWrite();
         $message->setRequireMaster($this->requireMaster);
         $message->setTransactionId($this->transactionId);
-        $message->setEvents($dtos);
+
+        foreach ($this->events as $event) {
+            $message->appendEvents(NewEventConverter::convert($event));
+        }
 
         return $message;
     }
 
-    protected function inspectResponse(Message $response): InspectionResult
+    protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
         /** @var TransactionWriteCompleted $response */
         switch ($response->getResult()) {
@@ -97,7 +96,7 @@ class TransactionalWriteOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response): void
+    protected function transformResponse(ProtobufMessage $response): void
     {
     }
 

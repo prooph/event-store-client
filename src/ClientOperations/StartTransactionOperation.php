@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Google\Protobuf\Internal\Message;
 use Prooph\EventStoreClient\EventStoreSyncTransaction;
 use Prooph\EventStoreClient\Exception\AccessDeniedException;
 use Prooph\EventStoreClient\Exception\InvalidTransactionException;
@@ -28,6 +27,7 @@ use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\UserCredentials;
+use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -66,7 +66,7 @@ class StartTransactionOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): Message
+    protected function createRequestDto(): ProtobufMessage
     {
         $message = new TransactionStart();
         $message->setRequireMaster($this->requireMaster);
@@ -74,7 +74,7 @@ class StartTransactionOperation extends AbstractOperation
         $message->setExpectedVersion($this->expectedVersion);
     }
 
-    protected function inspectResponse(Message $response): InspectionResult
+    protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
         /** @var TransactionStartCompleted $response */
         switch ($response->getResult()) {
@@ -114,7 +114,7 @@ class StartTransactionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response): EventStoreSyncTransaction
+    protected function transformResponse(ProtobufMessage $response): EventStoreSyncTransaction
     {
         /** @var TransactionStartCompleted $response */
         return new EventStoreSyncTransaction(

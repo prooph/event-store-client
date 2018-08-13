@@ -13,13 +13,12 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Google\Protobuf\Internal\Message;
 use Prooph\EventStoreClient\Exception\AccessDeniedException;
 use Prooph\EventStoreClient\Exception\ServerError;
 use Prooph\EventStoreClient\Internal\EventMessageConverter;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEvents;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEventsCompleted;
-use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEventsCompleted\ReadStreamResult;
+use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEventsCompleted_ReadStreamResult as ReadStreamResult;
 use Prooph\EventStoreClient\Messages\ClientMessages\ResolvedIndexedEvent;
 use Prooph\EventStoreClient\ReadDirection;
 use Prooph\EventStoreClient\ResolvedEvent;
@@ -29,6 +28,7 @@ use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\UserCredentials;
+use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -71,7 +71,7 @@ class ReadStreamEventsBackwardOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): Message
+    protected function createRequestDto(): ProtobufMessage
     {
         $message = new ReadStreamEvents();
         $message->setRequireMaster($this->requireMaster);
@@ -83,7 +83,7 @@ class ReadStreamEventsBackwardOperation extends AbstractOperation
         return $message;
     }
 
-    protected function inspectResponse(Message $response): InspectionResult
+    protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
         /** @var ReadStreamEventsCompleted $response */
         switch ($response->getResult()) {
@@ -112,7 +112,7 @@ class ReadStreamEventsBackwardOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response): StreamEventsSlice
+    protected function transformResponse(ProtobufMessage $response): StreamEventsSlice
     {
         /* @var ReadStreamEventsCompleted $response */
         $records = $response->getEvents();

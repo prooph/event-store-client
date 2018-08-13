@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Google\Protobuf\Internal\Message;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\Exception\AccessDeniedException;
 use Prooph\EventStoreClient\Exception\InvalidTransactionException;
@@ -30,6 +29,7 @@ use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\UserCredentials;
 use Prooph\EventStoreClient\WriteResult;
+use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -68,24 +68,21 @@ class AppendToStreamOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): Message
+    protected function createRequestDto(): ProtobufMessage
     {
-        $dtos = [];
-
-        foreach ($this->events as $event) {
-            $dtos[] = NewEventConverter::convert($event);
-        }
-
         $message = new WriteEvents();
         $message->setEventStreamId($this->stream);
         $message->setExpectedVersion($this->expectedVersion);
-        $message->setEvents($dtos);
         $message->setRequireMaster($this->requireMaster);
+
+        foreach ($this->events as $event) {
+            $message->appendEvents(NewEventConverter::convert($event));
+        }
 
         return $message;
     }
 
-    protected function inspectResponse(Message $response): InspectionResult
+    protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
         /** @var WriteEventsCompleted $response */
         switch ($response->getResult()) {
@@ -124,7 +121,7 @@ class AppendToStreamOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response)
+    protected function transformResponse(ProtobufMessage $response)
     {
         /** @var WriteEventsCompleted $response */
         return new WriteResult(

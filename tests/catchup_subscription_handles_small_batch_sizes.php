@@ -24,6 +24,7 @@ use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use ProophTest\EventStoreClient\Helper\Connection;
+use Throwable;
 use function Amp\call;
 use function Amp\Promise\timeout;
 use function Amp\Promise\wait;
@@ -76,12 +77,10 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function catchupSubscriptionToAllHandlesManyEventsWithSmallBatchSize(): void
     {
-        $this->markTestIncomplete('This needs to be checked!');
-
         wait(call(function () {
             yield $this->setUpTestCase();
 
@@ -123,7 +122,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function catchupSubscriptionToStreamHandlesManyEventsWithSmallBatchSize(): void
     {
