@@ -17,6 +17,7 @@ use Amp\Artax\DefaultClient;
 use Amp\Artax\Request;
 use Amp\Artax\Response;
 use Prooph\EventStoreClient\UserCredentials;
+use Throwable;
 
 /** @internal  */
 class HttpAsyncClient
@@ -35,8 +36,7 @@ class HttpAsyncClient
         ?UserCredentials $userCredentials,
         callable $onSuccess,
         callable $onException
-    ): void
-    {
+    ): void {
         $this->receive(
             HttpMethod::Get,
             $url,
@@ -53,8 +53,7 @@ class HttpAsyncClient
         ?UserCredentials $userCredentials,
         callable $onSuccess,
         callable $onException
-    ): void
-    {
+    ): void {
         $this->send(
             HttpMethod::Post,
             $url,
@@ -71,8 +70,7 @@ class HttpAsyncClient
         ?UserCredentials $userCredentials,
         callable $onSuccess,
         callable $onException
-    ): void
-    {
+    ): void {
         $this->receive(
             HttpMethod::Delete,
             $url,
@@ -89,8 +87,7 @@ class HttpAsyncClient
         ?UserCredentials $userCredentials,
         callable $onSuccess,
         callable $onException
-    ): void
-    {
+    ): void {
         $this->send(
             HttpMethod::Put,
             $url,
@@ -109,8 +106,7 @@ class HttpAsyncClient
         callable $onSuccess,
         callable $onException,
         string $hostHeader = ''
-    ): void
-    {
+    ): void {
         $request = new Request($url, $method);
 
         if (null !== $userCredentials) {
@@ -122,7 +118,7 @@ class HttpAsyncClient
         }
 
         $this->client->request($request)->onResolve(
-            function (?\Throwable $e, ?Response $response) use ($onSuccess, $onException): void {
+            function (?Throwable $e, ?Response $response) use ($onSuccess, $onException): void {
                 if ($e) {
                     $onException($e);
                 }
@@ -142,8 +138,7 @@ class HttpAsyncClient
         ?UserCredentials $userCredentials,
         callable $onSuccess,
         callable $onException
-    ): void
-    {
+    ): void {
         $request = new Request($url, $method);
 
         if (null !== $userCredentials) {
@@ -155,7 +150,7 @@ class HttpAsyncClient
         $request = $request->withBody($body);
 
         $this->client->request($request)->onResolve(
-            function (?\Throwable $e, ?Response $response) use ($onSuccess, $onException): void {
+            function (?Throwable $e, ?Response $response) use ($onSuccess, $onException): void {
                 if ($e) {
                     $onException($e);
                 }
@@ -170,8 +165,7 @@ class HttpAsyncClient
     private function addAuthenticationHeader(
         Request $request,
         UserCredentials $userCredentials
-    ): Request
-    {
+    ): Request {
         $httpAuthentication = \sprintf(
             '%s:%s',
             $userCredentials->username(),

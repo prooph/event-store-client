@@ -20,9 +20,9 @@ use Prooph\EventStoreClient\Exception\UserCommandFailedException;
 use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\Transport\Http\HttpAsyncClient;
-use Prooph\EventStoreClient\Transport\Http\HttpMethod;
 use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
 use Prooph\EventStoreClient\UserCredentials;
+use Throwable;
 
 /** @internal */
 class UsersClient
@@ -46,8 +46,7 @@ class UsersClient
         string $login,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HttpSchema
-    ): Promise
-    {
+    ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
@@ -66,8 +65,7 @@ class UsersClient
         string $login,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HttpSchema
-    ): Promise
-    {
+    ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
@@ -86,8 +84,7 @@ class UsersClient
         string $login,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HttpSchema
-    ): Promise
-    {
+    ): Promise {
         return $this->sendDelete(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
@@ -99,72 +96,72 @@ class UsersClient
             HttpStatusCode::OK
         );
     }
-/*
-    public Task<List<UserDetails>> ListAll(EndPoint endPoint, UserCredentials userCredentials = null, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
-    {
-        return SendGet(endPoint.ToHttpUrl(httpSchema, "/users/"), userCredentials, HttpStatusCode.OK)
-            .ContinueWith(x =>
+
+    /*
+        public Task<List<UserDetails>> ListAll(EndPoint endPoint, UserCredentials userCredentials = null, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
+        {
+            return SendGet(endPoint.ToHttpUrl(httpSchema, "/users/"), userCredentials, HttpStatusCode.OK)
+                .ContinueWith(x =>
+                    {
+                        if (x.IsFaulted) throw x.Exception;
+                        var r = JObject.Parse(x.Result);
+                        return r["data"] != null ? r["data"].ToObject<List<UserDetails>>() : null;
+                    });
+        }
+
+        public Task<UserDetails> GetCurrentUser(EndPoint endPoint, UserCredentials userCredentials = null, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
+        {
+            return SendGet(endPoint.ToHttpUrl(httpSchema, "/users/$current"), userCredentials, HttpStatusCode.OK)
+                .ContinueWith(x =>
                 {
                     if (x.IsFaulted) throw x.Exception;
                     var r = JObject.Parse(x.Result);
-                    return r["data"] != null ? r["data"].ToObject<List<UserDetails>>() : null;
+                    return r["data"] != null ? r["data"].ToObject<UserDetails>() : null;
                 });
-    }
+        }
 
-    public Task<UserDetails> GetCurrentUser(EndPoint endPoint, UserCredentials userCredentials = null, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
-    {
-        return SendGet(endPoint.ToHttpUrl(httpSchema, "/users/$current"), userCredentials, HttpStatusCode.OK)
-            .ContinueWith(x =>
-            {
-                if (x.IsFaulted) throw x.Exception;
-                var r = JObject.Parse(x.Result);
-                return r["data"] != null ? r["data"].ToObject<UserDetails>() : null;
-            });
-    }
+        public Task<UserDetails> GetUser(EndPoint endPoint, string login, UserCredentials userCredentials = null, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
+        {
+            return SendGet(endPoint.ToHttpUrl(httpSchema, "/users/{0}", login), userCredentials, HttpStatusCode.OK)
+                .ContinueWith(x =>
+                {
+                    if (x.IsFaulted) throw x.Exception;
+                    var r = JObject.Parse(x.Result);
+                    return r["data"] != null ? r["data"].ToObject<UserDetails>() : null;
+                });
+        }
 
-    public Task<UserDetails> GetUser(EndPoint endPoint, string login, UserCredentials userCredentials = null, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
-    {
-        return SendGet(endPoint.ToHttpUrl(httpSchema, "/users/{0}", login), userCredentials, HttpStatusCode.OK)
-            .ContinueWith(x =>
-            {
-                if (x.IsFaulted) throw x.Exception;
-                var r = JObject.Parse(x.Result);
-                return r["data"] != null ? r["data"].ToObject<UserDetails>() : null;
-            });
-    }
+        public Task CreateUser(EndPoint endPoint, UserCreationInformation newUser,
+            UserCredentials userCredentials = null, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
+        {
+            var userJson = newUser.ToJson();
+            return SendPost(endPoint.ToHttpUrl(httpSchema, "/users/"), userJson, userCredentials, HttpStatusCode.Created);
+        }
 
-    public Task CreateUser(EndPoint endPoint, UserCreationInformation newUser,
-        UserCredentials userCredentials = null, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
-    {
-        var userJson = newUser.ToJson();
-        return SendPost(endPoint.ToHttpUrl(httpSchema, "/users/"), userJson, userCredentials, HttpStatusCode.Created);
-    }
+        public Task UpdateUser(EndPoint endPoint, string login, UserUpdateInformation updatedUser,
+            UserCredentials userCredentials, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
+        {
+            return SendPut(endPoint.ToHttpUrl(httpSchema, "/users/{0}", login), updatedUser.ToJson(), userCredentials, HttpStatusCode.OK);
+        }
 
-    public Task UpdateUser(EndPoint endPoint, string login, UserUpdateInformation updatedUser,
-        UserCredentials userCredentials, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
-    {
-        return SendPut(endPoint.ToHttpUrl(httpSchema, "/users/{0}", login), updatedUser.ToJson(), userCredentials, HttpStatusCode.OK);
-    }
+        public Task ChangePassword(EndPoint endPoint, string login, ChangePasswordDetails changePasswordDetails,
+            UserCredentials userCredentials, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
+        {
+            return SendPost(endPoint.ToHttpUrl(httpSchema, "/users/{0}/command/change-password", login), changePasswordDetails.ToJson(), userCredentials, HttpStatusCode.OK);
+        }
 
-    public Task ChangePassword(EndPoint endPoint, string login, ChangePasswordDetails changePasswordDetails,
-        UserCredentials userCredentials, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
-    {
-        return SendPost(endPoint.ToHttpUrl(httpSchema, "/users/{0}/command/change-password", login), changePasswordDetails.ToJson(), userCredentials, HttpStatusCode.OK);
-    }
-
-    public Task ResetPassword(EndPoint endPoint, string login, ResetPasswordDetails resetPasswordDetails,
-        UserCredentials userCredentials = null, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
-    {
-        return SendPost(endPoint.ToHttpUrl(httpSchema, "/users/{0}/command/reset-password", login), resetPasswordDetails.ToJson(), userCredentials, HttpStatusCode.OK);
-    }
-*/
+        public Task ResetPassword(EndPoint endPoint, string login, ResetPasswordDetails resetPasswordDetails,
+            UserCredentials userCredentials = null, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
+        {
+            return SendPost(endPoint.ToHttpUrl(httpSchema, "/users/{0}/command/reset-password", login), resetPasswordDetails.ToJson(), userCredentials, HttpStatusCode.OK);
+        }
+    */
 
     private function sendGet(
         string $url,
         ?UserCredentials $userCredentials,
         int $expectedCode
-    ): Promise
-    {
+    ): Promise {
         $deferred = new Deferred();
 
         $this->client->get(
@@ -185,7 +182,7 @@ class UsersClient
                     ));
                 }
             },
-            function (\Throwable $exception) use ($deferred): void {
+            function (Throwable $exception) use ($deferred): void {
                 $deferred->fail($exception);
             }
         );
@@ -197,8 +194,7 @@ class UsersClient
         string $url,
         ?UserCredentials $userCredentials,
         int $expectedCode
-    ): Promise
-    {
+    ): Promise {
         $deferred = new Deferred();
 
         $this->client->delete(
@@ -219,7 +215,7 @@ class UsersClient
                     ));
                 }
             },
-            function (\Throwable $exception) use ($deferred): void {
+            function (Throwable $exception) use ($deferred): void {
                 $deferred->fail($exception);
             }
         );
@@ -232,8 +228,7 @@ class UsersClient
         string $content,
         ?UserCredentials $userCredentials,
         int $expectedCode
-    ): Promise
-    {
+    ): Promise {
         $deferred = new Deferred();
 
         $this->client->put(
@@ -256,7 +251,7 @@ class UsersClient
                     ));
                 }
             },
-            function (\Throwable $exception) use ($deferred): void {
+            function (Throwable $exception) use ($deferred): void {
                 $deferred->fail($exception);
             }
         );
@@ -269,8 +264,7 @@ class UsersClient
         string $content,
         ?UserCredentials $userCredentials,
         int $expectedCode
-    ): Promise
-    {
+    ): Promise {
         $deferred = new Deferred();
 
         $this->client->post(
@@ -295,7 +289,7 @@ class UsersClient
                     ));
                 }
             },
-            function (\Throwable $exception) use ($deferred): void {
+            function (Throwable $exception) use ($deferred): void {
                 $deferred->fail($exception);
             }
         );

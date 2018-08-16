@@ -22,6 +22,7 @@ use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
+use Throwable;
 use function Amp\Promise\timeout;
 
 class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestCase
@@ -57,7 +58,6 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
     /**
      * @test
      * @throws \Throwable
-     * @group by
      */
     public function do_test(): void
     {

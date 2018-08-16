@@ -17,6 +17,7 @@ use Amp\Promise;
 use Amp\Success;
 use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\StopWatch;
+use Throwable;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -52,7 +53,7 @@ Loop::run(function () {
         function (EventStoreCatchUpSubscription $subscription): void {
             echo 'liveProcessingStarted on ' . $subscription->streamId() . PHP_EOL;
         },
-        function (EventStoreCatchUpSubscription $subscription, SubscriptionDropReason $reason, \Throwable $exception): void {
+        function (EventStoreCatchUpSubscription $subscription, SubscriptionDropReason $reason, Throwable $exception): void {
             echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
             echo 'ex: ' . $exception->getMessage() . PHP_EOL;
         }

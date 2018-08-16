@@ -24,8 +24,7 @@ class EndpointExtensions
         IpEndPoint $endPoint,
         string $schema,
         string $rawUrl = null
-    ): string
-    {
+    ): string {
         return self::createHttpUrl(
             $schema,
             $endPoint->host(),
@@ -39,8 +38,7 @@ class EndpointExtensions
         string $schema,
         string $formatString,
         array $args
-    ): string
-    {
+    ): string {
         return self::createHttpUrl(
             $schema,
             $endPoint->host(),

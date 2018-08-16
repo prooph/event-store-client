@@ -228,7 +228,7 @@ class EventStoreConnectionLogicHandler
                 : null
         );
 
-        $promise->onResolve(function (?\Throwable $e, NodeEndPoints $endpoints = null) use ($deferred): void {
+        $promise->onResolve(function (?Throwable $e, NodeEndPoints $endpoints = null) use ($deferred): void {
             if ($e) {
                 $this->enqueueMessage(new CloseConnectionMessage(
                     'Failed to resolve TCP end point to which to connect',
@@ -322,13 +322,13 @@ class EventStoreConnectionLogicHandler
             function (TcpPackageConnection $connection, TcpPackage $package): void {
                 $this->enqueueMessage(new HandleTcpPackageMessage($connection, $package));
             },
-            function (TcpPackageConnection $connection, \Throwable $exception): void {
+            function (TcpPackageConnection $connection, Throwable $exception): void {
                 $this->enqueueMessage(new TcpConnectionErrorMessage($connection, $exception));
             },
             function (TcpPackageConnection $connection): void {
                 $this->enqueueMessage(new TcpConnectionEstablishedMessage($connection));
             },
-            function (TcpPackageConnection $connection, \Throwable $exception): void {
+            function (TcpPackageConnection $connection, Throwable $exception): void {
                 $this->enqueueMessage(new TcpConnectionClosedMessage($connection, $exception));
             }
         );
@@ -947,7 +947,7 @@ class EventStoreConnectionLogicHandler
         $this->eventHandler->disconnected(new ClientConnectionEventArgs($this->esConnection, $remoteEndPoint));
     }
 
-    private function raiseErrorOccurred(\Throwable $e): void
+    private function raiseErrorOccurred(Throwable $e): void
     {
         $this->eventHandler->errorOccurred(new ClientErrorEventArgs($this->esConnection, $e));
     }

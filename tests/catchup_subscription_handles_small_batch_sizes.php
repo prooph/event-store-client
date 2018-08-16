@@ -80,7 +80,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
 
     /**
      * @test
-     * @throws Throwable
+     * @throws \Throwable
      */
     public function catchupSubscriptionToAllHandlesManyEventsWithSmallBatchSize(): void
     {
@@ -127,7 +127,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
 
     /**
      * @test
-     * @throws Throwable
+     * @throws \Throwable
      */
     public function catchupSubscriptionToStreamHandlesManyEventsWithSmallBatchSize(): void
     {

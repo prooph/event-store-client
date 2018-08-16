@@ -28,6 +28,7 @@ use Prooph\EventStoreClient\Messages\ClusterMessages\ClusterInfoDto;
 use Prooph\EventStoreClient\Messages\ClusterMessages\MemberInfoDto;
 use Prooph\EventStoreClient\Messages\ClusterMessages\VNodeState;
 use Psr\Log\LoggerInterface as Logger;
+use Throwable;
 use function Amp\call;
 
 /** @internal */
@@ -109,7 +110,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
                         return new Success($endPoints);
                     }
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     $this->log->info(\sprintf(
                         'Discovering attempt %d/%d failed with error: %s',
                         $attempt,
@@ -242,7 +243,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
                 /** @var Response $response */
                 $response = yield $this->client->request($request);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 return null;
             }
 

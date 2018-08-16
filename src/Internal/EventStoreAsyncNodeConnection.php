@@ -55,6 +55,7 @@ use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\StreamMetadataResult;
 use Prooph\EventStoreClient\SystemSettings;
 use Prooph\EventStoreClient\UserCredentials;
+use Throwable;
 
 final class EventStoreAsyncNodeConnection implements
     EventStoreAsyncConnection,
@@ -411,7 +412,7 @@ final class EventStoreAsyncNodeConnection implements
 
         $deferred = new Deferred();
 
-        $readEventPromise->onResolve(function (?\Throwable $e, $eventReadResult) use ($stream, $deferred) {
+        $readEventPromise->onResolve(function (?Throwable $e, $eventReadResult) use ($stream, $deferred) {
             if ($e) {
                 $deferred->fail($e);
             }

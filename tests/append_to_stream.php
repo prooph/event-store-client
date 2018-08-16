@@ -24,6 +24,7 @@ use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\WriteResult;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
+use Throwable;
 use function Amp\call;
 use function Amp\Promise\wait;
 
@@ -310,7 +311,7 @@ class append_to_stream extends TestCase
 
             try {
                 yield $connection->deleteStreamAsync($stream, ExpectedVersion::EmptyStream, true);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->fail($e->getMessage());
             }
 

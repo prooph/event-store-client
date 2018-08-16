@@ -56,7 +56,7 @@ class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
 
     /**
      * @test
-     * @throws Throwable
+     * @throws \Throwable
      */
     public function test(): void
     {

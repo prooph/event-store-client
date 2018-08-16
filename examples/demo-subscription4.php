@@ -17,6 +17,7 @@ use Amp\Promise;
 use Amp\Success;
 use Prooph\EventStoreClient\Internal\StopWatch;
 use Prooph\EventStoreClient\Internal\VolatileEventStoreSubscription;
+use Throwable;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -49,7 +50,7 @@ Loop::run(function () {
 
             return new Success();
         },
-        function (VolatileEventStoreSubscription $subscription, SubscriptionDropReason $reason, \Throwable $exception): void {
+        function (VolatileEventStoreSubscription $subscription, SubscriptionDropReason $reason, Throwable $exception): void {
             echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
             echo 'ex: ' . $exception->getMessage() . PHP_EOL;
         },

@@ -18,6 +18,7 @@ use Prooph\EventStoreClient\Exception\InvalidOperationException;
 use Prooph\EventStoreClient\Position;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
+use Throwable;
 use function Amp\call;
 use function Amp\Promise\wait;
 
@@ -58,49 +59,49 @@ class event_store_connection_should extends TestCase
             try {
                 yield $connection->deleteStreamAsync($s, 0);
                 $this->fail('No exception thrown on DeleteStreamAsync');
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->assertInstanceOf(InvalidOperationException::class, $e);
             }
 
             try {
                 yield $connection->appendToStreamAsync($s, 0, $events);
                 $this->fail('No exception thrown on AppendToStreamAsync');
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->assertInstanceOf(InvalidOperationException::class, $e);
             }
 
             try {
                 yield $connection->readStreamEventsForwardAsync($s, 0, 1);
                 $this->fail('No exception thrown on ReadStreamEventsForwardAsync');
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->assertInstanceOf(InvalidOperationException::class, $e);
             }
 
             try {
                 yield $connection->readStreamEventsBackwardAsync($s, 0, 1);
                 $this->fail('No exception thrown on ReadStreamEventsBackwardAsync');
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->assertInstanceOf(InvalidOperationException::class, $e);
             }
 
             try {
                 yield $connection->readAllEventsForwardAsync(Position::start(), 1);
                 $this->fail('No exception thrown on ReadAllEventsForwardAsync');
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->assertInstanceOf(InvalidOperationException::class, $e);
             }
 
             try {
                 yield $connection->readAllEventsBackwardAsync(Position::end(), 1);
                 $this->fail('No exception thrown on ReadAllEventsBackwardAsync');
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->assertInstanceOf(InvalidOperationException::class, $e);
             }
 
             try {
                 yield $connection->startTransactionAsync($s, 0);
                 $this->fail('No exception thrown on StartTransactionAsync');
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->assertInstanceOf(InvalidOperationException::class, $e);
             }
 
@@ -109,7 +110,7 @@ class event_store_connection_should extends TestCase
                     return new Success();
                 });
                 $this->fail('No exception thrown on SubscribeToStreamAsync');
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->assertInstanceOf(InvalidOperationException::class, $e);
             }
 
@@ -118,7 +119,7 @@ class event_store_connection_should extends TestCase
                     return new Success();
                 });
                 $this->fail('No exception thrown on SubscribeToAllAsync');
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->assertInstanceOf(InvalidOperationException::class, $e);
             }
         }));

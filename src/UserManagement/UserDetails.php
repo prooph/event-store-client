@@ -36,8 +36,7 @@ final class UserDetails
         DateTimeImmutable $dateLastUpdated,
         bool $disabled,
         array $links
-    )
-    {
+    ) {
         $this->loginName = $loginName;
         $this->fullName = $fullName;
         $this->groups = $groups;

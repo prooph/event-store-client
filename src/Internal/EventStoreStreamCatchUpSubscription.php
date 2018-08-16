@@ -25,6 +25,7 @@ use Prooph\EventStoreClient\StreamEventsSlice;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
+use Throwable;
 use function Amp\call;
 
 class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
@@ -181,7 +182,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
                     }
 
                     yield $promise;
-                } catch (\Throwable $ex) {
+                } catch (Throwable $ex) {
                     $this->dropSubscription(SubscriptionDropReason::eventHandlerException(), $ex);
 
                     throw $ex;
