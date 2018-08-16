@@ -65,4 +65,157 @@ class UsersManager
 
         return $this->client->delete($this->endPoint, $login, $userCredentials, $this->schema);
     }
+
+    /** @return Promise<UserDetails[]> */
+    public function listAllAsync(UserCredentials $userCredentials = null): Promise
+    {
+        return $this->client->listAll($this->endPoint, $userCredentials, $this->schema);
+    }
+
+    /** @return Promise<UserDetails> */
+    public function getCurrentUserAsync(UserCredentials $userCredentials): Promise
+    {
+        return $this->client->getCurrentUser($this->endPoint, $userCredentials, $this->schema);
+    }
+
+    /** @return Promise<UserDetails> */
+    public function getUserAsync(string $login, UserCredentials $userCredentials = null): Promise
+    {
+        if (empty($login)) {
+            throw new InvalidArgumentException('Login cannot be empty');
+        }
+
+        return $this->client->getUser($this->endPoint, $login, $userCredentials, $this->schema);
+    }
+
+    /**
+     * @param string $login
+     * @param string $fullName
+     * @param string[] $groups
+     * @param string $password
+     * @param UserCredentials|null $userCredentials
+     * @return Promise
+     */
+    public function createUserAsync(
+        string $login,
+        string $fullName,
+        array $groups,
+        string $password,
+        UserCredentials $userCredentials = null
+    ): Promise {
+        if (empty($login)) {
+            throw new InvalidArgumentException('Login cannot be empty');
+        }
+
+        if (empty($fullName)) {
+            throw new InvalidArgumentException('FullName cannot be empty');
+        }
+
+        if (empty($password)) {
+            throw new InvalidArgumentException('Password cannot be empty');
+        }
+
+        foreach ($groups as $group) {
+            if (! \is_string($group) || empty($group)) {
+                throw new InvalidArgumentException('Expected an array of non empty strings for group');
+            }
+        }
+
+        return $this->client->createUser(
+            $this->endPoint,
+            new UserCreationInformation(
+                $login,
+                $fullName,
+                $groups,
+                $password
+            ),
+            $userCredentials,
+            $this->schema
+        );
+    }
+
+    /**
+     * @param string $login
+     * @param string $fullName
+     * @param string[] $groups
+     * @param UserCredentials|null $userCredentials
+     * @return Promise
+     */
+    public function updateUserAsync(
+        string $login,
+        string $fullName,
+        array $groups,
+        UserCredentials $userCredentials = null
+    ): Promise {
+        if (empty($login)) {
+            throw new InvalidArgumentException('Login cannot be empty');
+        }
+
+        if (empty($fullName)) {
+            throw new InvalidArgumentException('FullName cannot be empty');
+        }
+
+        foreach ($groups as $group) {
+            if (! \is_string($group) || empty($group)) {
+                throw new InvalidArgumentException('Expected an array of non empty strings for group');
+            }
+        }
+
+        return $this->client->updateUser(
+            $this->endPoint,
+            $login,
+            new UserUpdateInformation($fullName, $groups),
+            $userCredentials,
+            $this->schema
+        );
+    }
+
+    public function changePasswordAsync(
+        string $login,
+        string $oldPassword,
+        string $newPassword,
+        UserCredentials $userCredentials = null
+    ): Promise {
+        if (empty($login)) {
+            throw new InvalidArgumentException('Login cannot be empty');
+        }
+
+        if (empty($oldPassword)) {
+            throw new InvalidArgumentException('Old password cannot be empty');
+        }
+
+        if (empty($newPassword)) {
+            throw new InvalidArgumentException('New password cannot be empty');
+        }
+
+        return $this->client->changePassword(
+            $this->endPoint,
+            $login,
+            new ChangePasswordDetails($oldPassword, $newPassword),
+            $userCredentials,
+            $this->schema
+        );
+    }
+
+    public function resetPasswordAsync(
+        string $login,
+        string $newPassword,
+        UserCredentials $userCredentials = null
+    ): Promise {
+        if (empty($login)) {
+            throw new InvalidArgumentException('Login cannot be empty');
+        }
+
+        if (empty($newPassword)) {
+            throw new InvalidArgumentException('New password cannot be empty');
+        }
+
+        return $this->client->resetPassword(
+            $this->endPoint,
+            $login,
+            new ResetPasswordDetails($newPassword),
+            $userCredentials,
+            $this->schema
+        );
+    }
 }

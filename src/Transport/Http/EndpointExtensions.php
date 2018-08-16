@@ -37,7 +37,7 @@ class EndpointExtensions
         IpEndPoint $endPoint,
         string $schema,
         string $formatString,
-        array $args
+        ...$args
     ): string {
         return self::createHttpUrl(
             $schema,

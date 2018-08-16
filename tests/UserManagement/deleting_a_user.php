@@ -15,6 +15,7 @@ namespace ProophTest\EventStoreClient\UserManagement;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\UserCommandFailedException;
 use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
+use Prooph\EventStoreClient\UserManagement\UserDetails;
 use ProophTest\EventStoreClient\DefaultData;
 use Ramsey\Uuid\Uuid;
 use function Amp\call;
@@ -41,17 +42,20 @@ class deleting_a_user extends TestWithNode
         }));
     }
 
-//    /**
-//     * @test
-//     * @throws \Throwable
-//     */
-//    public function deleting_created_user_deletes_it(): void
-//    {
-//        var user = Guid.NewGuid().ToString();
-//        Assert.DoesNotThrow(() => _manager.CreateUserAsync(user, "ourofull", new[] { "foo", "bar" }, "ouro", new UserCredentials("admin", "changeit")).Wait());
-//        Assert.DoesNotThrow(() => _manager.DeleteUserAsync(user, new UserCredentials("admin", "changeit")).Wait());
-//    }
-//
+    /**
+     * @test
+     * @throws \Throwable
+     * @doesNotPerformAssertions
+     */
+    public function deleting_created_user_deletes_it(): void
+    {
+        wait(call(function () {
+            $user = Uuid::uuid4()->toString();
+
+            yield $this->manager->createUserAsync($user, 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
+            yield $this->manager->deleteUserAsync($user, DefaultData::adminCredentials());
+        }));
+    }
 
     /**
      * @test
@@ -64,23 +68,30 @@ class deleting_a_user extends TestWithNode
         $this->manager->deleteUserAsync('', DefaultData::adminCredentials());
     }
 
-//
-//    /**
-//     * @test
-//     * @throws \Throwable
-//     */
-//    public function can_delete_a_user(): void
-//    {
-//        _manager.CreateUserAsync("ouro", "ouro", new[] { "foo", "bar" }, "ouro", new UserCredentials("admin", "changeit")).Wait();
-//        Assert.DoesNotThrow(() =>
-//        {
-//            var x =_manager.GetUserAsync("ouro", new UserCredentials("admin", "changeit")).Result;
-//        });
-//        _manager.DeleteUserAsync("ouro", new UserCredentials("admin", "changeit")).Wait();
-//
-//        var ex = Assert.Throws<AggregateException>(
-//            () => { var x = _manager.GetUserAsync("ouro", new UserCredentials("admin", "changeit")).Result; }
-//        );
-//        Assert.AreEqual(HttpStatusCode.NotFound, ((UserCommandFailedException) ex.InnerException.InnerException).HttpStatusCode);
-//    }
+    /**
+     * @test
+     * @throws \Throwable
+     */
+    public function can_delete_a_user(): void
+    {
+        wait(call(function () {
+            yield $this->manager->createUserAsync(
+                'ouro',
+                'ouro',
+                ['foo', 'bar'],
+                'ouro',
+                DefaultData::adminCredentials()
+            );
+
+            $x = yield $this->manager->getUserAsync('ouro', DefaultData::adminCredentials());
+
+            $this->assertInstanceOf(UserDetails::class, $x);
+
+            yield $this->manager->deleteUserAsync('ouro', DefaultData::adminCredentials());
+
+            $this->expectException(UserCommandFailedException::class);
+
+            yield $this->manager->getUserAsync('ouro', DefaultData::adminCredentials());
+        }));
+    }
 }

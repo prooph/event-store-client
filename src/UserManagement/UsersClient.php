@@ -15,8 +15,10 @@ namespace Prooph\EventStoreClient\UserManagement;
 use Amp\Artax\Response;
 use Amp\Deferred;
 use Amp\Promise;
+use Prooph\EventStoreClient\Exception\UnexpectedValueException;
 use Prooph\EventStoreClient\Exception\UserCommandConflictException;
 use Prooph\EventStoreClient\Exception\UserCommandFailedException;
+use Prooph\EventStoreClient\Internal\DateTimeUtil;
 use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\Transport\Http\HttpAsyncClient;
@@ -52,7 +54,7 @@ class UsersClient
                 $endPoint,
                 $httpSchema,
                 '/users/%s/command/enable',
-                [$login]
+                $login
             ),
             '',
             $userCredentials,
@@ -71,7 +73,7 @@ class UsersClient
                 $endPoint,
                 $httpSchema,
                 '/users/%s/command/disable',
-                [$login]
+                $login
             ),
             '',
             $userCredentials,
@@ -90,72 +92,252 @@ class UsersClient
                 $endPoint,
                 $httpSchema,
                 '/users/%s',
-                [$login]
+                $login
             ),
             $userCredentials,
             HttpStatusCode::OK
         );
     }
 
-    /*
-        public Task<List<UserDetails>> ListAll(EndPoint endPoint, UserCredentials userCredentials = null, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
-        {
-            return SendGet(endPoint.ToHttpUrl(httpSchema, "/users/"), userCredentials, HttpStatusCode.OK)
-                .ContinueWith(x =>
-                    {
-                        if (x.IsFaulted) throw x.Exception;
-                        var r = JObject.Parse(x.Result);
-                        return r["data"] != null ? r["data"].ToObject<List<UserDetails>>() : null;
-                    });
-        }
+    /** @return Promise<UserDetails[]> */
+    public function listAll(
+        IpEndPoint $endPoint,
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HttpSchema
+    ): Promise {
+        $deferred = new Deferred();
 
-        public Task<UserDetails> GetCurrentUser(EndPoint endPoint, UserCredentials userCredentials = null, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
-        {
-            return SendGet(endPoint.ToHttpUrl(httpSchema, "/users/$current"), userCredentials, HttpStatusCode.OK)
-                .ContinueWith(x =>
-                {
-                    if (x.IsFaulted) throw x.Exception;
-                    var r = JObject.Parse(x.Result);
-                    return r["data"] != null ? r["data"].ToObject<UserDetails>() : null;
-                });
-        }
+        $promise = $this->sendGet(
+            EndpointExtensions::rawUrlToHttpUrl($endPoint, $httpSchema, '/users/'),
+            $userCredentials,
+            HttpStatusCode::OK
+        );
 
-        public Task<UserDetails> GetUser(EndPoint endPoint, string login, UserCredentials userCredentials = null, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
-        {
-            return SendGet(endPoint.ToHttpUrl(httpSchema, "/users/{0}", login), userCredentials, HttpStatusCode.OK)
-                .ContinueWith(x =>
-                {
-                    if (x.IsFaulted) throw x.Exception;
-                    var r = JObject.Parse(x.Result);
-                    return r["data"] != null ? r["data"].ToObject<UserDetails>() : null;
-                });
-        }
+        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
+            if ($exception) {
+                $deferred->fail($exception);
 
-        public Task CreateUser(EndPoint endPoint, UserCreationInformation newUser,
-            UserCredentials userCredentials = null, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
-        {
-            var userJson = newUser.ToJson();
-            return SendPost(endPoint.ToHttpUrl(httpSchema, "/users/"), userJson, userCredentials, HttpStatusCode.Created);
-        }
+                return;
+            }
 
-        public Task UpdateUser(EndPoint endPoint, string login, UserUpdateInformation updatedUser,
-            UserCredentials userCredentials, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
-        {
-            return SendPut(endPoint.ToHttpUrl(httpSchema, "/users/{0}", login), updatedUser.ToJson(), userCredentials, HttpStatusCode.OK);
-        }
+            $data = \json_decode($body, true);
 
-        public Task ChangePassword(EndPoint endPoint, string login, ChangePasswordDetails changePasswordDetails,
-            UserCredentials userCredentials, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
-        {
-            return SendPost(endPoint.ToHttpUrl(httpSchema, "/users/{0}/command/change-password", login), changePasswordDetails.ToJson(), userCredentials, HttpStatusCode.OK);
-        }
+            if (\json_last_error() !== \JSON_ERROR_NONE) {
+                $deferred->fail(new UnexpectedValueException(
+                    'Could not json decode response from server'
+                ));
 
-        public Task ResetPassword(EndPoint endPoint, string login, ResetPasswordDetails resetPasswordDetails,
-            UserCredentials userCredentials = null, string httpSchema = EndpointExtensions.HTTP_SCHEMA)
-        {
-            return SendPost(endPoint.ToHttpUrl(httpSchema, "/users/{0}/command/reset-password", login), resetPasswordDetails.ToJson(), userCredentials, HttpStatusCode.OK);
-        }
-    */
+                return;
+            }
+
+            $userDetails = [];
+
+            foreach ($data as $entry) {
+                $links = [];
+
+                foreach ($entry['links'] as $link) {
+                    $links[] = new RelLink($link['href'], $link['rel']);
+                }
+
+                $userDetails[] = new UserDetails(
+                    $entry['loginName'],
+                    $entry['fullName'],
+                    $entry['groups'],
+                    null,
+                    $entry['disabled'],
+                    $links
+                );
+            }
+
+            $deferred->resolve($userDetails);
+        });
+
+        return $deferred->promise();
+    }
+
+    /** @return Promise<UserDetails> */
+    public function getCurrentUser(
+        IpEndPoint $endPoint,
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HttpSchema
+    ): Promise {
+        $deferred = new Deferred();
+
+        $promise = $this->sendGet(
+            EndpointExtensions::rawUrlToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/users/$current'
+            ),
+            $userCredentials,
+            HttpStatusCode::OK
+        );
+
+        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
+            if ($exception) {
+                $deferred->fail($exception);
+
+                return;
+            }
+
+            $data = \json_decode($body, true);
+
+            if (\json_last_error() !== \JSON_ERROR_NONE) {
+                $deferred->fail(new UnexpectedValueException(
+                    'Could not json decode response from server'
+                ));
+
+                return;
+            }
+
+            $deferred->resolve(new UserDetails(
+                $data['loginName'],
+                $data['fullName'],
+                $data['groups'],
+                DateTimeUtil::create($data['dateLastUpdated']),
+                $data['disabled'],
+                []
+            ));
+        });
+
+        return $deferred->promise();
+    }
+
+    /** @return Promise<UserDetails> */
+    public function getUser(
+        IpEndPoint $endPoint,
+        string $login,
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HttpSchema
+    ): Promise {
+        $deferred = new Deferred();
+
+        $promise = $this->sendGet(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/users/%s',
+                $login
+            ),
+            $userCredentials,
+            HttpStatusCode::OK
+        );
+
+        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
+            if ($exception) {
+                $deferred->fail($exception);
+
+                return;
+            }
+
+            $data = \json_decode($body, true);
+
+            if (\json_last_error() !== \JSON_ERROR_NONE) {
+                $deferred->fail(new UnexpectedValueException(
+                    'Could not json decode response from server'
+                ));
+
+                return;
+            }
+
+            $links = [];
+
+            foreach ($data['data']['links'] as $link) {
+                $links[] = new RelLink($link['href'], $link['rel']);
+            }
+
+            $deferred->resolve(new UserDetails(
+                $data['data']['loginName'],
+                $data['data']['fullName'],
+                $data['data']['groups'],
+                isset($data['data']['dateLastUpdated'])
+                    ? DateTimeUtil::create($data['data']['dateLastUpdated'])
+                    : null,
+                $data['data']['disabled'],
+                $links
+            ));
+        });
+
+        return $deferred->promise();
+    }
+
+    public function createUser(
+        IpEndPoint $endPoint,
+        UserCreationInformation $newUser,
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HttpSchema
+    ): Promise {
+        return $this->sendPost(
+            EndpointExtensions::rawUrlToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/users/'
+            ),
+            \json_encode($newUser),
+            $userCredentials,
+            HttpStatusCode::Created
+        );
+    }
+
+    public function updateUser(
+        IpEndPoint $endPoint,
+        string $login,
+        UserUpdateInformation $updatedUser,
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HttpSchema
+    ): Promise {
+        return $this->sendPost(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/users/%s',
+                $login
+            ),
+            \json_encode($updatedUser),
+            $userCredentials,
+            HttpStatusCode::OK
+        );
+    }
+
+    public function changePassword(
+        IpEndPoint $endPoint,
+        string $login,
+        ChangePasswordDetails $changePasswordDetails,
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HttpSchema
+    ): Promise {
+        return $this->sendPost(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/users/%s/command/change-password',
+                $login
+            ),
+            \json_encode($changePasswordDetails),
+            $userCredentials,
+            HttpStatusCode::OK
+        );
+    }
+
+    public function resetPassword(
+        IpEndPoint $endPoint,
+        string $login,
+        ResetPasswordDetails $resetPasswordDetails,
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HttpSchema
+    ): Promise {
+        return $this->sendPost(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/users/%s/command/reset-password',
+                $login
+            ),
+            \json_encode($resetPasswordDetails),
+            $userCredentials,
+            HttpStatusCode::OK
+        );
+    }
 
     private function sendGet(
         string $url,
