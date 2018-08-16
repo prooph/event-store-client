@@ -24,7 +24,6 @@ use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use ProophTest\EventStoreClient\Helper\Connection;
-use Throwable;
 use function Amp\call;
 use function Amp\Promise\timeout;
 use function Amp\Promise\wait;

@@ -39,6 +39,7 @@
     <php>
         <env name="ES_HOST" value="localhost"/>
         <env name="ES_PORT" value="1113"/>
+        <env name="ES_HTTP_PORT" value="2113"/>
         <env name="ES_USER" value="admin"/>
         <env name="ES_PASS" value="changeit"/>
     </php>
