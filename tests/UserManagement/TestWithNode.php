@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\UserManagement\UsersManager;
 
-class TestWithNode extends TestCase
+abstract class TestWithNode extends TestCase
 {
     /** @var UsersManager */
     protected $manager;
