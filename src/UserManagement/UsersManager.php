@@ -14,6 +14,7 @@ namespace Prooph\EventStoreClient\UserManagement;
 
 use Amp\Promise;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStoreClient\Exception\UserCommandFailedException;
 use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\UserCredentials;
@@ -43,7 +44,7 @@ class UsersManager
             throw new InvalidArgumentException('Login cannot be empty');
         }
 
-        return $this->client->enable($this->endPoint, $login, $userCredentials);
+        return $this->client->enable($this->endPoint, $login, $userCredentials, $this->schema);
     }
 
     public function disableAsync(string $login, UserCredentials $userCredentials = null): Promise
@@ -52,15 +53,16 @@ class UsersManager
             throw new InvalidArgumentException('Login cannot be empty');
         }
 
-        return $this->client->disable($this->endPoint, $login, $userCredentials);
+        return $this->client->disable($this->endPoint, $login, $userCredentials, $this->schema);
     }
 
+    /** @throws UserCommandFailedException */
     public function deleteUserAsync(string $login, UserCredentials $userCredentials = null): Promise
     {
         if (empty($login)) {
             throw new InvalidArgumentException('Login cannot be empty');
         }
 
-        return $this->client->delete($this->endPoint, $login, $userCredentials);
+        return $this->client->delete($this->endPoint, $login, $userCredentials, $this->schema);
     }
 }
