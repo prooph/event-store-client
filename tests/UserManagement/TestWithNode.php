@@ -14,16 +14,16 @@ namespace ProophTest\EventStoreClient\UserManagement;
 
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\IpEndPoint;
-use Prooph\EventStoreClient\UserManagement\UsersManager;
+use Prooph\EventStoreClient\UserManagement\SyncUsersManager;
 
 abstract class TestWithNode extends TestCase
 {
-    /** @var UsersManager */
+    /** @var SyncUsersManager */
     protected $manager;
 
     protected function setUp(): void
     {
-        $this->manager = new UsersManager(
+        $this->manager = new SyncUsersManager(
             new IpEndPoint(
                 \getenv('ES_HOST'),
                 (int) \getenv('ES_HTTP_PORT')

@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use Amp\Promise;
 use ProophTest\EventStoreClient\DefaultData;
 use Ramsey\Uuid\Uuid;
 
@@ -26,11 +25,8 @@ abstract class TestWithUser extends TestWithNode
         parent::setUp();
 
         $this->username = Uuid::uuid4()->toString();
-    }
 
-    protected function setupUser(): Promise
-    {
-        return $this->manager->createUserAsync(
+        $this->manager->createUser(
             $this->username,
             'name',
             ['foo', 'admins'],

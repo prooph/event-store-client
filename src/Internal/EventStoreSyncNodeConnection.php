@@ -42,9 +42,18 @@ final class EventStoreSyncNodeConnection implements
     /** @var EventStoreAsyncConnection */
     private $asyncConnection;
 
-    public function __construct(EventStoreAsyncConnection $asyncConnection)
-    {
-        $this->asyncConnection = $asyncConnection;
+    public function __construct(
+        ConnectionSettings $settings,
+        ?ClusterSettings $clusterSettings,
+        EndPointDiscoverer $endPointDiscoverer,
+        string $connectionName = null
+    ) {
+        $this->asyncConnection = new EventStoreAsyncNodeConnection(
+            $settings,
+            $clusterSettings,
+            $endPointDiscoverer,
+            $connectionName
+        );
     }
 
     public function connectionName(): string

@@ -19,7 +19,7 @@ use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\UserCredentials;
 
-class UsersManager
+class AsyncUsersManager
 {
     /** @var UsersClient */
     private $client;
