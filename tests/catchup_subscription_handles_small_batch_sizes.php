@@ -127,8 +127,6 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
      */
     public function catchupSubscriptionToStreamHandlesManyEventsWithSmallBatchSize(): void
     {
-        $this->markTestIncomplete('This needs to be checked!');
-
         wait(call(function () {
             yield $this->setUpTestCase();
 
