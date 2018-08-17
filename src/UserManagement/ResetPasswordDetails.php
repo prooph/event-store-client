@@ -25,11 +25,6 @@ class ResetPasswordDetails implements JsonSerializable
         $this->newPassword = $newPassword;
     }
 
-    public function newPassword(): string
-    {
-        return $this->newPassword;
-    }
-
     public function jsonSerialize(): array
     {
         return [

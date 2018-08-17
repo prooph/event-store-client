@@ -28,17 +28,6 @@ class UserUpdateInformation implements JsonSerializable
         $this->groups = $groups;
     }
 
-    public function fullName(): string
-    {
-        return $this->fullName;
-    }
-
-    /** @return string[] */
-    public function groups(): array
-    {
-        return $this->groups;
-    }
-
     public function jsonSerialize(): array
     {
         return [

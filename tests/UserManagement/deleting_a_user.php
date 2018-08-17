@@ -58,22 +58,24 @@ class deleting_a_user extends TestWithNode
     /** @test */
     public function can_delete_a_user(): void
     {
+        $name = Uuid::uuid4()->toString();
+
         $this->manager->createUser(
-            'ouro',
+            $name,
             'ouro',
             ['foo', 'bar'],
             'ouro',
             DefaultData::adminCredentials()
         );
 
-        $x = $this->manager->getUser('ouro', DefaultData::adminCredentials());
+        $x = $this->manager->getUser($name, DefaultData::adminCredentials());
 
         $this->assertInstanceOf(UserDetails::class, $x);
 
-        $this->manager->deleteUser('ouro', DefaultData::adminCredentials());
+        $this->manager->deleteUser($name, DefaultData::adminCredentials());
 
         $this->expectException(UserCommandFailedException::class);
 
-        $this->manager->getUser('ouro', DefaultData::adminCredentials());
+        $this->manager->getUser($name, DefaultData::adminCredentials());
     }
 }

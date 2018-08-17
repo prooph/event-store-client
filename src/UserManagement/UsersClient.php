@@ -132,7 +132,7 @@ class UsersClient
 
             $userDetails = [];
 
-            foreach ($data as $entry) {
+            foreach ($data['data'] as $entry) {
                 $links = [];
 
                 foreach ($entry['links'] as $link) {
@@ -191,11 +191,11 @@ class UsersClient
             }
 
             $deferred->resolve(new UserDetails(
-                $data['loginName'],
-                $data['fullName'],
-                $data['groups'],
-                DateTimeUtil::create($data['dateLastUpdated']),
-                $data['disabled'],
+                $data['data']['loginName'],
+                $data['data']['fullName'],
+                $data['data']['groups'],
+                DateTimeUtil::create($data['data']['dateLastUpdated']),
+                $data['data']['disabled'],
                 []
             ));
         });
@@ -286,7 +286,7 @@ class UsersClient
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HttpSchema
     ): Promise {
-        return $this->sendPost(
+        return $this->sendPut(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,

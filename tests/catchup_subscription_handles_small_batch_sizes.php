@@ -28,9 +28,6 @@ use function Amp\call;
 use function Amp\Promise\timeout;
 use function Amp\Promise\wait;
 
-/**
- * @group longrunning
- */
 class catchup_subscription_handles_small_batch_sizes extends TestCase
 {
     /** @var string */
@@ -46,14 +43,14 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
             $this->connection = Connection::createAsync();
             yield $this->connection->connectAsync();
 
-            //Create 80000 events
-            for ($i = 0; $i < 80; $i++) {
+            //Create 10000 events
+            for ($i = 0; $i < 10; $i++) {
                 yield $this->connection->appendToStreamAsync(
                     $this->streamName,
                     ExpectedVersion::Any,
                     $this->createThousandEvents()
                 );
-                \fwrite(\STDOUT, 'batch ' . $i . ' of 80 appended' . PHP_EOL);
+                \fwrite(\STDOUT, 'batch ' . $i . ' of 10 appended' . PHP_EOL);
             }
 
             $this->settings = new CatchUpSubscriptionSettings(100, 1, false, true);
@@ -83,7 +80,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
      */
     public function catchupSubscriptionToAllHandlesManyEventsWithSmallBatchSize(): void
     {
-        $this->markTestSkipped('subscription to $all is buggy');
+        $this->markTestIncomplete('This needs to be checked!');
 
         wait(call(function () {
             yield $this->setUpTestCase();
@@ -130,6 +127,8 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
      */
     public function catchupSubscriptionToStreamHandlesManyEventsWithSmallBatchSize(): void
     {
+        $this->markTestIncomplete('This needs to be checked!');
+
         wait(call(function () {
             yield $this->setUpTestCase();
 

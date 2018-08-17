@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
+use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+
 class UserCredentials
 {
     /** @var string */
@@ -22,7 +24,11 @@ class UserCredentials
     public function __construct(string $username, string $password)
     {
         if (empty($username)) {
-            throw new \InvalidArgumentException('Username cannot be empty');
+            throw new InvalidArgumentException('Username cannot be empty');
+        }
+
+        if (empty($password)) {
+            throw new InvalidArgumentException('Password cannot be empty');
         }
 
         $this->username = $username;

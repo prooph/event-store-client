@@ -28,16 +28,6 @@ class ChangePasswordDetails implements JsonSerializable
         $this->newPassword = $newPassword;
     }
 
-    public function currentPassword(): string
-    {
-        return $this->currentPassword;
-    }
-
-    public function newPassword(): string
-    {
-        return $this->newPassword;
-    }
-
     public function jsonSerialize(): array
     {
         return [
