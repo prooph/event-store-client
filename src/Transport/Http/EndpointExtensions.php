@@ -23,13 +23,13 @@ class EndpointExtensions
     public static function rawUrlToHttpUrl(
         IpEndPoint $endPoint,
         string $schema,
-        string $rawUrl = null
+        string $rawUrl = ''
     ): string {
         return self::createHttpUrl(
             $schema,
             $endPoint->host(),
             $endPoint->port(),
-            null !== $rawUrl ? \ltrim($rawUrl, '/') : ''
+            \ltrim($rawUrl, '/')
         );
     }
 

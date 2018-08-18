@@ -12,6 +12,9 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
+use Prooph\EventStoreClient\IpEndPoint;
+use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
+use Prooph\EventStoreClient\UserManagement\SyncUsersManager;
 use ProophTest\EventStoreClient\DefaultData;
 
 class list_users extends TestWithNode
@@ -19,19 +22,74 @@ class list_users extends TestWithNode
     /** @test */
     public function list_all_users_works(): void
     {
-        $this->markTestSkipped('Users are set up and deleted before this test runs so db is in unknown state');
-
         $this->manager->createUser('ouro', 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
 
         $users = $this->manager->listAll(DefaultData::adminCredentials());
 
-        $this->assertCount(3, $users);
+        $this->assertGreaterThanOrEqual(3, \count($users));
 
-        $this->assertSame('admin', $users[0]->loginName());
-        $this->assertSame('Event Store Administrator', $users[0]->fullName());
-        $this->assertSame('ops', $users[1]->loginName());
-        $this->assertSame('Event Store Operations', $users[1]->fullName());
-        $this->assertSame('ouro', $users[2]->loginName());
-        $this->assertSame('ourofull', $users[2]->fullName());
+        $foundAdmin = false;
+        $foundOps = false;
+        $foundOuro = false;
+
+        foreach ($users as $user) {
+            if ($user->loginName() === 'admin') {
+                $foundAdmin = true;
+            }
+
+            if ($user->loginName() === 'ops') {
+                $foundOps = true;
+            }
+
+            if ($user->loginName() === 'ouro') {
+                $foundOuro = true;
+            }
+        }
+
+        $this->assertTrue($foundAdmin);
+        $this->assertTrue($foundOps);
+        $this->assertTrue($foundOuro);
+    }
+
+    /** @test */
+    public function list_all_users_falls_back_to_default_credentials(): void
+    {
+        $manager = new SyncUsersManager(
+            new IpEndPoint(
+                \getenv('ES_HOST'),
+                (int) \getenv('ES_HTTP_PORT')
+            ),
+            5000,
+            EndpointExtensions::HttpSchema,
+            DefaultData::adminCredentials()
+        );
+
+        $manager->createUser('ouro2', 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
+
+        $users = $manager->listAll();
+
+        $this->assertGreaterThanOrEqual(3, $users);
+
+        $foundAdmin = false;
+        $foundOps = false;
+        $foundOuro = false;
+
+        foreach ($users as $user) {
+            if ($user->loginName() === 'admin') {
+                $foundAdmin = true;
+            }
+
+            if ($user->loginName() === 'ops') {
+                $foundOps = true;
+            }
+
+            if ($user->loginName() === 'ouro2') {
+                $foundOuro = true;
+            }
+        }
+
+        $this->assertTrue($foundAdmin);
+        $this->assertTrue($foundOps);
+        $this->assertTrue($foundOuro);
     }
 }

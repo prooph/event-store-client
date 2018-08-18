@@ -14,6 +14,7 @@ namespace ProophTest\EventStoreClient\UserManagement;
 
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use ProophTest\EventStoreClient\DefaultData;
+use Ramsey\Uuid\Uuid;
 
 class creating_a_user extends TestWithNode
 {
@@ -67,17 +68,19 @@ class creating_a_user extends TestWithNode
     /** @test */
     public function creating_a_user_with_parameters_can_be_read(): void
     {
+        $login = Uuid::uuid4()->toString();
+
         $this->manager->createUser(
-            'ouro',
+            $login,
             'ourofull',
             ['foo', 'bar'],
             'foofoofoo',
             DefaultData::adminCredentials()
         );
 
-        $user = $this->manager->getUser('ouro', DefaultData::adminCredentials());
+        $user = $this->manager->getUser($login, DefaultData::adminCredentials());
 
-        $this->assertSame('ouro', $user->loginName());
+        $this->assertSame($login, $user->loginName());
         $this->assertSame('ourofull', $user->fullName());
         $this->assertEquals(['foo', 'bar'], $user->groups());
     }

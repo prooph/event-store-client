@@ -27,15 +27,19 @@ class AsyncUsersManager
     private $endPoint;
     /** @var string */
     private $schema;
+    /** @var UserCredentials|null */
+    private $defaultCredentials;
 
     public function __construct(
         IpEndPoint $endPoint,
         int $operationTimeout,
-        string $schema = EndpointExtensions::HttpSchema
+        string $schema = EndpointExtensions::HttpSchema,
+        UserCredentials $userCredentials = null
     ) {
         $this->client = new UsersClient($operationTimeout);
         $this->endPoint = $endPoint;
         $this->schema = $schema;
+        $this->defaultCredentials = $userCredentials;
     }
 
     public function enableAsync(string $login, UserCredentials $userCredentials = null): Promise
@@ -43,6 +47,8 @@ class AsyncUsersManager
         if (empty($login)) {
             throw new InvalidArgumentException('Login cannot be empty');
         }
+
+        $userCredentials = $userCredentials ?? $this->defaultCredentials;
 
         return $this->client->enable($this->endPoint, $login, $userCredentials, $this->schema);
     }
@@ -52,6 +58,8 @@ class AsyncUsersManager
         if (empty($login)) {
             throw new InvalidArgumentException('Login cannot be empty');
         }
+
+        $userCredentials = $userCredentials ?? $this->defaultCredentials;
 
         return $this->client->disable($this->endPoint, $login, $userCredentials, $this->schema);
     }
@@ -63,18 +71,24 @@ class AsyncUsersManager
             throw new InvalidArgumentException('Login cannot be empty');
         }
 
+        $userCredentials = $userCredentials ?? $this->defaultCredentials;
+
         return $this->client->delete($this->endPoint, $login, $userCredentials, $this->schema);
     }
 
     /** @return Promise<UserDetails[]> */
     public function listAllAsync(UserCredentials $userCredentials = null): Promise
     {
+        $userCredentials = $userCredentials ?? $this->defaultCredentials;
+
         return $this->client->listAll($this->endPoint, $userCredentials, $this->schema);
     }
 
     /** @return Promise<UserDetails> */
     public function getCurrentUserAsync(UserCredentials $userCredentials): Promise
     {
+        $userCredentials = $userCredentials ?? $this->defaultCredentials;
+
         return $this->client->getCurrentUser($this->endPoint, $userCredentials, $this->schema);
     }
 
@@ -84,6 +98,8 @@ class AsyncUsersManager
         if (empty($login)) {
             throw new InvalidArgumentException('Login cannot be empty');
         }
+
+        $userCredentials = $userCredentials ?? $this->defaultCredentials;
 
         return $this->client->getUser($this->endPoint, $login, $userCredentials, $this->schema);
     }
@@ -120,6 +136,8 @@ class AsyncUsersManager
                 throw new InvalidArgumentException('Expected an array of non empty strings for group');
             }
         }
+
+        $userCredentials = $userCredentials ?? $this->defaultCredentials;
 
         return $this->client->createUser(
             $this->endPoint,
@@ -161,6 +179,8 @@ class AsyncUsersManager
             }
         }
 
+        $userCredentials = $userCredentials ?? $this->defaultCredentials;
+
         return $this->client->updateUser(
             $this->endPoint,
             $login,
@@ -188,6 +208,8 @@ class AsyncUsersManager
             throw new InvalidArgumentException('New password cannot be empty');
         }
 
+        $userCredentials = $userCredentials ?? $this->defaultCredentials;
+
         return $this->client->changePassword(
             $this->endPoint,
             $login,
@@ -209,6 +231,8 @@ class AsyncUsersManager
         if (empty($newPassword)) {
             throw new InvalidArgumentException('New password cannot be empty');
         }
+
+        $userCredentials = $userCredentials ?? $this->defaultCredentials;
 
         return $this->client->resetPassword(
             $this->endPoint,
