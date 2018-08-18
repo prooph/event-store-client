@@ -39,8 +39,6 @@ Loop::run(function () {
     $stopWatch = StopWatch::startNew();
     $i = 0;
 
-    // @todo: there may be a bug somewhere, couldn't locate it yet. The server does not confirm the subscription yet !!
-    // see: https://github.com/EventStore/EventStore/issues/1677
     $subscription = yield $connection->subscribeToAllAsync(
         true,
         function (VolatileEventStoreSubscription $subscription, ResolvedEvent $event) use ($stopWatch, &$i): Promise {

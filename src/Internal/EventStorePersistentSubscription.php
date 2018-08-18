@@ -47,7 +47,8 @@ class EventStorePersistentSubscription extends AbstractEventStorePersistentSubsc
             $logger,
             $verboseLogging,
             $settings,
-            $bufferSize, $autoAck
+            $bufferSize,
+            $autoAck
         );
 
         $this->handler = $handler;

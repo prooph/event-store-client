@@ -27,10 +27,10 @@ use Prooph\EventStoreClient\Exception\UnexpectedCommandException;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled;
-use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled\MasterInfo;
-use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled\NotHandledReason;
+use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled_MasterInfo as MasterInfo;
+use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled_NotHandledReason as NotHandledReason;
 use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped;
-use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped\SubscriptionDropReason as SubscriptionDropReasonMessage;
+use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped_SubscriptionDropReason as SubscriptionDropReasonMessage;
 use Prooph\EventStoreClient\Messages\ClientMessages\UnsubscribeFromStream;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
@@ -145,7 +145,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
             TcpCommand::unsubscribeFromStream(),
             TcpFlags::none(),
             $this->correlationId,
-            (new UnsubscribeFromStream())->serializeToString()
+            (string) (new UnsubscribeFromStream())->serializeToString()
         );
     }
 
@@ -161,7 +161,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
             switch ($package->command()->value()) {
                 case TcpCommand::SubscriptionDropped:
                     $message = new SubscriptionDropped();
-                    $message->mergeFromString($package->data());
+                    $message->parseFromString($package->data());
 
                     switch ($message->getReason()) {
                         case SubscriptionDropReasonMessage::Unsubscribed:
@@ -207,7 +207,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
                     }
 
                     $message = new NotHandled();
-                    $message->mergeFromString($package->data());
+                    $message->parseFromString($package->data());
 
                     switch ($message->getReason()) {
                         case NotHandledReason::NotReady:
@@ -216,7 +216,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
                             return new InspectionResult(InspectionDecision::retry(), 'NotHandledException - TooBusy');
                         case NotHandledReason::NotMaster:
                             $masterInfo = new MasterInfo();
-                            $masterInfo->mergeFromString($message->getAdditionalInfo());
+                            $masterInfo->parseFromString($message->getAdditionalInfo());
 
                             return new InspectionResult(
                                 InspectionDecision::reconnect(),

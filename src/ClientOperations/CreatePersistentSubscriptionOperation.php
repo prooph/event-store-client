@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Google\Protobuf\Internal\Message;
 use Prooph\EventStoreClient\Common\SystemConsumerStrategies;
 use Prooph\EventStoreClient\Exception\AccessDeniedException;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
@@ -22,12 +21,13 @@ use Prooph\EventStoreClient\Internal\PersistentSubscriptionCreateResult;
 use Prooph\EventStoreClient\Internal\PersistentSubscriptionCreateStatus;
 use Prooph\EventStoreClient\Messages\ClientMessages\CreatePersistentSubscription;
 use Prooph\EventStoreClient\Messages\ClientMessages\CreatePersistentSubscriptionCompleted;
-use Prooph\EventStoreClient\Messages\ClientMessages\CreatePersistentSubscriptionCompleted\CreatePersistentSubscriptionResult;
+use Prooph\EventStoreClient\Messages\ClientMessages\CreatePersistentSubscriptionCompleted_CreatePersistentSubscriptionResult as CreatePersistentSubscriptionResult;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\UserCredentials;
+use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -62,7 +62,7 @@ class CreatePersistentSubscriptionOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): Message
+    protected function createRequestDto(): ProtobufMessage
     {
         $message = new CreatePersistentSubscription();
         $message->setSubscriptionGroupName($this->groupName);
@@ -85,7 +85,7 @@ class CreatePersistentSubscriptionOperation extends AbstractOperation
         return $message;
     }
 
-    protected function inspectResponse(Message $response): InspectionResult
+    protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
         /** @var CreatePersistentSubscriptionCompleted $response */
         switch ($response->getResult()) {
@@ -119,7 +119,7 @@ class CreatePersistentSubscriptionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response): PersistentSubscriptionCreateResult
+    protected function transformResponse(ProtobufMessage $response): PersistentSubscriptionCreateResult
     {
         return new PersistentSubscriptionCreateResult(
             PersistentSubscriptionCreateStatus::success()

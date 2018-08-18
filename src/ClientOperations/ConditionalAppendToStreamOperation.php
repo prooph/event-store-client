@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Google\Protobuf\Internal\Message;
 use Prooph\EventStoreClient\ConditionalWriteResult;
 use Prooph\EventStoreClient\ConditionalWriteStatus;
 use Prooph\EventStoreClient\EventData;
@@ -29,6 +28,7 @@ use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\UserCredentials;
+use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -67,24 +67,21 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): Message
+    protected function createRequestDto(): ProtobufMessage
     {
-        $dtos = [];
-
-        foreach ($this->events as $event) {
-            $dtos[] = NewEventConverter::convert($event);
-        }
-
         $message = new WriteEvents();
         $message->setEventStreamId($this->stream);
         $message->setExpectedVersion($this->expectedVersion);
-        $message->setEvents($dtos);
         $message->setRequireMaster($this->requireMaster);
+
+        foreach ($this->events as $event) {
+            $message->appendEvents(NewEventConverter::convert($event));
+        }
 
         return $message;
     }
 
-    protected function inspectResponse(Message $response): InspectionResult
+    protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
         /** @var WriteEventsCompleted $response */
         switch ($response->getResult()) {
@@ -121,7 +118,7 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response): ConditionalWriteResult
+    protected function transformResponse(ProtobufMessage $response): ConditionalWriteResult
     {
         /** @var WriteEventsCompleted $response */
         if ($response->getResult() === OperationResult::WrongExpectedVersion) {
@@ -148,7 +145,7 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
 
     public function __toString(): string
     {
-        return \sprintf('Stream: %s, ExpectedVersion: %d, RequireMaster:',
+        return \sprintf('Stream: %s, ExpectedVersion: %d, RequireMaster: %s',
             $this->stream,
             $this->expectedVersion,
             $this->requireMaster ? 'yes' : 'no'

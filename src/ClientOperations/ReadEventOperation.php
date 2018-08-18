@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Google\Protobuf\Internal\Message;
 use Prooph\EventStoreClient\EventReadResult;
 use Prooph\EventStoreClient\EventReadStatus;
 use Prooph\EventStoreClient\Exception\AccessDeniedException;
@@ -21,12 +20,13 @@ use Prooph\EventStoreClient\Exception\ServerError;
 use Prooph\EventStoreClient\Internal\EventMessageConverter;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadEvent;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadEventCompleted;
-use Prooph\EventStoreClient\Messages\ClientMessages\ReadEventCompleted\ReadEventResult;
+use Prooph\EventStoreClient\Messages\ClientMessages\ReadEventCompleted_ReadEventResult as ReadEventResult;
 use Prooph\EventStoreClient\ResolvedEvent;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\UserCredentials;
+use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -65,7 +65,7 @@ class ReadEventOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): Message
+    protected function createRequestDto(): ProtobufMessage
     {
         $message = new ReadEvent();
         $message->setEventStreamId($this->stream);
@@ -76,7 +76,7 @@ class ReadEventOperation extends AbstractOperation
         return $message;
     }
 
-    protected function inspectResponse(Message $response): InspectionResult
+    protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
         /** @var ReadEventCompleted $response */
 
@@ -110,7 +110,7 @@ class ReadEventOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response): EventReadResult
+    protected function transformResponse(ProtobufMessage $response): EventReadResult
     {
         /* @var ReadEventCompleted $response */
         $eventMessage = $response->getEvent();
