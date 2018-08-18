@@ -37,7 +37,7 @@ class TcpPackage
     /** @var string|null */
     private $login;
     /** @var string|null */
-    private $pass;
+    private $password;
 
     public static function fromRawData(string $bytes): TcpPackage
     {
@@ -53,19 +53,19 @@ class TcpPackage
         $login = null;
         $pass = null;
 
-        if (TcpFlags::Authenticated === $flags) {
-            list('l' => $loginLen) = \unpack('Cl/', $bytes, self::DataOffset + self::FlagsOffset);
-            list('l' => $login) = \unpack('a' . $loginLen . 'l/', $bytes, self::DataOffset + self::FlagsOffset + 1);
+        list('c' => $correlationId) = \unpack('H32c', $bytes, self::DataOffset + self::CorrelationOffset);
 
-            list('p' => $passLen) = \unpack('Cp/', $bytes, self::DataOffset + self::FlagsOffset + 1 + $loginLen);
-            list('p' => $pass) = \unpack('a' . $loginLen . 'p/', $bytes, self::DataOffset + self::FlagsOffset + 2 + $loginLen);
+        if ($flags->equals(TcpFlags::authenticated())) {
+            list('l' => $loginLen) = \unpack('Cl/', $bytes, self::AuthOffset + self::DataOffset);
+            list('l' => $login) = \unpack('a' . $loginLen . 'l/', $bytes, self::AuthOffset + self::DataOffset + 1);
+
+            list('p' => $passLen) = \unpack('Cp/', $bytes, self::AuthOffset + self::DataOffset + 1 + $loginLen);
+            list('p' => $pass) = \unpack('a' . $passLen . 'p/', $bytes, self::AuthOffset + self::DataOffset + 2 + $loginLen);
 
             $headerSize += 1 + $loginLen + 1 + $passLen;
-
-            list('c' => $correlationId, 'd' => $data) = \unpack('H32c/a' . ($messageLength - $headerSize) . 'd/', $bytes, self::DataOffset + self::CorrelationOffset + 2 + $loginLen + $passLen);
-        } else {
-            list('c' => $correlationId, 'd' => $data) = \unpack('H32c/a' . ($messageLength - $headerSize) . 'd/', $bytes, self::DataOffset + self::CorrelationOffset);
         }
+
+        list('d' => $data) = \unpack('a' . ($messageLength - $headerSize) . 'd/', $bytes, self::DataOffset + $headerSize);
 
         return new self($command, $flags, $correlationId, $data, $login, $pass);
     }
@@ -76,14 +76,32 @@ class TcpPackage
         string $correlationId,
         string $data = '',
         string $login = null,
-        string $pass = null
+        string $password = null
     ) {
+        if ($flags->equals(TcpFlags::authenticated())) {
+            if (null === $login) {
+                throw new InvalidArgumentException('Login not provided for authorized TcpPackage');
+            }
+
+            if (null === $password) {
+                throw new InvalidArgumentException('Password not provided for authorized TcpPackage');
+            }
+        } else {
+            if (null !== $login) {
+                throw new InvalidArgumentException('Login provided for non-authorized TcpPackage');
+            }
+
+            if (null !== $password) {
+                throw new InvalidArgumentException('Password provided for non-authorized TcpPackage');
+            }
+        }
+
         $this->command = $command;
         $this->flags = $flags;
         $this->correlationId = $correlationId;
         $this->data = $data;
         $this->login = $login;
-        $this->pass = $pass;
+        $this->password = $password;
     }
 
     public function asBytes(): string
@@ -94,7 +112,7 @@ class TcpPackage
 
         if ($this->flags->equals(TcpFlags::authenticated())) {
             $loginLen = \strlen($this->login);
-            $passLen = \strlen($this->pass);
+            $passLen = \strlen($this->password);
 
             if ($loginLen > 255) {
                 throw new InvalidArgumentException(\sprintf(
@@ -119,7 +137,7 @@ class TcpPackage
                 $loginLen,
                 $this->login,
                 $passLen,
-                $this->pass,
+                $this->password,
                 $this->data
             );
         }
@@ -159,8 +177,8 @@ class TcpPackage
         return $this->login;
     }
 
-    public function pass(): ?string
+    public function password(): ?string
     {
-        return $this->pass;
+        return $this->password;
     }
 }
