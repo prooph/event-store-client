@@ -23,15 +23,15 @@ class PersistentSubscriptionNakEventAction
     ];
 
     // Client unknown on action. Let server decide
-    public const Unknown = 0;
+    public const UNKNOWN = 0;
     // Park message do not resend. Put on poison queue
-    public const Park = 1;
+    public const PARK = 1;
     // Explicitly retry the message
-    public const Retry = 2;
+    public const RETRY = 2;
     // Skip this message do not resend do not put in poison queue
-    public const Skip = 3;
+    public const SKIP = 3;
     // Stop the subscription
-    public const Stop = 4;
+    public const STOP = 4;
 
     private $name;
     private $value;

@@ -41,12 +41,12 @@ class StreamWriter
     {
         return call(function () use ($events) {
             foreach ($events as $key => $event) {
-                $expVer = $this->version === ExpectedVersion::Any ? ExpectedVersion::Any : $this->version + $key;
+                $expVer = $this->version === ExpectedVersion::ANY ? ExpectedVersion::ANY : $this->version + $key;
                 /** @var WriteResult $result */
                 $result = yield $this->connection->appendToStreamAsync($this->stream, $expVer, [$event]);
                 $nextExpVer = $result->nextExpectedVersion();
 
-                if ($this->version !== ExpectedVersion::Any
+                if ($this->version !== ExpectedVersion::ANY
                     && ($expVer + 1) !== $nextExpVer
                 ) {
                     throw new \RuntimeException('Wrong next expected version');

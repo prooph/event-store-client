@@ -51,7 +51,7 @@ class LengthPrefixMessageFramer
 
         $dataLength = \strlen($data);
 
-        if ($dataLength < TcpPackage::MandatorySize) {
+        if ($dataLength < TcpPackage::MANDATORY_SIZE) {
             // message too short, let's wait for more data
             $this->messageBuffer = $data;
 
@@ -60,7 +60,7 @@ class LengthPrefixMessageFramer
 
         if (0 === $this->packageLength) {
             list('length' => $this->packageLength) = \unpack('Vlength', \substr($data, 0, 4));
-            $this->packageLength += TcpPackage::DataOffset;
+            $this->packageLength += TcpPackage::DATA_OFFSET;
         }
 
         if ($this->packageLength > $this->maxPackageSize) {

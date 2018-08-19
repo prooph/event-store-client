@@ -17,8 +17,8 @@ use Prooph\EventStoreClient\IpEndPoint;
 /** @internal */
 class EndpointExtensions
 {
-    public const HttpSchema = 'http';
-    public const HttpsSchema = 'https';
+    public const HTTP_SCHEMA = 'http';
+    public const HTTPS_SCHEMA = 'https';
 
     public static function rawUrlToHttpUrl(
         IpEndPoint $endPoint,

@@ -46,7 +46,7 @@ class reset_password extends TestWithUser
         try {
             $this->manager->changePassword($this->username, 'password', 'foobar', new UserCredentials($this->username, 'password'));
         } catch (UserCommandFailedException $e) {
-            $this->assertSame(HttpStatusCode::Unauthorized, $e->httpStatusCode());
+            $this->assertSame(HttpStatusCode::UNAUTHORIZED, $e->httpStatusCode());
 
             throw $e;
         }

@@ -38,7 +38,7 @@ trait SpecificationWithLinkToToMaxCountDeletedEvents
 
         yield $this->conn->appendToStreamAsync(
             $this->deletedStreamName,
-            ExpectedVersion::Any,
+            ExpectedVersion::ANY,
             [
                 new EventData(EventId::generate(), 'testing1', true, \json_encode(['foo' => 4])),
             ],
@@ -47,13 +47,13 @@ trait SpecificationWithLinkToToMaxCountDeletedEvents
 
         yield $this->conn->setStreamMetadataAsync(
             $this->deletedStreamName,
-            ExpectedVersion::Any,
+            ExpectedVersion::ANY,
             new StreamMetadata(2)
         );
 
         yield $this->conn->appendToStreamAsync(
             $this->deletedStreamName,
-            ExpectedVersion::Any,
+            ExpectedVersion::ANY,
             [
                 new EventData(EventId::generate(), 'testing2', true, \json_encode(['foo' => 4])),
             ]
@@ -61,7 +61,7 @@ trait SpecificationWithLinkToToMaxCountDeletedEvents
 
         yield $this->conn->appendToStreamAsync(
             $this->deletedStreamName,
-            ExpectedVersion::Any,
+            ExpectedVersion::ANY,
             [
                 new EventData(EventId::generate(), 'testing3', true, \json_encode(['foo' => 4])),
             ]
@@ -69,9 +69,9 @@ trait SpecificationWithLinkToToMaxCountDeletedEvents
 
         $this->conn->appendToStreamAsync(
             $this->linkedStreamName,
-            ExpectedVersion::Any,
+            ExpectedVersion::ANY,
             [
-                new EventData(EventId::generate(), SystemEventTypes::LinkTo, false, '0@' . $this->deletedStreamName),
+                new EventData(EventId::generate(), SystemEventTypes::LINK_TO, false, '0@' . $this->deletedStreamName),
             ],
             $creds
         );

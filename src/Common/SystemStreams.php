@@ -14,12 +14,12 @@ namespace Prooph\EventStoreClient\Common;
 
 class SystemStreams
 {
-    public const PersistentSubscriptionConfig = '$persistentSubscriptionConfig';
-    public const AllStream = '$all';
-    public const StreamsStream = '$streams';
-    public const SettingsStream = '$settings';
-    public const StatsStreamPrefix = '$stats';
-    public const ScavengesStream = '$scavenges';
+    public const PERSISTENT_SUBSCRIPTION_CONFIG = '$persistentSubscriptionConfig';
+    public const ALL_STREAM = '$all';
+    public const STREAMS_STREAM = '$streams';
+    public const SETTINGS_STREAM = '$settings';
+    public const STATS_STREAM_PREFIX = '$stats';
+    public const SCAVANGE_STREAM = '$scavenges';
 
     public static function metastreamOf(string $streamId): string
     {

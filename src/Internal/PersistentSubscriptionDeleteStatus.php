@@ -20,8 +20,8 @@ class PersistentSubscriptionDeleteStatus
         'Failure' => 1,
     ];
 
-    public const Success = 0;
-    public const Failure = 1;
+    public const SUCCESS = 0;
+    public const FAILURE = 1;
 
     private $name;
     private $value;

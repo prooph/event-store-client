@@ -80,7 +80,7 @@ class PersistentSubscriptionSettings
     /** @var NamedConsumerStrategy */
     private $namedConsumerStrategy;
 
-    private const Int32Max = 2147483647;
+    private const INT_32_MAX = 2147483647;
 
     public static function default(): PersistentSubscriptionSettings
     {
@@ -116,12 +116,12 @@ class PersistentSubscriptionSettings
         int $minCheckPointCount,
         NamedConsumerStrategy $namedConsumerStrategy
     ) {
-        if ($checkPointAfterMilliseconds > self::Int32Max) {
-            throw new \InvalidArgumentException('checkPointAfterMilliseconds must smaller then ' . self::Int32Max);
+        if ($checkPointAfterMilliseconds > self::INT_32_MAX) {
+            throw new \InvalidArgumentException('checkPointAfterMilliseconds must smaller then ' . self::INT_32_MAX);
         }
 
-        if ($messageTimeoutMilliseconds > self::Int32Max) {
-            throw new \InvalidArgumentException('messageTimeoutMilliseconds must smaller then ' . self::Int32Max);
+        if ($messageTimeoutMilliseconds > self::INT_32_MAX) {
+            throw new \InvalidArgumentException('messageTimeoutMilliseconds must smaller then ' . self::INT_32_MAX);
         }
 
         $this->resolveLinkTos = $resolveLinkTos;

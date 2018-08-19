@@ -16,9 +16,9 @@ use Amp\Success;
 use Generator;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use ProophTest\EventStoreClient\Helper\Connection;
+use Throwable;
 use function Amp\call;
 use function Amp\Promise\wait;
-use Throwable;
 
 trait SpecificationWithConnection
 {

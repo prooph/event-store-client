@@ -44,14 +44,14 @@ class read_all_events_forward_should extends TestCase
     {
         yield $this->conn->setStreamMetadataAsync(
             '$all',
-            ExpectedVersion::Any,
+            ExpectedVersion::ANY,
             new StreamMetadata(
                 null,
                 null,
                 null,
                 null,
                 new StreamAcl(
-                    [SystemRoles::All],
+                    [SystemRoles::ALL],
                     [],
                     [],
                     [],
@@ -69,14 +69,14 @@ class read_all_events_forward_should extends TestCase
         $this->testEvents = TestEvent::newAmount(20);
         $this->stream = 'read_all_events_forward_should-' . UuidGenerator::generate();
 
-        yield $this->conn->appendToStreamAsync($this->stream, ExpectedVersion::EmptyStream, $this->testEvents);
+        yield $this->conn->appendToStreamAsync($this->stream, ExpectedVersion::EMPTY_STREAM, $this->testEvents);
     }
 
     protected function end(): Generator
     {
         yield $this->conn->setStreamMetadataAsync(
             '$all',
-            ExpectedVersion::Any,
+            ExpectedVersion::ANY,
             new StreamMetadata(),
             DefaultData::adminCredentials()
         );

@@ -21,10 +21,10 @@ final class ReadAllResult
         'AccessDenied' => 3,
     ];
 
-    public const Success = 0;
-    public const NotModified = 1;
-    public const Error = 2;
-    public const AccessDenied = 3;
+    public const SUCCESS = 0;
+    public const NOT_MODIFIED = 1;
+    public const ERROR = 2;
+    public const ACCESS_DENIED = 3;
 
     private $name;
     private $value;

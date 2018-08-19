@@ -29,7 +29,7 @@ class deleting_a_user extends TestWithNode
         try {
             $this->manager->deleteUser(Uuid::uuid4()->toString(), DefaultData::adminCredentials());
         } catch (UserCommandFailedException $e) {
-            $this->assertSame(HttpStatusCode::NotFound, $e->httpStatusCode());
+            $this->assertSame(HttpStatusCode::NOT_FOUND, $e->httpStatusCode());
 
             throw $e;
         }

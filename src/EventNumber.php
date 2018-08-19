@@ -14,6 +14,6 @@ namespace Prooph\EventStoreClient;
 
 class EventNumber
 {
-    public const DeletedStream = \PHP_INT_MAX;
-    public const Invalid = -\PHP_INT_MAX - 1;
+    public const DELETED_STREAM = \PHP_INT_MAX;
+    public const INVALID = -\PHP_INT_MAX - 1;
 }

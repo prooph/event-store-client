@@ -149,7 +149,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
             }
 
             switch ($package->command()->value()) {
-                case TcpCommand::SubscriptionDropped:
+                case TcpCommand::SUBSCRIPTION_DROPPED:
                     $message = new SubscriptionDroppedMessage();
                     $message->parseFromString($package->data());
 
@@ -183,15 +183,15 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
                     }
 
                     return new InspectionResult(InspectionDecision::endOperation(), 'SubscriptionDropped: ' . $message->getReason());
-                case TcpCommand::NotAuthenticatedException:
+                case TcpCommand::NOT_AUTHENTICATED_EXCEPTION:
                     $this->dropSubscription(SubscriptionDropReason::notAuthenticated(), new NotAuthenticatedException());
 
                     return new InspectionResult(InspectionDecision::endOperation(), 'NotAuthenticated');
-                case TcpCommand::BadRequest:
+                case TcpCommand::BAD_REQUEST:
                     $this->dropSubscription(SubscriptionDropReason::serverError(), new ServerError());
 
                     return new InspectionResult(InspectionDecision::endOperation(), 'BadRequest');
-                case TcpCommand::NotHandled:
+                case TcpCommand::NOT_HANDLED:
                     if (null !== $this->subscription) {
                         throw new \Exception('NotHandledException command appeared while we were already subscribed');
                     }

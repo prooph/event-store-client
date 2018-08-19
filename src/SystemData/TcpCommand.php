@@ -89,77 +89,77 @@ final class TcpCommand
         'ClientIdentified' => 0xF6,
     ];
 
-    public const HeartbeatRequestCommand = 0x01;
-    public const HeartbeatResponseCommand = 0x02;
+    public const HEARTBEAT_REQUEST_COMMAND = 0x01;
+    public const HEARTBEAT_RESPONSE_COMMAND = 0x02;
 
-    public const Ping = 0x03;
-    public const Pong = 0x04;
+    public const PING = 0x03;
+    public const PONG = 0x04;
 
-    public const PrepareAck = 0x05;
-    public const CommitAck = 0x06;
+    public const PREPARE_ACK = 0x05;
+    public const COMMIT_ACK = 0x06;
 
-    public const SlaveAssignment = 0x07;
-    public const CloneAssignment = 0x08;
+    public const SLAVE_ASSIGNMENT = 0x07;
+    public const CLONE_ASSIGNMENT = 0x08;
 
-    public const SubscribeReplica = 0x10;
-    public const ReplicaLogPositionAck = 0x11;
-    public const CreateChunk = 0x12;
-    public const RawChunkBulk = 0x13;
-    public const DataChunkBulk = 0x14;
-    public const ReplicaSubscriptionRetry = 0x15;
-    public const ReplicaSubscribed = 0x16;
+    public const SUBSCRIBE_REPLICA = 0x10;
+    public const REPLICA_LOG_POSITION_ACK = 0x11;
+    public const CREATE_CHUNK = 0x12;
+    public const RAW_CHUNK_BULKD = 0x13;
+    public const DATA_CHUNK_BULK = 0x14;
+    public const REPLICA_SUBSCRIPTION_RETRY = 0x15;
+    public const REPLICA_SUBSCRIBED = 0x16;
 
-    public const WriteEvents = 0x82;
-    public const WriteEventsCompleted = 0x83;
+    public const WRITE_EVENTS = 0x82;
+    public const WRITE_EVENTS_COMPLETED = 0x83;
 
-    public const TransactionStart = 0x84;
-    public const TransactionStartCompleted = 0x85;
-    public const TransactionWrite = 0x86;
-    public const TransactionWriteCompleted = 0x87;
-    public const TransactionCommit = 0x88;
-    public const TransactionCommitCompleted = 0x89;
+    public const TRANSACTION_START = 0x84;
+    public const TRANSACTION_START_COMPLETED = 0x85;
+    public const TRANSACTION_WRITE = 0x86;
+    public const TRANSACTION_WRITE_COMPLETED = 0x87;
+    public const TRANSACTION_COMMIT = 0x88;
+    public const TRANSACTION_COMMIT_COMPLETED = 0x89;
 
-    public const DeleteStream = 0x8A;
-    public const DeleteStreamCompleted = 0x8B;
+    public const DELETE_STREAM = 0x8A;
+    public const DELETE_STREAM_COMPLETED = 0x8B;
 
-    public const ReadEvent = 0xB0;
-    public const ReadEventCompleted = 0xB1;
-    public const ReadStreamEventsForward = 0xB2;
-    public const ReadStreamEventsForwardCompleted = 0xB3;
-    public const ReadStreamEventsBackward = 0xB4;
-    public const ReadStreamEventsBackwardCompleted = 0xB5;
-    public const ReadAllEventsForward = 0xB6;
-    public const ReadAllEventsForwardCompleted = 0xB7;
-    public const ReadAllEventsBackward = 0xB8;
-    public const ReadAllEventsBackwardCompleted = 0xB9;
+    public const READ_EVENT = 0xB0;
+    public const READ_EVENT_COMPLETED = 0xB1;
+    public const READ_STREAM_EVENTS_FORWARD = 0xB2;
+    public const READ_STREAM_EVENTS_FORWARD_COMPLETED = 0xB3;
+    public const READ_STREAM_EVENTS_BACKWARD = 0xB4;
+    public const READ_STREAM_EVENTS_BACKWARD_COMPLETED = 0xB5;
+    public const REAL_ADD_EVENTS_FORWARD = 0xB6;
+    public const REAL_ADD_EVENTS_FORWARD_COMPLETED = 0xB7;
+    public const REAL_ADD_EVENTS_BACKWARD = 0xB8;
+    public const REAL_ADD_EVENTS_BACKWARD_COMPLETED = 0xB9;
 
-    public const SubscribeToStream = 0xC0;
-    public const SubscriptionConfirmation = 0xC1;
-    public const StreamEventAppeared = 0xC2;
-    public const UnsubscribeFromStream = 0xC3;
-    public const SubscriptionDropped = 0xC4;
-    public const ConnectToPersistentSubscription = 0xC5;
-    public const PersistentSubscriptionConfirmation = 0xC6;
-    public const PersistentSubscriptionStreamEventAppeared = 0xC7;
-    public const CreatePersistentSubscription = 0xC8;
-    public const CreatePersistentSubscriptionCompleted = 0xC9;
-    public const DeletePersistentSubscription = 0xCA;
-    public const DeletePersistentSubscriptionCompleted = 0xCB;
-    public const PersistentSubscriptionAckEvents = 0xCC;
-    public const PersistentSubscriptionNakEvents = 0xCD;
-    public const UpdatePersistentSubscription = 0xCE;
-    public const UpdatePersistentSubscriptionCompleted = 0xCF;
+    public const SUBSCRIBE_TO_STREAM = 0xC0;
+    public const SUBSCRIPTION_CONFIRMATION = 0xC1;
+    public const STREAM_EVENT_APPEARED = 0xC2;
+    public const UNSUBSCRIBE_FROM_STREAM = 0xC3;
+    public const SUBSCRIPTION_DROPPED = 0xC4;
+    public const CONNECT_TO_PERSISTENT_SUBSCRIPTION = 0xC5;
+    public const PERSISTENT_SUBSCRIPTION_CONFIRMATION = 0xC6;
+    public const PERSISTENT_SUBSCRIPTION_EVENT_APPEARED = 0xC7;
+    public const CREATE_PERSISTENT_SUBSCRIPTION = 0xC8;
+    public const CREATE_PERSISTENT_SUBSCRIPTION_COMPLETED = 0xC9;
+    public const DELETE_PERSISTENT_SUBSCRIPTION = 0xCA;
+    public const DELETE_PERSISTENT_SUBSCRIPTION_COMPLETED = 0xCB;
+    public const PERSISTENT_SUBSCRIPTION_ACK_EVENTS = 0xCC;
+    public const PERSISTENT_SUBSCRIPTION_NACK_EVENTS = 0xCD;
+    public const UPDATE_PERSISTENT_SUBSCRIPTION = 0xCE;
+    public const UPDATE_PERSISTENT_SUBSCRIPTION_COMPLETED = 0xCF;
 
-    public const ScavengeDatabase = 0xD0;
-    public const ScavengeDatabaseCompleted = 0xD1;
+    public const SCAVANGE_DATABASE = 0xD0;
+    public const SCAVANGE_DATABASE_COMPLETED = 0xD1;
 
-    public const BadRequest = 0xF0;
-    public const NotHandled = 0xF1;
-    public const Authenticate = 0xF2;
-    public const Authenticated = 0xF3;
-    public const NotAuthenticatedException = 0xF4;
-    public const IdentifyClient = 0xF5;
-    public const ClientIdentified = 0xF6;
+    public const BAD_REQUEST = 0xF0;
+    public const NOT_HANDLED = 0xF1;
+    public const AUTHENTICATE = 0xF2;
+    public const AUTHENTICATED = 0xF3;
+    public const NOT_AUTHENTICATED_EXCEPTION = 0xF4;
+    public const IDENITFY_CLIENT = 0xF5;
+    public const CLIENT_IDENTIFIED = 0xF6;
 
     private $name;
     private $value;

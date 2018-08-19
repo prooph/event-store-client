@@ -52,7 +52,7 @@ $m = $connection->getStreamMetadata('foo-bar');
 
 \var_dump($m);
 
-$wr = $connection->appendToStream('foo-bar', ExpectedVersion::Any, [
+$wr = $connection->appendToStream('foo-bar', ExpectedVersion::ANY, [
     new EventData(EventId::generate(), 'test-type', false, 'jfkhksdfhsds', 'meta'),
     new EventData(EventId::generate(), 'test-type2', false, 'kldjfls', 'meta'),
     new EventData(EventId::generate(), 'test-type3', false, 'aaa', 'meta'),

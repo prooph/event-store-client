@@ -21,9 +21,9 @@ final class TcpFlags
         'TrustedWrite' => 0x02,
     ];
 
-    public const None = 0x00;
-    public const Authenticated = 0x01;
-    public const TrustedWrite = 0x02;
+    public const NONE = 0x00;
+    public const AUTHENTICATED = 0x01;
+    public const TRUSTED_WRITE = 0x02;
 
     private $name;
     private $value;

@@ -16,29 +16,29 @@ class SystemMetadata
 {
     // The definition of the MaxAge value assigned to stream metadata
     // Setting this allows all events older than the limit to be deleted
-    public const MaxAge = '$maxAge';
+    public const MAX_AGE = '$maxAge';
     // The definition of the MaxCount value assigned to stream metadata
     // setting this allows all events with a sequence less than current -maxcount to be deleted
-    public const MaxCount = '$maxCount';
+    public const MAX_COUNT = '$maxCount';
     // The definition of the Truncate Before value assigned to stream metadata
     // setting this allows all events prior to the integer value to be deleted
-    public const TruncateBefore = '$tb';
+    public const TRUNCATE_BEFORE = '$tb';
     // Sets the cache control in seconds for the head of the stream.
-    public const CacheControl = '$cacheControl';
+    public const CACHE_CONTROL = '$cacheControl';
     // The acl definition in metadata
-    public const Acl = '$acl';
+    public const ACL = '$acl';
     // to read from a stream
-    public const AclRead = '$r';
+    public const ACL_READ = '$r';
     // to write to a stream
-    public const AclWrite = '$w';
+    public const ACL_WRITE = '$w';
     // to delete a stream
-    public const AclDelete = '$d';
+    public const ACL_DELETE = '$d';
     // to read metadata
-    public const AclMetaRead = '$mr';
+    public const ACL_META_READ = '$mr';
     // to write metadata
-    public const AclMetaWrite = '$mw';
+    public const ACL_META_WRITE = '$mw';
     // The user default acl stream
-    public const UserStreamAcl = '$userStreamAcl';
+    public const USER_STREAM_ACL = '$userStreamAcl';
     // the system stream defaults acl stream
-    public const SystemStreamAcl = '$systemStreamAcl';
+    public const SYSTEM_STREAM_ACL = '$systemStreamAcl';
 }

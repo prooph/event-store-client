@@ -136,23 +136,23 @@ class StreamMetadata
         $data = [];
 
         if (null !== $this->maxCount) {
-            $data[SystemMetadata::MaxCount] = $this->maxCount;
+            $data[SystemMetadata::MAX_COUNT] = $this->maxCount;
         }
 
         if (null !== $this->maxAge) {
-            $data[SystemMetadata::MaxAge] = $this->maxAge;
+            $data[SystemMetadata::MAX_AGE] = $this->maxAge;
         }
 
         if (null !== $this->truncateBefore) {
-            $data[SystemMetadata::TruncateBefore] = $this->truncateBefore;
+            $data[SystemMetadata::TRUNCATE_BEFORE] = $this->truncateBefore;
         }
 
         if (null !== $this->cacheControl) {
-            $data[SystemMetadata::CacheControl] = $this->cacheControl;
+            $data[SystemMetadata::CACHE_CONTROL] = $this->cacheControl;
         }
 
         if (null !== $this->acl) {
-            $data[SystemMetadata::Acl] = $this->acl->toArray();
+            $data[SystemMetadata::ACL] = $this->acl->toArray();
         }
 
         foreach ($this->customMetadata as $key => $value) {
@@ -165,10 +165,10 @@ class StreamMetadata
     public static function fromArray(array $data): StreamMetadata
     {
         $internal = [
-            SystemMetadata::MaxCount,
-            SystemMetadata::MaxAge,
-            SystemMetadata::TruncateBefore,
-            SystemMetadata::CacheControl,
+            SystemMetadata::MAX_COUNT,
+            SystemMetadata::MAX_AGE,
+            SystemMetadata::TRUNCATE_BEFORE,
+            SystemMetadata::CACHE_CONTROL,
         ];
 
         $params = [];
@@ -176,19 +176,19 @@ class StreamMetadata
         foreach ($data as $key => $value) {
             if (\in_array($key, $internal, true)) {
                 $params[$key] = $value;
-            } elseif ($key === SystemMetadata::Acl) {
-                $params[SystemMetadata::Acl] = StreamAcl::fromArray($value);
+            } elseif ($key === SystemMetadata::ACL) {
+                $params[SystemMetadata::ACL] = StreamAcl::fromArray($value);
             } else {
                 $params['customMetadata'][$key] = $value;
             }
         }
 
         return new self(
-            $params[SystemMetadata::MaxCount] ?? null,
-            $params[SystemMetadata::MaxAge] ?? null,
-            $params[SystemMetadata::TruncateBefore] ?? null,
-            $params[SystemMetadata::CacheControl] ?? null,
-            $params[SystemMetadata::Acl] ?? null,
+            $params[SystemMetadata::MAX_COUNT] ?? null,
+            $params[SystemMetadata::MAX_AGE] ?? null,
+            $params[SystemMetadata::TRUNCATE_BEFORE] ?? null,
+            $params[SystemMetadata::CACHE_CONTROL] ?? null,
+            $params[SystemMetadata::ACL] ?? null,
             $params['customMetadata'] ?? []
         );
     }

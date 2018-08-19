@@ -21,9 +21,9 @@ use ProophTest\EventStoreClient\Helper\EventsStream;
 use ProophTest\EventStoreClient\Helper\StreamWriter;
 use ProophTest\EventStoreClient\Helper\TailWriter;
 use ProophTest\EventStoreClient\Helper\TestEvent;
+use Throwable;
 use function Amp\call;
 use function Amp\Promise\wait;
-use Throwable;
 
 class appending_to_implicitly_created_stream extends TestCase
 {
@@ -42,11 +42,11 @@ class appending_to_implicitly_created_stream extends TestCase
 
             $events = TestEvent::newAmount(6);
 
-            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NoStream);
+            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NO_STREAM);
 
             /** @var TailWriter $tailWriter */
             $tailWriter = yield $writer->append($events);
-            $tailWriter->then($events[0], ExpectedVersion::NoStream);
+            $tailWriter->then($events[0], ExpectedVersion::NO_STREAM);
 
             $total = yield EventsStream::count($connection, $stream);
 
@@ -71,11 +71,11 @@ class appending_to_implicitly_created_stream extends TestCase
 
             $events = TestEvent::newAmount(6);
 
-            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NoStream);
+            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NO_STREAM);
 
             /** @var TailWriter $tailWriter */
             $tailWriter = yield $writer->append($events);
-            yield $tailWriter->then($events[0], ExpectedVersion::Any);
+            yield $tailWriter->then($events[0], ExpectedVersion::ANY);
 
             $total = yield EventsStream::count($connection, $stream);
 
@@ -100,7 +100,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
             $events = TestEvent::newAmount(6);
 
-            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NoStream);
+            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NO_STREAM);
 
             /** @var TailWriter $first6 */
             $first6 = yield $writer->append($events);
@@ -128,7 +128,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
             $events = TestEvent::newAmount(6);
 
-            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NoStream);
+            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NO_STREAM);
 
             /** @var TailWriter $first6 */
             $first6 = yield $writer->append($events);
@@ -156,7 +156,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
             $events = [TestEvent::new()];
 
-            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NoStream);
+            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NO_STREAM);
 
             /** @var TailWriter $tailWriter */
             $tailWriter = yield $writer->append($events);
@@ -186,12 +186,12 @@ class appending_to_implicitly_created_stream extends TestCase
 
             $events = [TestEvent::new()];
 
-            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NoStream);
+            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NO_STREAM);
 
             /** @var TailWriter $tailWriter */
             $tailWriter = yield $writer->append($events);
 
-            yield $tailWriter->then($events[0], ExpectedVersion::Any);
+            yield $tailWriter->then($events[0], ExpectedVersion::ANY);
 
             $total = yield EventsStream::count($connection, $stream);
 
@@ -216,12 +216,12 @@ class appending_to_implicitly_created_stream extends TestCase
 
             $events = [TestEvent::new()];
 
-            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NoStream);
+            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NO_STREAM);
 
             /** @var TailWriter $tailWriter */
             $tailWriter = yield $writer->append($events);
 
-            yield $tailWriter->then($events[0], ExpectedVersion::NoStream);
+            yield $tailWriter->then($events[0], ExpectedVersion::NO_STREAM);
 
             $total = yield EventsStream::count($connection, $stream);
 
@@ -246,14 +246,14 @@ class appending_to_implicitly_created_stream extends TestCase
 
             $events = TestEvent::newAmount(3);
 
-            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NoStream);
+            $writer = new StreamWriter($connection, $stream, ExpectedVersion::NO_STREAM);
 
             /** @var TailWriter $tailWriter */
             $tailWriter = yield $writer->append($events);
 
-            $tailWriter = yield $tailWriter->then($events[1], ExpectedVersion::Any);
+            $tailWriter = yield $tailWriter->then($events[1], ExpectedVersion::ANY);
 
-            yield $tailWriter->then($events[1], ExpectedVersion::Any);
+            yield $tailWriter->then($events[1], ExpectedVersion::ANY);
 
             $total = yield EventsStream::count($connection, $stream);
 
@@ -278,8 +278,8 @@ class appending_to_implicitly_created_stream extends TestCase
 
             $events = TestEvent::newAmount(2);
 
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::NoStream, $events);
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::NoStream, [$events[0]]);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [$events[0]]);
 
             $total = yield EventsStream::count($connection, $stream);
 
@@ -304,8 +304,8 @@ class appending_to_implicitly_created_stream extends TestCase
 
             $events = TestEvent::newAmount(2);
 
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::NoStream, $events);
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::Any, [$events[0]]);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [$events[0]]);
 
             $total = yield EventsStream::count($connection, $stream);
 
@@ -330,7 +330,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
             $events = TestEvent::newAmount(2);
 
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::NoStream, $events);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
             yield $connection->appendToStreamAsync($stream, 0, [$events[1]]);
 
             $total = yield EventsStream::count($connection, $stream);
@@ -357,8 +357,8 @@ class appending_to_implicitly_created_stream extends TestCase
             $events = TestEvent::newAmount(2);
 
             /** @var WriteResult $result */
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::NoStream, $events);
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::Any, [$events[1]]);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [$events[1]]);
 
             $total = yield EventsStream::count($connection, $stream);
 
@@ -383,14 +383,14 @@ class appending_to_implicitly_created_stream extends TestCase
 
             $events = TestEvent::newAmount(2);
 
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::NoStream, $events);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
 
             $events[] = TestEvent::new();
 
             $this->expectException(WrongExpectedVersionException::class);
 
             try {
-                yield $connection->appendToStreamAsync($stream, ExpectedVersion::NoStream, $events);
+                yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
             } finally {
                 $connection->close();
             }

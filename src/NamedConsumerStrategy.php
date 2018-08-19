@@ -15,14 +15,14 @@ namespace Prooph\EventStoreClient;
 final class NamedConsumerStrategy
 {
     // Distributes events to a single client until it is full. Then round robin to the next client.
-    public const DispatchToSingle = 'DispatchToSingle';
+    public const DISPATCH_TO_SINGLE = 'DispatchToSingle';
 
     // Distribute events to each client in a round robin fashion.
-    public const RoundRobin = 'RoundRobin';
+    public const ROUND_ROBIN = 'RoundRobin';
 
     // Distribute events of the same streamId to the same client until it disconnects on a best efforts basis.
     // Designed to be used with indexes such as the category projection.
-    public const Pinned = 'Pinned';
+    public const PINNED = 'Pinned';
 
     public const OPTIONS = [
         'DispatchToSingle' => 'DispatchToSingle',

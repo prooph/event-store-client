@@ -45,14 +45,14 @@ class read_all_events_backward_should extends TestCase
     {
         yield $this->conn->setStreamMetadataAsync(
             '$all',
-            ExpectedVersion::Any,
+            ExpectedVersion::ANY,
             new StreamMetadata(
                 null,
                 null,
                 null,
                 null,
                 new StreamAcl(
-                    [SystemRoles::All],
+                    [SystemRoles::ALL],
                     [],
                     [],
                     [],
@@ -65,10 +65,10 @@ class read_all_events_backward_should extends TestCase
 
         $this->testEvents = TestEvent::newAmount(20);
 
-        yield $this->conn->appendToStreamAsync('stream-' . UuidGenerator::generate(), ExpectedVersion::EmptyStream, $this->testEvents);
+        yield $this->conn->appendToStreamAsync('stream-' . UuidGenerator::generate(), ExpectedVersion::EMPTY_STREAM, $this->testEvents);
 
         /** @var WriteResult $result */
-        $result = yield $this->conn->appendToStreamAsync('stream-' . UuidGenerator::generate(), ExpectedVersion::NoStream, $this->testEvents);
+        $result = yield $this->conn->appendToStreamAsync('stream-' . UuidGenerator::generate(), ExpectedVersion::NO_STREAM, $this->testEvents);
 
         $lastId = $this->testEvents[19]->eventId();
         $this->endOfEvents = $result->logPosition();
@@ -89,7 +89,7 @@ class read_all_events_backward_should extends TestCase
     {
         yield $this->conn->setStreamMetadataAsync(
             '$all',
-            ExpectedVersion::Any,
+            ExpectedVersion::ANY,
             new StreamMetadata(),
             DefaultData::adminCredentials()
         );

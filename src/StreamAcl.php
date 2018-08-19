@@ -118,22 +118,22 @@ class StreamAcl
     public function toArray(): array
     {
         return [
-            SystemMetadata::AclRead => $this->readRoles,
-            SystemMetadata::AclWrite => $this->writeRoles,
-            SystemMetadata::AclDelete => $this->deleteRoles,
-            SystemMetadata::AclMetaRead => $this->metaReadRoles,
-            SystemMetadata::AclMetaWrite => $this->metaWriteRoles,
+            SystemMetadata::ACL_READ => $this->readRoles,
+            SystemMetadata::ACL_WRITE => $this->writeRoles,
+            SystemMetadata::ACL_DELETE => $this->deleteRoles,
+            SystemMetadata::ACL_META_READ => $this->metaReadRoles,
+            SystemMetadata::ACL_META_WRITE => $this->metaWriteRoles,
         ];
     }
 
     public static function fromArray(array $data): StreamAcl
     {
         $values = [
-            SystemMetadata::AclRead,
-            SystemMetadata::AclWrite,
-            SystemMetadata::AclDelete,
-            SystemMetadata::AclMetaRead,
-            SystemMetadata::AclMetaWrite,
+            SystemMetadata::ACL_READ,
+            SystemMetadata::ACL_WRITE,
+            SystemMetadata::ACL_DELETE,
+            SystemMetadata::ACL_META_READ,
+            SystemMetadata::ACL_META_WRITE,
         ];
 
         foreach ($values as $value) {
@@ -147,11 +147,11 @@ class StreamAcl
         }
 
         return new self(
-            $data[SystemMetadata::AclRead],
-            $data[SystemMetadata::AclWrite],
-            $data[SystemMetadata::AclDelete],
-            $data[SystemMetadata::AclMetaRead],
-            $data[SystemMetadata::AclMetaWrite]
+            $data[SystemMetadata::ACL_READ],
+            $data[SystemMetadata::ACL_WRITE],
+            $data[SystemMetadata::ACL_DELETE],
+            $data[SystemMetadata::ACL_META_READ],
+            $data[SystemMetadata::ACL_META_WRITE]
         );
     }
 }

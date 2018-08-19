@@ -60,7 +60,7 @@ class list_users extends TestWithNode
                 (int) \getenv('ES_HTTP_PORT')
             ),
             5000,
-            EndpointExtensions::HttpSchema,
+            EndpointExtensions::HTTP_SCHEMA,
             DefaultData::adminCredentials()
         );
 

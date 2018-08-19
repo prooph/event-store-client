@@ -20,9 +20,9 @@ class ConditionalWriteStatus
         'StreamDeleted' => 2,
     ];
 
-    public const Succeeded = 0;
-    public const VersionMismatch = 1;
-    public const StreamDeleted = 2;
+    public const SUCCEEDED = 0;
+    public const VERSION_MISMATCH = 1;
+    public const STREAM_DELETED = 2;
 
     private $name;
     private $value;

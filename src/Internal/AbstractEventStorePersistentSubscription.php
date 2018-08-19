@@ -44,7 +44,7 @@ abstract class AbstractEventStorePersistentSubscription
     /** @var ResolvedEvent */
     private static $dropSubscriptionEvent;
 
-    public const DefaultBufferSize = 10;
+    public const DEFAULT_BUFFER_SIZE = 10;
 
     /** @var string */
     private $subscriptionId;

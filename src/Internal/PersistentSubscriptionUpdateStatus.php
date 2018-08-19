@@ -21,9 +21,9 @@ class PersistentSubscriptionUpdateStatus
         'Failure' => 2,
     ];
 
-    public const Success = 0;
-    public const NotFound = 1;
-    public const Failure = 2;
+    public const SUCCESS = 0;
+    public const NOT_FOUND = 1;
+    public const FAILURE = 2;
 
     private $name;
     private $value;

@@ -47,7 +47,7 @@ class UsersClient
         IpEndPoint $endPoint,
         string $login,
         UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HttpSchema
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
@@ -66,7 +66,7 @@ class UsersClient
         IpEndPoint $endPoint,
         string $login,
         UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HttpSchema
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
@@ -85,7 +85,7 @@ class UsersClient
         IpEndPoint $endPoint,
         string $login,
         UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HttpSchema
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendDelete(
             EndpointExtensions::formatStringToHttpUrl(
@@ -103,7 +103,7 @@ class UsersClient
     public function listAll(
         IpEndPoint $endPoint,
         UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HttpSchema
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         $deferred = new Deferred();
 
@@ -159,7 +159,7 @@ class UsersClient
     public function getCurrentUser(
         IpEndPoint $endPoint,
         UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HttpSchema
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         $deferred = new Deferred();
 
@@ -208,7 +208,7 @@ class UsersClient
         IpEndPoint $endPoint,
         string $login,
         UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HttpSchema
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         $deferred = new Deferred();
 
@@ -265,7 +265,7 @@ class UsersClient
         IpEndPoint $endPoint,
         UserCreationInformation $newUser,
         UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HttpSchema
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::rawUrlToHttpUrl(
@@ -275,7 +275,7 @@ class UsersClient
             ),
             \json_encode($newUser),
             $userCredentials,
-            HttpStatusCode::Created
+            HttpStatusCode::CREATED
         );
     }
 
@@ -284,7 +284,7 @@ class UsersClient
         string $login,
         UserUpdateInformation $updatedUser,
         UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HttpSchema
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPut(
             EndpointExtensions::formatStringToHttpUrl(
@@ -304,7 +304,7 @@ class UsersClient
         string $login,
         ChangePasswordDetails $changePasswordDetails,
         UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HttpSchema
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
@@ -324,7 +324,7 @@ class UsersClient
         string $login,
         ResetPasswordDetails $resetPasswordDetails,
         UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HttpSchema
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
@@ -457,7 +457,7 @@ class UsersClient
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
                     $deferred->resolve(null);
-                } elseif ($response->getStatus() === HttpStatusCode::Conflict) {
+                } elseif ($response->getStatus() === HttpStatusCode::CONFLICT) {
                     $deferred->fail(new UserCommandConflictException($response->getStatus(), $response->getReason()));
                 } else {
                     $deferred->fail(new UserCommandFailedException(

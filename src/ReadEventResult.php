@@ -26,12 +26,12 @@ final class ReadEventResult
         'AccessDenied' => 5,
     ];
 
-    public const Success = 0;
-    public const NotFound = 1;
-    public const NoStream = 2;
-    public const StreamDeleted = 3;
-    public const Error = 4;
-    public const AccessDenied = 5;
+    public const SUCCESS = 0;
+    public const NOT_FOUND = 1;
+    public const NO_STREAM = 2;
+    public const STREAM_DELETED = 3;
+    public const ERROR = 4;
+    public const ACCESS_DENIED = 5;
 
     private $name;
     private $value;

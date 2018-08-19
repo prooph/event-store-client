@@ -34,11 +34,12 @@ class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
     use SpecificationWithConnection;
 
     /** @var string */
-    private $streamName; //= Guid.NewGuid().ToString();
-    private $groupName; // = Guid.NewGuid().ToString();
+    private $streamName;
+    /** @var string */
+    private $groupName;
 
-    private const BufferCount = 10;
-    private const EventWriteCount = self::BufferCount * 2;
+    private const BUFFER_COUNT = 10;
+    private const EVENT_WRITE_COUNT = self::BUFFER_COUNT * 2;
 
     /** @var Deferred */
     private $eventsReceived;
@@ -80,12 +81,12 @@ class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
                 NamedConsumerStrategy::roundRobin()
             );
 
-            for ($i = 0; $i < self::EventWriteCount; $i++) {
+            for ($i = 0; $i < self::EVENT_WRITE_COUNT; $i++) {
                 $eventData = new EventData(EventId::generate(), 'SomeEvent', false, '', '');
 
                 yield $this->conn->appendToStreamAsync(
                     $this->streamName,
-                    ExpectedVersion::Any,
+                    ExpectedVersion::ANY,
                     [$eventData],
                     DefaultData::adminCredentials()
                 );

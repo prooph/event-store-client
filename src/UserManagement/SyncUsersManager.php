@@ -26,7 +26,7 @@ class SyncUsersManager
     public function __construct(
         IpEndPoint $endPoint,
         int $operationTimeout,
-        string $httpSchema = EndpointExtensions::HttpSchema,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA,
         UserCredentials $userCredentials = null
     ) {
         $this->manager = new AsyncUsersManager(
