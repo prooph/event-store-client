@@ -76,7 +76,7 @@ class create_persistent_subscription_after_deleting_the_same extends TestCase
     /**
      * @test
      * @doesNotPerformAssertions
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function the_completion_succeeds(): void
     {

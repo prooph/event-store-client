@@ -16,6 +16,7 @@ use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\StreamEventsSlice;
+use Throwable;
 
 class read_all_events_forward_with_linkto_passed_max_count extends TestCase
 {
@@ -31,7 +32,7 @@ class read_all_events_forward_with_linkto_passed_max_count extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function one_event_is_read(): void
     {

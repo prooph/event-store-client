@@ -118,7 +118,7 @@ class connect_to_existing_persistent_subscription_with_max_one_client_async exte
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function the_first_subscription_connects_successfully(): void
     {
@@ -131,7 +131,7 @@ class connect_to_existing_persistent_subscription_with_max_one_client_async exte
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function the_second_subscription_throws_maximum_subscribers_reached_exception(): void
     {

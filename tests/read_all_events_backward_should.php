@@ -28,6 +28,7 @@ use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\WriteResult;
 use ProophTest\EventStoreClient\Helper\EventDataComparer;
 use ProophTest\EventStoreClient\Helper\TestEvent;
+use Throwable;
 
 class read_all_events_backward_should extends TestCase
 {
@@ -98,7 +99,7 @@ class read_all_events_backward_should extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function return_empty_slice_if_asked_to_read_from_start(): void
     {
@@ -113,7 +114,7 @@ class read_all_events_backward_should extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function return_events_in_reversed_order_compared_to_written(): void
     {
@@ -137,7 +138,7 @@ class read_all_events_backward_should extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function be_able_to_read_all_one_by_one_until_end_of_stream(): void
     {
@@ -165,7 +166,7 @@ class read_all_events_backward_should extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function be_able_to_read_events_slice_at_time(): void
     {
@@ -192,7 +193,7 @@ class read_all_events_backward_should extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function throw_when_got_int_max_value_as_maxcount(): void
     {

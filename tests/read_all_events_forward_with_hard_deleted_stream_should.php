@@ -27,6 +27,7 @@ use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\UserCredentials;
 use ProophTest\EventStoreClient\Helper\EventDataComparer;
 use ProophTest\EventStoreClient\Helper\TestEvent;
+use Throwable;
 
 class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
 {
@@ -80,7 +81,7 @@ class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function ensure_deleted_stream(): void
     {
@@ -94,7 +95,7 @@ class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function returns_all_events_including_tombstone(): void
     {

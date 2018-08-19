@@ -36,7 +36,7 @@ class subscribe_should extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function be_able_to_subscribe_to_non_existing_stream_and_then_catch_new_event(): void
     {
@@ -70,7 +70,7 @@ class subscribe_should extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function allow_multiple_subscriptions_to_same_stream(): void
     {
@@ -118,7 +118,7 @@ class subscribe_should extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function call_dropped_callback_after_unsubscribe_method_call(): void
     {
@@ -161,7 +161,7 @@ class subscribe_should extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function catch_deleted_events_as_well(): void
     {

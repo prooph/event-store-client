@@ -37,7 +37,7 @@ class deleting_persistent_subscription_group_that_doesnt_exist extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function the_delete_fails_with_argument_exception(): void
     {

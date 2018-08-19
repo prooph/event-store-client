@@ -32,7 +32,7 @@ class append_to_stream extends TestCase
 {
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function cannot_append_to_stream_without_name(): void
     {
@@ -45,7 +45,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_allow_appending_zero_events_to_stream_with_no_problems(): void
     {
@@ -95,7 +95,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_create_stream_with_no_stream_exp_ver_on_first_write_if_does_not_exist(): void
     {
@@ -121,7 +121,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_create_stream_with_any_exp_ver_on_first_write_if_does_not_exist(): void
     {
@@ -146,7 +146,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function multiple_idempotent_writes(): void
     {
@@ -172,7 +172,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function multiple_idempotent_writes_with_same_id_bug_case(): void
     {
@@ -196,7 +196,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function in_wtf_multiple_case_of_multiple_writes_expected_version_any_per_all_same_id(): void
     {
@@ -224,7 +224,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function in_slightly_reasonable_multiple_case_of_multiple_writes_with_expected_version_per_all_same_id(): void
     {
@@ -252,7 +252,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_fail_writing_with_correct_exp_ver_to_deleted_stream(): void
     {
@@ -276,7 +276,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_return_log_position_when_writing(): void
     {
@@ -298,7 +298,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_fail_writing_with_any_exp_ver_to_deleted_stream(): void
     {
@@ -326,7 +326,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_fail_writing_with_invalid_exp_ver_to_deleted_stream(): void
     {
@@ -351,7 +351,7 @@ class append_to_stream extends TestCase
     /**
      * @test
      * @doesNotPerformAssertions
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_append_with_correct_exp_ver_to_existing_stream(): void
     {
@@ -370,7 +370,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_append_with_any_exp_ver_to_existing_stream(): void
     {
@@ -394,7 +394,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_fail_appending_with_wrong_exp_ver_to_existing_stream(): void
     {
@@ -417,7 +417,7 @@ class append_to_stream extends TestCase
     /**
      * @test
      * @doesNotPerformAssertions
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_append_with_stream_exists_exp_ver_to_existing_stream(): void
     {
@@ -438,7 +438,7 @@ class append_to_stream extends TestCase
     /**
      * @test
      * @doesNotPerformAssertions
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_append_with_stream_exists_exp_ver_to_stream_with_multiple_events(): void
     {
@@ -462,7 +462,7 @@ class append_to_stream extends TestCase
     /**
      * @test
      * @doesNotPerformAssertions
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_append_with_stream_exists_exp_ver_if_metadata_stream_exists(): void
     {
@@ -489,7 +489,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_fail_appending_with_stream_exists_exp_ver_and_stream_does_not_exist(): void
     {
@@ -511,7 +511,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_fail_appending_with_stream_exists_exp_ver_to_hard_deleted_stream(): void
     {
@@ -535,7 +535,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_fail_appending_with_stream_exists_exp_ver_to_soft_deleted_stream(): void
     {
@@ -559,7 +559,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function can_append_multiple_events_at_once(): void
     {
@@ -583,7 +583,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function returns_failure_status_when_conditionally_appending_with_version_mismatch(): void
     {
@@ -605,7 +605,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function returns_success_status_when_conditionally_appending_with_matching_version(): void
     {
@@ -629,7 +629,7 @@ class append_to_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function returns_failure_status_when_conditionally_appending_to_a_deleted_stream(): void
     {

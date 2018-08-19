@@ -35,6 +35,7 @@ use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
 use Prooph\EventStoreClient\SystemSettings;
 use Prooph\EventStoreClient\UserCredentials;
 use Prooph\EventStoreClient\WriteResult;
+use Throwable;
 
 /** @internal */
 final class EventStoreSyncNodeConnection implements
@@ -73,7 +74,7 @@ final class EventStoreSyncNodeConnection implements
         return $this->asyncConnection->clusterSettings();
     }
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     public function connect(): void
     {
         Promise\wait($this->asyncConnection->connectAsync());
@@ -85,7 +86,7 @@ final class EventStoreSyncNodeConnection implements
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function deleteStream(
         string $stream,
@@ -98,7 +99,7 @@ final class EventStoreSyncNodeConnection implements
 
     /**
      * {@inheritdoc}
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function appendToStream(
         string $stream,
@@ -116,7 +117,7 @@ final class EventStoreSyncNodeConnection implements
 
     /**
      * {@inheritdoc}
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function conditionalAppendToStreamAsync(
         string $stream,
@@ -132,7 +133,7 @@ final class EventStoreSyncNodeConnection implements
         ));
     }
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     public function readEvent(
         string $stream,
         int $eventNumber,
@@ -147,7 +148,7 @@ final class EventStoreSyncNodeConnection implements
         ));
     }
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     public function readStreamEventsForward(
         string $stream,
         int $start,
@@ -164,7 +165,7 @@ final class EventStoreSyncNodeConnection implements
         ));
     }
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     public function readStreamEventsBackward(
         string $stream,
         int $start,
@@ -181,7 +182,7 @@ final class EventStoreSyncNodeConnection implements
         ));
     }
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     public function readAllEventsForward(
         Position $position,
         int $count,
@@ -196,7 +197,7 @@ final class EventStoreSyncNodeConnection implements
         ));
     }
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     public function readAllEventsBackward(
         Position $position,
         int $count,
@@ -211,7 +212,7 @@ final class EventStoreSyncNodeConnection implements
         ));
     }
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     public function setStreamMetadata(
         string $stream,
         int $expectedMetaStreamVersion,
@@ -226,19 +227,19 @@ final class EventStoreSyncNodeConnection implements
         ));
     }
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     public function getStreamMetadata(string $stream, UserCredentials $userCredentials = null): StreamMetadataResult
     {
         return Promise\wait($this->asyncConnection->getStreamMetadataAsync($stream, $userCredentials));
     }
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     public function setSystemSettings(SystemSettings $settings, UserCredentials $userCredentials = null): WriteResult
     {
         return Promise\wait($this->asyncConnection->setSystemSettingsAsync($settings, $userCredentials));
     }
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     public function createPersistentSubscription(
         string $stream,
         string $groupName,
@@ -248,7 +249,7 @@ final class EventStoreSyncNodeConnection implements
         return Promise\wait($this->asyncConnection->createPersistentSubscriptionAsync($stream, $groupName, $settings, $userCredentials));
     }
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     public function updatePersistentSubscription(
         string $stream,
         string $groupName,
@@ -263,7 +264,7 @@ final class EventStoreSyncNodeConnection implements
         ));
     }
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     public function deletePersistentSubscription(
         string $stream,
         string $groupName,
@@ -272,7 +273,7 @@ final class EventStoreSyncNodeConnection implements
         return Promise\wait($this->asyncConnection->deletePersistentSubscriptionAsync($stream, $groupName, $userCredentials));
     }
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     public function connectToPersistentSubscription(
         string $stream,
         string $groupName,
@@ -320,7 +321,7 @@ final class EventStoreSyncNodeConnection implements
         return Promise\wait($deferred->promise());
     }
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     public function continueTransaction(
         int $transactionId,
         UserCredentials $userCredentials = null

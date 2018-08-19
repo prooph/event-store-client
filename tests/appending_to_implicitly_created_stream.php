@@ -23,12 +23,13 @@ use ProophTest\EventStoreClient\Helper\TailWriter;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use function Amp\call;
 use function Amp\Promise\wait;
+use Throwable;
 
 class appending_to_implicitly_created_stream extends TestCase
 {
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0em1_idempotent(): void
     {
@@ -57,7 +58,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sequence_0em1_1e0_2e1_3e2_4e3_4e4_0any_idempotent(): void
     {
@@ -86,7 +87,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e5_non_idempotent(): void
     {
@@ -114,7 +115,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e4_wev(): void
     {
@@ -142,7 +143,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sequence_0em1_0e0_non_idempotent(): void
     {
@@ -172,7 +173,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sequence_0em1_0any_idempotent(): void
     {
@@ -202,7 +203,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sequence_0em1_0em1_idempotent(): void
     {
@@ -232,7 +233,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sequence_0em1_1e0_2e1_1any_1any_idempotent(): void
     {
@@ -264,7 +265,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sequence_S_0em1_1em1_E_S_0em1_E_idempotent(): void
     {
@@ -290,7 +291,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sequence_S_0em1_1em1_E_S_0any_E_idempotent(): void
     {
@@ -316,7 +317,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sequence_S_0em1_1em1_E_S_1e0_E_idempotent(): void
     {
@@ -342,7 +343,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sequence_S_0em1_1em1_E_S_1any_E_idempotent(): void
     {
@@ -369,7 +370,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sequence_S_0em1_1em1_E_S_0em1_1em1_2em1_E_idempotancy_fail(): void
     {

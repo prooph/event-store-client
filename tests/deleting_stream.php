@@ -21,6 +21,7 @@ use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use function Amp\call;
 use function Amp\Promise\wait;
+use Throwable;
 
 class deleting_stream extends TestCase
 {
@@ -64,7 +65,7 @@ class deleting_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function with_invalid_expected_version_should_fail(): void
     {
@@ -86,7 +87,7 @@ class deleting_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_return_log_position_when_writing(): void
     {
@@ -111,7 +112,7 @@ class deleting_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function which_was_already_deleted_should_fail(): void
     {
