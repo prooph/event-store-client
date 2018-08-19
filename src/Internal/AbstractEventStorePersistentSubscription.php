@@ -162,10 +162,11 @@ abstract class AbstractEventStorePersistentSubscription
                 $this->callback = $callback;
             }
 
-            public function __invoke(EventStoreSubscription $subscription,
-                                     SubscriptionDropReason $reason,
-                                     Throwable $exception = null): void
-            {
+            public function __invoke(
+                EventStoreSubscription $subscription,
+                SubscriptionDropReason $reason,
+                Throwable $exception = null
+            ): void {
                 ($this->callback)($subscription, $reason, $exception);
             }
         };
@@ -383,13 +384,7 @@ abstract class AbstractEventStorePersistentSubscription
                         }
 
                         try {
-                            $promise = ($this->eventAppeared)($this, $e->event(), $e->retryCount());
-
-                            if (! $promise instanceof Promise) {
-                                throw new RuntimeException('Event appeared callback needs to return an ' . Promise::class);
-                            }
-
-                            yield $promise;
+                            yield ($this->eventAppeared)($this, $e->event(), $e->retryCount());
 
                             if ($this->autoAck) {
                                 $this->subscription->notifyEventsProcessed([$e->originalEvent()->eventId()]);
@@ -421,7 +416,7 @@ abstract class AbstractEventStorePersistentSubscription
 
     private function dropSubscription(SubscriptionDropReason $reason, ?Throwable $error): void
     {
-        if ($this->isDropped) {
+        if (! $this->isDropped) {
             if ($this->verbose) {
                 $this->log->debug(\sprintf(
                     'Persistent Subscription to %s: dropping subscription, reason: %s %s',
