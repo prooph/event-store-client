@@ -16,9 +16,11 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
+use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
-use Prooph\EventStoreClient\Internal\StopWatch;
+use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Messages\ClientMessages\CreatePersistentSubscription;
+use Throwable;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -58,22 +60,32 @@ Loop::run(function () {
 
     \var_dump($result);
 
-    $stopWatch = StopWatch::startNew();
-    $i = 0;
-
     $subscription = $connection->connectToPersistentSubscription(
         'foo-bar',
         'test-persistent-subscription',
-        function (EventStorePersistentSubscription $subscription, ResolvedEvent $event, int $retry) use ($stopWatch, &$i): Promise {
-            echo 'incoming event: ' . $event->originalEventNumber() . '@' . $event->originalStreamName() . PHP_EOL;
-            echo 'data: ' . $event->originalEvent()->data() . PHP_EOL;
-            echo 'retry: ' . $retry . PHP_EOL;
-            echo 'no: ' . ++$i . ', elapsed: ' . $stopWatch->elapsed() . PHP_EOL;
+        new class() implements EventAppearedOnPersistentSubscription {
+            public function __invoke(
+                AbstractEventStorePersistentSubscription $subscription,
+                ResolvedEvent $resolvedEvent): Promise
+            {
+                echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
+                echo 'data: ' . $resolvedEvent->originalEvent()->data() . PHP_EOL;
 
-            return new Success();
+                return new Success();
+            }
         },
-        function () {
-            echo 'dropped' . PHP_EOL;
+        new class() implements SubscriptionDroppedOnPersistentSubscription {
+            public function __invoke(
+                AbstractEventStorePersistentSubscription $subscription,
+                SubscriptionDropReason $reason,
+                Throwable $exception = null): void
+            {
+                echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
+
+                if ($exception) {
+                    echo 'ex: ' . $exception->getMessage() . PHP_EOL;
+                }
+            }
         },
         10,
         true,

@@ -18,9 +18,12 @@ use Amp\Success;
 use Amp\TimeoutException;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\ExpectedVersion;
+use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
+use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\NamedConsumerStrategy;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
@@ -97,10 +100,22 @@ class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
             $this->conn->connectToPersistentSubscription(
                 $this->streamName,
                 $this->groupName,
-                function ($sub, $event): Promise {
-                    $this->eventsReceived->resolve(true);
+                new class($this->eventsReceived) implements EventAppearedOnPersistentSubscription {
+                    private $deferred;
 
-                    return new Success();
+                    public function __construct(Deferred $deferred)
+                    {
+                        $this->deferred = $deferred;
+                    }
+
+                    public function __invoke(
+                        AbstractEventStorePersistentSubscription $subscription,
+                        ResolvedEvent $resolvedEvent
+                    ): Promise {
+                        $this->deferred->resolve(true);
+
+                        return new Success();
+                    }
                 },
                 null,
                 10,

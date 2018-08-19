@@ -20,6 +20,7 @@ use Prooph\EventStoreClient\ClientOperations\TransactionalWriteOperation;
 use Prooph\EventStoreClient\ClusterSettings;
 use Prooph\EventStoreClient\ConditionalWriteResult;
 use Prooph\EventStoreClient\ConnectionSettings;
+use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventReadResult;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\EventStoreSyncConnection;
@@ -30,6 +31,7 @@ use Prooph\EventStoreClient\Position;
 use Prooph\EventStoreClient\StreamEventsSlice;
 use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\StreamMetadataResult;
+use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
 use Prooph\EventStoreClient\SystemSettings;
 use Prooph\EventStoreClient\UserCredentials;
 use Prooph\EventStoreClient\WriteResult;
@@ -274,8 +276,8 @@ final class EventStoreSyncNodeConnection implements
     public function connectToPersistentSubscription(
         string $stream,
         string $groupName,
-        callable $eventAppeared,
-        callable $subscriptionDropped = null,
+        EventAppearedOnSubscription $eventAppeared,
+        SubscriptionDroppedOnSubscription $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         UserCredentials $userCredentials = null

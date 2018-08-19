@@ -18,11 +18,15 @@ use Amp\Success;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
+use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\ExpectedVersion;
+use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
+use Prooph\EventStoreClient\SubscriptionDroppedOnCatchUpSubscription;
+use Prooph\EventStoreClient\SubscriptionDropReason;
 use ProophTest\EventStoreClient\Helper\Connection;
 use Throwable;
 use function Amp\call;
@@ -89,27 +93,15 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
             $this->connection->subscribeToAllFrom(
                 null,
                 $this->settings,
-                function ($sub, ResolvedEvent $event) {
-                    if ($this->streamName === $event->originalStreamName()
-                        && $event->originalEventNumber() % 1000 === 0
-                    ) {
-                        \fwrite(\STDOUT, \sprintf(
-                            "Processed %d events\n",
-                            $event->originalEventNumber()
-                        ));
-                    }
-
-                    return new Success();
-                },
-                function () use ($deferred): void {
-                    $deferred->resolve(true);
-                },
+                $this->eventAppearedResolver(),
                 null,
+                $this->subscriptionDroppedResolver($deferred),
                 DefaultData::adminCredentials()
             );
 
             try {
-                $result = yield timeout($deferred->promise(), 10 * 60 * 1000);
+                // we wait maximum 5 minutes
+                $result = yield timeout($deferred->promise(), 5 * 60 * 1000);
             } catch (TimeoutException $e) {
                 $this->fail('Timed out waiting for test to complete');
             }
@@ -135,20 +127,9 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
                 $this->streamName,
                 null,
                 $this->settings,
-                function ($sub, ResolvedEvent $event) {
-                    if ($event->originalEventNumber() % 1000 === 0) {
-                        \fwrite(\STDOUT, \sprintf(
-                            "Processed %d events\n",
-                            $event->originalEventNumber()
-                        ));
-                    }
-
-                    return new Success();
-                },
-                function () use ($deferred): void {
-                    $deferred->resolve(true);
-                },
+                $this->eventAppearedResolver(),
                 null,
+                $this->subscriptionDroppedResolver($deferred),
                 DefaultData::adminCredentials()
             );
 
@@ -163,5 +144,45 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
 
             $this->tearDownTestCase();
         }));
+    }
+
+    private function eventAppearedResolver(): EventAppearedOnCatchupSubscription
+    {
+        return new class() implements EventAppearedOnCatchupSubscription {
+            public function __invoke(
+                EventStoreCatchUpSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ): Promise {
+                if ($resolvedEvent->originalEventNumber() % 1000 === 0) {
+                    \fwrite(\STDOUT, \sprintf(
+                        "Processed %d events\n",
+                        $resolvedEvent->originalEventNumber()
+                    ));
+                }
+
+                return new Success();
+            }
+        };
+    }
+
+    private function subscriptionDroppedResolver(
+        Deferred $deferred
+    ): SubscriptionDroppedOnCatchUpSubscription {
+        return new class($deferred) implements SubscriptionDroppedOnCatchUpSubscription {
+            private $deferred;
+
+            public function __construct(Deferred $deferred)
+            {
+                $this->deferred = $deferred;
+            }
+
+            public function __invoke(
+                EventStoreCatchUpSubscription $subscription,
+                SubscriptionDropReason $reason,
+                Throwable $exception = null
+            ): void {
+                $this->deferred->resolve(true);
+            }
+        };
     }
 }

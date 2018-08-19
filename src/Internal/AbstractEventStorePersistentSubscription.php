@@ -19,6 +19,8 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use Prooph\EventStoreClient\ConnectionSettings;
+use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
+use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\Exception\RuntimeException;
@@ -27,6 +29,8 @@ use Prooph\EventStoreClient\Internal\ResolvedEvent as InternalResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
 use Prooph\EventStoreClient\PersistentSubscriptionResolvedEvent;
 use Prooph\EventStoreClient\ResolvedEvent;
+use Prooph\EventStoreClient\SubscriptionDroppedOnPersistentSubscription;
+use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
@@ -46,9 +50,9 @@ abstract class AbstractEventStorePersistentSubscription
     private $subscriptionId;
     /** @var string */
     private $streamId;
-    /** @var callable(self $subscription, ResolvedEvent $event, ?int $retryCount): Promise */
+    /** @var EventAppearedOnPersistentSubscription */
     private $eventAppeared;
-    /** @var null|callable(self $subscription, SubscriptionDropReason $reason, Throwable $exception):void */
+    /** @var SubscriptionDroppedOnPersistentSubscription|null */
     private $subscriptionDropped;
     /** @var UserCredentials|null */
     private $userCredentials;
@@ -80,23 +84,12 @@ abstract class AbstractEventStorePersistentSubscription
 
     /**
      * @internal
-     *
-     * @param string $subscriptionId
-     * @param string $streamId
-     * @param callable(self $subscription, ResolvedEvent $event, ?int $retryCount): Promise $eventAppeared
-     * @param null|callable(self $subscription, SubscriptionDropReason $reason, Throwable $exception): void $subscriptionDropped
-     * @param UserCredentials|null $userCredentials
-     * @param Logger $logger,
-     * @param bool $verboseLogging
-     * @param ConnectionSettings $settings
-     * @param int $bufferSize
-     * @param bool $autoAck
      */
     public function __construct(
         string $subscriptionId,
         string $streamId,
-        callable $eventAppeared,
-        ?callable $subscriptionDropped,
+        EventAppearedOnPersistentSubscription $eventAppeared,
+        ?SubscriptionDroppedOnPersistentSubscription $subscriptionDropped,
         ?UserCredentials $userCredentials,
         Logger $logger,
         bool $verboseLogging,
@@ -111,8 +104,7 @@ abstract class AbstractEventStorePersistentSubscription
         $this->subscriptionId = $subscriptionId;
         $this->streamId = $streamId;
         $this->eventAppeared = $eventAppeared;
-        $this->subscriptionDropped = $subscriptionDropped ?? function (): void {
-        };
+        $this->subscriptionDropped = $subscriptionDropped;
         $this->userCredentials = $userCredentials;
         $this->log = $logger;
         $this->verbose = $verboseLogging;
@@ -131,14 +123,14 @@ abstract class AbstractEventStorePersistentSubscription
     {
         $this->stopped = false;
 
-        $onEventAppeared = function (
+        $eventAppearedCallback = function (
             EventStoreSubscription $subscription,
             PersistentSubscriptionResolvedEvent $resolvedEvent
         ): Promise {
             return $this->onEventAppeared($resolvedEvent);
         };
 
-        $onSubscriptionDropped = function (
+        $subscriptionDroppedCallback = function (
             EventStoreSubscription $subscription,
             SubscriptionDropReason $reason,
             ?Throwable $exception
@@ -146,13 +138,45 @@ abstract class AbstractEventStorePersistentSubscription
             $this->onSubscriptionDropped($reason, $exception);
         };
 
+        $eventAppeared = new class($eventAppearedCallback) implements EventAppearedOnSubscription {
+            private $callback;
+
+            public function __construct(callable  $callback)
+            {
+                $this->callback = $callback;
+            }
+
+            public function __invoke(
+                EventStoreSubscription $subscription,
+                InternalResolvedEvent $resolvedEvent
+            ): Promise {
+                return ($this->callback)($subscription, $resolvedEvent);
+            }
+        };
+
+        $subscriptionDropped = new class($subscriptionDroppedCallback) implements SubscriptionDroppedOnSubscription {
+            private $callback;
+
+            public function __construct(callable  $callback)
+            {
+                $this->callback = $callback;
+            }
+
+            public function __invoke(EventStoreSubscription $subscription,
+                                     SubscriptionDropReason $reason,
+                                     Throwable $exception = null): void
+            {
+                ($this->callback)($subscription, $reason, $exception);
+            }
+        };
+
         $promise = $this->startSubscription(
             $this->subscriptionId,
             $this->streamId,
             $this->bufferSize,
             $this->userCredentials,
-            $onEventAppeared,
-            $onSubscriptionDropped,
+            $eventAppeared,
+            $subscriptionDropped,
             $this->settings
         );
 
@@ -174,23 +198,14 @@ abstract class AbstractEventStorePersistentSubscription
 
     /**
      * @internal
-     *
-     * @param string $subscriptionId
-     * @param string $streamId
-     * @param int $bufferSize
-     * @param UserCredentials|null $userCredentials
-     * @param callable(EventStoreSubscription $subscription, PersistentSubscriptionResolvedEvent $resolvedEvent): Promise $onEventAppeared,
-     * @param null|callable(EventStoreSubscription $subscription, SubscriptionDropReason $reason, ?Throwable $exception): void $onSubscriptionDropped
-     * @param ConnectionSettings $settings
-     * @return Promise
      */
     abstract public function startSubscription(
         string $subscriptionId,
         string $streamId,
         int $bufferSize,
         ?UserCredentials $userCredentials,
-        callable $onEventAppeared,
-        ?callable $onSubscriptionDropped,
+        EventAppearedOnSubscription $onEventAppeared,
+        ?SubscriptionDroppedOnSubscription $onSubscriptionDropped,
         ConnectionSettings $settings
     ): Promise;
 
@@ -420,7 +435,9 @@ abstract class AbstractEventStorePersistentSubscription
                 $this->subscription->unsubscribe();
             }
 
-            ($this->subscriptionDropped)($this, $reason, $error);
+            if ($this->subscriptionDropped) {
+                ($this->subscriptionDropped)($this, $reason, $error);
+            }
 
             $this->stopped = true;
         }

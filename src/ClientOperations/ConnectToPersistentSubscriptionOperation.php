@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
+use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\Exception\AccessDeniedException;
@@ -27,10 +28,11 @@ use Prooph\EventStoreClient\Messages\ClientMessages\PersistentSubscriptionAckEve
 use Prooph\EventStoreClient\Messages\ClientMessages\PersistentSubscriptionConfirmation;
 use Prooph\EventStoreClient\Messages\ClientMessages\PersistentSubscriptionNakEvents;
 use Prooph\EventStoreClient\Messages\ClientMessages\PersistentSubscriptionStreamEventAppeared;
-use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped;
+use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped as SubscriptionDroppedMessage;
 use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped_SubscriptionDropReason as SubscriptionDropReasonMessage;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
 use Prooph\EventStoreClient\PersistentSubscriptionResolvedEvent;
+use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
@@ -57,8 +59,8 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
         int $bufferSize,
         string $streamId,
         ?UserCredentials $userCredentials,
-        callable $eventAppeared,
-        ?callable $subscriptionDropped,
+        EventAppearedOnSubscription $eventAppeared,
+        ?SubscriptionDroppedOnSubscription $subscriptionDropped,
         bool $verboseLogging,
         callable $getConnection
     ) {
@@ -126,7 +128,7 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
         }
 
         if ($package->command()->equals(TcpCommand::subscriptionDropped())) {
-            $message = new SubscriptionDropped();
+            $message = new SubscriptionDroppedMessage();
             $message->parseFromString($package->data());
 
             if ($message->getReason() === SubscriptionDropReasonMessage::AccessDenied) {

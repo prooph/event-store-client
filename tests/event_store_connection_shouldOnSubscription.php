@@ -12,9 +12,13 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\Promise;
 use Amp\Success;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStoreClient\EventAppearedOnSubscription;
+use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
+use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Position;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
@@ -106,18 +110,37 @@ class event_store_connection_should extends TestCase
             }
 
             try {
-                yield $connection->subscribeToStreamAsync($s, false, function (): Promise {
-                    return new Success();
-                });
+                yield $connection->subscribeToStreamAsync(
+                    $s,
+                    false,
+                    new class() implements EventAppearedOnSubscription {
+                        public function __invoke(
+                            EventStoreSubscription $subscription,
+                            ResolvedEvent $resolvedEvent
+                        ): Promise {
+                            return new Success();
+                        }
+                    }
+                );
+
                 $this->fail('No exception thrown on SubscribeToStreamAsync');
             } catch (Throwable $e) {
                 $this->assertInstanceOf(InvalidOperationException::class, $e);
             }
 
             try {
-                yield $connection->subscribeToAllAsync(false, function (): Promise {
-                    return new Success();
-                });
+                yield $connection->subscribeToAllAsync(
+                    false,
+                    new class() implements EventAppearedOnSubscription {
+                        public function __invoke(
+                            EventStoreSubscription $subscription,
+                            ResolvedEvent $resolvedEvent
+                        ): Promise {
+                            return new Success();
+                        }
+                    }
+                );
+
                 $this->fail('No exception thrown on SubscribeToAllAsync');
             } catch (Throwable $e) {
                 $this->assertInstanceOf(InvalidOperationException::class, $e);

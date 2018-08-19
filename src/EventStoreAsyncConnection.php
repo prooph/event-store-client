@@ -146,106 +146,63 @@ interface EventStoreAsyncConnection
     ): Promise;
 
     /**
-     * @param string $stream
-     * @param bool $resolveLinkTos
-     * @param callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\Internal\ResolvedEvent $resolvedEvent): Promise $eventAppeared
-     * @param null|callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\SubscriptionDropReason $reason, \Throwable $exception): void $subscriptionDropped
-     * @param UserCredentials|null
      * @return Promise<EventStoreSubscription>
      */
     public function subscribeToStreamAsync(
         string $stream,
         bool $resolveLinkTos,
-        callable $eventAppeared,
-        callable $subscriptionDropped = null,
+        EventAppearedOnSubscription $eventAppeared,
+        SubscriptionDroppedOnSubscription $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): Promise;
 
-    /**
-     * @param string $stream
-     * @param int|null $lastCheckpoint
-     * @param CatchUpSubscriptionSettings $settings
-     * @param callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\Internal\ResolvedEvent $resolvedEvent): Promise $eventAppeared
-     * @param null|callable(\Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription $subscription): void $liveProcessingStarted
-     * @param null|callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\SubscriptionDropReason $reason, \Throwable $exception): void $subscriptionDropped
-     * @return EventStoreStreamCatchUpSubscription
-     */
     public function subscribeToStreamFrom(
         string $stream,
         ?int $lastCheckpoint,
-        CatchUpSubscriptionSettings $settings,
-        callable $eventAppeared,
-        callable $liveProcessingStarted = null,
-        callable $subscriptionDropped = null,
+        ?CatchUpSubscriptionSettings $settings,
+        EventAppearedOnCatchupSubscription $eventAppeared,
+        LiveProcessingStarted $liveProcessingStarted = null,
+        SubscriptionDroppedOnCatchUpSubscription $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): EventStoreStreamCatchUpSubscription;
 
     /**
-     * @param bool $resolveLinkTos
-     * @param callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\Internal\ResolvedEvent $resolvedEvent): Promise $eventAppeared
-     * @param null|callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\SubscriptionDropReason $reason, \Throwable $exception): void $subscriptionDropped
      * @return Promise<EventStoreSubscription>
      */
     public function subscribeToAllAsync(
         bool $resolveLinkTos,
-        callable $eventAppeared,
-        callable $subscriptionDropped = null,
+        EventAppearedOnSubscription $eventAppeared,
+        SubscriptionDroppedOnSubscription $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): Promise;
 
-    /**
-     * @param Position|null $lastCheckpoint
-     * @param CatchUpSubscriptionSettings|null $settings
-     * @param callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\Internal\ResolvedEvent $resolvedEvent): Promise $eventAppeared
-     * @param null|callable(\Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription $subscription): void $liveProcessingStarted
-     * @param null|callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\SubscriptionDropReason $reason, \Throwable $exception): void $subscriptionDropped
-     * @param UserCredentials|null $userCredentials
-     * @return EventStoreAllCatchUpSubscription
-     */
     public function subscribeToAllFrom(
         ?Position $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
-        callable $eventAppeared,
-        callable $liveProcessingStarted = null,
-        callable $subscriptionDropped = null,
+        EventAppearedOnCatchupSubscription $eventAppeared,
+        LiveProcessingStarted $liveProcessingStarted = null,
+        SubscriptionDroppedOnCatchUpSubscription $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): EventStoreAllCatchUpSubscription;
 
-    /**
-     * @param string $stream
-     * @param string $groupName
-     * @param callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\Internal\ResolvedEvent $resolvedEvent): Promise $eventAppeared
-     * @param null|callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\SubscriptionDropReason $reason, \Throwable $exception): void $subscriptionDropped
-     * @param int $bufferSize
-     * @param bool $autoAck
-     * @param UserCredentials|null $userCredentials
-     * @return EventStorePersistentSubscription
-     */
     public function connectToPersistentSubscription(
         string $stream,
         string $groupName,
-        callable $eventAppeared,
-        callable $subscriptionDropped = null,
+        EventAppearedOnPersistentSubscription $eventAppeared,
+        SubscriptionDroppedOnPersistentSubscription $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         UserCredentials $userCredentials = null
     ): EventStorePersistentSubscription;
 
     /**
-     * @param string $stream
-     * @param string $groupName
-     * @param callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\Internal\ResolvedEvent $resolvedEvent, int $retry): Promise $eventAppeared
-     * @param null|callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\SubscriptionDropReason $reason, \Throwable $exception): void $subscriptionDropped
-     * @param int $bufferSize
-     * @param bool $autoAck
-     * @param UserCredentials|null $userCredentials
      * @return Promise<AbstractEventStorePersistentSubscription>
      */
     public function connectToPersistentSubscriptionAsync(
         string $stream,
         string $groupName,
-        callable $eventAppeared,
-        ?callable $subscriptionDropped,
+        EventAppearedOnPersistentSubscription $eventAppeared,
+        SubscriptionDroppedOnPersistentSubscription $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         UserCredentials $userCredentials = null

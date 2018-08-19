@@ -34,6 +34,9 @@ use Prooph\EventStoreClient\ClusterSettings;
 use Prooph\EventStoreClient\Common\SystemEventTypes;
 use Prooph\EventStoreClient\Common\SystemStreams;
 use Prooph\EventStoreClient\ConnectionSettings;
+use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
+use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
+use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventReadResult;
 use Prooph\EventStoreClient\EventReadStatus;
@@ -49,10 +52,14 @@ use Prooph\EventStoreClient\Internal\Message\CloseConnectionMessage;
 use Prooph\EventStoreClient\Internal\Message\StartConnectionMessage;
 use Prooph\EventStoreClient\Internal\Message\StartOperationMessage;
 use Prooph\EventStoreClient\Internal\Message\StartSubscriptionMessage;
+use Prooph\EventStoreClient\LiveProcessingStarted;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Prooph\EventStoreClient\Position;
 use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\StreamMetadataResult;
+use Prooph\EventStoreClient\SubscriptionDroppedOnCatchUpSubscription;
+use Prooph\EventStoreClient\SubscriptionDroppedOnPersistentSubscription;
+use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
 use Prooph\EventStoreClient\SystemSettings;
 use Prooph\EventStoreClient\UserCredentials;
 use Throwable;
@@ -546,8 +553,8 @@ final class EventStoreAsyncNodeConnection implements
     public function subscribeToStreamAsync(
         string $stream,
         bool $resolveLinkTos,
-        callable $eventAppeared,
-        callable $subscriptionDropped = null,
+        EventAppearedOnSubscription $eventAppeared,
+        SubscriptionDroppedOnSubscription $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
@@ -574,10 +581,10 @@ final class EventStoreAsyncNodeConnection implements
     public function subscribeToStreamFrom(
         string $stream,
         ?int $lastCheckpoint,
-        CatchUpSubscriptionSettings $settings = null,
-        callable $eventAppeared,
-        callable $liveProcessingStarted = null,
-        callable $subscriptionDropped = null,
+        ?CatchUpSubscriptionSettings $settings,
+        EventAppearedOnCatchupSubscription $eventAppeared,
+        LiveProcessingStarted $liveProcessingStarted = null,
+        SubscriptionDroppedOnCatchUpSubscription $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): EventStoreStreamCatchUpSubscription {
         if (empty($stream)) {
@@ -612,8 +619,8 @@ final class EventStoreAsyncNodeConnection implements
     /** {@inheritdoc} */
     public function subscribeToAllAsync(
         bool $resolveLinkTos,
-        callable $eventAppeared,
-        callable $subscriptionDropped = null,
+        EventAppearedOnSubscription $eventAppeared,
+        SubscriptionDroppedOnSubscription $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
@@ -632,13 +639,12 @@ final class EventStoreAsyncNodeConnection implements
         return $deferred->promise();
     }
 
-    /** {@inheritdoc} */
     public function subscribeToAllFrom(
         ?Position $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
-        callable $eventAppeared,
-        callable $liveProcessingStarted = null,
-        callable $subscriptionDropped = null,
+        EventAppearedOnCatchupSubscription $eventAppeared,
+        LiveProcessingStarted $liveProcessingStarted = null,
+        SubscriptionDroppedOnCatchUpSubscription $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): EventStoreAllCatchUpSubscription {
         if (null === $settings) {
@@ -665,12 +671,11 @@ final class EventStoreAsyncNodeConnection implements
         return $catchUpSubscription;
     }
 
-    /** {@inheritdoc} */
     public function connectToPersistentSubscription(
         string $stream,
         string $groupName,
-        callable $eventAppeared,
-        callable $subscriptionDropped = null,
+        EventAppearedOnPersistentSubscription $eventAppeared,
+        SubscriptionDroppedOnPersistentSubscription $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         UserCredentials $userCredentials = null
@@ -706,8 +711,8 @@ final class EventStoreAsyncNodeConnection implements
     public function connectToPersistentSubscriptionAsync(
         string $stream,
         string $groupName,
-        callable $eventAppeared,
-        ?callable $subscriptionDropped,
+        EventAppearedOnPersistentSubscription $eventAppeared,
+        SubscriptionDroppedOnPersistentSubscription $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         UserCredentials $userCredentials = null
