@@ -16,11 +16,13 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\Exception\MaximumSubscribersReachedException;
+use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
+use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\NamedConsumerStrategy;
-use Prooph\EventStoreClient\PersistentSubscriptionResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
 
@@ -71,10 +73,15 @@ class connect_to_existing_persistent_subscription_with_max_one_client_async exte
         $this->firstSubscription = yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
-            function (EventStorePersistentSubscription $subscription, PersistentSubscriptionResolvedEvent $event): Promise {
-                $subscription->acknowledge($event);
+            new class() implements EventAppearedOnPersistentSubscription {
+                public function __invoke(
+                    AbstractEventStorePersistentSubscription $subscription,
+                    ResolvedEvent $resolvedEvent
+                ): Promise {
+                    $subscription->acknowledge($resolvedEvent);
 
-                return new Success();
+                    return new Success();
+                }
             },
             null,
             10,
@@ -89,10 +96,15 @@ class connect_to_existing_persistent_subscription_with_max_one_client_async exte
             yield $this->conn->connectToPersistentSubscriptionAsync(
                 $this->stream,
                 $this->group,
-                function (EventStorePersistentSubscription $subscription, PersistentSubscriptionResolvedEvent $event): Promise {
-                    $subscription->acknowledge($event);
+                new class() implements EventAppearedOnPersistentSubscription {
+                    public function __invoke(
+                        AbstractEventStorePersistentSubscription $subscription,
+                        ResolvedEvent $resolvedEvent
+                    ): Promise {
+                        $subscription->acknowledge($resolvedEvent);
 
-                    return new Success();
+                        return new Success();
+                    }
                 },
                 null,
                 10,

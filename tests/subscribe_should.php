@@ -17,11 +17,15 @@ use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Internal\VolatileEventStoreSubscription;
+use Prooph\EventStoreClient\Internal\ResolvedEvent;
+use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
+use Prooph\EventStoreClient\SubscriptionDropReason;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
+use Throwable;
 use function Amp\call;
 use function Amp\Promise\timeout;
 use function Amp\Promise\wait;
@@ -48,11 +52,7 @@ class subscribe_should extends TestCase
             yield $connection->subscribeToStreamAsync(
                 $stream,
                 false,
-                static function () use ($appeared): Promise {
-                    $appeared->resolve(true);
-
-                    return new Success();
-                }
+                $this->eventAppearedResolver($appeared)
             );
 
             yield $connection->appendToStreamAsync($stream, ExpectedVersion::EmptyStream, [TestEvent::new()]);
@@ -84,24 +84,16 @@ class subscribe_should extends TestCase
             $appeared1 = new Deferred();
             $appeared2 = new Deferred();
 
-            $subscription1 = yield $connection->subscribeToStreamAsync(
+            yield $connection->subscribeToStreamAsync(
                 $stream,
                 false,
-                static function (VolatileEventStoreSubscription $s) use ($appeared1): Promise {
-                    $appeared1->resolve(true);
-
-                    return new Success();
-                }
+                $this->eventAppearedResolver($appeared1)
             );
 
-            $subscription2 = yield $connection->subscribeToStreamAsync(
+            yield $connection->subscribeToStreamAsync(
                 $stream,
                 false,
-                static function () use ($appeared2): Promise {
-                    $appeared2->resolve(true);
-
-                    return new Success();
-                }
+                $this->eventAppearedResolver($appeared2)
             );
 
             $connection->appendToStreamAsync($stream, ExpectedVersion::EmptyStream, [TestEvent::new()]);
@@ -143,13 +135,15 @@ class subscribe_should extends TestCase
             $subscription = yield $connection->subscribeToStreamAsync(
                 $stream,
                 false,
-                static function (): Promise {
-                    return new Success();
+                new class() implements EventAppearedOnSubscription {
+                    public function __invoke(
+                        EventStoreSubscription $subscription,
+                        ResolvedEvent $resolvedEvent
+                    ): Promise {
+                        return new Success();
+                    }
                 },
-                static function () use ($dropped): void {
-                    $dropped->resolve(true);
-                }
-
+                $this->subscriptionDroppedResolver($dropped)
             );
 
             $subscription->unsubscribe();
@@ -181,14 +175,10 @@ class subscribe_should extends TestCase
             $appeared = new Deferred();
 
             /** @var EventStoreSubscription $subscription */
-            $subscription = yield $connection->subscribeToStreamAsync(
+            yield $connection->subscribeToStreamAsync(
                 $stream,
                 false,
-                static function () use ($appeared): Promise {
-                    $appeared->resolve(true);
-
-                    return new Success();
-                }
+                $this->eventAppearedResolver($appeared)
             );
 
             yield $connection->deleteStreamAsync($stream, ExpectedVersion::EmptyStream, true);
@@ -202,5 +192,46 @@ class subscribe_should extends TestCase
 
             $connection->close();
         }));
+    }
+
+    private function eventAppearedResolver(Deferred $deferred): EventAppearedOnSubscription
+    {
+        return new class($deferred) implements EventAppearedOnSubscription {
+            private $deferred;
+
+            public function __construct(Deferred $deferred)
+            {
+                $this->deferred = $deferred;
+            }
+
+            public function __invoke(
+                EventStoreSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ): Promise {
+                $this->deferred->resolve(true);
+
+                return new Success();
+            }
+        };
+    }
+
+    private function subscriptionDroppedResolver(Deferred $deferred): SubscriptionDroppedOnSubscription
+    {
+        return new class($deferred) implements SubscriptionDroppedOnSubscription {
+            private $deferred;
+
+            public function __construct(Deferred $deferred)
+            {
+                $this->deferred = $deferred;
+            }
+
+            public function __invoke(
+                EventStoreSubscription $subscription,
+                SubscriptionDropReason $reason,
+                Throwable $exception = null
+            ): void {
+                $this->deferred->resolve(true);
+            }
+        };
     }
 }

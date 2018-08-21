@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
+// @todo add builder, change in tests then
 class PersistentSubscriptionSettings
 {
     /**

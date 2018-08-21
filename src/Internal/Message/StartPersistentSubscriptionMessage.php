@@ -13,6 +13,9 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Internal\Message;
 
 use Amp\Deferred;
+use Prooph\EventStoreClient\EventAppearedOnSubscription;
+use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
+use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\UserCredentials;
 
 /** @internal  */
@@ -28,9 +31,9 @@ class StartPersistentSubscriptionMessage implements Message
     private $bufferSize;
     /** @var UserCredentials|null */
     private $userCredentials;
-    /** @var callable */
+    /** @var EventAppearedOnSubscription */
     private $eventAppeared;
-    /** @var callable */
+    /** @var SubscriptionDropReason|null */
     private $subscriptionDropped;
     /** @var int */
     private $maxRetries;
@@ -43,8 +46,8 @@ class StartPersistentSubscriptionMessage implements Message
         string $streamId,
         int $bufferSize,
         ?UserCredentials $userCredentials,
-        callable $eventAppeared,
-        ?callable $subscriptionDropped,
+        EventAppearedOnSubscription $eventAppeared,
+        ?SubscriptionDroppedOnSubscription $subscriptionDropped,
         int $maxRetries,
         int $timeout
     ) {
@@ -54,8 +57,7 @@ class StartPersistentSubscriptionMessage implements Message
         $this->bufferSize = $bufferSize;
         $this->userCredentials = $userCredentials;
         $this->eventAppeared = $eventAppeared;
-        $this->subscriptionDropped = $subscriptionDropped ?? function (): void {
-        };
+        $this->subscriptionDropped = $subscriptionDropped;
         $this->maxRetries = $maxRetries;
         $this->timeout = $timeout;
     }
@@ -85,12 +87,12 @@ class StartPersistentSubscriptionMessage implements Message
         return $this->userCredentials;
     }
 
-    public function eventAppeared(): callable
+    public function eventAppeared(): EventAppearedOnSubscription
     {
         return $this->eventAppeared;
     }
 
-    public function subscriptionDropped(): callable
+    public function subscriptionDropped(): ?SubscriptionDroppedOnSubscription
     {
         return $this->subscriptionDropped;
     }

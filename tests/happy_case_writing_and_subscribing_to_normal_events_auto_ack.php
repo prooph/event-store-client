@@ -18,8 +18,11 @@ use Amp\Success;
 use Amp\TimeoutException;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\ExpectedVersion;
+use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
+use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use function Amp\Promise\timeout;
@@ -34,13 +37,8 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
     private $groupName;
     /** @var int */
     private $bufferCount = 10;
-    /** @var int */
-    private $eventWriteCount = 20;
-
     /** @var Deferred */
     private $eventsReceived;
-    /** @var int */
-    private $eventReceivedCount = 0;
 
     protected function setUp(): void
     {
@@ -70,24 +68,37 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
                 DefaultData::adminCredentials()
             );
 
+            $deferred = $this->eventsReceived;
+
             $this->conn->connectToPersistentSubscription(
                 $this->streamName,
                 $this->groupName,
-                function ($s, $e): Promise {
-                    ++$this->eventReceivedCount;
+                new class($deferred) implements EventAppearedOnPersistentSubscription {
+                    private $deferred;
+                    private $eventReceivedCount = 0;
+                    private $eventWriteCount = 20;
 
-                    if ($this->eventReceivedCount === $this->eventWriteCount) {
-                        $this->eventsReceived->resolve(true);
+                    public function __construct(Deferred $deferred)
+                    {
+                        $this->deferred = $deferred;
                     }
 
-                    return new Success();
-                },
-                function ($s, $r, $e) {
-                    // subscription dropped
+                    public function __invoke(
+                        AbstractEventStorePersistentSubscription $subscription,
+                        ResolvedEvent $resolvedEvent
+                    ): Promise {
+                        ++$this->eventReceivedCount;
+
+                        if ($this->eventReceivedCount === $this->eventWriteCount) {
+                            $this->deferred->resolve(true);
+                        }
+
+                        return new Success();
+                    }
                 }
             );
 
-            for ($i = 0; $i < $this->eventWriteCount; $i++) {
+            for ($i = 0; $i < 20; $i++) {
                 $eventData = new EventData(null, 'SomeEvent', false);
 
                 yield $this->conn->appendToStreamAsync(

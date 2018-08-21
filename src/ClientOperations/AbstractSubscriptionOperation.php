@@ -17,6 +17,7 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
+use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\Exception\AccessDeniedException;
 use Prooph\EventStoreClient\Exception\ConnectionClosedException;
@@ -29,9 +30,10 @@ use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled;
 use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled_MasterInfo as MasterInfo;
 use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled_NotHandledReason as NotHandledReason;
-use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped;
+use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped as SubscriptionDroppedMessage;
 use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped_SubscriptionDropReason as SubscriptionDropReasonMessage;
 use Prooph\EventStoreClient\Messages\ClientMessages\UnsubscribeFromStream;
+use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
@@ -58,9 +60,9 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
     protected $resolveLinkTos;
     /** @var UserCredentials|null */
     protected $userCredentials;
-    /** @var callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\Internal\ResolvedEvent $resolvedEvent): Promise */
+    /** @var EventAppearedOnSubscription */
     protected $eventAppeared;
-    /** @var null|callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\SubscriptionDropReason $reason, \Throwable $exception): void */
+    /** @var SubscriptionDroppedOnSubscription|null */
     private $subscriptionDropped;
     /** @var bool */
     private $verboseLogging;
@@ -79,25 +81,14 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
     /** @var string */
     protected $correlationId;
 
-    /**
-     * @param Logger $logger
-     * @param Deferred $deferred
-     * @param string $streamId
-     * @param bool $resolveLinkTos
-     * @param null|UserCredentials $userCredentials
-     * @param callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\Internal\ResolvedEvent $resolvedEvent): Promise $eventAppeared
-     * @param null|callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\SubscriptionDropReason $reason, \Throwable $exception): void $subscriptionDropped
-     * @param bool $verboseLogging
-     * @param callable $getConnection
-     */
     public function __construct(
         Logger $logger,
         Deferred $deferred,
         string $streamId,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
-        callable $eventAppeared,
-        ?callable $subscriptionDropped,
+        EventAppearedOnSubscription $eventAppeared,
+        ?SubscriptionDroppedOnSubscription $subscriptionDropped,
         bool $verboseLogging,
         callable $getConnection
     ) {
@@ -107,8 +98,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
         $this->resolveLinkTos = $resolveLinkTos;
         $this->userCredentials = $userCredentials;
         $this->eventAppeared = $eventAppeared;
-        $this->subscriptionDropped = $subscriptionDropped ?? function (): void {
-        };
+        $this->subscriptionDropped = $subscriptionDropped;
         $this->verboseLogging = $verboseLogging;
         $this->getConnection = $getConnection;
         $this->actionQueue = new SplQueue();
@@ -160,7 +150,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 
             switch ($package->command()->value()) {
                 case TcpCommand::SubscriptionDropped:
-                    $message = new SubscriptionDropped();
+                    $message = new SubscriptionDroppedMessage();
                     $message->parseFromString($package->data());
 
                     switch ($message->getReason()) {
@@ -310,7 +300,9 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 
             if (null !== $this->subscription) {
                 $this->executeActionAsync(function () use ($reason, $exception) {
-                    ($this->subscriptionDropped)($this->subscription, $reason, $exception);
+                    if ($this->subscriptionDropped) {
+                        ($this->subscriptionDropped)($this->subscription, $reason, $exception);
+                    }
 
                     return new Success();
                 });

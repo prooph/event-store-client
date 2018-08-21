@@ -13,6 +13,8 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Internal\Message;
 
 use Amp\Deferred;
+use Prooph\EventStoreClient\EventAppearedOnSubscription;
+use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
 use Prooph\EventStoreClient\UserCredentials;
 
 /** @internal  */
@@ -26,32 +28,22 @@ class StartSubscriptionMessage implements Message
     private $resolveTo;
     /** @var UserCredentials|null */
     private $userCredentials;
-    /** @var callable */
+    /** @var EventAppearedOnSubscription */
     private $eventAppeared;
-    /** @var callable */
+    /** @var SubscriptionDroppedOnSubscription|null */
     private $subscriptionDropped;
     /** @var int */
     private $maxRetries;
     /** @var int */
     private $timeout;
 
-    /**
-     * @param Deferred $deferred
-     * @param string $streamId
-     * @param bool $resolveTo
-     * @param UserCredentials|null $userCredentials
-     * @param callable(EventStoreSubscription $subscription, ResolvedEvent $event): Promise $eventAppeared
-     * @param null|callable(EventStoreSubscription $subscription, SubscriptionDropReason $reason, Exception $exception): void $subscriptionDropped
-     * @param int $maxRetries
-     * @param int $timeout
-     */
     public function __construct(
         Deferred $deferred,
         string $streamId,
         bool $resolveTo,
         ?UserCredentials $userCredentials,
-        callable $eventAppeared,
-        ?callable $subscriptionDropped,
+        EventAppearedOnSubscription $eventAppeared,
+        ?SubscriptionDroppedOnSubscription $subscriptionDropped,
         int $maxRetries,
         int $timeout
     ) {
@@ -60,8 +52,7 @@ class StartSubscriptionMessage implements Message
         $this->resolveTo = $resolveTo;
         $this->userCredentials = $userCredentials;
         $this->eventAppeared = $eventAppeared;
-        $this->subscriptionDropped = $subscriptionDropped ?? function (): void {
-        };
+        $this->subscriptionDropped = $subscriptionDropped;
         $this->maxRetries = $maxRetries;
         $this->timeout = $timeout;
     }
@@ -86,12 +77,12 @@ class StartSubscriptionMessage implements Message
         return $this->userCredentials;
     }
 
-    public function eventAppeared(): callable
+    public function eventAppeared(): EventAppearedOnSubscription
     {
         return $this->eventAppeared;
     }
 
-    public function subscriptionDropped(): callable
+    public function subscriptionDropped(): ?SubscriptionDroppedOnSubscription
     {
         return $this->subscriptionDropped;
     }

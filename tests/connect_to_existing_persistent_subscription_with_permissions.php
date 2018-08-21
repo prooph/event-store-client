@@ -12,10 +12,13 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
+use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\NamedConsumerStrategy;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
@@ -63,10 +66,13 @@ class connect_to_existing_persistent_subscription_with_permissions extends TestC
         $this->sub = $this->conn->connectToPersistentSubscription(
             $this->stream,
             'agroupname17',
-            function () {
-                yield new Success();
-            },
-            function () {
+            new class() implements EventAppearedOnPersistentSubscription {
+                public function __invoke(
+                    AbstractEventStorePersistentSubscription $subscription,
+                    ResolvedEvent $resolvedEvent
+                ): Promise {
+                    return new Success();
+                }
             }
         );
     }

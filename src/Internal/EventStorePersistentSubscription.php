@@ -15,7 +15,11 @@ namespace Prooph\EventStoreClient\Internal;
 use Amp\Deferred;
 use Amp\Promise;
 use Prooph\EventStoreClient\ConnectionSettings;
+use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
+use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\Internal\Message\StartPersistentSubscriptionMessage;
+use Prooph\EventStoreClient\SubscriptionDroppedOnPersistentSubscription;
+use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
 use Prooph\EventStoreClient\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
 
@@ -28,8 +32,8 @@ class EventStorePersistentSubscription extends AbstractEventStorePersistentSubsc
     public function __construct(
         string $subscriptionId,
         string $streamId,
-        callable $eventAppeared,
-        ?callable $subscriptionDropped,
+        EventAppearedOnPersistentSubscription $eventAppeared,
+        ?SubscriptionDroppedOnPersistentSubscription $subscriptionDropped,
         ?UserCredentials $userCredentials,
         Logger $logger,
         bool $verboseLogging,
@@ -59,8 +63,8 @@ class EventStorePersistentSubscription extends AbstractEventStorePersistentSubsc
         string $streamId,
         int $bufferSize,
         ?UserCredentials $userCredentials,
-        callable $onEventAppeared,
-        ?callable $onSubscriptionDropped,
+        EventAppearedOnSubscription $onEventAppeared,
+        ?SubscriptionDroppedOnSubscription $onSubscriptionDropped,
         ConnectionSettings $settings
     ): Promise {
         $deferred = new Deferred();

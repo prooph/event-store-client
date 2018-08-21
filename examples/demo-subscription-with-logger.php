@@ -15,8 +15,7 @@ namespace Prooph\EventStoreClient;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
-use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
-use Prooph\EventStoreClient\Internal\StopWatch;
+use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Throwable;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -41,22 +40,39 @@ Loop::run(function () {
 
     yield $connection->connectAsync();
 
-    $stopWatch = StopWatch::startNew();
-    $i = 0;
-
     $connection->subscribeToStreamFrom(
         'foo-bar',
         null,
         CatchUpSubscriptionSettings::default(),
-        function (EventStoreCatchUpSubscription $subscription, ResolvedEvent $event) use ($stopWatch, &$i): Promise {
-            return new Success();
+        new class() implements EventAppearedOnSubscription {
+            public function __invoke(
+                EventStoreSubscription $subscription,
+                ResolvedEvent $resolvedEvent): Promise
+            {
+                echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
+                echo 'data: ' . $resolvedEvent->originalEvent()->data() . PHP_EOL;
+
+                return new Success();
+            }
         },
-        function (EventStoreCatchUpSubscription $subscription): void {
-            echo 'liveProcessingStarted on ' . $subscription->streamId() . PHP_EOL;
+        new class() implements LiveProcessingStarted {
+            public function __invoke(EventStoreSubscription $subscription): void
+            {
+                echo 'liveProcessingStarted on ' . $subscription->streamId() . PHP_EOL;
+            }
         },
-        function (EventStoreCatchUpSubscription $subscription, SubscriptionDropReason $reason, Throwable $exception): void {
-            echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
-            echo 'ex: ' . $exception->getMessage() . PHP_EOL;
+        new class() implements SubscriptionDroppedOnSubscription {
+            public function __invoke(
+                EventStoreSubscription $subscription,
+                SubscriptionDropReason $reason,
+                Throwable $exception = null): void
+            {
+                echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
+
+                if ($exception) {
+                    echo 'ex: ' . $exception->getMessage() . PHP_EOL;
+                }
+            }
         }
     );
 });

@@ -16,12 +16,14 @@ use Amp\Delayed;
 use Amp\Promise;
 use Generator;
 use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
+use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
-use Prooph\EventStoreClient\Exception\RuntimeException;
 use Prooph\EventStoreClient\Exception\StreamDeletedException;
+use Prooph\EventStoreClient\LiveProcessingStarted;
 use Prooph\EventStoreClient\ResolvedEvent;
 use Prooph\EventStoreClient\SliceReadStatus;
 use Prooph\EventStoreClient\StreamEventsSlice;
+use Prooph\EventStoreClient\SubscriptionDroppedOnCatchUpSubscription;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
@@ -37,16 +39,6 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
 
     /**
      * @internal
-     *
-     * @param EventStoreAsyncConnection $connection
-     * @param Logger $logger,
-     * @param string $streamId
-     * @param int|null $fromEventNumberExclusive
-     * @param null|UserCredentials $userCredentials
-     * @param callable(EventStoreCatchUpSubscription $subscription, ResolvedEvent $event): Promise $eventAppeared
-     * @param null|callable(EventStoreCatchUpSubscription $subscription): void $liveProcessingStarted
-     * @param null|callable(EventStoreCatchUpSubscription $subscription, SubscriptionDropReason $reason, Throwable $exception):void $subscriptionDropped
-     * @param CatchUpSubscriptionSettings $settings
      */
     public function __construct(
         EventStoreAsyncConnection $connection,
@@ -54,9 +46,9 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
         string $streamId,
         ?int $fromEventNumberExclusive, // if null from the very beginning
         ?UserCredentials $userCredentials,
-        callable $eventAppeared,
-        ?callable $liveProcessingStarted,
-        ?callable $subscriptionDropped,
+        EventAppearedOnCatchupSubscription $eventAppeared,
+        ?LiveProcessingStarted $liveProcessingStarted,
+        ?SubscriptionDroppedOnCatchUpSubscription $subscriptionDropped,
         CatchUpSubscriptionSettings $settings
     ) {
         parent::__construct(
@@ -175,13 +167,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
 
             if ($e->originalEventNumber() > $this->lastProcessedEventNumber) {
                 try {
-                    $promise = ($this->eventAppeared)($this, $e);
-
-                    if (! $promise instanceof Promise) {
-                        throw new RuntimeException('Event appeared callback needs to return an ' . Promise::class);
-                    }
-
-                    yield $promise;
+                    yield ($this->eventAppeared)($this, $e);
                 } catch (Throwable $ex) {
                     $this->dropSubscription(SubscriptionDropReason::eventHandlerException(), $ex);
 

@@ -16,10 +16,12 @@ use Amp\Delayed;
 use Amp\Promise;
 use Prooph\EventStoreClient\AllEventsSlice;
 use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
+use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
-use Prooph\EventStoreClient\Exception\RuntimeException;
+use Prooph\EventStoreClient\LiveProcessingStarted;
 use Prooph\EventStoreClient\Position;
 use Prooph\EventStoreClient\ResolvedEvent;
+use Prooph\EventStoreClient\SubscriptionDroppedOnCatchUpSubscription;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
@@ -35,24 +37,15 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription
 
     /**
      * @internal
-     *
-     * @param EventStoreAsyncConnection $connection
-     * @param Logger $logger
-     * @param Position|null $fromPositionExclusive
-     * @param null|UserCredentials $userCredentials
-     * @param callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\Internal\ResolvedEvent $resolvedEvent): Promise $eventAppeared
-     * @param null|callable(\Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription $subscription): void $liveProcessingStarted
-     * @param null|callable(\Prooph\EventStoreClient\EventStoreSubscription $subscription, \Prooph\EventStoreClient\SubscriptionDropReason $reason, \Throwable $exception): void $subscriptionDropped
-     * @param CatchUpSubscriptionSettings $settings
      */
     public function __construct(
         EventStoreAsyncConnection $connection,
         Logger $logger,
         ?Position $fromPositionExclusive, // if null from the very beginning
         ?UserCredentials $userCredentials,
-        callable $eventAppeared,
-        ?callable $liveProcessingStarted,
-        ?callable $subscriptionDropped,
+        EventAppearedOnCatchupSubscription $eventAppeared,
+        ?LiveProcessingStarted $liveProcessingStarted,
+        ?SubscriptionDroppedOnCatchUpSubscription $subscriptionDropped,
         CatchUpSubscriptionSettings $settings
     ) {
         parent::__construct(
@@ -161,13 +154,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription
 
             if ($e->originalPosition()->greater($this->lastProcessedPosition)) {
                 try {
-                    $promise = ($this->eventAppeared)($this, $e);
-
-                    if (! $promise instanceof Promise) {
-                        throw new RuntimeException('Event appeared callback needs to return an ' . Promise::class);
-                    }
-
-                    yield $promise;
+                    yield ($this->eventAppeared)($this, $e);
                 } catch (Throwable $ex) {
                     $this->dropSubscription(SubscriptionDropReason::eventHandlerException(), $ex);
 
