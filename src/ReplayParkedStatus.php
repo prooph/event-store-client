@@ -20,8 +20,8 @@ class ReplayParkedStatus
         'DoesNotExist' => 1,
     ];
 
-    public const Success = 0;
-    public const NotFound = 1;
+    public const SUCCESS = 0;
+    public const NOT_FOUND = 1;
 
     private $name;
     private $value;

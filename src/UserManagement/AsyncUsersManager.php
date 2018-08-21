@@ -33,7 +33,7 @@ class AsyncUsersManager
     public function __construct(
         IpEndPoint $endPoint,
         int $operationTimeout,
-        string $schema = EndpointExtensions::HttpSchema,
+        string $schema = EndpointExtensions::HTTP_SCHEMA,
         UserCredentials $userCredentials = null
     ) {
         $this->client = new UsersClient($operationTimeout);

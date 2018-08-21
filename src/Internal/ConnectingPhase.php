@@ -25,13 +25,13 @@ final class ConnectingPhase
         'Connected' => 6,
     ];
 
-    public const Invalid = 0;
-    public const Reconnecting = 1;
-    public const EndPointDiscovery = 2;
-    public const ConnectionEstablishing = 3;
-    public const Authentication = 4;
-    public const Identification = 5;
-    public const Connected = 6;
+    public const INVALID = 0;
+    public const RECONNECTION = 1;
+    public const END_POINT_DISCOVERY = 2;
+    public const CONNECTION_ESTABLISHING = 3;
+    public const AUTHENTICATION = 4;
+    public const IDENTIFICATION = 5;
+    public const CONNECTED = 6;
 
     private $name;
     private $value;

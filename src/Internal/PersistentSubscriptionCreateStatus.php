@@ -21,9 +21,9 @@ class PersistentSubscriptionCreateStatus
         'Failure' => 2,
     ];
 
-    public const Success = 0;
-    public const AlreadyExists = 1;
-    public const Failure = 2;
+    public const SUCCESS = 0;
+    public const ALREADY_EXISTS = 1;
+    public const FAILURE = 2;
 
     private $name;
     private $value;

@@ -20,9 +20,9 @@ class SliceReadStatus
         'StreamDeleted' => 2,
     ];
 
-    public const Success = 0;
-    public const StreamNotFound = 1;
-    public const StreamDeleted = 2;
+    public const SUCCESS = 0;
+    public const STREAM_NOT_FOUND = 1;
+    public const STREAM_DELETED = 2;
 
     private $name;
     private $value;

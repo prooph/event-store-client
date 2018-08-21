@@ -16,6 +16,7 @@ use Amp\Success;
 use Generator;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use ProophTest\EventStoreClient\Helper\Connection;
+use Throwable;
 use function Amp\call;
 use function Amp\Promise\wait;
 
@@ -31,7 +32,7 @@ trait SpecificationWithConnection
 
     abstract protected function when(): Generator;
 
-    /** @throws \Throwable */
+    /** @throws Throwable */
     protected function executeCallback(callable $test): void
     {
         wait(call(function () use ($test) {

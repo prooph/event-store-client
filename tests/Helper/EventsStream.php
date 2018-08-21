@@ -21,7 +21,7 @@ use function Amp\call;
 /** @internal */
 class EventsStream
 {
-    private const SliceSize = 10;
+    private const SLICE_SIZE = 10;
 
     /** @return Promise<int> */
     public static function count(EventStoreAsyncConnection $connection, string $stream): Promise
@@ -31,7 +31,7 @@ class EventsStream
 
             while (true) {
                 /** @var StreamEventsSlice $slice */
-                $slice = yield $connection->readStreamEventsForwardAsync($stream, $result, self::SliceSize, false);
+                $slice = yield $connection->readStreamEventsForwardAsync($stream, $result, self::SLICE_SIZE, false);
                 $result += \count($slice->events());
 
                 if ($slice->isEndOfStream()) {

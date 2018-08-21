@@ -14,7 +14,7 @@ namespace Prooph\EventStoreClient\Common;
 
 class SystemRoles
 {
-    public const All = '$all';
-    public const Admins = '$admins';
-    public const Ops = '$ops';
+    public const ALL = '$all';
+    public const ADMINS = '$admins';
+    public const OPS = '$ops';
 }

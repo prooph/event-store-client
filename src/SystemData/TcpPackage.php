@@ -17,14 +17,14 @@ use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 /** @internal */
 class TcpPackage
 {
-    public const CommandOffset = 0;
-    public const FlagsOffset = self::CommandOffset + 1;
-    public const CorrelationOffset = self::FlagsOffset + 1;
-    public const AuthOffset = self::CorrelationOffset + 16;
+    public const COMMAND_OFFSET = 0;
+    public const FLAG_OFFSET = self::COMMAND_OFFSET + 1;
+    public const CORRELATION_OFFSET = self::FLAG_OFFSET + 1;
+    public const AUTH_OFFSET = self::CORRELATION_OFFSET + 16;
 
-    public const MandatorySize = self::AuthOffset;
+    public const MANDATORY_SIZE = self::AUTH_OFFSET;
 
-    public const DataOffset = 4;
+    public const DATA_OFFSET = 4;
 
     /** @var TcpCommand */
     private $command;
@@ -41,31 +41,31 @@ class TcpPackage
 
     public static function fromRawData(string $bytes): TcpPackage
     {
-        list('m' => $messageLength, 'c' => $command, 'f' => $flags) = \unpack('Vm/Cc/Cf/', $bytes, self::CommandOffset);
+        list('m' => $messageLength, 'c' => $command, 'f' => $flags) = \unpack('Vm/Cc/Cf/', $bytes, self::COMMAND_OFFSET);
 
-        if ($messageLength < self::MandatorySize) {
+        if ($messageLength < self::MANDATORY_SIZE) {
             throw new InvalidArgumentException('RawData too short, length: ' . $messageLength);
         }
 
-        $headerSize = self::MandatorySize;
+        $headerSize = self::MANDATORY_SIZE;
         $command = TcpCommand::fromValue($command);
         $flags = TcpFlags::fromValue($flags);
         $login = null;
         $pass = null;
 
-        list('c' => $correlationId) = \unpack('H32c', $bytes, self::DataOffset + self::CorrelationOffset);
+        list('c' => $correlationId) = \unpack('H32c', $bytes, self::DATA_OFFSET + self::CORRELATION_OFFSET);
 
         if ($flags->equals(TcpFlags::authenticated())) {
-            list('l' => $loginLen) = \unpack('Cl/', $bytes, self::AuthOffset + self::DataOffset);
-            list('l' => $login) = \unpack('a' . $loginLen . 'l/', $bytes, self::AuthOffset + self::DataOffset + 1);
+            list('l' => $loginLen) = \unpack('Cl/', $bytes, self::AUTH_OFFSET + self::DATA_OFFSET);
+            list('l' => $login) = \unpack('a' . $loginLen . 'l/', $bytes, self::AUTH_OFFSET + self::DATA_OFFSET + 1);
 
-            list('p' => $passLen) = \unpack('Cp/', $bytes, self::AuthOffset + self::DataOffset + 1 + $loginLen);
-            list('p' => $pass) = \unpack('a' . $passLen . 'p/', $bytes, self::AuthOffset + self::DataOffset + 2 + $loginLen);
+            list('p' => $passLen) = \unpack('Cp/', $bytes, self::AUTH_OFFSET + self::DATA_OFFSET + 1 + $loginLen);
+            list('p' => $pass) = \unpack('a' . $passLen . 'p/', $bytes, self::AUTH_OFFSET + self::DATA_OFFSET + 2 + $loginLen);
 
             $headerSize += 1 + $loginLen + 1 + $passLen;
         }
 
-        list('d' => $data) = \unpack('a' . ($messageLength - $headerSize) . 'd/', $bytes, self::DataOffset + $headerSize);
+        list('d' => $data) = \unpack('a' . ($messageLength - $headerSize) . 'd/', $bytes, self::DATA_OFFSET + $headerSize);
 
         return new self($command, $flags, $correlationId, $data, $login, $pass);
     }
@@ -107,7 +107,7 @@ class TcpPackage
     public function asBytes(): string
     {
         $dataLen = \strlen($this->data);
-        $headerSize = self::MandatorySize;
+        $headerSize = self::MANDATORY_SIZE;
         $messageLen = $headerSize + $dataLen;
 
         if ($this->flags->equals(TcpFlags::authenticated())) {
@@ -132,7 +132,7 @@ class TcpPackage
                 'VCCH32Ca' . $loginLen . 'Ca' . $passLen . 'a' . $dataLen,
                 $messageLen + 2 + $loginLen + $passLen,
                 $this->command->value(),
-                TcpFlags::Authenticated,
+                TcpFlags::AUTHENTICATED,
                 $this->correlationId,
                 $loginLen,
                 $this->login,
@@ -146,7 +146,7 @@ class TcpPackage
             'VCCH32a' . $dataLen,
             $messageLen,
             $this->command->value(),
-            TcpFlags::None,
+            TcpFlags::NONE,
             $this->correlationId,
             $this->data
         );

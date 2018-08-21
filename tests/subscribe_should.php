@@ -32,11 +32,11 @@ use function Amp\Promise\wait;
 
 class subscribe_should extends TestCase
 {
-    private const Timeout = 10000;
+    private const TIMEOUT = 10000;
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function be_able_to_subscribe_to_non_existing_stream_and_then_catch_new_event(): void
     {
@@ -55,10 +55,10 @@ class subscribe_should extends TestCase
                 $this->eventAppearedResolver($appeared)
             );
 
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::EmptyStream, [TestEvent::new()]);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::new()]);
 
             try {
-                $result = yield timeout($appeared->promise(), self::Timeout);
+                $result = yield timeout($appeared->promise(), self::TIMEOUT);
                 $this->assertTrue($result);
             } catch (TimeoutException $e) {
                 $this->fail('Appeared countdown event timed out');
@@ -70,7 +70,7 @@ class subscribe_should extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function allow_multiple_subscriptions_to_same_stream(): void
     {
@@ -96,17 +96,17 @@ class subscribe_should extends TestCase
                 $this->eventAppearedResolver($appeared2)
             );
 
-            $connection->appendToStreamAsync($stream, ExpectedVersion::EmptyStream, [TestEvent::new()]);
+            $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::new()]);
 
             try {
-                $result = yield timeout($appeared1->promise(), self::Timeout);
+                $result = yield timeout($appeared1->promise(), self::TIMEOUT);
                 $this->assertTrue($result);
             } catch (TimeoutException $e) {
                 $this->fail('Appeared1 countdown event timed out');
             }
 
             try {
-                $result = yield timeout($appeared2->promise(), self::Timeout);
+                $result = yield timeout($appeared2->promise(), self::TIMEOUT);
                 $this->assertTrue($result);
             } catch (TimeoutException $e) {
                 $this->fail('Appeared2 countdown event timed out');
@@ -118,7 +118,7 @@ class subscribe_should extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function call_dropped_callback_after_unsubscribe_method_call(): void
     {
@@ -149,7 +149,7 @@ class subscribe_should extends TestCase
             $subscription->unsubscribe();
 
             try {
-                $result = yield timeout($dropped->promise(), self::Timeout);
+                $result = yield timeout($dropped->promise(), self::TIMEOUT);
                 $this->assertTrue($result);
             } catch (TimeoutException $e) {
                 $this->fail('Dropdown countdown event timed out');
@@ -161,7 +161,7 @@ class subscribe_should extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function catch_deleted_events_as_well(): void
     {
@@ -181,10 +181,10 @@ class subscribe_should extends TestCase
                 $this->eventAppearedResolver($appeared)
             );
 
-            yield $connection->deleteStreamAsync($stream, ExpectedVersion::EmptyStream, true);
+            yield $connection->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
 
             try {
-                $result = yield timeout($appeared->promise(), self::Timeout);
+                $result = yield timeout($appeared->promise(), self::TIMEOUT);
                 $this->assertTrue($result);
             } catch (TimeoutException $e) {
                 $this->fail('Appeared countdown event timed out');

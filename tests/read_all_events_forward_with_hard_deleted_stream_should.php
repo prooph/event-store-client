@@ -27,6 +27,7 @@ use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\UserCredentials;
 use ProophTest\EventStoreClient\Helper\EventDataComparer;
 use ProophTest\EventStoreClient\Helper\TestEvent;
+use Throwable;
 
 class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
 {
@@ -45,17 +46,17 @@ class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
 
         yield $this->conn->setStreamMetadataAsync(
             '$all',
-            ExpectedVersion::Any,
+            ExpectedVersion::ANY,
             new StreamMetadata(
                 null,
                 null,
                 null,
                 null,
                 new StreamAcl(
-                    [SystemRoles::All]
+                    [SystemRoles::ALL]
                 )
             ),
-            new UserCredentials(SystemUsers::Admin, SystemUsers::DefaultAdminPassword)
+            new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
         );
 
         /** @var AllEventsSlice $result */
@@ -67,20 +68,20 @@ class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
 
         yield $this->conn->appendToStreamAsync(
             $this->streamName,
-            ExpectedVersion::EmptyStream,
+            ExpectedVersion::EMPTY_STREAM,
             $this->testEvents
         );
 
         yield $this->conn->deleteStreamAsync(
             $this->streamName,
-            ExpectedVersion::Any,
+            ExpectedVersion::ANY,
             true
         );
     }
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function ensure_deleted_stream(): void
     {
@@ -94,7 +95,7 @@ class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function returns_all_events_including_tombstone(): void
     {
@@ -117,7 +118,7 @@ class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
             $lastEvent = \end($events);
 
             $this->assertSame($this->streamName, $lastEvent->eventStreamId());
-            $this->assertSame(SystemEventTypes::StreamDeleted, $lastEvent->eventType());
+            $this->assertSame(SystemEventTypes::STREAM_DELETED, $lastEvent->eventType());
         });
     }
 }

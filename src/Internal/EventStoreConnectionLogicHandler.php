@@ -51,7 +51,7 @@ use Throwable;
 /** @internal */
 class EventStoreConnectionLogicHandler
 {
-    private const ClientVersion = 1;
+    private const CLIENT_VERSION = 1;
 
     /** @var EventStoreAsyncNodeConnection */
     private $esConnection;
@@ -186,8 +186,8 @@ class EventStoreConnectionLogicHandler
         $this->logDebug('startConnection');
 
         switch ($this->state->value()) {
-            case ConnectionState::Init:
-                $this->timerTickWatcherId = Loop::repeat(Consts::TimerPeriod, function (): void {
+            case ConnectionState::INIT:
+                $this->timerTickWatcherId = Loop::repeat(Consts::TIMER_PERIOD, function (): void {
                     $this->timerTick();
                 });
                 $this->endPointDiscoverer = $endPointDiscoverer;
@@ -195,14 +195,14 @@ class EventStoreConnectionLogicHandler
                 $this->connectingPhase = ConnectingPhase::reconnecting();
                 $this->discoverEndPoint($deferred);
                 break;
-            case ConnectionState::Connecting:
-            case ConnectionState::Connected:
+            case ConnectionState::CONNECTING:
+            case ConnectionState::CONNECTED:
                 $deferred->fail(new InvalidOperationException(\sprintf(
                     'EventStoreNodeConnection \'%s\' is already active',
                     $this->esConnection->connectionName()
                 )));
                 break;
-            case ConnectionState::Closed:
+            case ConnectionState::CLOSED:
                 $deferred->fail(ConnectionClosedException::withName($this->esConnection->connectionName()));
                 break;
         }
@@ -464,7 +464,7 @@ class EventStoreConnectionLogicHandler
         $this->identityInfo = new IdentifyInfo(UuidGenerator::generate(), $this->stopWatch->elapsed());
 
         $message = new IdentifyClient();
-        $message->setVersion(self::ClientVersion);
+        $message->setVersion(self::CLIENT_VERSION);
         $message->setConnectionName($this->esConnection->connectionName());
 
         $this->connection->enqueueSend(new TcpPackage(
@@ -497,9 +497,9 @@ class EventStoreConnectionLogicHandler
         $elapsed = $this->stopWatch->elapsed();
 
         switch ($this->state->value()) {
-            case ConnectionState::Init:
+            case ConnectionState::INIT:
                 break;
-            case ConnectionState::Connecting:
+            case ConnectionState::CONNECTING:
                 if ($this->connectingPhase->equals(ConnectingPhase::reconnecting())
                     && $elapsed - $this->reconnInfo->timestamp() >= $this->settings->reconnectionDelay()
                 ) {
@@ -530,12 +530,12 @@ class EventStoreConnectionLogicHandler
                     $this->closeTcpConnection($msg);
                 }
 
-                if ($this->connectingPhase->value() > ConnectingPhase::ConnectionEstablishing) {
+                if ($this->connectingPhase->value() > ConnectingPhase::CONNECTION_ESTABLISHING) {
                     $this->manageHeartbeats();
                 }
 
                 break;
-            case ConnectionState::Connected:
+            case ConnectionState::CONNECTED:
                 if ($elapsed - $this->lastTimeoutsTimeStamp >= $this->settings->operationTimeoutCheckPeriod()) {
                     $this->reconnInfo = new ReconnectionInfo(0, $elapsed);
                     $this->operations->checkTimeoutsAndRetry($this->connection);
@@ -546,7 +546,7 @@ class EventStoreConnectionLogicHandler
                 $this->manageHeartbeats();
 
                 break;
-            case ConnectionState::Closed:
+            case ConnectionState::CLOSED:
                 break;
         }
     }
@@ -598,7 +598,7 @@ class EventStoreConnectionLogicHandler
     private function startOperation(ClientOperation $operation, int $maxRetries, int $timeout): void
     {
         switch ($this->state->value()) {
-            case ConnectionState::Init:
+            case ConnectionState::INIT:
                 $operation->fail(new InvalidOperationException(
                     \sprintf(
                         'EventStoreNodeConnection \'%s\' is not active',
@@ -606,7 +606,7 @@ class EventStoreConnectionLogicHandler
                     )
                 ));
                 break;
-            case ConnectionState::Connecting:
+            case ConnectionState::CONNECTING:
                 $this->logDebug(
                     'StartOperation enqueue %s, %s, %s',
                     $operation->name(),
@@ -616,7 +616,7 @@ class EventStoreConnectionLogicHandler
                 );
                 $this->operations->enqueueOperation(new OperationItem($operation, $maxRetries, $timeout));
                 break;
-            case ConnectionState::Connected:
+            case ConnectionState::CONNECTED:
                 $this->logDebug(
                     'StartOperation schedule %s, %s, %s, %s',
                     $operation->name(),
@@ -626,7 +626,7 @@ class EventStoreConnectionLogicHandler
                 );
                 $this->operations->scheduleOperation(new OperationItem($operation, $maxRetries, $timeout), $this->connection);
                 break;
-            case ConnectionState::Closed:
+            case ConnectionState::CLOSED:
                 $operation->fail(ConnectionClosedException::withName($this->esConnection->connectionName()));
                 break;
         }
@@ -635,14 +635,14 @@ class EventStoreConnectionLogicHandler
     private function startSubscription(StartSubscriptionMessage $message): void
     {
         switch ($this->state->value()) {
-            case ConnectionState::Init:
+            case ConnectionState::INIT:
                 $message->deferred()->fail(new InvalidOperationException(\sprintf(
                     'EventStoreNodeConnection \'%s\' is not active',
                     $this->esConnection->connectionName()
                 )));
                 break;
-            case ConnectionState::Connecting:
-            case ConnectionState::Connected:
+            case ConnectionState::CONNECTING:
+            case ConnectionState::CONNECTED:
                 $operation = new VolatileSubscriptionOperation(
                     $this->settings->log(),
                     $message->deferred(),
@@ -675,7 +675,7 @@ class EventStoreConnectionLogicHandler
                 }
 
                 break;
-            case ConnectionState::Closed:
+            case ConnectionState::CLOSED:
                 $message->deferred()->fail(ConnectionClosedException::withName($this->esConnection->connectionName()));
                 break;
         }
@@ -684,14 +684,14 @@ class EventStoreConnectionLogicHandler
     private function startPersistentSubscription(StartPersistentSubscriptionMessage $message): void
     {
         switch ($this->state->value()) {
-            case ConnectionState::Init:
+            case ConnectionState::INIT:
                 $message->deferred()->fail(new InvalidOperationException(\sprintf(
                     'EventStoreNodeConnection \'%s\' is not active',
                     $this->esConnection->connectionName()
                 )));
                 break;
-            case ConnectionState::Connecting:
-            case ConnectionState::Connected:
+            case ConnectionState::CONNECTING:
+            case ConnectionState::CONNECTED:
                 $operation = new ConnectToPersistentSubscriptionOperation(
                     $this->settings->log(),
                     $message->deferred(),
@@ -725,7 +725,7 @@ class EventStoreConnectionLogicHandler
                 }
 
                 break;
-            case ConnectionState::Closed:
+            case ConnectionState::CLOSED:
                 $message->deferred()->fail(ConnectionClosedException::withName($this->esConnection->connectionName()));
                 break;
         }
@@ -816,15 +816,15 @@ class EventStoreConnectionLogicHandler
             );
 
             switch ($result->decision()->value()) {
-                case InspectionDecision::DoNothing:
+                case InspectionDecision::DO_NOTHING:
                     break;
-                case InspectionDecision::EndOperation:
+                case InspectionDecision::END_OPERATION:
                     $this->operations->removeOperation($operation);
                     break;
-                case InspectionDecision::Retry:
+                case InspectionDecision::RETRY:
                     $this->operations->scheduleOperationRetry($operation);
                     break;
-                case InspectionDecision::Reconnect:
+                case InspectionDecision::RECONNECT:
                     $this->reconnectTo(new NodeEndPoints($result->tcpEndPoint(), $result->secureTcpEndPoint()));
                     $this->operations->scheduleOperationRetry($operation);
                     break;
@@ -845,19 +845,19 @@ class EventStoreConnectionLogicHandler
             );
 
             switch ($result->decision()->value()) {
-                case InspectionDecision::DoNothing:
+                case InspectionDecision::DO_NOTHING:
                     break;
-                case InspectionDecision::EndOperation:
+                case InspectionDecision::END_OPERATION:
                     $this->subscriptions->removeSubscription($subscription);
                     break;
-                case InspectionDecision::Retry:
+                case InspectionDecision::RETRY:
                     $this->subscriptions->scheduleSubscriptionRetry($subscription);
                     break;
-                case InspectionDecision::Reconnect:
+                case InspectionDecision::RECONNECT:
                     $this->reconnectTo(new NodeEndPoints($result->tcpEndPoint(), $result->secureTcpEndPoint()));
                     $this->subscriptions->scheduleSubscriptionRetry($subscription);
                     break;
-                case InspectionDecision::Subscribed:
+                case InspectionDecision::SUBSCRIBED:
                     $subscription->setIsSubscribed(true);
                     break;
             }

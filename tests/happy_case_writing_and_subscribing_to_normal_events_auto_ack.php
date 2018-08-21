@@ -25,6 +25,7 @@ use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
+use Throwable;
 use function Amp\Promise\timeout;
 
 class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestCase
@@ -54,7 +55,7 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function do_test(): void
     {
@@ -103,7 +104,7 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
 
                 yield $this->conn->appendToStreamAsync(
                     $this->streamName,
-                    ExpectedVersion::Any,
+                    ExpectedVersion::ANY,
                     [$eventData],
                     DefaultData::adminCredentials()
                 );

@@ -30,19 +30,19 @@ class SubscriptionDropReason
         'NotFound' => 11,
     ];
 
-    public const UserInitiated = 0;
-    public const NotAuthenticated = 1;
-    public const AccessDenied = 2;
-    public const SubscribingError = 3;
-    public const ServerError = 4;
-    public const ConnectionClosed = 5;
-    public const CatchUpError = 6;
-    public const ProcessingQueueOverflow = 7;
-    public const EventHandlerException = 8;
-    public const MaxSubscribersReached = 9;
-    public const PersistentSubscriptionDeleted = 10;
-    public const Unknown = 100;
-    public const NotFound = 11;
+    public const USER_INITIATED = 0;
+    public const NOT_AUTHENTICATED = 1;
+    public const ACCESS_DENIED = 2;
+    public const SUBSCRIBING_ERROR = 3;
+    public const SERVER_ERROR = 4;
+    public const CONNECTION_CLOSED = 5;
+    public const CATCH_UP_ERROR = 6;
+    public const PROCESSING_QUEUE_OVERFLOW = 7;
+    public const EVENT_HANDLER_EXCEPTION = 8;
+    public const MAX_SUBSCRIBERS_REACHED = 9;
+    public const PERSISTENT_SUBSCRIPTION_DELETED = 10;
+    public const UNKNOWN = 100;
+    public const NOT_FOUND = 11;
 
     private $name;
     private $value;

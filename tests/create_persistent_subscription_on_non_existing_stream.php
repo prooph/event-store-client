@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\NamedConsumerStrategy;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
+use Throwable;
 
 class create_persistent_subscription_on_non_existing_stream extends TestCase
 {
@@ -56,7 +57,7 @@ class create_persistent_subscription_on_non_existing_stream extends TestCase
     /**
      * @test
      * @doesNotPerformAssertions
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function the_completion_succeeds(): void
     {

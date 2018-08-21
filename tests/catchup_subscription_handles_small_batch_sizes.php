@@ -52,7 +52,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
             for ($i = 0; $i < 10; $i++) {
                 yield $this->connection->appendToStreamAsync(
                     $this->streamName,
-                    ExpectedVersion::Any,
+                    ExpectedVersion::ANY,
                     $this->createThousandEvents()
                 );
                 \fwrite(\STDOUT, 'batch ' . $i . ' of 10 appended' . PHP_EOL);

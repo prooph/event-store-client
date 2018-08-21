@@ -33,21 +33,21 @@ class ConnectionSettingsBuilder
     /** @var bool */
     private $verboseLogging = false;
     /** @var int */
-    private $maxQueueSize = Consts::DefaultMaxQueueSize;
+    private $maxQueueSize = Consts::DEFAULT_MAX_QUEUE_SIZE;
     /** @var int */
-    private $maxConcurrentItems = Consts::DefaultMaxConcurrentItems;
+    private $maxConcurrentItems = Consts::DEFAULT_MAX_CONCURRENT_ITEMS;
     /** @var int */
-    private $maxRetries = Consts::DefaultMaxOperationRetries;
+    private $maxRetries = Consts::DEFAULT_MAX_OPERATIONS_RETRY;
     /** @var int */
-    private $maxReconnections = Consts::DefaultMaxReconnections;
+    private $maxReconnections = Consts::DEFAULT_MAX_RECONNECTIONS;
     /** @var bool */
-    private $requireMaster = Consts::DefaultRequireMaster;
+    private $requireMaster = Consts::DEFAULT_REQUIRE_MASTER;
     /** @var int */
-    private $reconnectionDelay = Consts::DefaultReconnectionDelay;
+    private $reconnectionDelay = Consts::DEFAULT_RECONNECTION_DELAY;
     /** @var int */
-    private $operationTimeout = Consts::DefaultOperationTimeout;
+    private $operationTimeout = Consts::DEFAULT_OPERATION_TIMEOUT;
     /** @var int */
-    private $operationTimeoutCheckPeriod = Consts::DefaultOperationTimeoutCheckPeriod;
+    private $operationTimeoutCheckPeriod = Consts::DEFAULT_OPERATION_TIMEOUT_CHECK_PERIOD;
     /** @var UserCredentials|null */
     private $defaultUserCredentials;
     /** @var bool */
@@ -67,9 +67,9 @@ class ConnectionSettingsBuilder
     /** @var string */
     private $clusterDns = '';
     /** @var int */
-    private $maxDiscoverAttempts = Consts::DefaultMaxClusterDiscoverAttempts;
+    private $maxDiscoverAttempts = Consts::DEFAULT_MAX_CLUSTER_DISCOVER_ATTEMPTS;
     /** @var int */
-    private $gossipExternalHttpPort = Consts::DefaultClusterManagerExternalHttpPort;
+    private $gossipExternalHttpPort = Consts::DEFAULT_CLUSTER_MANAGER_EXTERNAL_HTTP_PORT;
     /** @var int */
     private $gossipTimeout = 1000;
     /** @var GossipSeed[] */

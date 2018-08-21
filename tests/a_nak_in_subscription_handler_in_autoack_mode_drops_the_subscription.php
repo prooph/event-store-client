@@ -126,7 +126,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
     {
         yield $this->conn->appendToStreamAsync(
             $this->stream,
-            ExpectedVersion::Any,
+            ExpectedVersion::ANY,
             [
                 new EventData(EventId::generate(), 'test', true, '{"foo: "bar"}'),
             ],

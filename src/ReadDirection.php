@@ -19,8 +19,8 @@ class ReadDirection
         'Backward' => 1,
     ];
 
-    public const Forward = 0;
-    public const Backward = 1;
+    public const FORWARD = 0;
+    public const BACKWARD = 1;
 
     private $name;
     private $value;

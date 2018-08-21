@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\NamedConsumerStrategy;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
+use Throwable;
 
 class can_create_duplicate_persistent_subscription_group_name_on_different_streams extends TestCase
 {
@@ -60,7 +61,7 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
     /**
      * @test
      * @doesNotPerformAssertions
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function the_completion_succeeds(): void
     {

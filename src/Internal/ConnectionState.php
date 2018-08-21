@@ -22,10 +22,10 @@ final class ConnectionState
         'Closed' => 3,
     ];
 
-    public const Init = 0;
-    public const Connecting = 1;
-    public const Connected = 2;
-    public const Closed = 3;
+    public const INIT = 0;
+    public const CONNECTING = 1;
+    public const CONNECTED = 2;
+    public const CLOSED = 3;
 
     private $name;
     private $value;

@@ -128,7 +128,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
     {
         return call(function () use ($lastEventNumber, $slice): Generator {
             switch ($slice->status()->value()) {
-                case SliceReadStatus::Success:
+                case SliceReadStatus::SUCCESS:
                     foreach ($slice->events() as $e) {
                         yield $this->tryProcessAsync($e);
                     }
@@ -136,7 +136,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
                     $done = (null === $lastEventNumber) ? $slice->isEndOfStream() : $slice->nextEventNumber() > $lastEventNumber;
 
                     break;
-                case SliceReadStatus::StreamNotFound:
+                case SliceReadStatus::STREAM_NOT_FOUND:
                     if (null !== $lastEventNumber && $lastEventNumber !== -1) {
                         throw new \Exception(\sprintf(
                             'Impossible: stream %s disappeared in the middle of catching up subscription %s',
@@ -148,7 +148,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
                     $done = true;
 
                     break;
-                case SliceReadStatus::StreamDeleted:
+                case SliceReadStatus::STREAM_DELETED:
                     throw StreamDeletedException::with($this->streamId());
             }
 

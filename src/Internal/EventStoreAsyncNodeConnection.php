@@ -240,10 +240,10 @@ final class EventStoreAsyncNodeConnection implements
             throw new InvalidArgumentException('Count must be positive');
         }
 
-        if ($count > Consts::MaxReadSize) {
+        if ($count > Consts::MAX_READ_SIZE) {
             throw new InvalidArgumentException(\sprintf(
                 'Count should be less than %s. For larger reads you should page.',
-                Consts::MaxReadSize
+                Consts::MAX_READ_SIZE
             ));
         }
 
@@ -278,10 +278,10 @@ final class EventStoreAsyncNodeConnection implements
             throw new InvalidArgumentException('Count must be positive');
         }
 
-        if ($count > Consts::MaxReadSize) {
+        if ($count > Consts::MAX_READ_SIZE) {
             throw new InvalidArgumentException(\sprintf(
                 'Count should be less than %s. For larger reads you should page.',
-                Consts::MaxReadSize
+                Consts::MAX_READ_SIZE
             ));
         }
 
@@ -311,10 +311,10 @@ final class EventStoreAsyncNodeConnection implements
             throw new InvalidArgumentException('Count must be positive');
         }
 
-        if ($count > Consts::MaxReadSize) {
+        if ($count > Consts::MAX_READ_SIZE) {
             throw new InvalidArgumentException(\sprintf(
                 'Count should be less than %s. For larger reads you should page.',
-                Consts::MaxReadSize
+                Consts::MAX_READ_SIZE
             ));
         }
 
@@ -343,10 +343,10 @@ final class EventStoreAsyncNodeConnection implements
             throw new InvalidArgumentException('Count must be positive');
         }
 
-        if ($count > Consts::MaxReadSize) {
+        if ($count > Consts::MAX_READ_SIZE) {
             throw new InvalidArgumentException(\sprintf(
                 'Count should be less than %s. For larger reads you should page.',
-                Consts::MaxReadSize
+                Consts::MAX_READ_SIZE
             ));
         }
 
@@ -386,7 +386,7 @@ final class EventStoreAsyncNodeConnection implements
 
         $metaEvent = new EventData(
             null,
-            SystemEventTypes::StreamMetadata,
+            SystemEventTypes::STREAM_METADATA,
             true,
             $metadata ? \json_encode($metadata->toArray()) : null
         );
@@ -427,7 +427,7 @@ final class EventStoreAsyncNodeConnection implements
             /** @var EventReadResult $eventReadResult */
 
             switch ($eventReadResult->status()->value()) {
-                case EventReadStatus::Success:
+                case EventReadStatus::SUCCESS:
                     $event = $eventReadResult->event();
 
                     if (null === $event) {
@@ -443,11 +443,11 @@ final class EventStoreAsyncNodeConnection implements
                         $event ? $event->data() : ''
                     ));
                     break;
-                case EventReadStatus::NotFound:
-                case EventReadStatus::NoStream:
+                case EventReadStatus::NOT_FOUND:
+                case EventReadStatus::NO_STREAM:
                     $deferred->resolve(new StreamMetadataResult($stream, false, -1, ''));
                     break;
-                case EventReadStatus::StreamDeleted:
+                case EventReadStatus::STREAM_DELETED:
                     $deferred->resolve(new StreamMetadataResult($stream, true, PHP_INT_MAX, ''));
                     break;
             }
@@ -459,9 +459,9 @@ final class EventStoreAsyncNodeConnection implements
     public function setSystemSettingsAsync(SystemSettings $settings, UserCredentials $userCredentials = null): Promise
     {
         return $this->appendToStreamAsync(
-            SystemStreams::SettingsStream,
-            ExpectedVersion::Any,
-            [new EventData(null, SystemEventTypes::Settings, true, \json_encode($settings->toArray()))],
+            SystemStreams::SETTINGS_STREAM,
+            ExpectedVersion::ANY,
+            [new EventData(null, SystemEventTypes::SETTINGS, true, \json_encode($settings->toArray()))],
             $userCredentials
         );
     }

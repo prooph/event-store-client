@@ -22,6 +22,7 @@ use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\NamedConsumerStrategy;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
+use Throwable;
 
 class connect_to_existing_persistent_subscription_with_permissions extends TestCase
 {
@@ -79,7 +80,7 @@ class connect_to_existing_persistent_subscription_with_permissions extends TestC
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function the_subscription_suceeds(): void
     {

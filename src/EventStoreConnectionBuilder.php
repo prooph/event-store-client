@@ -16,7 +16,6 @@ use Prooph\EventStoreClient\EventStoreAsyncConnection as AsyncConnection;
 use Prooph\EventStoreClient\EventStoreSyncConnection as SyncConnection;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Internal\ClusterDnsEndPointDiscoverer;
-use Prooph\EventStoreClient\Internal\Consts;
 use Prooph\EventStoreClient\Internal\EventStoreAsyncNodeConnection;
 use Prooph\EventStoreClient\Internal\EventStoreSyncNodeConnection;
 use Prooph\EventStoreClient\Internal\SingleEndpointDiscoverer;
@@ -34,6 +33,8 @@ class EventStoreConnectionBuilder
      * @const string
      */
     private const CHAR_UNRESERVED = 'a-zA-Z0-9_\-\.~\pL';
+
+    private const TCP_PORT_DEFAULT = 1113;
 
     /** @throws \Exception */
     public static function createAsyncFromBuilder(
@@ -222,7 +223,7 @@ class EventStoreConnectionBuilder
 
         $scheme = isset($parts['scheme']) ? self::filterScheme($parts['scheme']) : '';
         $host = isset($parts['host']) ? \strtolower($parts['host']) : '';
-        $port = isset($parts['port']) ? (int) $parts['port'] : Consts::TcpPortDefault;
+        $port = isset($parts['port']) ? (int) $parts['port'] : self::TCP_PORT_DEFAULT;
         $user = isset($parts['user']) ? self::filterUserInfoPart($parts['user']) : '';
         $pass = $parts['pass'] ?? '';
 

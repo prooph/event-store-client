@@ -33,18 +33,18 @@ class SystemSettings
     {
         return new self(
             new StreamAcl(
-                [SystemRoles::All],
-                [SystemRoles::All],
-                [SystemRoles::All],
-                [SystemRoles::All],
-                [SystemRoles::All]
+                [SystemRoles::ALL],
+                [SystemRoles::ALL],
+                [SystemRoles::ALL],
+                [SystemRoles::ALL],
+                [SystemRoles::ALL]
             ),
             new StreamAcl(
-                [SystemRoles::All, SystemRoles::Admins],
-                [SystemRoles::All, SystemRoles::Admins],
-                [SystemRoles::All, SystemRoles::Admins],
-                [SystemRoles::All, SystemRoles::Admins],
-                [SystemRoles::All, SystemRoles::Admins]
+                [SystemRoles::ALL, SystemRoles::ADMINS],
+                [SystemRoles::ALL, SystemRoles::ADMINS],
+                [SystemRoles::ALL, SystemRoles::ADMINS],
+                [SystemRoles::ALL, SystemRoles::ADMINS],
+                [SystemRoles::ALL, SystemRoles::ADMINS]
             )
         );
     }
@@ -68,24 +68,24 @@ class SystemSettings
     public function toArray(): array
     {
         return [
-            SystemMetadata::UserStreamAcl => $this->userStreamAcl->toArray(),
-            SystemMetadata::SystemStreamAcl => $this->systemStreamAcl->toArray(),
+            SystemMetadata::USER_STREAM_ACL => $this->userStreamAcl->toArray(),
+            SystemMetadata::SYSTEM_STREAM_ACL => $this->systemStreamAcl->toArray(),
         ];
     }
 
     public static function fromArray(array $data): SystemSettings
     {
-        if (! isset($data[SystemMetadata::UserStreamAcl])) {
-            throw new \InvalidArgumentException(SystemMetadata::UserStreamAcl . ' is missing');
+        if (! isset($data[SystemMetadata::USER_STREAM_ACL])) {
+            throw new \InvalidArgumentException(SystemMetadata::USER_STREAM_ACL . ' is missing');
         }
 
-        if (! isset($data[SystemMetadata::SystemStreamAcl])) {
-            throw new \InvalidArgumentException(SystemMetadata::SystemStreamAcl . ' is missing');
+        if (! isset($data[SystemMetadata::SYSTEM_STREAM_ACL])) {
+            throw new \InvalidArgumentException(SystemMetadata::SYSTEM_STREAM_ACL . ' is missing');
         }
 
         return new self(
-            StreamAcl::fromArray($data[SystemMetadata::UserStreamAcl]),
-            StreamAcl::fromArray($data[SystemMetadata::SystemStreamAcl])
+            StreamAcl::fromArray($data[SystemMetadata::USER_STREAM_ACL]),
+            StreamAcl::fromArray($data[SystemMetadata::SYSTEM_STREAM_ACL])
         );
     }
 }

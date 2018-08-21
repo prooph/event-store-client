@@ -38,7 +38,7 @@ class HttpAsyncClient
         callable $onException
     ): void {
         $this->receive(
-            HttpMethod::Get,
+            HttpMethod::GET,
             $url,
             $userCredentials,
             $onSuccess,
@@ -55,7 +55,7 @@ class HttpAsyncClient
         callable $onException
     ): void {
         $this->send(
-            HttpMethod::Post,
+            HttpMethod::POST,
             $url,
             $body,
             $contentType,
@@ -72,7 +72,7 @@ class HttpAsyncClient
         callable $onException
     ): void {
         $this->receive(
-            HttpMethod::Delete,
+            HttpMethod::DELETE,
             $url,
             $userCredentials,
             $onSuccess,
@@ -89,7 +89,7 @@ class HttpAsyncClient
         callable $onException
     ): void {
         $this->send(
-            HttpMethod::Put,
+            HttpMethod::PUT,
             $url,
             $body,
             $contentType,

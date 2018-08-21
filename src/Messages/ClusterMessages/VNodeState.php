@@ -28,17 +28,17 @@ final class VNodeState
         'Shutdown' => 10,
     ];
 
-    public const Initializing = 0;
-    public const Unknown = 1;
-    public const PreReplica = 2;
-    public const CatchingUp = 3;
-    public const Clone = 4;
-    public const Slave = 5;
-    public const PreMaster = 6;
-    public const Master = 7;
-    public const Manager = 8;
-    public const ShuttingDown = 9;
-    public const Shutdown = 10;
+    public const INITIALIZING = 0;
+    public const UNKNOWN = 1;
+    public const PRE_REPLICA = 2;
+    public const CATCHING_UP = 3;
+    public const CLONE = 4;
+    public const SLAVE = 5;
+    public const PRE_MASTER = 6;
+    public const MASTER = 7;
+    public const MANAGER = 8;
+    public const SHUTTING_DOWN = 9;
+    public const SHUTDOWN = 10;
 
     private $name;
     private $value;

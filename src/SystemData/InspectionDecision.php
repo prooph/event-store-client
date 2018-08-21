@@ -23,11 +23,11 @@ final class InspectionDecision
         'Subscribed' => 4,
     ];
 
-    public const DoNothing = 0;
-    public const EndOperation = 1;
-    public const Retry = 2;
-    public const Reconnect = 3;
-    public const Subscribed = 4;
+    public const DO_NOTHING = 0;
+    public const END_OPERATION = 1;
+    public const RETRY = 2;
+    public const RECONNECT = 3;
+    public const SUBSCRIBED = 4;
 
     private $name;
     private $value;

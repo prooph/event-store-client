@@ -15,13 +15,13 @@ namespace Prooph\EventStoreClient\Common;
 class SystemEventTypes
 {
     // event type for stream deleted
-    public const StreamDeleted = '$streamDeleted';
+    public const STREAM_DELETED = '$streamDeleted';
     // event type for statistics
-    public const StatsCollection = '$statsCollected';
+    public const STATS_COLLECTED = '$statsCollected';
     // event type for linkTo
-    public const LinkTo = '$>';
+    public const LINK_TO = '$>';
     // event type for stream metadata
-    public const StreamMetadata = '$metadata';
+    public const STREAM_METADATA = '$metadata';
     // event type for the system settings
-    public const Settings = '$settings';
+    public const SETTINGS = '$settings';
 }

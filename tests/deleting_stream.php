@@ -19,6 +19,7 @@ use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
 use Prooph\EventStoreClient\ExpectedVersion;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
+use Throwable;
 use function Amp\call;
 use function Amp\Promise\wait;
 
@@ -37,7 +38,7 @@ class deleting_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            yield $connection->deleteStreamAsync($stream, ExpectedVersion::EmptyStream, true);
+            yield $connection->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
 
             $connection->close();
         }));
@@ -56,7 +57,7 @@ class deleting_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            yield $connection->deleteStreamAsync($stream, ExpectedVersion::Any, true);
+            yield $connection->deleteStreamAsync($stream, ExpectedVersion::ANY, true);
 
             $connection->close();
         }));
@@ -64,7 +65,7 @@ class deleting_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function with_invalid_expected_version_should_fail(): void
     {
@@ -86,7 +87,7 @@ class deleting_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function should_return_log_position_when_writing(): void
     {
@@ -97,7 +98,7 @@ class deleting_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::EmptyStream, [TestEvent::new()]);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::new()]);
 
             /** @var DeleteResult $delete */
             $delete = yield $connection->deleteStreamAsync($stream, 0, true);
@@ -111,7 +112,7 @@ class deleting_stream extends TestCase
 
     /**
      * @test
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function which_was_already_deleted_should_fail(): void
     {
@@ -122,11 +123,11 @@ class deleting_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            yield $connection->deleteStreamAsync($stream, ExpectedVersion::EmptyStream, true);
+            yield $connection->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
 
             try {
                 $this->expectException(StreamDeletedException::class);
-                yield $connection->deleteStreamAsync($stream, ExpectedVersion::EmptyStream, true);
+                yield $connection->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
             } finally {
                 $connection->close();
             }
