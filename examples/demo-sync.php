@@ -14,7 +14,7 @@ namespace Prooph\EventStoreClient;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$connection = EventStoreConnectionBuilder::createFromIpEndPoint(
+$connection = EventStoreAsyncConnectionBuilder::createFromIpEndPoint(
     new IpEndPoint('eventstore', 1113)
 );
 

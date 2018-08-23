@@ -19,18 +19,6 @@ use Prooph\EventStoreClient\UserCredentials;
 /** @internal */
 interface EventStoreAsyncTransactionConnection
 {
-    /** @return Promise<EventStoreAsyncTransaction> */
-    public function startTransactionAsync(
-        string $stream,
-        int $expectedVersion,
-        UserCredentials $userCredentials = null
-    ): Promise;
-
-    public function continueTransaction(
-        int $transactionId,
-        UserCredentials $userCredentials = null
-    ): EventStoreAsyncTransaction;
-
     public function transactionalWriteAsync(
         EventStoreAsyncTransaction $transaction,
         array $events,

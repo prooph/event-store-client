@@ -12,16 +12,14 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-use Prooph\EventStoreClient\EventStoreAsyncConnection as AsyncConnection;
 use Prooph\EventStoreClient\EventStoreSyncConnection as SyncConnection;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Internal\ClusterDnsEndPointDiscoverer;
-use Prooph\EventStoreClient\Internal\EventStoreAsyncNodeConnection;
 use Prooph\EventStoreClient\Internal\EventStoreSyncNodeConnection;
 use Prooph\EventStoreClient\Internal\SingleEndpointDiscoverer;
 use Prooph\EventStoreClient\Internal\StaticEndPointDiscoverer;
 
-class EventStoreConnectionBuilder
+class EventStoreSyncConnectionBuilder
 {
     /**
      * Sub-delimiters used in user info, query strings and fragments.
@@ -37,22 +35,22 @@ class EventStoreConnectionBuilder
     private const TCP_PORT_DEFAULT = 1113;
 
     /** @throws \Exception */
-    public static function createAsyncFromBuilder(
+    public static function createFromBuilder(
         string $connectionString = null,
         ConnectionSettingsBuilder $builder = null,
         string $connectionName = ''
-    ): AsyncConnection {
+    ): SyncConnection {
         $builder = $builder ?? new ConnectionSettingsBuilder();
 
-        return self::createAsyncFromSettings($connectionString, $builder->build(), $connectionName);
+        return self::createFromSettings($connectionString, $builder->build(), $connectionName);
     }
 
     /** @throws \Exception */
-    public static function createAsyncFromSettings(
+    public static function createFromSettings(
         string $connectionString = null,
         ConnectionSettings $settings = null,
         string $connectionName = ''
-    ): AsyncConnection {
+    ): SyncConnection {
         if (null === $connectionString && (null === $settings || (empty($settings->gossipSeeds()) && empty($settings->clusterDns())))) {
             throw new \Exception('Did not find ConnectTo, ClusterDNS or GossipSeeds in the connection string');
         }
@@ -113,14 +111,14 @@ class EventStoreConnectionBuilder
         throw new \Exception('Must specify uri, ClusterDNS or gossip seeds');
     }
 
-    public static function createAsyncFromIpEndPoint(
+    public static function createFromIpEndPoint(
         IpEndPoint $endPoint,
         ConnectionSettings $settings = null,
         string $connectionName = null
-    ): AsyncConnection {
+    ): SyncConnection {
         $settings = $settings ?? ConnectionSettings::default();
 
-        return new EventStoreAsyncNodeConnection(
+        return new EventStoreSyncNodeConnection(
             $settings,
             null,
             new StaticEndPointDiscoverer($endPoint, $settings->useSslConnection()),
@@ -128,54 +126,10 @@ class EventStoreConnectionBuilder
         );
     }
 
-    /** @throws \Exception */
-    public static function createFromBuilder(
-        string $connectionString = null,
-        ConnectionSettingsBuilder $builder = null,
-        string $connectionName = ''
-    ): SyncConnection {
-        $connection = self::createAsyncFromBuilder(
-            $connectionString,
-            $builder,
-            $connectionName
-        );
-
-        return new EventStoreSyncNodeConnection($connection);
-    }
-
-    /** @throws \Exception */
-    public static function createFromSettings(
-        string $connectionString = null,
-        ConnectionSettings $settings = null,
-        string $connectionName = ''
-    ): SyncConnection {
-        $connection = self::createAsyncFromSettings(
-            $connectionString,
-            $settings,
-            $connectionName
-        );
-
-        return new EventStoreSyncNodeConnection($connection);
-    }
-
-    public static function createFromIpEndPoint(
-        IpEndPoint $endPoint,
-        ConnectionSettings $settings = null,
-        string $connectionName = null
-    ): SyncConnection {
-        $connection = self::createAsyncFromIpEndPoint(
-            $endPoint,
-            $settings,
-            $connectionName
-        );
-
-        return new EventStoreSyncNodeConnection($connection);
-    }
-
     private static function createWithClusterDnsEndPointDiscoverer(
         ConnectionSettings $settings,
         string $connectionName = null
-    ): AsyncConnection {
+    ): SyncConnection {
         $clusterSettings = new ClusterSettings(
             $settings->clusterDns(),
             $settings->maxDiscoverAttempts(),
@@ -195,15 +149,15 @@ class EventStoreConnectionBuilder
             $settings->preferRandomNode()
         );
 
-        return new EventStoreAsyncNodeConnection($settings, $clusterSettings, $endPointDiscoverer, $connectionName);
+        return new EventStoreSyncNodeConnection($settings, $clusterSettings, $endPointDiscoverer, $connectionName);
     }
 
     private static function createWithSingleEndpointDiscoverer(
         string $connectionString,
         ConnectionSettings $settings,
         string $connectionName = null
-    ): AsyncConnection {
-        return new EventStoreAsyncNodeConnection(
+    ): SyncConnection {
+        return new EventStoreSyncNodeConnection(
             $settings,
             null,
             new SingleEndpointDiscoverer($connectionString, $settings->useSslConnection()),

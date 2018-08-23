@@ -72,6 +72,8 @@ class StartAsyncTransactionOperation extends AbstractOperation
         $message->setRequireMaster($this->requireMaster);
         $message->setEventStreamId($this->stream);
         $message->setExpectedVersion($this->expectedVersion);
+
+        return $message;
     }
 
     protected function inspectResponse(ProtobufMessage $response): InspectionResult
