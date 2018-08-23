@@ -25,8 +25,7 @@ use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
-use Prooph\EventStoreClient\SubscriptionDroppedOnCatchUpSubscription;
-use Prooph\EventStoreClient\SubscriptionDropReason;
+use Prooph\EventStoreClient\LiveProcessingStarted;
 use ProophTest\EventStoreClient\Helper\Connection;
 use Throwable;
 use function Amp\call;
@@ -94,8 +93,8 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
                 null,
                 $this->settings,
                 $this->eventAppearedResolver(),
+                $this->liveProcessingStartedResolver($deferred),
                 null,
-                $this->subscriptionDroppedResolver($deferred),
                 DefaultData::adminCredentials()
             );
 
@@ -128,8 +127,8 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
                 null,
                 $this->settings,
                 $this->eventAppearedResolver(),
+                $this->liveProcessingStartedResolver($deferred),
                 null,
-                $this->subscriptionDroppedResolver($deferred),
                 DefaultData::adminCredentials()
             );
 
@@ -165,10 +164,10 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
         };
     }
 
-    private function subscriptionDroppedResolver(
+    private function liveProcessingStartedResolver(
         Deferred $deferred
-    ): SubscriptionDroppedOnCatchUpSubscription {
-        return new class($deferred) implements SubscriptionDroppedOnCatchUpSubscription {
+    ): LiveProcessingStarted {
+        return new class($deferred) implements LiveProcessingStarted {
             private $deferred;
 
             public function __construct(Deferred $deferred)
@@ -176,11 +175,8 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
                 $this->deferred = $deferred;
             }
 
-            public function __invoke(
-                EventStoreCatchUpSubscription $subscription,
-                SubscriptionDropReason $reason,
-                Throwable $exception = null
-            ): void {
+            public function __invoke(EventStoreCatchUpSubscription $subscription): void
+            {
                 $this->deferred->resolve(true);
             }
         };
