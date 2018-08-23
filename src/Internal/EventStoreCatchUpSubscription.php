@@ -376,7 +376,9 @@ abstract class EventStoreCatchUpSubscription
             ));
         }
 
-        ($this->liveProcessingStarted)($this);
+        if ($this->liveProcessingStarted) {
+            ($this->liveProcessingStarted)($this);
+        }
 
         if ($this->verbose) {
             $this->log->debug(\sprintf(
