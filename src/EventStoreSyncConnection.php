@@ -112,6 +112,17 @@ interface EventStoreSyncConnection
 
     public function setSystemSettings(SystemSettings $settings, UserCredentials $userCredentials = null): WriteResult;
 
+    public function startTransaction(
+        string $stream,
+        int $expectedVersion,
+        UserCredentials $userCredentials = null
+    ): EventStoreSyncTransaction;
+
+    public function continueTransaction(
+        int $transactionId,
+        UserCredentials $userCredentials = null
+    ): EventStoreSyncTransaction;
+
     public function onConnected(callable $handler): ListenerHandler;
 
     public function onDisconnected(callable $handler): ListenerHandler;

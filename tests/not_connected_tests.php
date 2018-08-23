@@ -16,7 +16,7 @@ use Amp\Deferred;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\ConnectionSettingsBuilder;
-use Prooph\EventStoreClient\EventStoreConnectionBuilder;
+use Prooph\EventStoreClient\EventStoreAsyncConnectionBuilder;
 use Prooph\EventStoreClient\IpEndPoint;
 use function Amp\call;
 use function Amp\Promise\timeout;
@@ -40,7 +40,7 @@ class not_connected_tests extends TestCase
             $ip = '8.8.8.8'; //NOTE: This relies on Google DNS server being configured to swallow nonsense traffic
             $port = 4567;
 
-            $connection = EventStoreConnectionBuilder::createAsyncFromIpEndPoint(
+            $connection = EventStoreAsyncConnectionBuilder::createFromIpEndPoint(
                 new IpEndPoint($ip, $port),
                 $settingsBuilder->build(),
                 'test-connection'

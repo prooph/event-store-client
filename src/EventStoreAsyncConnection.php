@@ -122,6 +122,18 @@ interface EventStoreAsyncConnection
     /** @return Promise<WriteResult> */
     public function setSystemSettingsAsync(SystemSettings $settings, UserCredentials $userCredentials = null): Promise;
 
+    /** @return Promise<EventStoreAsyncTransaction> */
+    public function startTransactionAsync(
+        string $stream,
+        int $expectedVersion,
+        UserCredentials $userCredentials = null
+    ): Promise;
+
+    public function continueTransaction(
+        int $transactionId,
+        UserCredentials $userCredentials = null
+    ): EventStoreAsyncTransaction;
+
     /** @return Promise<PersistentSubscriptionCreateResult> */
     public function createPersistentSubscriptionAsync(
         string $stream,

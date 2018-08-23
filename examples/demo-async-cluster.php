@@ -24,7 +24,7 @@ Loop::run(function () {
         new IpEndPoint('eventstore3', 2133),
     ]);
 
-    $connection = EventStoreConnectionBuilder::createAsyncFromSettings(
+    $connection = EventStoreAsyncConnectionBuilder::createFromSettings(
         null,
         $builder->build(),
         'cluster-connection'
