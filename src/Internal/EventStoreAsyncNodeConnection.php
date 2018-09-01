@@ -611,7 +611,7 @@ final class EventStoreAsyncNodeConnection implements
             $settings
         );
 
-        $catchUpSubscription->startAsync();
+        Promise\rethrow($catchUpSubscription->startAsync());
 
         return $catchUpSubscription;
     }
@@ -666,7 +666,7 @@ final class EventStoreAsyncNodeConnection implements
             $settings
         );
 
-        $catchUpSubscription->startAsync();
+        Promise\rethrow($catchUpSubscription->startAsync());
 
         return $catchUpSubscription;
     }
@@ -702,7 +702,7 @@ final class EventStoreAsyncNodeConnection implements
             $autoAck
         );
 
-        $subscription->start();
+        Promise\rethrow($subscription->start());
 
         return $subscription;
     }

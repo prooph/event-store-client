@@ -27,6 +27,7 @@ class deleting_stream extends TestCase
 {
     /**
      * @test
+     * @throws Throwable
      * @doesNotPerformAssertions
      */
     public function which_doesnt_exists_should_success_when_passed_empty_stream_expected_version(): void
@@ -46,6 +47,7 @@ class deleting_stream extends TestCase
 
     /**
      * @test
+     * @throws Throwable
      * @doesNotPerformAssertions
      */
     public function which_doesnt_exists_should_success_when_passed_any_for_expected_version(): void

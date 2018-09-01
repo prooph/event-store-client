@@ -67,7 +67,6 @@ class SubscriptionsManager
         }
 
         foreach ($this->retryPendingSubscriptions as $subscriptionItem) {
-            $subscriptionItem = $this->waitingSubscriptions->dequeue();
             $subscriptionItem->operation()->dropSubscription(
                 SubscriptionDropReason::connectionClosed(),
                 $connectionClosedException
