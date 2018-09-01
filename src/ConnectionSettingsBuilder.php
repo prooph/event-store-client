@@ -345,7 +345,7 @@ class ConnectionSettingsBuilder
         return $this;
     }
 
-    /** @param IpEndPoint[] */
+    /** @param EndPoint[] */
     public function setGossipSeedEndPoints(array $gossipSeeds): self
     {
         if (empty($gossipSeeds)) {
@@ -353,8 +353,8 @@ class ConnectionSettingsBuilder
         }
 
         foreach ($gossipSeeds as $seed) {
-            if (! $seed instanceof IpEndPoint) {
-                throw new InvalidArgumentException('Gossip seeds must be an array of ' . IpEndPoint::class);
+            if (! $seed instanceof EndPoint) {
+                throw new InvalidArgumentException('Gossip seeds must be an array of ' . EndPoint::class);
             }
 
             $this->gossipSeeds[] = new GossipSeed($seed);

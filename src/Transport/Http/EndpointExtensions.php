@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Transport\Http;
 
-use Prooph\EventStoreClient\IpEndPoint;
+use Prooph\EventStoreClient\EndPoint;
 
 /** @internal */
 class EndpointExtensions
@@ -21,7 +21,7 @@ class EndpointExtensions
     public const HTTPS_SCHEMA = 'https';
 
     public static function rawUrlToHttpUrl(
-        IpEndPoint $endPoint,
+        EndPoint $endPoint,
         string $schema,
         string $rawUrl = ''
     ): string {
@@ -34,7 +34,7 @@ class EndpointExtensions
     }
 
     public static function formatStringToHttpUrl(
-        IpEndPoint $endPoint,
+        EndPoint $endPoint,
         string $schema,
         string $formatString,
         ...$args

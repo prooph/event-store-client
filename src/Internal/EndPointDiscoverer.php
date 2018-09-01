@@ -16,14 +16,14 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Internal;
 
 use Amp\Promise;
-use Prooph\EventStoreClient\IpEndPoint;
+use Prooph\EventStoreClient\EndPoint;
 
 /** @internal */
 interface EndPointDiscoverer
 {
     /**
-     * @param IpEndPoint|null $failedTcpEndPoint The recently failed endpoint
+     * @param EndPoint|null $failedTcpEndPoint The recently failed endpoint
      * @return Promise<NodeEndPoints>
      */
-    public function discoverAsync(?IpEndPoint $failedTcpEndPoint): Promise;
+    public function discoverAsync(?EndPoint $failedTcpEndPoint): Promise;
 }

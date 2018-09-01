@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\SystemData;
 
+use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\IpEndPoint;
 
 /** @internal */
 class InspectionResult
@@ -22,16 +22,16 @@ class InspectionResult
     private $inspectionDecision;
     /** @var string */
     private $description;
-    /** @var IpEndPoint|null */
+    /** @var EndPoint|null */
     private $tcpEndPoint;
-    /** @var IpEndPoint|null */
+    /** @var EndPoint|null */
     private $secureTcpEndPoint;
 
     public function __construct(
         InspectionDecision $decision,
         string $description,
-        IpEndPoint $tcpEndPoint = null,
-        IpEndPoint $secureTcpEndPoint = null)
+        EndPoint $tcpEndPoint = null,
+        EndPoint $secureTcpEndPoint = null)
     {
         if ($decision->equals(InspectionDecision::reconnect())) {
             if (null === $tcpEndPoint) {
@@ -57,12 +57,12 @@ class InspectionResult
         return $this->description;
     }
 
-    public function tcpEndPoint(): ?IpEndPoint
+    public function tcpEndPoint(): ?EndPoint
     {
         return $this->tcpEndPoint;
     }
 
-    public function secureTcpEndPoint(): ?IpEndPoint
+    public function secureTcpEndPoint(): ?EndPoint
     {
         return $this->secureTcpEndPoint;
     }

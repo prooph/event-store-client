@@ -24,6 +24,7 @@ use Prooph\EventStoreClient\ClientOperations\ConnectToPersistentSubscriptionOper
 use Prooph\EventStoreClient\ClientOperations\VolatileSubscriptionOperation;
 use Prooph\EventStoreClient\ClientReconnectingEventArgs;
 use Prooph\EventStoreClient\ConnectionSettings;
+use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\Exception\CannotEstablishConnectionException;
 use Prooph\EventStoreClient\Exception\ConnectionClosedException;
 use Prooph\EventStoreClient\Exception\EventStoreConnectionException;
@@ -39,7 +40,6 @@ use Prooph\EventStoreClient\Internal\Message\StartSubscriptionMessage;
 use Prooph\EventStoreClient\Internal\Message\TcpConnectionClosedMessage;
 use Prooph\EventStoreClient\Internal\Message\TcpConnectionErrorMessage;
 use Prooph\EventStoreClient\Internal\Message\TcpConnectionEstablishedMessage;
-use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\Messages\ClientMessages\IdentifyClient;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
@@ -937,12 +937,12 @@ class EventStoreConnectionLogicHandler
         }
     }
 
-    private function raiseConnectedEvent(IpEndPoint $remoteEndPoint): void
+    private function raiseConnectedEvent(EndPoint $remoteEndPoint): void
     {
         $this->eventHandler->connected(new ClientConnectionEventArgs($this->esConnection, $remoteEndPoint));
     }
 
-    private function raiseDisconnected(IpEndPoint $remoteEndPoint): void
+    private function raiseDisconnected(EndPoint $remoteEndPoint): void
     {
         $this->eventHandler->disconnected(new ClientConnectionEventArgs($this->esConnection, $remoteEndPoint));
     }

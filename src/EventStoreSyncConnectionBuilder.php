@@ -112,7 +112,7 @@ class EventStoreSyncConnectionBuilder
     }
 
     public static function createFromIpEndPoint(
-        IpEndPoint $endPoint,
+        EndPoint $endPoint,
         ConnectionSettings $settings = null,
         string $connectionName = null
     ): SyncConnection {

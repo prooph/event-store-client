@@ -13,8 +13,8 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\UserManagement;
 
 use Amp\Promise;
+use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\Exception\UserCommandFailedException;
-use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\UserCredentials;
 
@@ -24,7 +24,7 @@ class SyncUsersManager
     private $manager;
 
     public function __construct(
-        IpEndPoint $endPoint,
+        EndPoint $endPoint,
         int $operationTimeout,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA,
         UserCredentials $userCredentials = null

@@ -16,8 +16,8 @@ use Amp\Deferred;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\ConnectionSettingsBuilder;
+use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\EventStoreAsyncConnectionBuilder;
-use Prooph\EventStoreClient\IpEndPoint;
 use function Amp\call;
 use function Amp\Promise\timeout;
 use function Amp\Promise\wait;
@@ -41,7 +41,7 @@ class not_connected_tests extends TestCase
             $port = 4567;
 
             $connection = EventStoreAsyncConnectionBuilder::createFromIpEndPoint(
-                new IpEndPoint($ip, $port),
+                new EndPoint($ip, $port),
                 $settingsBuilder->build(),
                 'test-connection'
             );

@@ -17,6 +17,7 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
+use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\Exception\AccessDeniedException;
@@ -26,7 +27,6 @@ use Prooph\EventStoreClient\Exception\RuntimeException;
 use Prooph\EventStoreClient\Exception\ServerError;
 use Prooph\EventStoreClient\Exception\UnexpectedCommandException;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
-use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled;
 use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled_MasterInfo as MasterInfo;
 use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled_NotHandledReason as NotHandledReason;
@@ -211,11 +211,11 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
                             return new InspectionResult(
                                 InspectionDecision::reconnect(),
                                 'NotHandledException - NotMaster',
-                                new IpEndPoint(
+                                new EndPoint(
                                     $masterInfo->getExternalTcpAddress(),
                                     $masterInfo->getExternalTcpPort()
                                 ),
-                                new IpEndPoint(
+                                new EndPoint(
                                     $masterInfo->getExternalSecureTcpAddress(),
                                     $masterInfo->getExternalSecureTcpPort()
                                 )

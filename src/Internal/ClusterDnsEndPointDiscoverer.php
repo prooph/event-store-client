@@ -20,10 +20,10 @@ use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
+use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\Exception\ClusterException;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\GossipSeed;
-use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\Messages\ClusterMessages\ClusterInfoDto;
 use Prooph\EventStoreClient\Messages\ClusterMessages\MemberInfoDto;
 use Prooph\EventStoreClient\Messages\ClusterMessages\VNodeState;
@@ -93,7 +93,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
     }
 
     /** {@inheritdoc} */
-    public function discoverAsync(?IpEndPoint $failedTcpEndPoint): Promise
+    public function discoverAsync(?EndPoint $failedTcpEndPoint): Promise
     {
         return call(function () use ($failedTcpEndPoint): Generator {
             for ($attempt = 1; $attempt <= $this->maxDiscoverAttempts; ++$attempt) {
@@ -130,7 +130,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
     }
 
     /** @return Promise<NodeEndPoints|null> */
-    private function discoverEndPoint(?IpEndPoint $failedTcpEndPoint): Promise
+    private function discoverEndPoint(?EndPoint $failedTcpEndPoint): Promise
     {
         return call(function () use ($failedTcpEndPoint): Generator {
             $oldGossip = $this->oldGossip;
@@ -167,7 +167,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         if (\count($this->gossipSeeds) > 0) {
             $endPoints = $this->gossipSeeds;
         } else {
-            $endPoints = [new GossipSeed(new IpEndPoint($this->clusterDns, $this->managerExternalHttpPort))];
+            $endPoints = [new GossipSeed(new EndPoint($this->clusterDns, $this->managerExternalHttpPort))];
         }
 
         \shuffle($endPoints);
@@ -177,10 +177,10 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
     /**
      * @param MemberInfoDto[] $oldGossip
-     * @param IpEndPoint|null $failedTcpEndPoint
+     * @param EndPoint|null $failedTcpEndPoint
      * @return GossipSeed[]
      */
-    private function getGossipCandidatesFromOldGossip(array $oldGossip, ?IpEndPoint $failedTcpEndPoint): array
+    private function getGossipCandidatesFromOldGossip(array $oldGossip, ?EndPoint $failedTcpEndPoint): array
     {
         $filter = function () use ($oldGossip, $failedTcpEndPoint): array {
             $result = [];
@@ -214,9 +214,9 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
         for ($k = 0; $k < \count($members); ++$k) {
             if ($members[$k]->state()->equals(VNodeState::manager())) {
-                $result[--$j] = new GossipSeed(new IpEndPoint($members[$k]->externalHttpIp(), $members[$k]->externalHttpPort()));
+                $result[--$j] = new GossipSeed(new EndPoint($members[$k]->externalHttpIp(), $members[$k]->externalHttpPort()));
             } else {
-                $result[++$i] = new GossipSeed(new IpEndPoint($members[$k]->externalHttpIp(), $members[$k]->externalHttpPort()));
+                $result[++$i] = new GossipSeed(new EndPoint($members[$k]->externalHttpIp(), $members[$k]->externalHttpPort()));
             }
         }
 
@@ -296,9 +296,9 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         $key = \rand(0, \count($nodes) - 1);
         $node = $nodes[$key];
 
-        $normTcp = new IpEndPoint($node->externalTcpIp(), $node->externalTcpPort());
+        $normTcp = new EndPoint($node->externalTcpIp(), $node->externalTcpPort());
         $secTcp = $node->externalSecureTcpPort() > 0
-            ? new IpEndPoint($node->externalTcpIp(), $node->externalSecureTcpPort())
+            ? new EndPoint($node->externalTcpIp(), $node->externalSecureTcpPort())
             : null;
 
         $this->log->info(\sprintf(

@@ -13,11 +13,11 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient\Helper;
 
 use Prooph\EventStoreClient\ConnectionSettingsBuilder;
+use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\EventStoreAsyncConnectionBuilder;
 use Prooph\EventStoreClient\EventStoreSyncConnection;
 use Prooph\EventStoreClient\Internal\EventStoreSyncNodeConnection;
-use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\UserCredentials;
 
 /** @internal */
@@ -36,7 +36,7 @@ class Connection
         $settingsBuilder->setDefaultUserCredentials(new UserCredentials($user, $pass));
 
         return EventStoreAsyncConnectionBuilder::createFromIpEndPoint(
-            new IpEndPoint($host, $port),
+            new EndPoint($host, $port),
             $settingsBuilder->build()
         );
     }

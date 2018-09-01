@@ -19,9 +19,9 @@ use Amp\Socket\ClientSocket;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\ConnectException;
 use Generator;
+use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\PackageFramingException;
-use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Psr\Log\LoggerInterface as Logger;
 use Throwable;
@@ -33,7 +33,7 @@ class TcpPackageConnection
 {
     /** @var Logger */
     private $log;
-    /** @var IpEndPoint */
+    /** @var EndPoint */
     private $remoteEndPoint;
     /** @var string */
     private $connectionId;
@@ -63,7 +63,7 @@ class TcpPackageConnection
 
     public function __construct(
         Logger $logger,
-        IpEndPoint $remoteEndPoint,
+        EndPoint $remoteEndPoint,
         string $connectionId,
         bool $ssl,
         string $targetHost,
@@ -101,7 +101,7 @@ class TcpPackageConnection
         });
     }
 
-    public function remoteEndPoint(): IpEndPoint
+    public function remoteEndPoint(): EndPoint
     {
         return $this->remoteEndPoint;
     }

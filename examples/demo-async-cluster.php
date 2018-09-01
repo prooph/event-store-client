@@ -19,9 +19,9 @@ require __DIR__ . '/../vendor/autoload.php';
 Loop::run(function () {
     $builder = new ConnectionSettingsBuilder();
     $builder->setGossipSeedEndPoints([
-        new IpEndPoint('eventstore1', 2113),
-        new IpEndPoint('eventstore2', 2123),
-        new IpEndPoint('eventstore3', 2133),
+        new EndPoint('eventstore1', 2113),
+        new EndPoint('eventstore2', 2123),
+        new EndPoint('eventstore3', 2133),
     ]);
 
     $connection = EventStoreAsyncConnectionBuilder::createFromSettings(

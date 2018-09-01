@@ -13,9 +13,9 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\UserManagement;
 
 use Amp\Promise;
+use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\UserCommandFailedException;
-use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\UserCredentials;
 
@@ -23,7 +23,7 @@ class AsyncUsersManager
 {
     /** @var UsersClient */
     private $client;
-    /** @var IpEndPoint */
+    /** @var EndPoint */
     private $endPoint;
     /** @var string */
     private $schema;
@@ -31,7 +31,7 @@ class AsyncUsersManager
     private $defaultCredentials;
 
     public function __construct(
-        IpEndPoint $endPoint,
+        EndPoint $endPoint,
         int $operationTimeout,
         string $schema = EndpointExtensions::HTTP_SCHEMA,
         UserCredentials $userCredentials = null

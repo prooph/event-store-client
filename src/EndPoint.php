@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-class IpEndPoint
+class EndPoint
 {
     private $host;
     private $port;
@@ -33,7 +33,7 @@ class IpEndPoint
         return $this->port;
     }
 
-    public function equals(IpEndPoint $endPoint): bool
+    public function equals(EndPoint $endPoint): bool
     {
         return $this->host === $endPoint->host && $this->port === $endPoint->port;
     }

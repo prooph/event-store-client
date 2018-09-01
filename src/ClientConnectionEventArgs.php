@@ -18,10 +18,10 @@ class ClientConnectionEventArgs implements EventArgs
 {
     /** @var EventStoreAsyncNodeConnection */
     private $connection;
-    /** @var IpEndPoint */
+    /** @var EndPoint */
     private $remoteEndPoint;
 
-    public function __construct(EventStoreAsyncNodeConnection $connection, IpEndPoint $remoteEndPoint)
+    public function __construct(EventStoreAsyncNodeConnection $connection, EndPoint $remoteEndPoint)
     {
         $this->connection = $connection;
         $this->remoteEndPoint = $remoteEndPoint;
@@ -32,7 +32,7 @@ class ClientConnectionEventArgs implements EventArgs
         return $this->connection;
     }
 
-    public function remoteEndPoint(): IpEndPoint
+    public function remoteEndPoint(): EndPoint
     {
         return $this->remoteEndPoint;
     }

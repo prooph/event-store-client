@@ -12,18 +12,18 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\IpEndPoint;
 
 /** @internal */
 class NodeEndPoints
 {
-    /** @var IpEndPoint|null */
+    /** @var EndPoint|null */
     private $tcpEndPoint;
-    /** @var IpEndPoint|null */
+    /** @var EndPoint|null */
     private $secureTcpEndPoint;
 
-    public function __construct(?IpEndPoint $tcpEndPoint, IpEndPoint $secureTcpEndPoint = null)
+    public function __construct(?EndPoint $tcpEndPoint, EndPoint $secureTcpEndPoint = null)
     {
         if (($tcpEndPoint && $secureTcpEndPoint) === null) {
             throw new InvalidArgumentException('Both endpoints are null');
@@ -33,12 +33,12 @@ class NodeEndPoints
         $this->secureTcpEndPoint = $secureTcpEndPoint;
     }
 
-    public function tcpEndPoint(): ?IpEndPoint
+    public function tcpEndPoint(): ?EndPoint
     {
         return $this->tcpEndPoint;
     }
 
-    public function secureTcpEndPoint(): ?IpEndPoint
+    public function secureTcpEndPoint(): ?EndPoint
     {
         return $this->secureTcpEndPoint;
     }

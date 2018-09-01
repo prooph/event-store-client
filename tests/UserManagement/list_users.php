@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use Prooph\EventStoreClient\IpEndPoint;
+use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\UserManagement\SyncUsersManager;
 use ProophTest\EventStoreClient\DefaultData;
@@ -55,7 +55,7 @@ class list_users extends TestWithNode
     public function list_all_users_falls_back_to_default_credentials(): void
     {
         $manager = new SyncUsersManager(
-            new IpEndPoint(
+            new EndPoint(
                 \getenv('ES_HOST'),
                 (int) \getenv('ES_HTTP_PORT')
             ),

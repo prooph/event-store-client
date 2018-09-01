@@ -18,7 +18,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 Loop::run(function () {
     $connection = EventStoreAsyncConnectionBuilder::createFromIpEndPoint(
-        new IpEndPoint('eventstore', 1113)
+        new EndPoint('eventstore', 1113)
     );
 
     $connection->onConnected(function (): void {

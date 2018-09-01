@@ -15,11 +15,11 @@ namespace Prooph\EventStoreClient\UserManagement;
 use Amp\Artax\Response;
 use Amp\Deferred;
 use Amp\Promise;
+use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\Exception\UnexpectedValueException;
 use Prooph\EventStoreClient\Exception\UserCommandConflictException;
 use Prooph\EventStoreClient\Exception\UserCommandFailedException;
 use Prooph\EventStoreClient\Internal\DateTimeUtil;
-use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\Transport\Http\HttpAsyncClient;
 use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
@@ -44,7 +44,7 @@ class UsersClient
     }
 
     public function enable(
-        IpEndPoint $endPoint,
+        EndPoint $endPoint,
         string $login,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
@@ -63,7 +63,7 @@ class UsersClient
     }
 
     public function disable(
-        IpEndPoint $endPoint,
+        EndPoint $endPoint,
         string $login,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
@@ -82,7 +82,7 @@ class UsersClient
     }
 
     public function delete(
-        IpEndPoint $endPoint,
+        EndPoint $endPoint,
         string $login,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
@@ -101,7 +101,7 @@ class UsersClient
 
     /** @return Promise<UserDetails[]> */
     public function listAll(
-        IpEndPoint $endPoint,
+        EndPoint $endPoint,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
@@ -157,7 +157,7 @@ class UsersClient
 
     /** @return Promise<UserDetails> */
     public function getCurrentUser(
-        IpEndPoint $endPoint,
+        EndPoint $endPoint,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
@@ -205,7 +205,7 @@ class UsersClient
 
     /** @return Promise<UserDetails> */
     public function getUser(
-        IpEndPoint $endPoint,
+        EndPoint $endPoint,
         string $login,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
@@ -262,7 +262,7 @@ class UsersClient
     }
 
     public function createUser(
-        IpEndPoint $endPoint,
+        EndPoint $endPoint,
         UserCreationInformation $newUser,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
@@ -280,7 +280,7 @@ class UsersClient
     }
 
     public function updateUser(
-        IpEndPoint $endPoint,
+        EndPoint $endPoint,
         string $login,
         UserUpdateInformation $updatedUser,
         UserCredentials $userCredentials = null,
@@ -300,7 +300,7 @@ class UsersClient
     }
 
     public function changePassword(
-        IpEndPoint $endPoint,
+        EndPoint $endPoint,
         string $login,
         ChangePasswordDetails $changePasswordDetails,
         UserCredentials $userCredentials = null,
@@ -320,7 +320,7 @@ class UsersClient
     }
 
     public function resetPassword(
-        IpEndPoint $endPoint,
+        EndPoint $endPoint,
         string $login,
         ResetPasswordDetails $resetPasswordDetails,
         UserCredentials $userCredentials = null,

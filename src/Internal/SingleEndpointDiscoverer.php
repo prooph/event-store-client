@@ -17,7 +17,7 @@ use Amp\Promise;
 use Amp\Success;
 use Amp\Uri\InvalidUriException;
 use Amp\Uri\Uri;
-use Prooph\EventStoreClient\IpEndPoint;
+use Prooph\EventStoreClient\EndPoint;
 
 /** @internal */
 final class SingleEndpointDiscoverer implements EndPointDiscoverer
@@ -33,7 +33,7 @@ final class SingleEndpointDiscoverer implements EndPointDiscoverer
         $this->useSslConnection = $useSslConnection;
     }
 
-    public function discoverAsync(?IpEndPoint $failedTcpEndPoint): Promise
+    public function discoverAsync(?EndPoint $failedTcpEndPoint): Promise
     {
         try {
             $uri = new Uri($this->connectionString);
@@ -41,7 +41,7 @@ final class SingleEndpointDiscoverer implements EndPointDiscoverer
             return new Failure($e);
         }
 
-        $endPoint = new IpEndPoint($uri->getHost(), $uri->getPort());
+        $endPoint = new EndPoint($uri->getHost(), $uri->getPort());
 
         return new Success(
             new NodeEndPoints(

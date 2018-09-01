@@ -17,18 +17,18 @@ namespace Prooph\EventStoreClient;
  */
 class GossipSeed
 {
-    /** @var IpEndPoint */
+    /** @var EndPoint */
     private $endPoint;
     /** @var string */
     private $hostHeader;
 
-    public function __construct(IpEndPoint $endPoint, string $hostHeader = '')
+    public function __construct(EndPoint $endPoint, string $hostHeader = '')
     {
         $this->endPoint = $endPoint;
         $this->hostHeader = $hostHeader;
     }
 
-    public function endPoint(): IpEndPoint
+    public function endPoint(): EndPoint
     {
         return $this->endPoint;
     }

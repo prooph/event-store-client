@@ -14,10 +14,10 @@ namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
 use Amp\Promise;
+use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\Exception\NotAuthenticatedException;
 use Prooph\EventStoreClient\Exception\ServerError;
 use Prooph\EventStoreClient\Exception\UnexpectedCommandException;
-use Prooph\EventStoreClient\IpEndPoint;
 use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled;
 use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled_MasterInfo as MasterInfo;
 use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled_NotHandledReason as NotHandledReason;
@@ -165,11 +165,11 @@ abstract class AbstractOperation implements ClientOperation
                 return new InspectionResult(
                     InspectionDecision::reconnect(),
                     'Not handled: not master',
-                    new IpEndPoint(
+                    new EndPoint(
                         $masterInfo->getExternalTcpAddress(),
                         $masterInfo->getExternalTcpPort()
                     ),
-                    new IpEndPoint(
+                    new EndPoint(
                         $masterInfo->getExternalSecureTcpAddress(),
                         $masterInfo->getExternalSecureTcpPort()
                     )
