@@ -15,7 +15,6 @@ namespace ProophTest\EventStoreClient;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
-use Prooph\EventStoreClient\NamedConsumerStrategy;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
 
@@ -31,21 +30,10 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
     protected function setUp(): void
     {
         $this->stream = UuidGenerator::generate();
-        $this->settings = new PersistentSubscriptionSettings(
-            false,
-            -1,
-            false,
-            2000,
-            500,
-            10,
-            20,
-            1000,
-            500,
-            0,
-            30000,
-            10,
-            NamedConsumerStrategy::roundRobin()
-        );
+        $this->settings = PersistentSubscriptionSettings::create()
+            ->doNotResolveLinkTos()
+            ->startFromCurrent()
+            ->build();
     }
 
     protected function when(): Generator

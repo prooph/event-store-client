@@ -75,12 +75,12 @@ class UpdatePersistentSubscriptionOperation extends AbstractOperation
         $message->setReadBatchSize($this->settings->readBatchSize());
         $message->setBufferSize($this->settings->bufferSize());
         $message->setMaxRetryCount($this->settings->maxRetryCount());
-        $message->setPreferRoundRobin($this->settings->namedConsumerStrategy()->name() === SystemConsumerStrategies::ROUND_ROBIN);
+        $message->setPreferRoundRobin($this->settings->namedConsumerStrategy() === SystemConsumerStrategies::ROUND_ROBIN);
         $message->setCheckpointAfterTime($this->settings->checkPointAfterMilliseconds());
         $message->setCheckpointMaxCount($this->settings->maxCheckPointCount());
         $message->setCheckpointMinCount($this->settings->minCheckPointCount());
         $message->setSubscriberMaxCount($this->settings->maxSubscriberCount());
-        $message->setNamedConsumerStrategy($this->settings->namedConsumerStrategy()->name());
+        $message->setNamedConsumerStrategy($this->settings->namedConsumerStrategy());
 
         return $message;
     }

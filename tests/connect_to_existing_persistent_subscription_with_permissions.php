@@ -20,7 +20,6 @@ use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
-use Prooph\EventStoreClient\NamedConsumerStrategy;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
 
@@ -38,21 +37,10 @@ class connect_to_existing_persistent_subscription_with_permissions extends TestC
     protected function setUp(): void
     {
         $this->stream = UuidGenerator::generate();
-        $this->settings = new PersistentSubscriptionSettings(
-            false,
-            -1,
-            false,
-            2000,
-            500,
-            10,
-            20,
-            1000,
-            500,
-            0,
-            30000,
-            10,
-            NamedConsumerStrategy::roundRobin()
-        );
+        $this->settings = PersistentSubscriptionSettings::create()
+            ->doNotResolveLinkTos()
+            ->startFromCurrent()
+            ->build();
     }
 
     protected function when(): Generator

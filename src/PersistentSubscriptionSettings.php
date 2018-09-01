@@ -12,7 +12,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-// @todo add builder, change in tests then
+use Prooph\EventStoreClient\Common\SystemConsumerStrategies;
+
 class PersistentSubscriptionSettings
 {
     /**
@@ -77,44 +78,50 @@ class PersistentSubscriptionSettings
      * @var int
      */
     private $minCheckPointCount;
-    /** @var NamedConsumerStrategy */
+    /** @var string */
     private $namedConsumerStrategy;
 
     private const INT_32_MAX = 2147483647;
 
-    public static function default(): PersistentSubscriptionSettings
+    public static function default(): self
     {
-        return new self(
-            true,
+        return self::create()->build();
+    }
+
+    public static function create(): PersistentSubscriptionSettingsBuilder
+    {
+        return new PersistentSubscriptionSettingsBuilder(
+            false,
             -1,
             false,
-            2000,
+            30000,
+            500,
             500,
             10,
             20,
-            1000,
-            500,
-            0,
-            30000,
+            2000,
             10,
-            NamedConsumerStrategy::roundRobin()
+            1000,
+            0,
+            SystemConsumerStrategies::ROUND_ROBIN
         );
     }
 
+    /** @internal  */
     public function __construct(
         bool $resolveLinkTos,
         int $startFrom,
         bool $extraStatistics,
-        int $checkPointAfterMilliseconds,
-        int $liveBufferSize,
-        int $readBatchSize,
-        int $bufferSize,
-        int $maxCheckPointCount,
-        int $maxRetryCount,
-        int $maxSubscriberCount,
         int $messageTimeoutMilliseconds,
+        int $bufferSize,
+        int $liveBufferSize,
+        int $maxRetryCount,
+        int $readBatchSize,
+        int $checkPointAfterMilliseconds,
         int $minCheckPointCount,
-        NamedConsumerStrategy $namedConsumerStrategy
+        int $maxCheckPointCount,
+        int $maxSubscriberCount,
+        string $namedConsumerStrategy
     ) {
         if ($checkPointAfterMilliseconds > self::INT_32_MAX) {
             throw new \InvalidArgumentException('checkPointAfterMilliseconds must smaller then ' . self::INT_32_MAX);
@@ -199,27 +206,8 @@ class PersistentSubscriptionSettings
         return $this->minCheckPointCount;
     }
 
-    public function namedConsumerStrategy(): NamedConsumerStrategy
+    public function namedConsumerStrategy(): string
     {
         return $this->namedConsumerStrategy;
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'resolveLinkTos' => $this->resolveLinkTos,
-            'startFrom' => $this->startFrom,
-            'extraStatistics' => $this->extraStatistics,
-            'checkPointAfterMilliseconds' => $this->checkPointAfterMilliseconds,
-            'liveBufferSize' => $this->liveBufferSize,
-            'readBatchSize' => $this->readBatchSize,
-            'bufferSize' => $this->bufferSize,
-            'maxCheckPointCount' => $this->maxCheckPointCount,
-            'maxRetryCount' => $this->maxRetryCount,
-            'maxSubscriberCount' => $this->maxSubscriberCount,
-            'messageTimeoutMilliseconds' => $this->messageTimeoutMilliseconds,
-            'minCheckPointCount' => $this->minCheckPointCount,
-            'namedConsumerStrategy' => $this->namedConsumerStrategy->name(),
-        ];
     }
 }

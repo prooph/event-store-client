@@ -74,6 +74,12 @@ class ConnectionSettings
         return (new ConnectionSettingsBuilder())->build();
     }
 
+    public static function create(): ConnectionSettingsBuilder
+    {
+        return new ConnectionSettingsBuilder();
+    }
+
+    /** @internal */
     public function __construct(
         Log $logger,
         bool $verboseLoggin,

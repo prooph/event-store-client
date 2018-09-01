@@ -25,7 +25,6 @@ use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
-use Prooph\EventStoreClient\NamedConsumerStrategy;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Prooph\EventStoreClient\SubscriptionDroppedOnPersistentSubscription;
 use Prooph\EventStoreClient\SubscriptionDropReason;
@@ -52,21 +51,10 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
     protected function setUp()
     {
         $this->stream = '$' . Uuid::uuid4()->toString();
-        $this->settings = new PersistentSubscriptionSettings(
-            false,
-            0,
-            false,
-            2000,
-            500,
-            10,
-            20,
-            1000,
-            500,
-            0,
-            30000,
-            10,
-            NamedConsumerStrategy::roundRobin()
-        );
+        $this->settings = PersistentSubscriptionSettings::create()
+            ->doNotResolveLinkTos()
+            ->startFromBeginning()
+            ->build();
         $this->resetEvent = new Deferred();
         $this->group = 'naktest';
     }

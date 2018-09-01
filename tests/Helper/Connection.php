@@ -35,7 +35,7 @@ class Connection
         $settingsBuilder = new ConnectionSettingsBuilder();
         $settingsBuilder->setDefaultUserCredentials(new UserCredentials($user, $pass));
 
-        return EventStoreAsyncConnectionBuilder::createFromIpEndPoint(
+        return EventStoreAsyncConnectionBuilder::createFromSettingsWithIpEndPoint(
             new EndPoint($host, $port),
             $settingsBuilder->build()
         );

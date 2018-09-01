@@ -25,7 +25,6 @@ use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
-use Prooph\EventStoreClient\NamedConsumerStrategy;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
 
@@ -65,21 +64,10 @@ class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
     public function test(): void
     {
         $this->executeCallback(function () {
-            $settings = new PersistentSubscriptionSettings(
-                true,
-                0,
-                false,
-                2000,
-                500,
-                10,
-                20,
-                1000,
-                500,
-                0,
-                30000,
-                10,
-                NamedConsumerStrategy::roundRobin()
-            );
+            $settings = PersistentSubscriptionSettings::create()
+                ->startFromBeginning()
+                ->resolveLinkTos()
+                ->build();
 
             for ($i = 0; $i < self::EVENT_WRITE_COUNT; $i++) {
                 $eventData = new EventData(EventId::generate(), 'SomeEvent', false, '', '');

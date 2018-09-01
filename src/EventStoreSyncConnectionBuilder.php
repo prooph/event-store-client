@@ -111,7 +111,17 @@ class EventStoreSyncConnectionBuilder
         throw new \Exception('Must specify uri, ClusterDNS or gossip seeds');
     }
 
-    public static function createFromIpEndPoint(
+    public static function createFromBuilderWithIpEndPoint(
+        EndPoint $endPoint,
+        ConnectionSettingsBuilder $builder = null,
+        string $connectionName = null
+    ): SyncConnection {
+        $builder = $builder ?? new ConnectionSettingsBuilder();
+
+        return self::createFromSettingsWithIpEndPoint($endPoint, $builder->build(), $connectionName);
+    }
+
+    public static function createFromSettingsWithIpEndPoint(
         EndPoint $endPoint,
         ConnectionSettings $settings = null,
         string $connectionName = null

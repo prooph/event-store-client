@@ -77,6 +77,7 @@ class ConnectionSettingsBuilder
     /** @var bool */
     private $preferRandomNode = false;
 
+    /** @internal */
     public function __construct()
     {
         $this->log = new NullLogger();
