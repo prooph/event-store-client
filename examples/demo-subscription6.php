@@ -73,7 +73,7 @@ Loop::run(function () {
                 return new Success();
             }
         },
-        new class() implements SubscriptionDroppedOnPersistentSubscription {
+        new class() implements PersistentSubscriptionDropped {
             public function __invoke(
                 AbstractEventStorePersistentSubscription $subscription,
                 SubscriptionDropReason $reason,

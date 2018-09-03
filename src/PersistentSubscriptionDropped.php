@@ -12,13 +12,13 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
+use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Throwable;
 
-interface SubscriptionDroppedOnCatchUpSubscription
+interface PersistentSubscriptionDropped
 {
     public function __invoke(
-        EventStoreCatchUpSubscription $subscription,
+        AbstractEventStorePersistentSubscription $subscription,
         SubscriptionDropReason $reason,
         Throwable $exception = null
     ): void;

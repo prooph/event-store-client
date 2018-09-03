@@ -14,6 +14,7 @@ namespace Prooph\EventStoreClient\Internal;
 
 use Amp\Deferred;
 use Amp\Promise;
+use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
 use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\ClientOperations\AppendToStreamOperation;
 use Prooph\EventStoreClient\ClientOperations\ClientOperation;
@@ -53,13 +54,12 @@ use Prooph\EventStoreClient\Internal\Message\StartConnectionMessage;
 use Prooph\EventStoreClient\Internal\Message\StartOperationMessage;
 use Prooph\EventStoreClient\Internal\Message\StartSubscriptionMessage;
 use Prooph\EventStoreClient\LiveProcessingStarted;
+use Prooph\EventStoreClient\PersistentSubscriptionDropped;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Prooph\EventStoreClient\Position;
 use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\StreamMetadataResult;
-use Prooph\EventStoreClient\SubscriptionDroppedOnCatchUpSubscription;
-use Prooph\EventStoreClient\SubscriptionDroppedOnPersistentSubscription;
-use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
+use Prooph\EventStoreClient\SubscriptionDropped;
 use Prooph\EventStoreClient\SystemSettings;
 use Prooph\EventStoreClient\UserCredentials;
 use Throwable;
@@ -554,7 +554,7 @@ final class EventStoreAsyncNodeConnection implements
         string $stream,
         bool $resolveLinkTos,
         EventAppearedOnSubscription $eventAppeared,
-        SubscriptionDroppedOnSubscription $subscriptionDropped = null,
+        SubscriptionDropped $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
@@ -584,7 +584,7 @@ final class EventStoreAsyncNodeConnection implements
         ?CatchUpSubscriptionSettings $settings,
         EventAppearedOnCatchupSubscription $eventAppeared,
         LiveProcessingStarted $liveProcessingStarted = null,
-        SubscriptionDroppedOnCatchUpSubscription $subscriptionDropped = null,
+        CatchUpSubscriptionDropped $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): EventStoreStreamCatchUpSubscription {
         if (empty($stream)) {
@@ -620,7 +620,7 @@ final class EventStoreAsyncNodeConnection implements
     public function subscribeToAllAsync(
         bool $resolveLinkTos,
         EventAppearedOnSubscription $eventAppeared,
-        SubscriptionDroppedOnSubscription $subscriptionDropped = null,
+        SubscriptionDropped $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
@@ -644,7 +644,7 @@ final class EventStoreAsyncNodeConnection implements
         ?CatchUpSubscriptionSettings $settings,
         EventAppearedOnCatchupSubscription $eventAppeared,
         LiveProcessingStarted $liveProcessingStarted = null,
-        SubscriptionDroppedOnCatchUpSubscription $subscriptionDropped = null,
+        CatchUpSubscriptionDropped $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): EventStoreAllCatchUpSubscription {
         if (null === $settings) {
@@ -675,7 +675,7 @@ final class EventStoreAsyncNodeConnection implements
         string $stream,
         string $groupName,
         EventAppearedOnPersistentSubscription $eventAppeared,
-        SubscriptionDroppedOnPersistentSubscription $subscriptionDropped = null,
+        PersistentSubscriptionDropped $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         UserCredentials $userCredentials = null
@@ -712,7 +712,7 @@ final class EventStoreAsyncNodeConnection implements
         string $stream,
         string $groupName,
         EventAppearedOnPersistentSubscription $eventAppeared,
-        SubscriptionDroppedOnPersistentSubscription $subscriptionDropped = null,
+        PersistentSubscriptionDropped $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         UserCredentials $userCredentials = null

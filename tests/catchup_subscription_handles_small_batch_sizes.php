@@ -48,7 +48,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
             yield $this->connection->connectAsync();
 
             //Create 5000 events
-            for ($i = 0; $i < 5; $i++) {
+            for ($i = 1; $i < 6; $i++) {
                 yield $this->connection->appendToStreamAsync(
                     $this->streamName,
                     ExpectedVersion::ANY,

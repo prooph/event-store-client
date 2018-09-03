@@ -32,7 +32,7 @@ use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped as Subsc
 use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped_SubscriptionDropReason as SubscriptionDropReasonMessage;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
 use Prooph\EventStoreClient\PersistentSubscriptionResolvedEvent;
-use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
+use Prooph\EventStoreClient\SubscriptionDropped;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
@@ -60,7 +60,7 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
         string $streamId,
         ?UserCredentials $userCredentials,
         EventAppearedOnSubscription $eventAppeared,
-        ?SubscriptionDroppedOnSubscription $subscriptionDropped,
+        ?SubscriptionDropped $subscriptionDropped,
         bool $verboseLogging,
         callable $getConnection
     ) {

@@ -15,6 +15,7 @@ namespace Prooph\EventStoreClient;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
+use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Throwable;
 
@@ -56,12 +57,12 @@ Loop::run(function () {
             }
         },
         new class() implements LiveProcessingStarted {
-            public function __invoke(EventStoreSubscription $subscription): void
+            public function __invoke(EventStoreCatchUpSubscription $subscription): void
             {
                 echo 'liveProcessingStarted on ' . $subscription->streamId() . PHP_EOL;
             }
         },
-        new class() implements SubscriptionDroppedOnSubscription {
+        new class() implements SubscriptionDropped {
             public function __invoke(
                 EventStoreSubscription $subscription,
                 SubscriptionDropReason $reason,

@@ -271,7 +271,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
     /**
      * @param MemberInfoDto[] $members
      * @param bool $preferRandomNode
-     * @return null|NodeEndPoints
+     * @return NodeEndPoints|null
      */
     private function tryDetermineBestNode(array $members, bool $preferRandomNode): ?NodeEndPoints
     {

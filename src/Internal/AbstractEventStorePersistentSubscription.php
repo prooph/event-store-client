@@ -26,11 +26,11 @@ use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\Exception\RuntimeException;
 use Prooph\EventStoreClient\Exception\TimeoutException;
 use Prooph\EventStoreClient\Internal\ResolvedEvent as InternalResolvedEvent;
+use Prooph\EventStoreClient\PersistentSubscriptionDropped;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
 use Prooph\EventStoreClient\PersistentSubscriptionResolvedEvent;
 use Prooph\EventStoreClient\ResolvedEvent;
-use Prooph\EventStoreClient\SubscriptionDroppedOnPersistentSubscription;
-use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
+use Prooph\EventStoreClient\SubscriptionDropped;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
@@ -52,7 +52,7 @@ abstract class AbstractEventStorePersistentSubscription
     private $streamId;
     /** @var EventAppearedOnPersistentSubscription */
     private $eventAppeared;
-    /** @var SubscriptionDroppedOnPersistentSubscription|null */
+    /** @var PersistentSubscriptionDropped|null */
     private $subscriptionDropped;
     /** @var UserCredentials|null */
     private $userCredentials;
@@ -89,7 +89,7 @@ abstract class AbstractEventStorePersistentSubscription
         string $subscriptionId,
         string $streamId,
         EventAppearedOnPersistentSubscription $eventAppeared,
-        ?SubscriptionDroppedOnPersistentSubscription $subscriptionDropped,
+        ?PersistentSubscriptionDropped $subscriptionDropped,
         ?UserCredentials $userCredentials,
         Logger $logger,
         bool $verboseLogging,
@@ -154,7 +154,7 @@ abstract class AbstractEventStorePersistentSubscription
             }
         };
 
-        $subscriptionDropped = new class($subscriptionDroppedCallback) implements SubscriptionDroppedOnSubscription {
+        $subscriptionDropped = new class($subscriptionDroppedCallback) implements SubscriptionDropped {
             private $callback;
 
             public function __construct(callable  $callback)
@@ -206,7 +206,7 @@ abstract class AbstractEventStorePersistentSubscription
         int $bufferSize,
         ?UserCredentials $userCredentials,
         EventAppearedOnSubscription $onEventAppeared,
-        ?SubscriptionDroppedOnSubscription $onSubscriptionDropped,
+        ?SubscriptionDropped $onSubscriptionDropped,
         ConnectionSettings $settings
     ): Promise;
 
@@ -349,7 +349,11 @@ abstract class AbstractEventStorePersistentSubscription
             $this->isProcessing = true;
 
             Loop::defer(function (): Generator {
-                yield $this->processQueue();
+                $promise = $this->processQueue();
+
+                Promise\rethrow($promise);
+
+                yield $promise;
             });
         }
     }
@@ -402,6 +406,7 @@ abstract class AbstractEventStorePersistentSubscription
                             }
                         } catch (Throwable $ex) {
                             //TODO GFY should we autonak here?
+
                             $this->dropSubscription(SubscriptionDropReason::eventHandlerException(), $ex);
 
                             return null;

@@ -31,7 +31,7 @@ use Prooph\EventStoreClient\Position;
 use Prooph\EventStoreClient\StreamEventsSlice;
 use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\StreamMetadataResult;
-use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
+use Prooph\EventStoreClient\SubscriptionDropped;
 use Prooph\EventStoreClient\SystemSettings;
 use Prooph\EventStoreClient\UserCredentials;
 use Prooph\EventStoreClient\WriteResult;
@@ -278,7 +278,7 @@ final class EventStoreSyncNodeConnection implements
         string $stream,
         string $groupName,
         EventAppearedOnSubscription $eventAppeared,
-        SubscriptionDroppedOnSubscription $subscriptionDropped = null,
+        SubscriptionDropped $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         UserCredentials $userCredentials = null

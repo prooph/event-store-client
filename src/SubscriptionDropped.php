@@ -14,7 +14,7 @@ namespace Prooph\EventStoreClient;
 
 use Throwable;
 
-interface SubscriptionDroppedOnSubscription
+interface SubscriptionDropped
 {
     public function __invoke(
         EventStoreSubscription $subscription,

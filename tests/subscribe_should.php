@@ -21,7 +21,7 @@ use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
-use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
+use Prooph\EventStoreClient\SubscriptionDropped;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
@@ -215,9 +215,9 @@ class subscribe_should extends TestCase
         };
     }
 
-    private function subscriptionDroppedResolver(Deferred $deferred): SubscriptionDroppedOnSubscription
+    private function subscriptionDroppedResolver(Deferred $deferred): SubscriptionDropped
     {
-        return new class($deferred) implements SubscriptionDroppedOnSubscription {
+        return new class($deferred) implements SubscriptionDropped {
             private $deferred;
 
             public function __construct(Deferred $deferred)

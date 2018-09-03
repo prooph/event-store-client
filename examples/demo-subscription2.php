@@ -56,7 +56,7 @@ Loop::run(function () {
                 echo 'liveProcessingStarted on <all>' . PHP_EOL;
             }
         },
-        new class() implements SubscriptionDroppedOnCatchUpSubscription {
+        new class() implements CatchUpSubscriptionDropped {
             public function __invoke(
                 EventStoreCatchUpSubscription $subscription,
                 SubscriptionDropReason $reason,

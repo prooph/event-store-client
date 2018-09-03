@@ -20,10 +20,10 @@ class DropData
 {
     /** @var SubscriptionDropReason */
     private $reason;
-    /** @var Throwable */
+    /** @var Throwable|null */
     private $error;
 
-    public function __construct(SubscriptionDropReason $reason, Throwable $error)
+    public function __construct(SubscriptionDropReason $reason, ?Throwable $error)
     {
         $this->reason = $reason;
         $this->error = $error;
@@ -34,7 +34,7 @@ class DropData
         return $this->reason;
     }
 
-    public function error(): Throwable
+    public function error(): ?Throwable
     {
         return $this->error;
     }

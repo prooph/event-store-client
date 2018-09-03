@@ -36,7 +36,7 @@ interface EventStoreSyncConnection
     /**
      * @param string $stream
      * @param int $expectedVersion
-     * @param null|UserCredentials $userCredentials
+     * @param UserCredentials|null $userCredentials
      * @param EventData[] $events
      * @return WriteResult
      */

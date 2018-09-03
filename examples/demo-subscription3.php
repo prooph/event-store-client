@@ -50,7 +50,7 @@ Loop::run(function () {
                 return new Success();
             }
         },
-        new class() implements SubscriptionDroppedOnSubscription {
+        new class() implements SubscriptionDropped {
             public function __invoke(
                 EventStoreSubscription $subscription,
                 SubscriptionDropReason $reason,

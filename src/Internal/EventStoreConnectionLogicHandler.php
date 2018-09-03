@@ -25,6 +25,7 @@ use Prooph\EventStoreClient\ClientOperations\VolatileSubscriptionOperation;
 use Prooph\EventStoreClient\ClientReconnectingEventArgs;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\EndPoint;
+use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\Exception\CannotEstablishConnectionException;
 use Prooph\EventStoreClient\Exception\ConnectionClosedException;
 use Prooph\EventStoreClient\Exception\EventStoreConnectionException;
@@ -47,13 +48,14 @@ use Prooph\EventStoreClient\SystemData\TcpFlags;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
 use Throwable;
+use function Amp\Promise\rethrow;
 
 /** @internal */
 class EventStoreConnectionLogicHandler
 {
     private const CLIENT_VERSION = 1;
 
-    /** @var EventStoreAsyncNodeConnection */
+    /** @var EventStoreAsyncConnection */
     private $esConnection;
     /** @var TcpPackageConnection */
     private $connection;
@@ -93,7 +95,7 @@ class EventStoreConnectionLogicHandler
     /** @var int */
     private $lastTimeoutsTimeStamp = 0;
 
-    public function __construct(EventStoreAsyncNodeConnection $connection, ConnectionSettings $settings)
+    public function __construct(EventStoreAsyncConnection $connection, ConnectionSettings $settings)
     {
         $this->esConnection = $connection;
         $this->settings = $settings;
@@ -249,9 +251,7 @@ class EventStoreConnectionLogicHandler
             }
         });
 
-        Loop::defer(function () use ($promise): Generator {
-            yield $promise;
-        });
+        rethrow($promise);
     }
 
     /** @throws \Exception */
@@ -334,7 +334,10 @@ class EventStoreConnectionLogicHandler
         );
 
         Loop::defer(function (): Generator {
-            yield $this->connection->connectAsync();
+            $promise = $this->connection->connectAsync();
+            rethrow($promise);
+
+            yield $promise;
 
             if (! $this->connection->isClosed()) {
                 $this->connection->startReceiving();

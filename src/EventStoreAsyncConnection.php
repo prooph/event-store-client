@@ -42,7 +42,7 @@ interface EventStoreAsyncConnection
      * @param string $stream
      * @param int $expectedVersion
      * @param EventData[] $events
-     * @param null|UserCredentials $userCredentials
+     * @param UserCredentials|null $userCredentials
      * @return Promise<WriteResult>
      */
     public function appendToStreamAsync(
@@ -164,7 +164,7 @@ interface EventStoreAsyncConnection
         string $stream,
         bool $resolveLinkTos,
         EventAppearedOnSubscription $eventAppeared,
-        SubscriptionDroppedOnSubscription $subscriptionDropped = null,
+        SubscriptionDropped $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): Promise;
 
@@ -174,7 +174,7 @@ interface EventStoreAsyncConnection
         ?CatchUpSubscriptionSettings $settings,
         EventAppearedOnCatchupSubscription $eventAppeared,
         LiveProcessingStarted $liveProcessingStarted = null,
-        SubscriptionDroppedOnCatchUpSubscription $subscriptionDropped = null,
+        CatchUpSubscriptionDropped $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): EventStoreStreamCatchUpSubscription;
 
@@ -184,7 +184,7 @@ interface EventStoreAsyncConnection
     public function subscribeToAllAsync(
         bool $resolveLinkTos,
         EventAppearedOnSubscription $eventAppeared,
-        SubscriptionDroppedOnSubscription $subscriptionDropped = null,
+        SubscriptionDropped $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): Promise;
 
@@ -193,7 +193,7 @@ interface EventStoreAsyncConnection
         ?CatchUpSubscriptionSettings $settings,
         EventAppearedOnCatchupSubscription $eventAppeared,
         LiveProcessingStarted $liveProcessingStarted = null,
-        SubscriptionDroppedOnCatchUpSubscription $subscriptionDropped = null,
+        CatchUpSubscriptionDropped $subscriptionDropped = null,
         UserCredentials $userCredentials = null
     ): EventStoreAllCatchUpSubscription;
 
@@ -201,7 +201,7 @@ interface EventStoreAsyncConnection
         string $stream,
         string $groupName,
         EventAppearedOnPersistentSubscription $eventAppeared,
-        SubscriptionDroppedOnPersistentSubscription $subscriptionDropped = null,
+        PersistentSubscriptionDropped $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         UserCredentials $userCredentials = null
@@ -214,7 +214,7 @@ interface EventStoreAsyncConnection
         string $stream,
         string $groupName,
         EventAppearedOnPersistentSubscription $eventAppeared,
-        SubscriptionDroppedOnPersistentSubscription $subscriptionDropped = null,
+        PersistentSubscriptionDropped $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         UserCredentials $userCredentials = null

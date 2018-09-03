@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
@@ -33,7 +32,7 @@ use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled_NotHandledReason 
 use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped as SubscriptionDroppedMessage;
 use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped_SubscriptionDropReason as SubscriptionDropReasonMessage;
 use Prooph\EventStoreClient\Messages\ClientMessages\UnsubscribeFromStream;
-use Prooph\EventStoreClient\SubscriptionDroppedOnSubscription;
+use Prooph\EventStoreClient\SubscriptionDropped;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
@@ -62,7 +61,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
     protected $userCredentials;
     /** @var EventAppearedOnSubscription */
     protected $eventAppeared;
-    /** @var SubscriptionDroppedOnSubscription|null */
+    /** @var SubscriptionDropped|null */
     private $subscriptionDropped;
     /** @var bool */
     private $verboseLogging;
@@ -72,8 +71,6 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
     private $maxQueueSize = 2000;
     /** @var SplQueue */
     private $actionQueue;
-    /** @var bool */
-    private $actionExecuting = false;
     /** @var EventStoreSubscription */
     private $subscription;
     /** @var bool */
@@ -88,7 +85,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         EventAppearedOnSubscription $eventAppeared,
-        ?SubscriptionDroppedOnSubscription $subscriptionDropped,
+        ?SubscriptionDropped $subscriptionDropped,
         bool $verboseLogging,
         callable $getConnection
     ) {
@@ -374,20 +371,14 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
             $this->dropSubscription(SubscriptionDropReason::userInitiated(), new \Exception('client buffer too big'));
         }
 
-        if (! $this->actionExecuting) {
-            $this->actionExecuting = true;
-
-            Loop::defer(function (): Generator {
-                yield $this->executeActions();
-            });
-        }
+        Promise\rethrow($this->executeActions());
     }
 
     /** @return Promise<void> */
     private function executeActions(): Promise
     {
         return call(function (): Generator {
-            while (! $this->actionQueue->isEmpty() && $this->actionExecuting) {
+            while (! $this->actionQueue->isEmpty()) {
                 /** @var callable $action */
                 $action = $this->actionQueue->dequeue();
 
@@ -398,8 +389,6 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
                         'Exception during executing user callback: %s', $exception->getMessage()
                     ));
                 }
-
-                $this->actionExecuting = false;
             }
         });
     }

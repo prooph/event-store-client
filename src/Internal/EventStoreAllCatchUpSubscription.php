@@ -15,13 +15,13 @@ namespace Prooph\EventStoreClient\Internal;
 use Amp\Delayed;
 use Amp\Promise;
 use Prooph\EventStoreClient\AllEventsSlice;
+use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
 use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\LiveProcessingStarted;
 use Prooph\EventStoreClient\Position;
 use Prooph\EventStoreClient\ResolvedEvent;
-use Prooph\EventStoreClient\SubscriptionDroppedOnCatchUpSubscription;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
@@ -45,7 +45,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription
         ?UserCredentials $userCredentials,
         EventAppearedOnCatchupSubscription $eventAppeared,
         ?LiveProcessingStarted $liveProcessingStarted,
-        ?SubscriptionDroppedOnCatchUpSubscription $subscriptionDropped,
+        ?CatchUpSubscriptionDropped $subscriptionDropped,
         CatchUpSubscriptionSettings $settings
     ) {
         parent::__construct(

@@ -25,8 +25,8 @@ use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
+use Prooph\EventStoreClient\PersistentSubscriptionDropped;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\SubscriptionDroppedOnPersistentSubscription;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Ramsey\Uuid\Uuid;
 use Throwable;
@@ -88,7 +88,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
                     throw new \Exception('test');
                 }
             },
-            new class(Closure::fromCallable($dropBehaviour)) implements SubscriptionDroppedOnPersistentSubscription {
+            new class(Closure::fromCallable($dropBehaviour)) implements PersistentSubscriptionDropped {
                 private $callback;
 
                 public function __construct(callable $callback)
