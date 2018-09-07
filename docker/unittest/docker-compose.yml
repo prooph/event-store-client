@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  php:
+    image: prooph/php:7.2-cli
+    volumes:
+      - ./../../:/app
+      - ./phpunit:/app/phpunit
+    command: tail -f /dev/null
+    depends_on:
+      - eventstore
+
+  eventstore:
+    image: eventstore/eventstore:release-4.1.0
+    ports:
+      - 2113:2113
+      - 1113:1113
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:2113/stats || exit 1"]
+      interval: 5s
+      timeout: 2s
+    environment:
+      - EVENTSTORE_RUN_PROJECTIONS=all
+      - EVENTSTORE_MEM_DB=true
