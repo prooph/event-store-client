@@ -27,9 +27,9 @@ use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\Exception\CannotEstablishConnectionException;
-use Prooph\EventStoreClient\Exception\ConnectionClosedException;
 use Prooph\EventStoreClient\Exception\EventStoreConnectionException;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
+use Prooph\EventStoreClient\Exception\ObjectDisposedException;
 use Prooph\EventStoreClient\Internal\Message\CloseConnectionMessage;
 use Prooph\EventStoreClient\Internal\Message\EstablishTcpConnectionMessage;
 use Prooph\EventStoreClient\Internal\Message\HandleTcpPackageMessage;
@@ -205,7 +205,7 @@ class EventStoreConnectionLogicHandler
                 )));
                 break;
             case ConnectionState::CLOSED:
-                $deferred->fail(ConnectionClosedException::withName($this->esConnection->connectionName()));
+                $deferred->fail(new ObjectDisposedException($this->esConnection->connectionName()));
                 break;
         }
     }
@@ -630,7 +630,7 @@ class EventStoreConnectionLogicHandler
                 $this->operations->scheduleOperation(new OperationItem($operation, $maxRetries, $timeout), $this->connection);
                 break;
             case ConnectionState::CLOSED:
-                $operation->fail(ConnectionClosedException::withName($this->esConnection->connectionName()));
+                $operation->fail(new ObjectDisposedException($this->esConnection->connectionName()));
                 break;
         }
     }
@@ -679,7 +679,7 @@ class EventStoreConnectionLogicHandler
 
                 break;
             case ConnectionState::CLOSED:
-                $message->deferred()->fail(ConnectionClosedException::withName($this->esConnection->connectionName()));
+                $message->deferred()->fail(new ObjectDisposedException($this->esConnection->connectionName()));
                 break;
         }
     }
@@ -729,7 +729,7 @@ class EventStoreConnectionLogicHandler
 
                 break;
             case ConnectionState::CLOSED:
-                $message->deferred()->fail(ConnectionClosedException::withName($this->esConnection->connectionName()));
+                $message->deferred()->fail(new ObjectDisposedException($this->esConnection->connectionName()));
                 break;
         }
     }
