@@ -55,7 +55,6 @@ class read_all_events_forward_should extends TestCase
                     [],
                     [],
                     [],
-                    [],
                     []
                 )
             ),

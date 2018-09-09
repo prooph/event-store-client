@@ -28,7 +28,7 @@ class not_connected_tests extends TestCase
      * @test
      * @doesNotPerformAssertions
      */
-    public function should_timeout_connection_after_configured_amount_time_on_conenct(): void
+    public function should_timeout_connection_after_configured_amount_time_on_connect(): void
     {
         wait(call(function () {
             $settingsBuilder = (new ConnectionSettingsBuilder())
