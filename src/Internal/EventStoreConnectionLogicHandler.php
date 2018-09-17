@@ -408,7 +408,8 @@ class EventStoreConnectionLogicHandler
             $this->reconnInfo = new ReconnectionInfo($this->reconnInfo->reconnectionAttempt(), $this->stopWatch->elapsed());
         }
 
-        if ($this->compareWasConnected(false, true)) {
+        if ($this->wasConnected) {
+            $this->wasConnected = false;
             $this->raiseDisconnected($connection->remoteEndPoint());
         }
     }
@@ -482,8 +483,7 @@ class EventStoreConnectionLogicHandler
     {
         $this->state = ConnectionState::connected();
         $this->connectingPhase = ConnectingPhase::connected();
-
-        $this->compareWasConnected(true, false);
+        $this->wasConnected = true;
 
         $this->raiseConnectedEvent($this->connection->remoteEndPoint());
 
@@ -1003,16 +1003,5 @@ class EventStoreConnectionLogicHandler
     public function detach(ListenerHandler $handler): void
     {
         $this->eventHandler->detach($handler);
-    }
-
-    private function compareWasConnected(bool $value, bool $comparand): bool // @todo remove this method
-    {
-        $original = $this->wasConnected;
-
-        if ($this->wasConnected === $comparand) {
-            $this->wasConnected = $value;
-        }
-
-        return $original;
     }
 }
