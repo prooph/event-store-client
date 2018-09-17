@@ -382,8 +382,8 @@ class EventStoreConnectionLogicHandler
             throw new \Exception();
         }
 
-        if ($this->state->equals(ConnectionState::closed())
-            || $this->connection !== $connection
+        if ($this->connection !== $connection
+            || $this->state->equals(ConnectionState::closed())
         ) {
             $this->logDebug('IGNORED (state: %s, internal conn.ID: {1:B}, conn.ID: %s): TCP connection to [%s] closed',
                 $this->state,
