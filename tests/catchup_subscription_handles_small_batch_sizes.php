@@ -52,7 +52,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
                 yield $this->connection->appendToStreamAsync(
                     $this->streamName,
                     ExpectedVersion::ANY,
-                    $this->createThousandEvents()
+                    $this->createOneHundredEvents()
                 );
                 \fwrite(\STDOUT, 'batch ' . $i . ' of 5 appended' . PHP_EOL);
             }
@@ -62,11 +62,11 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
     }
 
     /** @return EventData[] */
-    private function createThousandEvents(): array
+    private function createOneHundredEvents(): array
     {
         $events = [];
 
-        for ($i = 0; $i < 1000; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $events[] = new EventData(EventId::generate(), 'testEvent', true, \json_encode('{ "Foo": "Bar" }'), '');
         }
 
