@@ -47,14 +47,13 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
             $this->connection = Connection::createAsync();
             yield $this->connection->connectAsync();
 
-            //Create 5000 events
-            for ($i = 1; $i < 6; $i++) {
+            //Create 500 events
+            for ($i = 0; $i < 5; $i++) {
                 yield $this->connection->appendToStreamAsync(
                     $this->streamName,
                     ExpectedVersion::ANY,
                     $this->createOneHundredEvents()
                 );
-                \fwrite(\STDOUT, 'batch ' . $i . ' of 5 appended' . PHP_EOL);
             }
 
             $this->settings = new CatchUpSubscriptionSettings(100, 1, false, true);
@@ -152,13 +151,6 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
                 EventStoreCatchUpSubscription $subscription,
                 ResolvedEvent $resolvedEvent
             ): Promise {
-                if ($resolvedEvent->originalEventNumber() % 1000 === 0) {
-                    \fwrite(\STDOUT, \sprintf(
-                        "Processed %d events\n",
-                        $resolvedEvent->originalEventNumber()
-                    ));
-                }
-
                 return new Success();
             }
         };
