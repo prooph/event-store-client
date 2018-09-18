@@ -10,16 +10,15 @@
 
 declare(strict_types=1);
 
-namespace Prooph\EventStoreClient\UserManagement;
+namespace Prooph\EventStoreClient\Projections;
 
 use Amp\Artax\Response;
 use Amp\Deferred;
 use Amp\Promise;
 use Prooph\EventStoreClient\EndPoint;
+use Prooph\EventStoreClient\Exception\ProjectionCommandConflictException;
+use Prooph\EventStoreClient\Exception\ProjectionCommandFailedException;
 use Prooph\EventStoreClient\Exception\UnexpectedValueException;
-use Prooph\EventStoreClient\Exception\UserCommandConflictException;
-use Prooph\EventStoreClient\Exception\UserCommandFailedException;
-use Prooph\EventStoreClient\Internal\DateTimeUtil;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\Transport\Http\HttpAsyncClient;
 use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
@@ -27,7 +26,7 @@ use Prooph\EventStoreClient\UserCredentials;
 use Throwable;
 
 /** @internal */
-class UsersClient
+class ProjectionsClient
 {
     /** @var HttpAsyncClient */
     private $client;
@@ -42,7 +41,7 @@ class UsersClient
 
     public function enable(
         EndPoint $endPoint,
-        string $login,
+        string $name,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
@@ -50,8 +49,8 @@ class UsersClient
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
-                '/users/%s/command/enable',
-                $login
+                '/projection/%s/command/enable',
+                $name
             ),
             '',
             $userCredentials,
@@ -61,7 +60,7 @@ class UsersClient
 
     public function disable(
         EndPoint $endPoint,
-        string $login,
+        string $name,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
@@ -69,8 +68,8 @@ class UsersClient
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
-                '/users/%s/command/disable',
-                $login
+                '/projection/%s/command/disable',
+                $name
             ),
             '',
             $userCredentials,
@@ -78,25 +77,94 @@ class UsersClient
         );
     }
 
-    public function delete(
+    public function abort(
         EndPoint $endPoint,
-        string $login,
+        string $name,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        return $this->sendDelete(
+        return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
-                '/users/%s',
-                $login
+                '/projection/%s/command/abort',
+                $name
             ),
+            '',
             $userCredentials,
             HttpStatusCode::OK
         );
     }
 
-    /** @return Promise<UserDetails[]> */
+    public function createOneTime(
+        EndPoint $endPoint,
+        string $query,
+        string $type = 'JS',
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+    ): Promise {
+        return $this->sendPost(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/projections/onetime?type=%s',
+                $type
+            ),
+            $query,
+            $userCredentials,
+            HttpStatusCode::CREATED
+        );
+    }
+
+    public function createTransient(
+        EndPoint $endPoint,
+        string $name,
+        string $query,
+        string $type = 'JS',
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+    ): Promise {
+        return $this->sendPost(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/projections/transient?name=%s&type=%s',
+                $name,
+                $type
+            ),
+            $query,
+            $userCredentials,
+            HttpStatusCode::CREATED
+        );
+    }
+
+    public function createContinuous(
+        EndPoint $endPoint,
+        string $name,
+        string $query,
+        bool $trackEmitted,
+        string $type = 'JS',
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+    ): Promise {
+        return $this->sendPost(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/projections/continuous?name=%s&type=%s&emit=1&trackemittedstreams=%d',
+                $name,
+                $type,
+                (int) $trackEmitted
+            ),
+            $query,
+            $userCredentials,
+            HttpStatusCode::CREATED
+        );
+    }
+
+    /**
+     * @return Promise<ProjectionDetails[]>
+     */
     public function listAll(
         EndPoint $endPoint,
         UserCredentials $userCredentials = null,
@@ -105,7 +173,7 @@ class UsersClient
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
-            EndpointExtensions::rawUrlToHttpUrl($endPoint, $httpSchema, '/users/'),
+            EndpointExtensions::rawUrlToHttpUrl($endPoint, $httpSchema, '/projections/any'),
             $userCredentials,
             HttpStatusCode::OK
         );
@@ -127,33 +195,28 @@ class UsersClient
                 return;
             }
 
-            $userDetails = [];
+            if (null === $data['projections']) {
+                $deferred->resolve(null);
 
-            foreach ($data['data'] as $entry) {
-                $links = [];
-
-                foreach ($entry['links'] as $link) {
-                    $links[] = new RelLink($link['href'], $link['rel']);
-                }
-
-                $userDetails[] = new UserDetails(
-                    $entry['loginName'],
-                    $entry['fullName'],
-                    $entry['groups'],
-                    null,
-                    $entry['disabled'],
-                    $links
-                );
+                return;
             }
 
-            $deferred->resolve($userDetails);
+            $projectionDetails = [];
+
+            foreach ($data['projections'] as $entry) {
+                $projectionDetails[] = $this->buildProjectionDetails($entry);
+            }
+
+            $deferred->resolve($projectionDetails);
         });
 
         return $deferred->promise();
     }
 
-    /** @return Promise<UserDetails> */
-    public function getCurrentUser(
+    /**
+     * @return Promise<ProjectionDetails[]>
+     */
+    public function listOneTime(
         EndPoint $endPoint,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
@@ -161,11 +224,7 @@ class UsersClient
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
-            EndpointExtensions::rawUrlToHttpUrl(
-                $endPoint,
-                $httpSchema,
-                '/users/$current'
-            ),
+            EndpointExtensions::rawUrlToHttpUrl($endPoint, $httpSchema, '/projections/onetime'),
             $userCredentials,
             HttpStatusCode::OK
         );
@@ -187,150 +246,271 @@ class UsersClient
                 return;
             }
 
-            $deferred->resolve(new UserDetails(
-                $data['data']['loginName'],
-                $data['data']['fullName'],
-                $data['data']['groups'],
-                DateTimeUtil::create($data['data']['dateLastUpdated']),
-                $data['data']['disabled'],
-                []
-            ));
+            if (null === $data['projections']) {
+                $deferred->resolve(null);
+
+                return;
+            }
+
+            $projectionDetails = [];
+
+            foreach ($data['projections'] as $entry) {
+                $projectionDetails[] = $this->buildProjectionDetails($entry);
+            }
+
+            $deferred->resolve($projectionDetails);
         });
 
         return $deferred->promise();
     }
 
-    /** @return Promise<UserDetails> */
-    public function getUser(
+    /**
+     * @return Promise<ProjectionDetails[]>
+     */
+    public function listContinuous(
         EndPoint $endPoint,
-        string $login,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
+            EndpointExtensions::rawUrlToHttpUrl($endPoint, $httpSchema, '/projections/continuous'),
+            $userCredentials,
+            HttpStatusCode::OK
+        );
+
+        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
+            if ($exception) {
+                $deferred->fail($exception);
+
+                return;
+            }
+
+            $data = \json_decode($body, true);
+
+            if (\json_last_error() !== \JSON_ERROR_NONE) {
+                $deferred->fail(new UnexpectedValueException(
+                    'Could not json decode response from server'
+                ));
+
+                return;
+            }
+
+            if (null === $data['projections']) {
+                $deferred->resolve(null);
+
+                return;
+            }
+
+            $projectionDetails = [];
+
+            foreach ($data['projections'] as $entry) {
+                $projectionDetails[] = $this->buildProjectionDetails($entry);
+            }
+
+            $deferred->resolve($projectionDetails);
+        });
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @return Promise<string>
+     */
+    public function getStatus(
+        EndPoint $endPoint,
+        string $name,
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+    ): Promise {
+        return $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
-                '/users/%s',
-                $login
+                '/projection/%s',
+                $name
             ),
             $userCredentials,
             HttpStatusCode::OK
         );
-
-        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
-            if ($exception) {
-                $deferred->fail($exception);
-
-                return;
-            }
-
-            $data = \json_decode($body, true);
-
-            if (\json_last_error() !== \JSON_ERROR_NONE) {
-                $deferred->fail(new UnexpectedValueException(
-                    'Could not json decode response from server'
-                ));
-
-                return;
-            }
-
-            $links = [];
-
-            foreach ($data['data']['links'] as $link) {
-                $links[] = new RelLink($link['href'], $link['rel']);
-            }
-
-            $deferred->resolve(new UserDetails(
-                $data['data']['loginName'],
-                $data['data']['fullName'],
-                $data['data']['groups'],
-                isset($data['data']['dateLastUpdated'])
-                    ? DateTimeUtil::create($data['data']['dateLastUpdated'])
-                    : null,
-                $data['data']['disabled'],
-                $links
-            ));
-        });
-
-        return $deferred->promise();
     }
 
-    public function createUser(
+    /**
+     * @return Promise<string>
+     */
+    public function getState(
         EndPoint $endPoint,
-        UserCreationInformation $newUser,
+        string $name,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        return $this->sendPost(
-            EndpointExtensions::rawUrlToHttpUrl(
+        return $this->sendGet(
+            EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
-                '/users/'
+                '/projection/%s/state',
+                $name,
+                $partition
             ),
-            \json_encode($newUser),
             $userCredentials,
-            HttpStatusCode::CREATED
+            HttpStatusCode::OK
         );
     }
 
-    public function updateUser(
+    /**
+     * @return Promise<string>
+     */
+    public function getPartitionState(
         EndPoint $endPoint,
-        string $login,
-        UserUpdateInformation $updatedUser,
+        string $name,
+        string $partition,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
+        return $this->sendGet(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/projection/%s/state?partition=%s',
+                $name,
+                $partition
+            ),
+            $userCredentials,
+            HttpStatusCode::OK
+        );
+    }
+
+    /**
+     * @return Promise<string>
+     */
+    public function getResult(
+        EndPoint $endPoint,
+        string $name,
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+    ): Promise {
+        return $this->sendGet(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/projection/%s/result',
+                $name
+            ),
+            $userCredentials,
+            HttpStatusCode::OK
+        );
+    }
+
+    /**
+     * @return Promise<string>
+     */
+    public function getPartitionResult(
+        EndPoint $endPoint,
+        string $name,
+        string $partition,
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+    ): Promise {
+        return $this->sendGet(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/projection/%s/result?partition=%s',
+                $name,
+                $partition
+            ),
+            $userCredentials,
+            HttpStatusCode::OK
+        );
+    }
+
+    /**
+     * @return Promise<string>
+     */
+    public function getStatistics(
+        EndPoint $endPoint,
+        string $name,
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+    ): Promise {
+        return $this->sendGet(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/projection/%s/statistics',
+                $name
+            ),
+            $userCredentials,
+            HttpStatusCode::OK
+        );
+    }
+
+    /**
+     * @return Promise<string>
+     */
+    public function getQuery(
+        EndPoint $endPoint,
+        string $name,
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+    ): Promise {
+        return $this->sendGet(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/projection/%s/query',
+                $name
+            ),
+            $userCredentials,
+            HttpStatusCode::OK
+        );
+    }
+
+    public function updateQuery(
+        EndPoint $endPoint,
+        string $name,
+        string $query,
+        bool $emitEnabled = null,
+        string $type = 'JS',
+        UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+    ): Promise {
+        if (null === $emitEnabled) {
+            $url = '/projection/%s/query?type=%s';
+        } else {
+            $url = '/projection/%s/query?emit=' . (int) $emitEnabled . '&type=%s';
+        }
+
         return $this->sendPut(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
-                '/users/%s',
-                $login
+                $url,
+                $name,
+                $type
             ),
-            \json_encode($updatedUser),
+            $query,
             $userCredentials,
             HttpStatusCode::OK
         );
     }
 
-    public function changePassword(
+    public function delete(
         EndPoint $endPoint,
-        string $login,
-        ChangePasswordDetails $changePasswordDetails,
+        string $name,
+        bool $deleteEmittedStreams,
         UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        return $this->sendPost(
+        return $this->sendDelete(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
-                '/users/%s/command/change-password',
-                $login
+                '/projection/%s?deleteEmittedStreams=%d',
+                $name,
+                (int) $deleteEmittedStreams
             ),
-            \json_encode($changePasswordDetails),
-            $userCredentials,
-            HttpStatusCode::OK
-        );
-    }
-
-    public function resetPassword(
-        EndPoint $endPoint,
-        string $login,
-        ResetPasswordDetails $resetPasswordDetails,
-        UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
-    ): Promise {
-        return $this->sendPost(
-            EndpointExtensions::formatStringToHttpUrl(
-                $endPoint,
-                $httpSchema,
-                '/users/%s/command/reset-password',
-                $login
-            ),
-            \json_encode($resetPasswordDetails),
             $userCredentials,
             HttpStatusCode::OK
         );
@@ -350,7 +530,7 @@ class UsersClient
                 if ($response->getStatus() === $expectedCode) {
                     $deferred->resolve($response->getBody());
                 } else {
-                    $deferred->fail(new UserCommandFailedException(
+                    $deferred->fail(new ProjectionCommandFailedException(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for GET on %s',
@@ -383,7 +563,7 @@ class UsersClient
                 if ($response->getStatus() === $expectedCode) {
                     $deferred->resolve($response->getBody());
                 } else {
-                    $deferred->fail(new UserCommandFailedException(
+                    $deferred->fail(new ProjectionCommandFailedException(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for DELETE on %s',
@@ -419,7 +599,7 @@ class UsersClient
                 if ($response->getStatus() === $expectedCode) {
                     $deferred->resolve(null);
                 } else {
-                    $deferred->fail(new UserCommandFailedException(
+                    $deferred->fail(new ProjectionCommandFailedException(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for PUT on %s',
@@ -455,9 +635,9 @@ class UsersClient
                 if ($response->getStatus() === $expectedCode) {
                     $deferred->resolve(null);
                 } elseif ($response->getStatus() === HttpStatusCode::CONFLICT) {
-                    $deferred->fail(new UserCommandConflictException($response->getStatus(), $response->getReason()));
+                    $deferred->fail(new ProjectionCommandConflictException($response->getStatus(), $response->getReason()));
                 } else {
-                    $deferred->fail(new UserCommandFailedException(
+                    $deferred->fail(new ProjectionCommandFailedException(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for POST on %s',
@@ -474,5 +654,36 @@ class UsersClient
         );
 
         return $deferred->promise();
+    }
+
+    private function buildProjectionDetails(array $entry): ProjectionDetails
+    {
+        return new ProjectionDetails(
+            $entry['coreProcessingTime'],
+            $entry['version'],
+            $entry['epoch'],
+            $entry['effectiveName'],
+            $entry['writesInProgress'],
+            $entry['readsInProgress'],
+            $entry['partitionsCached'],
+            $entry['status'],
+            $entry['stateReason'],
+            $entry['name'],
+            $entry['mode'],
+            $entry['position'],
+            $entry['progress'],
+            $entry['lastCheckpoint'],
+            $entry['eventsProcessedAfterRestart'],
+            $entry['statusUrl'],
+            $entry['stateUrl'],
+            $entry['resultUrl'],
+            $entry['queryUrl'],
+            $entry['enableCommandUrl'],
+            $entry['disableCommandUrl'],
+            $entry['checkpointStatus'],
+            $entry['bufferedEvents'],
+            $entry['writePendingEventsBeforeCheckpoint'],
+            $entry['writePendingEventsAfterCheckpoint']
+        );
     }
 }

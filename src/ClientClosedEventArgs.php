@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-
 class ClientClosedEventArgs implements EventArgs
 {
     /** @var EventStoreAsyncConnection */

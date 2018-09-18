@@ -19,6 +19,7 @@
   "prefer-stable": true,
   "require": {
     "php": "^7.2",
+    "ext-json": "*",
     "amphp/amp": "^2.0.7",
     "amphp/artax": "^3.0.14",
     "amphp/byte-stream": "^1.3.1",
