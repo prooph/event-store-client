@@ -29,7 +29,7 @@ use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
 use function Amp\call;
 
-class connect_to_existing_persistent_subscription_with_start_from_beginning_and_events_in_it extends TestCase
+class connect_to_existing_persistent_subscription_with_start_from_beginning_and_events_in_it_async extends TestCase
 {
     use SpecificationWithConnection;
 
@@ -94,7 +94,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
         $deferred = $this->resetEvent;
         $firstEvent = &$this->firstEvent;
 
-        $this->conn->connectToPersistentSubscription(
+        yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             new class($set, $deferred, $firstEvent) implements EventAppearedOnPersistentSubscription {
@@ -127,8 +127,6 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
             true,
             DefaultData::adminCredentials()
         );
-
-        yield new Success();
     }
 
     /**
