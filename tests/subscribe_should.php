@@ -23,7 +23,7 @@ use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\SubscriptionDropped;
 use Prooph\EventStoreClient\SubscriptionDropReason;
-use ProophTest\EventStoreClient\Helper\Connection;
+use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 use function Amp\call;
@@ -45,7 +45,7 @@ class subscribe_should extends TestCase
 
             $appeared = new Deferred();
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -77,7 +77,7 @@ class subscribe_should extends TestCase
         wait(call(function () {
             $stream = 'subscribe_should_allow_multiple_subscriptions_to_same_stream';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -125,7 +125,7 @@ class subscribe_should extends TestCase
         wait(call(function () {
             $stream = 'subscribe_should_call_dropped_callback_after_unsubscribe_method_call';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -168,7 +168,7 @@ class subscribe_should extends TestCase
         wait(call(function () {
             $stream = 'subscribe_should_catch_created_and_deleted_events_as_well';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 

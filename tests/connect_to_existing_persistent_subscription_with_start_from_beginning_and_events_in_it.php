@@ -22,7 +22,6 @@ use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
-use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
@@ -39,8 +38,6 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
     private $settings;
     /** @var string */
     private $group = 'startinbeginning1';
-    /** @var EventStorePersistentSubscription|null */
-    private $firstSubscription;
     /** @var ResolvedEvent */
     private $firstEvent;
     /** @var Deferred */

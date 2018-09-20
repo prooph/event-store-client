@@ -12,38 +12,36 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\Helper;
 
+use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\ConnectionSettingsBuilder;
 use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\EventStoreAsyncConnectionBuilder;
 use Prooph\EventStoreClient\EventStoreSyncConnection;
-use Prooph\EventStoreClient\Internal\EventStoreSyncNodeConnection;
+use Prooph\EventStoreClient\EventStoreSyncConnectionBuilder;
 use Prooph\EventStoreClient\UserCredentials;
 
 /** @internal */
-class Connection
+class TestConnection
 {
-    public static function createAsync(): EventStoreAsyncConnection
+    public static function createAsync(?UserCredentials $userCredentials = null): EventStoreAsyncConnection
     {
         self::checkRequiredEnvironmentSettings();
 
-        $host = \getenv('ES_HOST');
-        $port = (int) \getenv('ES_PORT');
-        $user = \getenv('ES_USER');
-        $pass = \getenv('ES_PASS');
-
-        $settingsBuilder = new ConnectionSettingsBuilder();
-        $settingsBuilder->setDefaultUserCredentials(new UserCredentials($user, $pass));
-
         return EventStoreAsyncConnectionBuilder::createFromSettingsWithIpEndPoint(
-            new EndPoint($host, $port),
-            $settingsBuilder->build()
+            self::endPoint(),
+            self::settings($userCredentials)
         );
     }
 
-    public static function createSync(): EventStoreSyncConnection
+    public static function createSync(?UserCredentials $userCredentials = null): EventStoreSyncConnection
     {
-        return new EventStoreSyncNodeConnection(self::createAsync());
+        self::checkRequiredEnvironmentSettings();
+
+        return EventStoreSyncConnectionBuilder::createFromSettingsWithEndPoint(
+            self::endPoint(),
+            self::settings($userCredentials)
+        );
     }
 
     private static function checkRequiredEnvironmentSettings(): void
@@ -58,5 +56,24 @@ class Connection
         )) {
             throw new \RuntimeException('Environment settings for event store connection not found');
         }
+    }
+
+    private static function settings(?UserCredentials $userCredentials = null): ConnectionSettings
+    {
+        $settingsBuilder = new ConnectionSettingsBuilder();
+
+        if ($userCredentials) {
+            $settingsBuilder->setDefaultUserCredentials($userCredentials);
+        }
+
+        return $settingsBuilder->build();
+    }
+
+    private static function endPoint(): EndPoint
+    {
+        $host = \getenv('ES_HOST');
+        $port = (int) \getenv('ES_PORT');
+
+        return new EndPoint($host, $port);
     }
 }

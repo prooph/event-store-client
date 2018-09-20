@@ -20,7 +20,7 @@ use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Position;
-use ProophTest\EventStoreClient\Helper\Connection;
+use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 use function Amp\call;
@@ -34,7 +34,7 @@ class event_store_connection_should extends TestCase
      */
     public function not_throw_on_close_if_connect_was_not_called(): void
     {
-        $connection = Connection::createAsync();
+        $connection = TestConnection::createAsync();
         $connection->close();
     }
 
@@ -44,7 +44,7 @@ class event_store_connection_should extends TestCase
      */
     public function not_throw_on_close_if_called_multiple_times(): void
     {
-        $connection = Connection::createAsync();
+        $connection = TestConnection::createAsync();
         $connection->close();
         $connection->close();
     }
@@ -56,7 +56,7 @@ class event_store_connection_should extends TestCase
     public function throw_invalid_operation_on_every_api_call_if_connect_was_not_called(): void
     {
         wait(call(function () {
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             $s = 'stream';
             $events = TestEvent::newAmount(1);

@@ -22,7 +22,7 @@ use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\StreamEventsSlice;
 use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\WriteResult;
-use ProophTest\EventStoreClient\Helper\Connection;
+use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 use function Amp\call;
@@ -37,7 +37,7 @@ class append_to_stream extends TestCase
     public function cannot_append_to_stream_without_name(): void
     {
         wait(call(function () {
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
             $this->expectException(InvalidArgumentException::class);
             yield $connection->appendToStreamAsync('', ExpectedVersion::ANY, []);
         }));
@@ -53,7 +53,7 @@ class append_to_stream extends TestCase
             $stream1 = 'should_allow_appending_zero_events_to_stream_with_no_problems1';
             $stream2 = 'should_allow_appending_zero_events_to_stream_with_no_problems2';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -102,7 +102,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'should_create_stream_with_no_stream_exp_ver_on_first_write_if_does_not_exist';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -128,7 +128,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'should_create_stream_with_any_exp_ver_on_first_write_if_does_not_exist';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -153,7 +153,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'multiple_idempotent_writes';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -179,7 +179,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'multiple_idempotent_writes_with_same_id_bug_case';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -203,7 +203,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'in_wtf_multiple_case_of_multiple_writes_expected_version_any_per_all_same_id';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -231,7 +231,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'in_slightly_reasonable_multiple_case_of_multiple_writes_with_expected_version_per_all_same_id';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -259,7 +259,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'should_fail_writing_with_correct_exp_ver_to_deleted_stream';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -283,7 +283,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'should_return_log_position_when_writing';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -305,7 +305,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'should_fail_writing_with_any_exp_ver_to_deleted_stream';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -333,7 +333,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'should_fail_writing_with_invalid_exp_ver_to_deleted_stream';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -358,7 +358,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'should_append_with_correct_exp_ver_to_existing_stream';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -377,7 +377,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'should_append_with_any_exp_ver_to_existing_stream';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -401,7 +401,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'should_fail_appending_with_wrong_exp_ver_to_existing_stream';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -424,7 +424,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'should_append_with_stream_exists_exp_ver_to_existing_stream';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -445,7 +445,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'should_append_with_stream_exists_exp_ver_to_stream_with_multiple_events';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -469,7 +469,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'should_append_with_stream_exists_exp_ver_if_metadata_stream_exists';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -496,7 +496,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'should_fail_appending_with_stream_exists_exp_ver_and_stream_does_not_exist';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -518,7 +518,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'should_fail_appending_with_stream_exists_exp_ver_and_stream_does_not_exist';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -542,7 +542,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'should_fail_appending_with_stream_exists_exp_ver_to_soft_deleted_stream';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -566,7 +566,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'can_append_multiple_events_at_once';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -590,7 +590,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'returns_failure_status_when_conditionally_appending_with_version_mismatch';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -612,7 +612,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'returns_success_status_when_conditionally_appending_with_matching_version';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -636,7 +636,7 @@ class append_to_stream extends TestCase
         wait(call(function () {
             $stream = 'returns_failure_status_when_conditionally_appending_to_a_deleted_stream';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 

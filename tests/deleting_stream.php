@@ -17,7 +17,7 @@ use Prooph\EventStoreClient\DeleteResult;
 use Prooph\EventStoreClient\Exception\StreamDeletedException;
 use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
 use Prooph\EventStoreClient\ExpectedVersion;
-use ProophTest\EventStoreClient\Helper\Connection;
+use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 use function Amp\call;
@@ -35,7 +35,7 @@ class deleting_stream extends TestCase
         wait(call(function () {
             $stream = 'which_already_exists_should_success_when_passed_empty_stream_expected_version';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -55,7 +55,7 @@ class deleting_stream extends TestCase
         wait(call(function () {
             $stream = 'which_already_exists_should_success_when_passed_any_for_expected_version';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -74,7 +74,7 @@ class deleting_stream extends TestCase
         wait(call(function () {
             $stream = 'with_invalid_expected_version_should_fail';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -96,7 +96,7 @@ class deleting_stream extends TestCase
         wait(call(function () {
             $stream = 'delete_should_return_log_position_when_writing';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -121,7 +121,7 @@ class deleting_stream extends TestCase
         wait(call(function () {
             $stream = 'which_was_allready_deleted_should_fail';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 

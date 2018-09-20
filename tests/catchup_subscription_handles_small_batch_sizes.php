@@ -26,7 +26,7 @@ use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\LiveProcessingStarted;
-use ProophTest\EventStoreClient\Helper\Connection;
+use ProophTest\EventStoreClient\Helper\TestConnection;
 use Throwable;
 use function Amp\call;
 use function Amp\Promise\timeout;
@@ -44,7 +44,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
     private function setUpTestCase(): Promise
     {
         return call(function () {
-            $this->connection = Connection::createAsync();
+            $this->connection = TestConnection::createAsync();
             yield $this->connection->connectAsync();
 
             //Create 500 events

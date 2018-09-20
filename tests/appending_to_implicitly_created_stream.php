@@ -16,10 +16,10 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\WriteResult;
-use ProophTest\EventStoreClient\Helper\Connection;
 use ProophTest\EventStoreClient\Helper\EventsStream;
 use ProophTest\EventStoreClient\Helper\StreamWriter;
 use ProophTest\EventStoreClient\Helper\TailWriter;
+use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 use function Amp\call;
@@ -36,7 +36,7 @@ class appending_to_implicitly_created_stream extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0em1_idempotent';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -65,7 +65,7 @@ class appending_to_implicitly_created_stream extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_4e4_0any_idempotent';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -94,7 +94,7 @@ class appending_to_implicitly_created_stream extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e5_non_idempotent';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -122,7 +122,7 @@ class appending_to_implicitly_created_stream extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e4_wev';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -150,7 +150,7 @@ class appending_to_implicitly_created_stream extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_0e0_non_idempotent';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -180,7 +180,7 @@ class appending_to_implicitly_created_stream extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_0any_idempotent';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -210,7 +210,7 @@ class appending_to_implicitly_created_stream extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_0em1_idempotent';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -240,7 +240,7 @@ class appending_to_implicitly_created_stream extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_1any_1any_idempotent';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -272,7 +272,7 @@ class appending_to_implicitly_created_stream extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_0em1_E_idempotent';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -298,7 +298,7 @@ class appending_to_implicitly_created_stream extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_0any_E_idempotent';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -324,7 +324,7 @@ class appending_to_implicitly_created_stream extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_1e0_E_idempotent';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -350,7 +350,7 @@ class appending_to_implicitly_created_stream extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_1any_E_idempotent';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 
@@ -377,7 +377,7 @@ class appending_to_implicitly_created_stream extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_0em1_1em1_2em1_E_idempotancy_fail';
 
-            $connection = Connection::createAsync();
+            $connection = TestConnection::createAsync();
 
             yield $connection->connectAsync();
 

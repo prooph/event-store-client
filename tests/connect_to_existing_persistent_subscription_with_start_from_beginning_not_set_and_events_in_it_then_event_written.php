@@ -28,7 +28,7 @@ use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
 use function Amp\call;
 
-class connect_to_existing_persistent_subscription_with_start_from_beginning_and_no_stream extends TestCase
+class connect_to_existing_persistent_subscription_with_start_from_beginning_not_set_and_events_in_it_then_event_written extends TestCase
 {
     use SpecificationWithConnection;
 
@@ -38,27 +38,27 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
     private $settings;
     /** @var string */
     private $group = 'startinbeginning1';
-    /** @var ResolvedEvent */
-    private $firstEvent;
     /** @var Deferred */
     private $resetEvent;
-    /** @var array */
-    private $ids = [];
-    /** @var bool */
-    private $set = false;
+    /** @var ResolvedEvent */
+    private $firstEvent;
+    /** @var EventId */
+    private $eventId;
 
     protected function setUp(): void
     {
         $this->stream = '$' . UuidGenerator::generate();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
-            ->startFromBeginning()
+            ->startFromCurrent()
             ->build();
         $this->resetEvent = new Deferred();
     }
 
     protected function given(): Generator
     {
+        yield $this->writeEvents();
+
         yield $this->conn->createPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
@@ -66,21 +66,18 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
             DefaultData::adminCredentials()
         );
 
-        $set = &$this->set;
         $deferred = $this->resetEvent;
         $firstEvent = &$this->firstEvent;
 
         $this->conn->connectToPersistentSubscription(
             $this->stream,
             $this->group,
-            new class($set, $deferred, $firstEvent) implements EventAppearedOnPersistentSubscription {
-                private $set;
+            new class($deferred, $firstEvent) implements EventAppearedOnPersistentSubscription {
                 private $deferred;
                 private $firstEvent;
 
-                public function __construct(&$set, &$deferred, &$firstEvent)
+                public function __construct($deferred, &$firstEvent)
                 {
-                    $this->set = &$set;
                     $this->deferred = $deferred;
                     $this->firstEvent = &$firstEvent;
                 }
@@ -89,11 +86,8 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
                     AbstractEventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent
                 ): Promise {
-                    if (! $this->set) {
-                        $this->set = true;
-                        $this->firstEvent = $resolvedEvent;
-                        $this->deferred->resolve(true);
-                    }
+                    $this->deferred->resolve(true);
+                    $this->firstEvent = $resolvedEvent;
 
                     return new Success();
                 }
@@ -123,22 +117,28 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
 
     protected function when(): Generator
     {
-        yield $this->writeEvents();
+        $this->eventId = EventId::generate();
+
+        yield $this->conn->appendToStreamAsync(
+            $this->stream,
+            ExpectedVersion::ANY,
+            [new EventData($this->eventId, 'test', true, '{"foo":"bar"}')],
+            DefaultData::adminCredentials()
+        );
     }
 
     /**
      * @test
      * @throws Throwable
      */
-    public function the_subscription_gets_event_zero_as_its_first_event(): void
+    public function the_subscription_gets_the_written_event_as_its_first_event(): void
     {
         $this->executeCallback(function (): Generator {
             $value = yield Promise\timeout($this->resetEvent->promise(), 10000);
             $this->assertTrue($value);
-            $this->assertSame(0, $this->firstEvent->originalEventNumber());
-            $this->assertTrue($this->firstEvent->originalEvent()->eventId()->equals($this->ids[0]));
-
-            yield new Success();
+            $this->assertNotNull($this->firstEvent);
+            $this->assertSame(10, $this->firstEvent->originalEventNumber());
+            $this->assertTrue($this->firstEvent->originalEvent()->eventId()->equals($this->eventId));
         });
     }
 }

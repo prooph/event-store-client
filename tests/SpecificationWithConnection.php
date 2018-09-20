@@ -15,7 +15,7 @@ namespace ProophTest\EventStoreClient;
 use Amp\Success;
 use Generator;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
-use ProophTest\EventStoreClient\Helper\Connection;
+use ProophTest\EventStoreClient\Helper\TestConnection;
 use Throwable;
 use function Amp\call;
 use function Amp\Promise\wait;
@@ -30,13 +30,13 @@ trait SpecificationWithConnection
         yield new Success();
     }
 
-    abstract protected function when(): Generator;
+    abstract protected function when();
 
     /** @throws Throwable */
     protected function executeCallback(callable $test): void
     {
         wait(call(function () use ($test) {
-            $this->conn = Connection::createAsync();
+            $this->conn = TestConnection::createAsync();
 
             yield $this->conn->connectAsync();
 

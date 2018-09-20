@@ -693,7 +693,7 @@ final class EventStoreAsyncNodeConnection implements
             $stream,
             $eventAppeared,
             $subscriptionDropped,
-            $userCredentials ?? $this->settings->defaultUserCredentials(),
+            $userCredentials,
             $this->settings->log(),
             $this->settings->verboseLogging(),
             $this->settings,
