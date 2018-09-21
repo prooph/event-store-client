@@ -29,9 +29,9 @@ class connect_to_existing_persistent_subscription_with_permissions extends TestC
 
     /** @var AbstractEventStorePersistentSubscription */
     private $sub;
-    /** string */
+    /** @var string */
     private $stream;
-    /** PersistentSubscriptionSettings */
+    /** @var PersistentSubscriptionSettings */
     private $settings;
 
     protected function setUp(): void

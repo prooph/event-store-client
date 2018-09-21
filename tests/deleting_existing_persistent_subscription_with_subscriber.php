@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\Deferred;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
@@ -20,19 +21,21 @@ use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
+use Prooph\EventStoreClient\PersistentSubscriptionDropped;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
+use Prooph\EventStoreClient\SubscriptionDropReason;
 use Throwable;
 
-class connect_to_existing_persistent_subscription_with_permissions_async extends TestCase
+class deleting_existing_persistent_subscription_with_subscriber extends TestCase
 {
     use SpecificationWithConnection;
 
-    /** @var AbstractEventStorePersistentSubscription */
-    private $sub;
     /** @var string */
     private $stream;
     /** @var PersistentSubscriptionSettings */
     private $settings;
+    /** @var Deferred */
+    private $called;
 
     protected function setUp(): void
     {
@@ -41,20 +44,23 @@ class connect_to_existing_persistent_subscription_with_permissions_async extends
             ->doNotResolveLinkTos()
             ->startFromCurrent()
             ->build();
+        $this->called = new Deferred();
     }
 
-    protected function when(): Generator
+    protected function given(): Generator
     {
         yield $this->conn->createPersistentSubscriptionAsync(
             $this->stream,
-            'agroupname17',
+            'groupname123',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        $this->sub = $this->conn->connectToPersistentSubscriptionAsync(
+        $called = &$this->called;
+
+        $this->conn->connectToPersistentSubscription(
             $this->stream,
-            'agroupname17',
+            'groupname123',
             new class() implements EventAppearedOnPersistentSubscription {
                 public function __invoke(
                     AbstractEventStorePersistentSubscription $subscription,
@@ -63,7 +69,32 @@ class connect_to_existing_persistent_subscription_with_permissions_async extends
                 ): Promise {
                     return new Success();
                 }
+            },
+            new class($called) implements PersistentSubscriptionDropped {
+                private $called;
+
+                public function __construct(&$called)
+                {
+                    $this->called = &$called;
+                }
+
+                public function __invoke(
+                    AbstractEventStorePersistentSubscription $subscription,
+                    SubscriptionDropReason $reason,
+                    ?Throwable $exception = null
+                ): void {
+                    $this->called->resolve(true);
+                }
             }
+        );
+    }
+
+    protected function when(): Generator
+    {
+        yield $this->conn->deletePersistentSubscriptionAsync(
+            $this->stream,
+            'groupname123',
+            DefaultData::adminCredentials()
         );
     }
 
@@ -71,10 +102,11 @@ class connect_to_existing_persistent_subscription_with_permissions_async extends
      * @test
      * @throws Throwable
      */
-    public function the_subscription_suceeds(): void
+    public function the_subscription_is_dropped(): void
     {
         $this->executeCallback(function () {
-            $this->assertNotNull(yield $this->sub);
+            $value = yield Promise\timeout($this->called->promise(), 5000);
+            $this->assertTrue($value);
         });
     }
 }

@@ -23,9 +23,9 @@ class create_persistent_subscription_after_deleting_the_same extends TestCase
 {
     use SpecificationWithConnection;
 
-    /** string */
+    /** @var string */
     private $stream;
-    /** PersistentSubscriptionSettings */
+    /** @var PersistentSubscriptionSettings */
     private $settings;
 
     protected function setUp(): void

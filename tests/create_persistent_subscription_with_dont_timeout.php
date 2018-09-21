@@ -12,13 +12,14 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
 
-class can_create_duplicate_persistent_subscription_group_name_on_different_streams extends TestCase
+class create_persistent_subscription_with_dont_timeout extends TestCase
 {
     use SpecificationWithConnection;
 
@@ -33,17 +34,22 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()
+            ->dontTimeoutMessages()
             ->build();
     }
 
     protected function when(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
-            $this->stream,
-            'group3211',
-            $this->settings,
-            DefaultData::adminCredentials()
-        );
+        yield new Success();
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function the_message_timeout_should_be_zero(): void
+    {
+        $this->assertSame(0, $this->settings->messageTimeoutMilliseconds());
     }
 
     /**
@@ -51,12 +57,12 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
      * @doesNotPerformAssertions
      * @throws Throwable
      */
-    public function the_completion_succeeds(): void
+    public function the_subscription_is_created_without_error(): void
     {
         $this->executeCallback(function () {
             yield $this->conn->createPersistentSubscriptionAsync(
-                'someother' . $this->stream,
-                'group3211',
+                $this->stream,
+                'dont-timeout',
                 $this->settings,
                 DefaultData::adminCredentials()
             );

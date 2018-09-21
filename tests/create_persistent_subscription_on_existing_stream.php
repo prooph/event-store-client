@@ -14,11 +14,13 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStoreClient\EventData;
+use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
 
-class can_create_duplicate_persistent_subscription_group_name_on_different_streams extends TestCase
+class create_persistent_subscription_on_existing_stream extends TestCase
 {
     use SpecificationWithConnection;
 
@@ -38,11 +40,10 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
 
     protected function when(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->conn->appendToStreamAsync(
             $this->stream,
-            'group3211',
-            $this->settings,
-            DefaultData::adminCredentials()
+            ExpectedVersion::ANY,
+            [new EventData(null, 'whatever', true, '{"foo":"bar"}')]
         );
     }
 
@@ -55,8 +56,8 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
     {
         $this->executeCallback(function () {
             yield $this->conn->createPersistentSubscriptionAsync(
-                'someother' . $this->stream,
-                'group3211',
+                $this->stream,
+                'existing',
                 $this->settings,
                 DefaultData::adminCredentials()
             );

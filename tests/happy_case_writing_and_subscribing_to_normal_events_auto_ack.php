@@ -32,9 +32,9 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
 {
     use SpecificationWithConnection;
 
-    /** string */
+    /** @var string */
     private $streamName;
-    /** string */
+    /** @var string */
     private $groupName;
     /** @var int */
     private $bufferCount = 10;

@@ -12,13 +12,15 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStoreClient\Exception\AccessDeniedException;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
 
-class can_create_duplicate_persistent_subscription_group_name_on_different_streams extends TestCase
+class create_persistent_subscription_group_without_permissions extends TestCase
 {
     use SpecificationWithConnection;
 
@@ -38,28 +40,27 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
 
     protected function when(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
-            $this->stream,
-            'group3211',
-            $this->settings,
-            DefaultData::adminCredentials()
-        );
+        yield new Success();
     }
 
     /**
      * @test
-     * @doesNotPerformAssertions
      * @throws Throwable
      */
     public function the_completion_succeeds(): void
     {
         $this->executeCallback(function () {
-            yield $this->conn->createPersistentSubscriptionAsync(
-                'someother' . $this->stream,
-                'group3211',
-                $this->settings,
-                DefaultData::adminCredentials()
-            );
+            try {
+                yield $this->conn->createPersistentSubscriptionAsync(
+                    $this->stream,
+                    'nonexistinggroup',
+                    $this->settings
+                );
+
+                $this->fail('Should have thrown');
+            } catch (Throwable $e) {
+                $this->assertInstanceOf(AccessDeniedException::class, $e);
+            }
         });
     }
 }

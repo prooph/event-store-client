@@ -17,12 +17,13 @@ use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
+use Throwable;
 
 class deleting_persistent_subscription_group_that_doesnt_exist extends TestCase
 {
     use SpecificationWithConnection;
 
-    /** string */
+    /** @var string */
     private $stream;
 
     protected function setUp(): void

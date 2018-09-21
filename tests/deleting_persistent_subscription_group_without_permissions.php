@@ -15,26 +15,20 @@ namespace ProophTest\EventStoreClient;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStoreClient\Exception\AccessDeniedException;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
 
-class create_persistent_subscription_on_non_existing_stream extends TestCase
+class deleting_persistent_subscription_group_without_permissions extends TestCase
 {
     use SpecificationWithConnection;
 
     /** @var string */
     private $stream;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
 
     protected function setUp(): void
     {
         $this->stream = UuidGenerator::generate();
-        $this->settings = PersistentSubscriptionSettings::create()
-            ->doNotResolveLinkTos()
-            ->startFromCurrent()
-            ->build();
     }
 
     protected function when(): Generator
@@ -44,17 +38,16 @@ class create_persistent_subscription_on_non_existing_stream extends TestCase
 
     /**
      * @test
-     * @doesNotPerformAssertions
      * @throws Throwable
      */
-    public function the_completion_succeeds(): void
+    public function the_delete_fails_with_access_denied(): void
     {
         $this->executeCallback(function () {
-            yield $this->conn->createPersistentSubscriptionAsync(
+            $this->expectException(AccessDeniedException::class);
+
+            yield $this->conn->deletePersistentSubscriptionAsync(
                 $this->stream,
-                'nonexistinggroup',
-                $this->settings,
-                DefaultData::adminCredentials()
+                UuidGenerator::generate()
             );
         });
     }

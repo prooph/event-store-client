@@ -18,7 +18,7 @@ use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
 
-class can_create_duplicate_persistent_subscription_group_name_on_different_streams extends TestCase
+class deleting_existing_persistent_subscription_group_with_permissions extends TestCase
 {
     use SpecificationWithConnection;
 
@@ -40,7 +40,7 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
     {
         yield $this->conn->createPersistentSubscriptionAsync(
             $this->stream,
-            'group3211',
+            'groupname123',
             $this->settings,
             DefaultData::adminCredentials()
         );
@@ -51,13 +51,12 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
      * @doesNotPerformAssertions
      * @throws Throwable
      */
-    public function the_completion_succeeds(): void
+    public function the_delete_of_group_succeeds(): void
     {
         $this->executeCallback(function () {
-            yield $this->conn->createPersistentSubscriptionAsync(
-                'someother' . $this->stream,
-                'group3211',
-                $this->settings,
+            yield $this->conn->deletePersistentSubscriptionAsync(
+                $this->stream,
+                'groupname123',
                 DefaultData::adminCredentials()
             );
         });
