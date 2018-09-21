@@ -100,7 +100,8 @@ class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
 
                     public function __invoke(
                         AbstractEventStorePersistentSubscription $subscription,
-                        ResolvedEvent $resolvedEvent
+                        ResolvedEvent $resolvedEvent,
+                        ?int $retryCount = null
                     ): Promise {
                         $this->deferred->resolve(true);
 

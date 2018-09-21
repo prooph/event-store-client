@@ -86,7 +86,8 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
 
                     public function __invoke(
                         AbstractEventStorePersistentSubscription $subscription,
-                        ResolvedEvent $resolvedEvent
+                        ResolvedEvent $resolvedEvent,
+                        ?int $retryCount = null
                     ): Promise {
                         ++$this->eventReceivedCount;
 

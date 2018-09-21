@@ -87,7 +87,8 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
 
                 public function __invoke(
                     AbstractEventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
+                    ResolvedEvent $resolvedEvent,
+                    ?int $retryCount = null
                 ): Promise {
                     if (! $this->set) {
                         $this->set = true;

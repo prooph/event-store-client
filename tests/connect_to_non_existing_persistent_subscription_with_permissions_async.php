@@ -49,7 +49,8 @@ class connect_to_non_existing_persistent_subscription_with_permissions_async ext
                 new class() implements EventAppearedOnPersistentSubscription {
                     public function __invoke(
                         AbstractEventStorePersistentSubscription $subscription,
-                        ResolvedEvent $resolvedEvent
+                        ResolvedEvent $resolvedEvent,
+                        ?int $retryCount = null
                     ): Promise {
                         return new Success();
                     }

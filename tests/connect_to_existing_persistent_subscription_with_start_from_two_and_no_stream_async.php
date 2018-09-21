@@ -26,9 +26,8 @@ use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
-use function Amp\call;
 
-class connect_to_existing_persistent_subscription_with_start_from_beginning_and_no_stream_async extends TestCase
+class connect_to_existing_persistent_subscription_with_start_from_two_and_no_stream_async extends TestCase
 {
     use SpecificationWithConnection;
 
@@ -42,17 +41,18 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
     private $firstEvent;
     /** @var Deferred */
     private $resetEvent;
-    /** @var array */
-    private $ids = [];
+    /** @var EventId */
+    private $eventId;
     /** @var bool */
     private $set = false;
 
     protected function setUp(): void
     {
+        $this->eventId = EventId::generate();
         $this->stream = '$' . UuidGenerator::generate();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
-            ->startFromBeginning()
+            ->startFrom(2)
             ->build();
         $this->resetEvent = new Deferred();
     }
@@ -106,38 +106,41 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
         );
     }
 
-    private function writeEvents(): Promise
-    {
-        return call(function (): Generator {
-            for ($i = 0; $i < 10; $i++) {
-                $this->ids[$i] = EventId::generate();
-
-                yield $this->conn->appendToStreamAsync(
-                    $this->stream,
-                    ExpectedVersion::ANY,
-                    [new EventData($this->ids[$i], 'test', true, '{"foo":"bar"}')],
-                    DefaultData::adminCredentials()
-                );
-            }
-        });
-    }
-
     protected function when(): Generator
     {
-        yield $this->writeEvents();
+        yield $this->conn->appendToStreamAsync(
+            $this->stream,
+            ExpectedVersion::ANY,
+            [new EventData(null, 'test', true, '{"foo":"bar"}')],
+            DefaultData::adminCredentials()
+        );
+
+        yield $this->conn->appendToStreamAsync(
+            $this->stream,
+            ExpectedVersion::ANY,
+            [new EventData(null, 'test', true, '{"foo":"bar"}')],
+            DefaultData::adminCredentials()
+        );
+
+        yield $this->conn->appendToStreamAsync(
+            $this->stream,
+            ExpectedVersion::ANY,
+            [new EventData($this->eventId, 'test', true, '{"foo":"bar"}')],
+            DefaultData::adminCredentials()
+        );
     }
 
     /**
      * @test
      * @throws Throwable
      */
-    public function the_subscription_gets_event_zero_as_its_first_event(): void
+    public function the_subscription_gets_event_two_as_its_first_event(): void
     {
         $this->executeCallback(function (): Generator {
             $value = yield Promise\timeout($this->resetEvent->promise(), 10000);
             $this->assertTrue($value);
-            $this->assertSame(0, $this->firstEvent->originalEventNumber());
-            $this->assertTrue($this->firstEvent->originalEvent()->eventId()->equals($this->ids[0]));
+            $this->assertSame(2, $this->firstEvent->originalEventNumber());
+            $this->assertTrue($this->firstEvent->originalEvent()->eventId()->equals($this->eventId));
 
             yield new Success();
         });

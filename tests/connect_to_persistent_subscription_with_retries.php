@@ -24,11 +24,11 @@ use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
+use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
-use function Amp\call;
 
-class connect_to_existing_persistent_subscription_with_start_from_beginning_and_no_stream_async extends TestCase
+class connect_to_persistent_subscription_with_retries extends TestCase
 {
     use SpecificationWithConnection;
 
@@ -36,53 +36,48 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
     private $stream;
     /** @var PersistentSubscriptionSettings */
     private $settings;
-    /** @var string */
-    private $group = 'startinbeginning1';
-    /** @var ResolvedEvent */
-    private $firstEvent;
     /** @var Deferred */
     private $resetEvent;
-    /** @var array */
-    private $ids = [];
-    /** @var bool */
-    private $set = false;
+    /** @var EventId */
+    private $eventId;
+    /** @var int|null */
+    private $retryCount;
+    private $group = 'retries';
 
     protected function setUp(): void
     {
-        $this->stream = '$' . UuidGenerator::generate();
+        $this->stream = UuidGenerator::generate();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromBeginning()
             ->build();
         $this->resetEvent = new Deferred();
+        $this->eventId = EventId::generate();
     }
 
     protected function given(): Generator
     {
         yield $this->conn->createPersistentSubscriptionAsync(
             $this->stream,
-            $this->group,
+            'agroupname55',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        $set = &$this->set;
-        $deferred = $this->resetEvent;
-        $firstEvent = &$this->firstEvent;
+        $retryCount = &$this->retryCount;
+        $resetEvent = $this->resetEvent;
 
-        yield $this->conn->connectToPersistentSubscriptionAsync(
+        $this->conn->connectToPersistentSubscription(
             $this->stream,
-            $this->group,
-            new class($set, $deferred, $firstEvent) implements EventAppearedOnPersistentSubscription {
-                private $set;
-                private $deferred;
-                private $firstEvent;
+            'agroupname55',
+            new class($retryCount, $resetEvent) implements EventAppearedOnPersistentSubscription {
+                private $retryCount;
+                private $resetEvent;
 
-                public function __construct(&$set, &$deferred, &$firstEvent)
+                public function __construct(&$retryCount, $resetEvent)
                 {
-                    $this->set = &$set;
-                    $this->deferred = $deferred;
-                    $this->firstEvent = &$firstEvent;
+                    $this->retryCount = &$retryCount;
+                    $this->resetEvent = $resetEvent;
                 }
 
                 public function __invoke(
@@ -90,10 +85,16 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {
-                    if (! $this->set) {
-                        $this->set = true;
-                        $this->firstEvent = $resolvedEvent;
-                        $this->deferred->resolve(true);
+                    if ($retryCount > 4) {
+                        $this->retryCount = $retryCount;
+                        $subscription->acknowledge($resolvedEvent);
+                        $this->resetEvent->resolve(true);
+                    } else {
+                        $subscription->fail(
+                            $resolvedEvent,
+                            PersistentSubscriptionNakEventAction::retry(),
+                            'Not yet tried enough times'
+                        );
                     }
 
                     return new Success();
@@ -101,45 +102,31 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
             },
             null,
             10,
-            true,
+            false,
             DefaultData::adminCredentials()
         );
     }
 
-    private function writeEvents(): Promise
-    {
-        return call(function (): Generator {
-            for ($i = 0; $i < 10; $i++) {
-                $this->ids[$i] = EventId::generate();
-
-                yield $this->conn->appendToStreamAsync(
-                    $this->stream,
-                    ExpectedVersion::ANY,
-                    [new EventData($this->ids[$i], 'test', true, '{"foo":"bar"}')],
-                    DefaultData::adminCredentials()
-                );
-            }
-        });
-    }
-
     protected function when(): Generator
     {
-        yield $this->writeEvents();
+        yield $this->conn->appendToStreamAsync(
+            $this->stream,
+            ExpectedVersion::ANY,
+            [new EventData($this->eventId, 'test', true, '{"foo":"bar"}')],
+            DefaultData::adminCredentials()
+        );
     }
 
     /**
      * @test
      * @throws Throwable
      */
-    public function the_subscription_gets_event_zero_as_its_first_event(): void
+    public function events_are_retried_until_success(): void
     {
         $this->executeCallback(function (): Generator {
             $value = yield Promise\timeout($this->resetEvent->promise(), 10000);
             $this->assertTrue($value);
-            $this->assertSame(0, $this->firstEvent->originalEventNumber());
-            $this->assertTrue($this->firstEvent->originalEvent()->eventId()->equals($this->ids[0]));
-
-            yield new Success();
+            $this->assertSame(5, $this->retryCount);
         });
     }
 }

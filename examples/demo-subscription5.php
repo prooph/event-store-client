@@ -66,8 +66,9 @@ Loop::run(function () {
         new class() implements EventAppearedOnPersistentSubscription {
             public function __invoke(
                 AbstractEventStorePersistentSubscription $subscription,
-                ResolvedEvent $resolvedEvent): Promise
-            {
+                ResolvedEvent $resolvedEvent,
+                ?int $retryCount = null
+            ): Promise {
                 echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
                 echo 'data: ' . $resolvedEvent->originalEvent()->data() . PHP_EOL;
 

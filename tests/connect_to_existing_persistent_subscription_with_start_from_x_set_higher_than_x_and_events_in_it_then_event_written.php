@@ -84,7 +84,8 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_higher_t
 
                 public function __invoke(
                     AbstractEventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
+                    ResolvedEvent $resolvedEvent,
+                    ?int $retryCount = null
                 ): Promise {
                     $this->firstEvent = $resolvedEvent;
                     $this->deferred->resolve(true);

@@ -62,7 +62,8 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends Te
             new class() implements EventAppearedOnPersistentSubscription {
                 public function __invoke(
                     AbstractEventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
+                    ResolvedEvent $resolvedEvent,
+                    ?int $retryCount = null
                 ): Promise {
                     $subscription->acknowledge($resolvedEvent);
 
@@ -84,7 +85,8 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends Te
             new class() implements EventAppearedOnPersistentSubscription {
                 public function __invoke(
                     AbstractEventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
+                    ResolvedEvent $resolvedEvent,
+                    ?int $retryCount = null
                 ): Promise {
                     $subscription->acknowledge($resolvedEvent);
 

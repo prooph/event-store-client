@@ -83,7 +83,8 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
             new class() implements EventAppearedOnPersistentSubscription {
                 public function __invoke(
                     AbstractEventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
+                    ResolvedEvent $resolvedEvent,
+                    ?int $retryCount = null
                 ): Promise {
                     throw new \Exception('test');
                 }

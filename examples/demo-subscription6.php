@@ -65,8 +65,9 @@ Loop::run(function () {
         new class() implements EventAppearedOnPersistentSubscription {
             public function __invoke(
                 AbstractEventStorePersistentSubscription $subscription,
-                ResolvedEvent $resolvedEvent): Promise
-            {
+                ResolvedEvent $resolvedEvent,
+                ?int $retryCount = null
+            ): Promise {
                 echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
                 echo 'data: ' . $resolvedEvent->originalEvent()->data() . PHP_EOL;
 
@@ -77,8 +78,8 @@ Loop::run(function () {
             public function __invoke(
                 AbstractEventStorePersistentSubscription $subscription,
                 SubscriptionDropReason $reason,
-                Throwable $exception = null): void
-            {
+                Throwable $exception = null
+            ): void {
                 echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
 
                 if ($exception) {

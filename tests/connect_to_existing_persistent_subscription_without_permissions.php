@@ -67,7 +67,8 @@ class connect_to_existing_persistent_subscription_without_permissions extends Te
                     new class() implements EventAppearedOnPersistentSubscription {
                         public function __invoke(
                             AbstractEventStorePersistentSubscription $subscription,
-                            ResolvedEvent $resolvedEvent
+                            ResolvedEvent $resolvedEvent,
+                            ?int $retryCount = null
                         ): Promise {
                             return new Success();
                         }

@@ -20,6 +20,7 @@ interface EventAppearedOnPersistentSubscription
 {
     public function __invoke(
         AbstractEventStorePersistentSubscription $subscription,
-        ResolvedEvent $resolvedEvent
+        ResolvedEvent $resolvedEvent,
+        ?int $retryCount = null
     ): Promise;
 }
