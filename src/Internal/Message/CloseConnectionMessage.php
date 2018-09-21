@@ -22,7 +22,7 @@ class CloseConnectionMessage implements Message
     /** @var Throwable|null */
     private $exception;
 
-    public function __construct(string $reason, Throwable $exception = null)
+    public function __construct(string $reason, ?Throwable $exception = null)
     {
         $this->reason = $reason;
         $this->exception = $exception;

@@ -30,8 +30,8 @@ class InspectionResult
     public function __construct(
         InspectionDecision $decision,
         string $description,
-        EndPoint $tcpEndPoint = null,
-        EndPoint $secureTcpEndPoint = null)
+        ?EndPoint $tcpEndPoint = null,
+        ?EndPoint $secureTcpEndPoint = null)
     {
         if ($decision->equals(InspectionDecision::reconnect())) {
             if (null === $tcpEndPoint) {

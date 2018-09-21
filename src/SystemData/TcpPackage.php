@@ -75,8 +75,8 @@ class TcpPackage
         TcpFlags $flags,
         string $correlationId,
         string $data = '',
-        string $login = null,
-        string $password = null
+        ?string $login = null,
+        ?string $password = null
     ) {
         if ($flags->equals(TcpFlags::authenticated())) {
             if (null === $login) {

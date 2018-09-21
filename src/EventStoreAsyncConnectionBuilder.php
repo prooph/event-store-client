@@ -36,8 +36,8 @@ class EventStoreAsyncConnectionBuilder
 
     /** @throws \Exception */
     public static function createFromBuilder(
-        string $connectionString = null,
-        ConnectionSettingsBuilder $builder = null,
+        ?string $connectionString = null,
+        ?ConnectionSettingsBuilder $builder = null,
         string $connectionName = ''
     ): AsyncConnection {
         $builder = $builder ?? new ConnectionSettingsBuilder();
@@ -47,8 +47,8 @@ class EventStoreAsyncConnectionBuilder
 
     /** @throws \Exception */
     public static function createFromSettings(
-        string $connectionString = null,
-        ConnectionSettings $settings = null,
+        ?string $connectionString = null,
+        ?ConnectionSettings $settings = null,
         string $connectionName = ''
     ): AsyncConnection {
         if (null === $connectionString && (null === $settings || (empty($settings->gossipSeeds()) && empty($settings->clusterDns())))) {
@@ -113,8 +113,8 @@ class EventStoreAsyncConnectionBuilder
 
     public static function createFromBuilderWithIpEndPoint(
         EndPoint $endPoint,
-        ConnectionSettingsBuilder $builder = null,
-        string $connectionName = null
+        ?ConnectionSettingsBuilder $builder = null,
+        ?string $connectionName = null
     ): AsyncConnection {
         $builder = $builder ?? new ConnectionSettingsBuilder();
 
@@ -123,8 +123,8 @@ class EventStoreAsyncConnectionBuilder
 
     public static function createFromSettingsWithIpEndPoint(
         EndPoint $endPoint,
-        ConnectionSettings $settings = null,
-        string $connectionName = null
+        ?ConnectionSettings $settings = null,
+        ?string $connectionName = null
     ): AsyncConnection {
         $settings = $settings ?? ConnectionSettings::default();
 
@@ -138,7 +138,7 @@ class EventStoreAsyncConnectionBuilder
 
     private static function createWithClusterDnsEndPointDiscoverer(
         ConnectionSettings $settings,
-        string $connectionName = null
+        ?string $connectionName = null
     ): AsyncConnection {
         $clusterSettings = new ClusterSettings(
             $settings->clusterDns(),
@@ -165,7 +165,7 @@ class EventStoreAsyncConnectionBuilder
     private static function createWithSingleEndpointDiscoverer(
         string $connectionString,
         ConnectionSettings $settings,
-        string $connectionName = null
+        ?string $connectionName = null
     ): AsyncConnection {
         return new EventStoreAsyncNodeConnection(
             $settings,

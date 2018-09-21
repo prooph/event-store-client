@@ -49,7 +49,7 @@ final class EventStoreSyncNodeConnection implements
         ConnectionSettings $settings,
         ?ClusterSettings $clusterSettings,
         EndPointDiscoverer $endPointDiscoverer,
-        string $connectionName = null
+        ?string $connectionName = null
     ) {
         $this->asyncConnection = new EventStoreAsyncNodeConnection(
             $settings,
@@ -92,7 +92,7 @@ final class EventStoreSyncNodeConnection implements
         string $stream,
         int $expectedVersion,
         bool $hardDelete = false,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): void {
         Promise\wait($this->asyncConnection->deleteStreamAsync($stream, $expectedVersion, $hardDelete, $userCredentials));
     }
@@ -105,7 +105,7 @@ final class EventStoreSyncNodeConnection implements
         string $stream,
         int $expectedVersion,
         array $events = [],
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): WriteResult {
         return Promise\wait($this->asyncConnection->appendToStreamAsync(
             $stream,
@@ -123,7 +123,7 @@ final class EventStoreSyncNodeConnection implements
         string $stream,
         int $expectedVersion,
         array $events = [],
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): ConditionalWriteResult {
         return Promise\wait($this->asyncConnection->conditionalAppendToStreamAsync(
             $stream,
@@ -138,7 +138,7 @@ final class EventStoreSyncNodeConnection implements
         string $stream,
         int $eventNumber,
         bool $resolveLinkTo = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): EventReadResult {
         return Promise\wait($this->asyncConnection->readEventAsync(
             $stream,
@@ -154,7 +154,7 @@ final class EventStoreSyncNodeConnection implements
         int $start,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): StreamEventsSlice {
         return Promise\wait($this->asyncConnection->readStreamEventsForwardAsync(
             $stream,
@@ -171,7 +171,7 @@ final class EventStoreSyncNodeConnection implements
         int $start,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): StreamEventsSlice {
         return Promise\wait($this->asyncConnection->readStreamEventsBackwardAsync(
             $stream,
@@ -187,7 +187,7 @@ final class EventStoreSyncNodeConnection implements
         Position $position,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): StreamEventsSlice {
         return Promise\wait($this->asyncConnection->readAllEventsForwardAsync(
             $position,
@@ -202,7 +202,7 @@ final class EventStoreSyncNodeConnection implements
         Position $position,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): StreamEventsSlice {
         return Promise\wait($this->asyncConnection->readAllEventsBackwardAsync(
             $position,
@@ -217,7 +217,7 @@ final class EventStoreSyncNodeConnection implements
         string $stream,
         int $expectedMetaStreamVersion,
         StreamMetadata $metadata,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): WriteResult {
         return Promise\wait($this->asyncConnection->setStreamMetadataAsync(
             $stream,
@@ -228,13 +228,13 @@ final class EventStoreSyncNodeConnection implements
     }
 
     /** @throws Throwable */
-    public function getStreamMetadata(string $stream, UserCredentials $userCredentials = null): StreamMetadataResult
+    public function getStreamMetadata(string $stream, ?UserCredentials $userCredentials = null): StreamMetadataResult
     {
         return Promise\wait($this->asyncConnection->getStreamMetadataAsync($stream, $userCredentials));
     }
 
     /** @throws Throwable */
-    public function setSystemSettings(SystemSettings $settings, UserCredentials $userCredentials = null): WriteResult
+    public function setSystemSettings(SystemSettings $settings, ?UserCredentials $userCredentials = null): WriteResult
     {
         return Promise\wait($this->asyncConnection->setSystemSettingsAsync($settings, $userCredentials));
     }
@@ -244,7 +244,7 @@ final class EventStoreSyncNodeConnection implements
         string $stream,
         string $groupName,
         PersistentSubscriptionSettings $settings,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): PersistentSubscriptionCreateResult {
         return Promise\wait($this->asyncConnection->createPersistentSubscriptionAsync($stream, $groupName, $settings, $userCredentials));
     }
@@ -254,7 +254,7 @@ final class EventStoreSyncNodeConnection implements
         string $stream,
         string $groupName,
         PersistentSubscriptionSettings $settings,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): PersistentSubscriptionUpdateResult {
         return Promise\wait($this->asyncConnection->updatePersistentSubscriptionAsync(
             $stream,
@@ -268,7 +268,7 @@ final class EventStoreSyncNodeConnection implements
     public function deletePersistentSubscription(
         string $stream,
         string $groupName,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): PersistentSubscriptionDeleteResult {
         return Promise\wait($this->asyncConnection->deletePersistentSubscriptionAsync($stream, $groupName, $userCredentials));
     }
@@ -278,10 +278,10 @@ final class EventStoreSyncNodeConnection implements
         string $stream,
         string $groupName,
         EventAppearedOnSubscription $eventAppeared,
-        SubscriptionDropped $subscriptionDropped = null,
+        ?SubscriptionDropped $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): EventStorePersistentSubscription {
         return $this->asyncConnection->connectToPersistentSubscription(
             $stream,
@@ -297,7 +297,7 @@ final class EventStoreSyncNodeConnection implements
     public function startTransaction(
         string $stream,
         int $expectedVersion,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): EventStoreSyncTransaction {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -324,7 +324,7 @@ final class EventStoreSyncNodeConnection implements
     /** @throws Throwable */
     public function continueTransaction(
         int $transactionId,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): EventStoreSyncTransaction {
         if ($transactionId < 0) {
             throw new InvalidArgumentException('Invalid transaction id');
@@ -336,7 +336,7 @@ final class EventStoreSyncNodeConnection implements
     public function transactionalWrite(
         EventStoreSyncTransaction $transaction,
         array $events,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): void {
         if (empty($events)) {
             throw new InvalidArgumentException('No events given');
@@ -361,7 +361,7 @@ final class EventStoreSyncNodeConnection implements
 
     public function commitTransaction(
         EventStoreSyncTransaction $transaction,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): WriteResult {
         $deferred = new Deferred();
 

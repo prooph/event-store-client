@@ -20,6 +20,6 @@ interface PersistentSubscriptionDropped
     public function __invoke(
         AbstractEventStorePersistentSubscription $subscription,
         SubscriptionDropReason $reason,
-        Throwable $exception = null
+        ?Throwable $exception = null
     ): void;
 }

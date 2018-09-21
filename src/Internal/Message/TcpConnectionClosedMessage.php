@@ -23,7 +23,7 @@ class TcpConnectionClosedMessage implements Message
     /** @var Throwable|null */
     private $exception;
 
-    public function __construct(TcpPackageConnection $tcpPackageConnection, Throwable $exception = null)
+    public function __construct(TcpPackageConnection $tcpPackageConnection, ?Throwable $exception = null)
     {
         $this->tcpPackageConnection = $tcpPackageConnection;
         $this->exception = $exception;

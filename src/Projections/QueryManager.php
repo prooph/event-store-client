@@ -64,7 +64,7 @@ class QueryManager
         string $type,
         int $initialPollingDelay,
         int $maximumPollingDelay,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $promise = call(function () use (
                 $name, $query, $type, $initialPollingDelay, $maximumPollingDelay, $userCredentials

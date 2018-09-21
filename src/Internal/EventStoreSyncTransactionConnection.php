@@ -22,11 +22,11 @@ interface EventStoreSyncTransactionConnection
     public function transactionalWrite(
         EventStoreSyncTransaction $transaction,
         array $events,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): void;
 
     public function commitTransaction(
         EventStoreSyncTransaction $transaction,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): WriteResult;
 }

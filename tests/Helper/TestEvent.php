@@ -18,7 +18,7 @@ use Prooph\EventStoreClient\EventId;
 /** @internal */
 class TestEvent
 {
-    public static function new(EventId $eventId = null, string $data = null, string $metadata = null): EventData
+    public static function new(?EventId $eventId = null, ?string $data = null, ?string $metadata = null): EventData
     {
         if (null === $eventId) {
             $eventId = EventId::generate();

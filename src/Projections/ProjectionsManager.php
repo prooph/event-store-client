@@ -40,7 +40,7 @@ class ProjectionsManager
     /**
      * Asynchronously enables a projection
      */
-    public function enableAsync(string $name, UserCredentials $userCredentials = null): Promise
+    public function enableAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -57,7 +57,7 @@ class ProjectionsManager
     /**
      * Asynchronously aborts and disables a projection without writing a checkpoint
      */
-    public function disableAsync(string $name, UserCredentials $userCredentials = null): Promise
+    public function disableAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -74,7 +74,7 @@ class ProjectionsManager
     /**
      * Asynchronously disables a projection
      */
-    public function abortAsync(string $name, UserCredentials $userCredentials = null): Promise
+    public function abortAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -94,7 +94,7 @@ class ProjectionsManager
     public function createOneTimeAsync(
         string $query,
         string $type = 'JS',
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if ('' === $query) {
             throw new InvalidArgumentException('Query is required');
@@ -116,7 +116,7 @@ class ProjectionsManager
         string $name,
         string $query,
         string $type = 'JS',
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -142,9 +142,9 @@ class ProjectionsManager
     public function createContinuousAsync(
         string $name,
         string $query,
-        bool $trackEmittedStreams = null,
+        ?bool $trackEmittedStreams = null,
         string $type = 'JS',
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -170,7 +170,7 @@ class ProjectionsManager
      *
      * @return Promise<ProjectionDetails[]>
      */
-    public function listAllAsync(UserCredentials $userCredentials = null): Promise
+    public function listAllAsync(?UserCredentials $userCredentials = null): Promise
     {
         return $this->client->listAll(
             $this->httpEndPoint,
@@ -184,7 +184,7 @@ class ProjectionsManager
      *
      * @return Promise<ProjectionDetails[]>
      */
-    public function listOneTimeAsync(UserCredentials $userCredentials = null): Promise
+    public function listOneTimeAsync(?UserCredentials $userCredentials = null): Promise
     {
         return $this->client->listOneTime(
             $this->httpEndPoint,
@@ -198,7 +198,7 @@ class ProjectionsManager
      *
      * @return Promise<ProjectionDetails[]>
      */
-    public function listContinuousAsync(UserCredentials $userCredentials = null): Promise
+    public function listContinuousAsync(?UserCredentials $userCredentials = null): Promise
     {
         return $this->client->listContinuous(
             $this->httpEndPoint,
@@ -214,7 +214,7 @@ class ProjectionsManager
      *
      * @return Promise<string>
      */
-    public function getStatusAsync(string $name, UserCredentials $userCredentials = null): Promise
+    public function getStatusAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -235,7 +235,7 @@ class ProjectionsManager
      *
      * @return Promise<string>
      */
-    public function getStateAsync(string $name, UserCredentials $userCredentials = null): Promise
+    public function getStateAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -259,7 +259,7 @@ class ProjectionsManager
     public function getPartitionStateAsync(
         string $name,
         string $partition,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -285,7 +285,7 @@ class ProjectionsManager
      *
      * @return Promise<string>
      */
-    public function getResultAsync(string $name, UserCredentials $userCredentials = null): Promise
+    public function getResultAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -309,7 +309,7 @@ class ProjectionsManager
     public function getPartitionResultAsync(
         string $name,
         string $partition,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -335,7 +335,7 @@ class ProjectionsManager
      *
      * @return Promise<string>
      */
-    public function getStatisticsAsync(string $name, UserCredentials $userCredentials = null): Promise
+    public function getStatisticsAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -354,7 +354,7 @@ class ProjectionsManager
      *
      * @return Promise<string>
      */
-    public function getQueryAsync(string $name, UserCredentials $userCredentials = null): Promise
+    public function getQueryAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -374,9 +374,9 @@ class ProjectionsManager
     public function updateQueryAsync(
         string $name,
         string $query,
-        bool $emitEnabled = null,
+        ?bool $emitEnabled = null,
         string $type = 'JS',
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -403,7 +403,7 @@ class ProjectionsManager
     public function deleteAsync(
         string $name,
         bool $deleteEmittedStreams = false,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');

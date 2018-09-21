@@ -147,7 +147,7 @@ class catch_up_subscription_handles_errors extends TestCase
                 public function __invoke(
                     EventStoreCatchUpSubscription $subscription,
                     SubscriptionDropReason $reason,
-                    Throwable $exception = null
+                    ?Throwable $exception = null
                 ): void {
                     $this->props['isDropped'] = true;
                     $this->props['dropReason'] = $reason;
@@ -570,7 +570,7 @@ class catch_up_subscription_handles_errors extends TestCase
                     public function __invoke(
                         EventStoreSubscription $subscription,
                         SubscriptionDropReason $reason,
-                        Throwable $exception = null
+                        ?Throwable $exception = null
                     ): void {
                         ($this->drop)($subscription, $reason, $exception);
                     }

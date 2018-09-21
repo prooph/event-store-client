@@ -27,7 +27,7 @@ class SyncUsersManager
         EndPoint $endPoint,
         int $operationTimeout,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ) {
         $this->manager = new AsyncUsersManager(
             $endPoint,
@@ -37,18 +37,18 @@ class SyncUsersManager
         );
     }
 
-    public function enable(string $login, UserCredentials $userCredentials = null): void
+    public function enable(string $login, ?UserCredentials $userCredentials = null): void
     {
         Promise\wait($this->manager->enableAsync($login, $userCredentials));
     }
 
-    public function disable(string $login, UserCredentials $userCredentials = null): void
+    public function disable(string $login, ?UserCredentials $userCredentials = null): void
     {
         Promise\wait($this->manager->disableAsync($login, $userCredentials));
     }
 
     /** @throws UserCommandFailedException */
-    public function deleteUser(string $login, UserCredentials $userCredentials = null): void
+    public function deleteUser(string $login, ?UserCredentials $userCredentials = null): void
     {
         Promise\wait($this->manager->deleteUserAsync($login, $userCredentials));
     }
@@ -64,7 +64,7 @@ class SyncUsersManager
         return Promise\wait($this->manager->getCurrentUserAsync($userCredentials));
     }
 
-    public function getUser(string $login, UserCredentials $userCredentials = null): UserDetails
+    public function getUser(string $login, ?UserCredentials $userCredentials = null): UserDetails
     {
         return Promise\wait($this->manager->getUserAsync($login, $userCredentials));
     }
@@ -82,7 +82,7 @@ class SyncUsersManager
         string $fullName,
         array $groups,
         string $password,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): void {
         Promise\wait($this->manager->createUserAsync(
             $login,
@@ -104,7 +104,7 @@ class SyncUsersManager
         string $login,
         string $fullName,
         array $groups,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): void {
         Promise\wait($this->manager->updateUserAsync(
             $login,
@@ -118,7 +118,7 @@ class SyncUsersManager
         string $login,
         string $oldPassword,
         string $newPassword,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): void {
         Promise\wait($this->manager->changePasswordAsync(
             $login,
@@ -131,7 +131,7 @@ class SyncUsersManager
     public function resetPassword(
         string $login,
         string $newPassword,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): void {
         Promise\wait($this->manager->resetPasswordAsync(
             $login,

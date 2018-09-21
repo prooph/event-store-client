@@ -228,7 +228,7 @@ class subscribe_should extends TestCase
             public function __invoke(
                 EventStoreSubscription $subscription,
                 SubscriptionDropReason $reason,
-                Throwable $exception = null
+                ?Throwable $exception = null
             ): void {
                 $this->deferred->resolve(true);
             }

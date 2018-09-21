@@ -60,8 +60,8 @@ Loop::run(function () {
             public function __invoke(
                 EventStoreCatchUpSubscription $subscription,
                 SubscriptionDropReason $reason,
-                Throwable $exception = null): void
-            {
+                ?Throwable $exception = null
+            ): void {
                 echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
 
                 if ($exception) {

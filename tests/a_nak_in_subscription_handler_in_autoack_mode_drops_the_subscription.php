@@ -70,7 +70,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
 
         $dropBehaviour = function (
             SubscriptionDropReason $reason,
-            Throwable $exception = null
+            ?Throwable $exception = null
         ): void {
             $this->reason = $reason;
             $this->exception = $exception;
@@ -100,7 +100,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
                 public function __invoke(
                     AbstractEventStorePersistentSubscription $subscription,
                     SubscriptionDropReason $reason,
-                    Throwable $exception = null
+                    ?Throwable $exception = null
                 ): void {
                     ($this->callback)($reason, $exception);
                 }

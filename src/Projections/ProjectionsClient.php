@@ -42,7 +42,7 @@ class ProjectionsClient
     public function enable(
         EndPoint $endPoint,
         string $name,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(
@@ -61,7 +61,7 @@ class ProjectionsClient
     public function disable(
         EndPoint $endPoint,
         string $name,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(
@@ -80,7 +80,7 @@ class ProjectionsClient
     public function abort(
         EndPoint $endPoint,
         string $name,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(
@@ -100,7 +100,7 @@ class ProjectionsClient
         EndPoint $endPoint,
         string $query,
         string $type = 'JS',
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(
@@ -121,7 +121,7 @@ class ProjectionsClient
         string $name,
         string $query,
         string $type = 'JS',
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(
@@ -144,7 +144,7 @@ class ProjectionsClient
         string $query,
         bool $trackEmitted,
         string $type = 'JS',
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(
@@ -167,7 +167,7 @@ class ProjectionsClient
      */
     public function listAll(
         EndPoint $endPoint,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         $deferred = new Deferred();
@@ -218,7 +218,7 @@ class ProjectionsClient
      */
     public function listOneTime(
         EndPoint $endPoint,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         $deferred = new Deferred();
@@ -269,7 +269,7 @@ class ProjectionsClient
      */
     public function listContinuous(
         EndPoint $endPoint,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         $deferred = new Deferred();
@@ -321,7 +321,7 @@ class ProjectionsClient
     public function getStatus(
         EndPoint $endPoint,
         string $name,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendGet(
@@ -342,7 +342,7 @@ class ProjectionsClient
     public function getState(
         EndPoint $endPoint,
         string $name,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendGet(
@@ -365,7 +365,7 @@ class ProjectionsClient
         EndPoint $endPoint,
         string $name,
         string $partition,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendGet(
@@ -387,7 +387,7 @@ class ProjectionsClient
     public function getResult(
         EndPoint $endPoint,
         string $name,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendGet(
@@ -409,7 +409,7 @@ class ProjectionsClient
         EndPoint $endPoint,
         string $name,
         string $partition,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendGet(
@@ -431,7 +431,7 @@ class ProjectionsClient
     public function getStatistics(
         EndPoint $endPoint,
         string $name,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendGet(
@@ -452,7 +452,7 @@ class ProjectionsClient
     public function getQuery(
         EndPoint $endPoint,
         string $name,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendGet(
@@ -471,9 +471,9 @@ class ProjectionsClient
         EndPoint $endPoint,
         string $name,
         string $query,
-        bool $emitEnabled = null,
+        ?bool $emitEnabled = null,
         string $type = 'JS',
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         if (null === $emitEnabled) {
@@ -500,7 +500,7 @@ class ProjectionsClient
         EndPoint $endPoint,
         string $name,
         bool $deleteEmittedStreams,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendDelete(

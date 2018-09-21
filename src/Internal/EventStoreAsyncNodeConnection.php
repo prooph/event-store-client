@@ -83,9 +83,10 @@ final class EventStoreAsyncNodeConnection implements
         ConnectionSettings $settings,
         ?ClusterSettings $clusterSettings,
         EndPointDiscoverer $endPointDiscoverer,
-        string $connectionName = null
+        ?string $connectionName = null
     ) {
         $this->settings = $settings;
+        $this->clusterSettings = $clusterSettings;
         $this->connectionName = $connectionName ?? UuidGenerator::generate();
         $this->endPointDiscoverer = $endPointDiscoverer;
         $this->handler = new EventStoreConnectionLogicHandler($this, $settings);
@@ -123,7 +124,7 @@ final class EventStoreAsyncNodeConnection implements
         string $stream,
         int $expectedVersion,
         bool $hardDelete = false,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -149,7 +150,7 @@ final class EventStoreAsyncNodeConnection implements
         string $stream,
         int $expectedVersion,
         array $events = [],
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -175,7 +176,7 @@ final class EventStoreAsyncNodeConnection implements
         string $stream,
         int $expectedVersion,
         array $events = [],
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -200,7 +201,7 @@ final class EventStoreAsyncNodeConnection implements
         string $stream,
         int $eventNumber,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -230,7 +231,7 @@ final class EventStoreAsyncNodeConnection implements
         int $start,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -268,7 +269,7 @@ final class EventStoreAsyncNodeConnection implements
         int $start,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -305,7 +306,7 @@ final class EventStoreAsyncNodeConnection implements
         Position $position,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if ($count < 1) {
             throw new InvalidArgumentException('Count must be positive');
@@ -337,7 +338,7 @@ final class EventStoreAsyncNodeConnection implements
         Position $position,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if ($count < 1) {
             throw new InvalidArgumentException('Count must be positive');
@@ -369,7 +370,7 @@ final class EventStoreAsyncNodeConnection implements
         string $stream,
         int $expectedMetaStreamVersion,
         ?StreamMetadata $metadata,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -404,7 +405,7 @@ final class EventStoreAsyncNodeConnection implements
         return $deferred->promise();
     }
 
-    public function getStreamMetadataAsync(string $stream, UserCredentials $userCredentials = null): Promise
+    public function getStreamMetadataAsync(string $stream, ?UserCredentials $userCredentials = null): Promise
     {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -456,7 +457,7 @@ final class EventStoreAsyncNodeConnection implements
         return $deferred->promise();
     }
 
-    public function setSystemSettingsAsync(SystemSettings $settings, UserCredentials $userCredentials = null): Promise
+    public function setSystemSettingsAsync(SystemSettings $settings, ?UserCredentials $userCredentials = null): Promise
     {
         return $this->appendToStreamAsync(
             SystemStreams::SETTINGS_STREAM,
@@ -471,7 +472,7 @@ final class EventStoreAsyncNodeConnection implements
         string $stream,
         string $groupName,
         PersistentSubscriptionSettings $settings,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -499,7 +500,7 @@ final class EventStoreAsyncNodeConnection implements
         string $stream,
         string $groupName,
         PersistentSubscriptionSettings $settings,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -526,7 +527,7 @@ final class EventStoreAsyncNodeConnection implements
     public function deletePersistentSubscriptionAsync(
         string $stream,
         string $groupName,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -554,8 +555,8 @@ final class EventStoreAsyncNodeConnection implements
         string $stream,
         bool $resolveLinkTos,
         EventAppearedOnSubscription $eventAppeared,
-        SubscriptionDropped $subscriptionDropped = null,
-        UserCredentials $userCredentials = null
+        ?SubscriptionDropped $subscriptionDropped = null,
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -583,9 +584,9 @@ final class EventStoreAsyncNodeConnection implements
         ?int $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
         EventAppearedOnCatchupSubscription $eventAppeared,
-        LiveProcessingStarted $liveProcessingStarted = null,
-        CatchUpSubscriptionDropped $subscriptionDropped = null,
-        UserCredentials $userCredentials = null
+        ?LiveProcessingStarted $liveProcessingStarted = null,
+        ?CatchUpSubscriptionDropped $subscriptionDropped = null,
+        ?UserCredentials $userCredentials = null
     ): EventStoreStreamCatchUpSubscription {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -620,8 +621,8 @@ final class EventStoreAsyncNodeConnection implements
     public function subscribeToAllAsync(
         bool $resolveLinkTos,
         EventAppearedOnSubscription $eventAppeared,
-        SubscriptionDropped $subscriptionDropped = null,
-        UserCredentials $userCredentials = null
+        ?SubscriptionDropped $subscriptionDropped = null,
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
@@ -643,9 +644,9 @@ final class EventStoreAsyncNodeConnection implements
         ?Position $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
         EventAppearedOnCatchupSubscription $eventAppeared,
-        LiveProcessingStarted $liveProcessingStarted = null,
-        CatchUpSubscriptionDropped $subscriptionDropped = null,
-        UserCredentials $userCredentials = null
+        ?LiveProcessingStarted $liveProcessingStarted = null,
+        ?CatchUpSubscriptionDropped $subscriptionDropped = null,
+        ?UserCredentials $userCredentials = null
     ): EventStoreAllCatchUpSubscription {
         if (null === $settings) {
             $settings = CatchUpSubscriptionSettings::default();
@@ -675,10 +676,10 @@ final class EventStoreAsyncNodeConnection implements
         string $stream,
         string $groupName,
         EventAppearedOnPersistentSubscription $eventAppeared,
-        PersistentSubscriptionDropped $subscriptionDropped = null,
+        ?PersistentSubscriptionDropped $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): EventStorePersistentSubscription {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -712,10 +713,10 @@ final class EventStoreAsyncNodeConnection implements
         string $stream,
         string $groupName,
         EventAppearedOnPersistentSubscription $eventAppeared,
-        PersistentSubscriptionDropped $subscriptionDropped = null,
+        ?PersistentSubscriptionDropped $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -745,7 +746,7 @@ final class EventStoreAsyncNodeConnection implements
     public function startTransactionAsync(
         string $stream,
         int $expectedVersion,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -768,7 +769,7 @@ final class EventStoreAsyncNodeConnection implements
 
     public function continueTransaction(
         int $transactionId,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): EventStoreAsyncTransaction {
         if ($transactionId < 0) {
             throw new InvalidArgumentException('Invalid transaction id');

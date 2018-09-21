@@ -54,11 +54,11 @@ class StreamMetadata
     private $customMetadata;
 
     public function __construct(
-        int $maxCount = null,
-        int $maxAge = null,
-        int $truncateBefore = null,
-        int $cacheControl = null,
-        StreamAcl $acl = null,
+        ?int $maxCount = null,
+        ?int $maxAge = null,
+        ?int $truncateBefore = null,
+        ?int $cacheControl = null,
+        ?StreamAcl $acl = null,
         array $customMetadata = []
     ) {
         if (null !== $maxCount && $maxCount <= 0) {

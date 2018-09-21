@@ -230,7 +230,7 @@ class EventStoreConnectionLogicHandler
                 : null
         );
 
-        $promise->onResolve(function (?Throwable $e, NodeEndPoints $endpoints = null) use ($deferred): void {
+        $promise->onResolve(function (?Throwable $e, ?NodeEndPoints $endpoints = null) use ($deferred): void {
             if ($e) {
                 $this->enqueueMessage(new CloseConnectionMessage(
                     'Failed to resolve TCP end point to which to connect',
@@ -255,7 +255,7 @@ class EventStoreConnectionLogicHandler
     }
 
     /** @throws \Exception */
-    private function closeConnection(string $reason, Throwable $exception = null): void
+    private function closeConnection(string $reason, ?Throwable $exception = null): void
     {
         if ($this->state->equals(ConnectionState::closed())) {
             if ($exception) {

@@ -35,7 +35,7 @@ interface EventStoreAsyncConnection
         string $stream,
         int $expectedVersion,
         bool $hardDelete = false,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     /**
@@ -49,7 +49,7 @@ interface EventStoreAsyncConnection
         string $stream,
         int $expectedVersion,
         array $events = [],
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     /**
@@ -63,7 +63,7 @@ interface EventStoreAsyncConnection
         string $stream,
         int $expectedVersion,
         array $events = [],
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     /** @return Promise<EventReadResult> */
@@ -71,7 +71,7 @@ interface EventStoreAsyncConnection
         string $stream,
         int $eventNumber,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     /** @return Promise<StreamEventsSlice> */
@@ -80,7 +80,7 @@ interface EventStoreAsyncConnection
         int $start,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     /** @return Promise<StreamEventsSlice> */
@@ -89,7 +89,7 @@ interface EventStoreAsyncConnection
         int $start,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     /** @return Promise<AllEventsSlice> */
@@ -97,7 +97,7 @@ interface EventStoreAsyncConnection
         Position $position,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     /** @return Promise<AllEventsSlice> */
@@ -105,7 +105,7 @@ interface EventStoreAsyncConnection
         Position $position,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     /** @return Promise<WriteResult> */
@@ -113,25 +113,25 @@ interface EventStoreAsyncConnection
         string $stream,
         int $expectedMetaStreamVersion,
         ?StreamMetadata $metadata,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     /** @return Promise<StreamMetadataResult> */
-    public function getStreamMetadataAsync(string $stream, UserCredentials $userCredentials = null): Promise;
+    public function getStreamMetadataAsync(string $stream, ?UserCredentials $userCredentials = null): Promise;
 
     /** @return Promise<WriteResult> */
-    public function setSystemSettingsAsync(SystemSettings $settings, UserCredentials $userCredentials = null): Promise;
+    public function setSystemSettingsAsync(SystemSettings $settings, ?UserCredentials $userCredentials = null): Promise;
 
     /** @return Promise<EventStoreAsyncTransaction> */
     public function startTransactionAsync(
         string $stream,
         int $expectedVersion,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     public function continueTransaction(
         int $transactionId,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): EventStoreAsyncTransaction;
 
     /** @return Promise<PersistentSubscriptionCreateResult> */
@@ -139,7 +139,7 @@ interface EventStoreAsyncConnection
         string $stream,
         string $groupName,
         PersistentSubscriptionSettings $settings,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     /** @return Promise<UpdatePersistentSubscription> */
@@ -147,14 +147,14 @@ interface EventStoreAsyncConnection
         string $stream,
         string $groupName,
         PersistentSubscriptionSettings $settings,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     /** @return Promise<DeletePersistentSubscription> */
     public function deletePersistentSubscriptionAsync(
         string $stream,
         string $groupName,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     /**
@@ -164,8 +164,8 @@ interface EventStoreAsyncConnection
         string $stream,
         bool $resolveLinkTos,
         EventAppearedOnSubscription $eventAppeared,
-        SubscriptionDropped $subscriptionDropped = null,
-        UserCredentials $userCredentials = null
+        ?SubscriptionDropped $subscriptionDropped = null,
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     public function subscribeToStreamFrom(
@@ -173,9 +173,9 @@ interface EventStoreAsyncConnection
         ?int $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
         EventAppearedOnCatchupSubscription $eventAppeared,
-        LiveProcessingStarted $liveProcessingStarted = null,
-        CatchUpSubscriptionDropped $subscriptionDropped = null,
-        UserCredentials $userCredentials = null
+        ?LiveProcessingStarted $liveProcessingStarted = null,
+        ?CatchUpSubscriptionDropped $subscriptionDropped = null,
+        ?UserCredentials $userCredentials = null
     ): EventStoreStreamCatchUpSubscription;
 
     /**
@@ -184,27 +184,27 @@ interface EventStoreAsyncConnection
     public function subscribeToAllAsync(
         bool $resolveLinkTos,
         EventAppearedOnSubscription $eventAppeared,
-        SubscriptionDropped $subscriptionDropped = null,
-        UserCredentials $userCredentials = null
+        ?SubscriptionDropped $subscriptionDropped = null,
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     public function subscribeToAllFrom(
         ?Position $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
         EventAppearedOnCatchupSubscription $eventAppeared,
-        LiveProcessingStarted $liveProcessingStarted = null,
-        CatchUpSubscriptionDropped $subscriptionDropped = null,
-        UserCredentials $userCredentials = null
+        ?LiveProcessingStarted $liveProcessingStarted = null,
+        ?CatchUpSubscriptionDropped $subscriptionDropped = null,
+        ?UserCredentials $userCredentials = null
     ): EventStoreAllCatchUpSubscription;
 
     public function connectToPersistentSubscription(
         string $stream,
         string $groupName,
         EventAppearedOnPersistentSubscription $eventAppeared,
-        PersistentSubscriptionDropped $subscriptionDropped = null,
+        ?PersistentSubscriptionDropped $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): EventStorePersistentSubscription;
 
     /**
@@ -214,10 +214,10 @@ interface EventStoreAsyncConnection
         string $stream,
         string $groupName,
         EventAppearedOnPersistentSubscription $eventAppeared,
-        PersistentSubscriptionDropped $subscriptionDropped = null,
+        ?PersistentSubscriptionDropped $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise;
 
     public function onConnected(callable $handler): ListenerHandler;

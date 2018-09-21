@@ -262,8 +262,8 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 
     public function dropSubscription(
         SubscriptionDropReason $reason,
-        Throwable $exception = null,
-        TcpPackageConnection $connection = null
+        ?Throwable $exception = null,
+        ?TcpPackageConnection $connection = null
     ): void {
         if (! $this->unsubscribed) {
             $this->unsubscribed = true;

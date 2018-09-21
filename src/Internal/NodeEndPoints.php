@@ -23,7 +23,7 @@ class NodeEndPoints
     /** @var EndPoint|null */
     private $secureTcpEndPoint;
 
-    public function __construct(?EndPoint $tcpEndPoint, EndPoint $secureTcpEndPoint = null)
+    public function __construct(?EndPoint $tcpEndPoint, ?EndPoint $secureTcpEndPoint = null)
     {
         if (($tcpEndPoint && $secureTcpEndPoint) === null) {
             throw new InvalidArgumentException('Both endpoints are null');

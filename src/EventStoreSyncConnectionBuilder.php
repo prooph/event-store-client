@@ -36,8 +36,8 @@ class EventStoreSyncConnectionBuilder
 
     /** @throws \Exception */
     public static function createFromBuilder(
-        string $connectionString = null,
-        ConnectionSettingsBuilder $builder = null,
+        ?string $connectionString = null,
+        ?ConnectionSettingsBuilder $builder = null,
         string $connectionName = ''
     ): SyncConnection {
         $builder = $builder ?? new ConnectionSettingsBuilder();
@@ -47,8 +47,8 @@ class EventStoreSyncConnectionBuilder
 
     /** @throws \Exception */
     public static function createFromSettings(
-        string $connectionString = null,
-        ConnectionSettings $settings = null,
+        ?string $connectionString = null,
+        ?ConnectionSettings $settings = null,
         string $connectionName = ''
     ): SyncConnection {
         if (null === $connectionString && (null === $settings || (empty($settings->gossipSeeds()) && empty($settings->clusterDns())))) {
@@ -113,8 +113,8 @@ class EventStoreSyncConnectionBuilder
 
     public static function createFromBuilderWithEndPoint(
         EndPoint $endPoint,
-        ConnectionSettingsBuilder $builder = null,
-        string $connectionName = null
+        ?ConnectionSettingsBuilder $builder = null,
+        ?string $connectionName = null
     ): SyncConnection {
         $builder = $builder ?? new ConnectionSettingsBuilder();
 
@@ -123,8 +123,8 @@ class EventStoreSyncConnectionBuilder
 
     public static function createFromSettingsWithEndPoint(
         EndPoint $endPoint,
-        ConnectionSettings $settings = null,
-        string $connectionName = null
+        ?ConnectionSettings $settings = null,
+        ?string $connectionName = null
     ): SyncConnection {
         $settings = $settings ?? ConnectionSettings::default();
 
@@ -138,7 +138,7 @@ class EventStoreSyncConnectionBuilder
 
     private static function createWithClusterDnsEndPointDiscoverer(
         ConnectionSettings $settings,
-        string $connectionName = null
+        ?string $connectionName = null
     ): SyncConnection {
         $clusterSettings = new ClusterSettings(
             $settings->clusterDns(),
@@ -165,7 +165,7 @@ class EventStoreSyncConnectionBuilder
     private static function createWithSingleEndpointDiscoverer(
         string $connectionString,
         ConnectionSettings $settings,
-        string $connectionName = null
+        ?string $connectionName = null
     ): SyncConnection {
         return new EventStoreSyncNodeConnection(
             $settings,

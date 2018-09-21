@@ -43,7 +43,7 @@ class UsersClient
     public function enable(
         EndPoint $endPoint,
         string $login,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(
@@ -62,7 +62,7 @@ class UsersClient
     public function disable(
         EndPoint $endPoint,
         string $login,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(
@@ -81,7 +81,7 @@ class UsersClient
     public function delete(
         EndPoint $endPoint,
         string $login,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendDelete(
@@ -99,7 +99,7 @@ class UsersClient
     /** @return Promise<UserDetails[]> */
     public function listAll(
         EndPoint $endPoint,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         $deferred = new Deferred();
@@ -155,7 +155,7 @@ class UsersClient
     /** @return Promise<UserDetails> */
     public function getCurrentUser(
         EndPoint $endPoint,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         $deferred = new Deferred();
@@ -204,7 +204,7 @@ class UsersClient
     public function getUser(
         EndPoint $endPoint,
         string $login,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         $deferred = new Deferred();
@@ -261,7 +261,7 @@ class UsersClient
     public function createUser(
         EndPoint $endPoint,
         UserCreationInformation $newUser,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(
@@ -280,7 +280,7 @@ class UsersClient
         EndPoint $endPoint,
         string $login,
         UserUpdateInformation $updatedUser,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPut(
@@ -300,7 +300,7 @@ class UsersClient
         EndPoint $endPoint,
         string $login,
         ChangePasswordDetails $changePasswordDetails,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(
@@ -320,7 +320,7 @@ class UsersClient
         EndPoint $endPoint,
         string $login,
         ResetPasswordDetails $resetPasswordDetails,
-        UserCredentials $userCredentials = null,
+        ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
         return $this->sendPost(

@@ -34,7 +34,7 @@ class AsyncUsersManager
         EndPoint $endPoint,
         int $operationTimeout,
         string $schema = EndpointExtensions::HTTP_SCHEMA,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ) {
         $this->client = new UsersClient($operationTimeout);
         $this->endPoint = $endPoint;
@@ -42,7 +42,7 @@ class AsyncUsersManager
         $this->defaultCredentials = $userCredentials;
     }
 
-    public function enableAsync(string $login, UserCredentials $userCredentials = null): Promise
+    public function enableAsync(string $login, ?UserCredentials $userCredentials = null): Promise
     {
         if (empty($login)) {
             throw new InvalidArgumentException('Login cannot be empty');
@@ -53,7 +53,7 @@ class AsyncUsersManager
         return $this->client->enable($this->endPoint, $login, $userCredentials, $this->schema);
     }
 
-    public function disableAsync(string $login, UserCredentials $userCredentials = null): Promise
+    public function disableAsync(string $login, ?UserCredentials $userCredentials = null): Promise
     {
         if (empty($login)) {
             throw new InvalidArgumentException('Login cannot be empty');
@@ -65,7 +65,7 @@ class AsyncUsersManager
     }
 
     /** @throws UserCommandFailedException */
-    public function deleteUserAsync(string $login, UserCredentials $userCredentials = null): Promise
+    public function deleteUserAsync(string $login, ?UserCredentials $userCredentials = null): Promise
     {
         if (empty($login)) {
             throw new InvalidArgumentException('Login cannot be empty');
@@ -77,7 +77,7 @@ class AsyncUsersManager
     }
 
     /** @return Promise<UserDetails[]> */
-    public function listAllAsync(UserCredentials $userCredentials = null): Promise
+    public function listAllAsync(?UserCredentials $userCredentials = null): Promise
     {
         $userCredentials = $userCredentials ?? $this->defaultCredentials;
 
@@ -85,7 +85,7 @@ class AsyncUsersManager
     }
 
     /** @return Promise<UserDetails> */
-    public function getCurrentUserAsync(UserCredentials $userCredentials): Promise
+    public function getCurrentUserAsync(?UserCredentials $userCredentials): Promise
     {
         $userCredentials = $userCredentials ?? $this->defaultCredentials;
 
@@ -93,7 +93,7 @@ class AsyncUsersManager
     }
 
     /** @return Promise<UserDetails> */
-    public function getUserAsync(string $login, UserCredentials $userCredentials = null): Promise
+    public function getUserAsync(string $login, ?UserCredentials $userCredentials = null): Promise
     {
         if (empty($login)) {
             throw new InvalidArgumentException('Login cannot be empty');
@@ -117,7 +117,7 @@ class AsyncUsersManager
         string $fullName,
         array $groups,
         string $password,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($login)) {
             throw new InvalidArgumentException('Login cannot be empty');
@@ -163,7 +163,7 @@ class AsyncUsersManager
         string $login,
         string $fullName,
         array $groups,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($login)) {
             throw new InvalidArgumentException('Login cannot be empty');
@@ -194,7 +194,7 @@ class AsyncUsersManager
         string $login,
         string $oldPassword,
         string $newPassword,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($login)) {
             throw new InvalidArgumentException('Login cannot be empty');
@@ -222,7 +222,7 @@ class AsyncUsersManager
     public function resetPasswordAsync(
         string $login,
         string $newPassword,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($login)) {
             throw new InvalidArgumentException('Login cannot be empty');

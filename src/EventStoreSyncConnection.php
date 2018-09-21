@@ -30,7 +30,7 @@ interface EventStoreSyncConnection
         string $stream,
         int $expectedVersion,
         bool $hardDelete = false,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): void;
 
     /**
@@ -44,7 +44,7 @@ interface EventStoreSyncConnection
         string $stream,
         int $expectedVersion,
         array $events = [],
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): WriteResult;
 
     /**
@@ -58,7 +58,7 @@ interface EventStoreSyncConnection
         string $stream,
         int $expectedVersion,
         array $events = [],
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): ConditionalWriteResult;
 
     /**
@@ -68,7 +68,7 @@ interface EventStoreSyncConnection
         string $stream,
         int $eventNumber,
         bool $resolveLinkTo = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): EventReadResult;
 
     public function readStreamEventsForward(
@@ -76,7 +76,7 @@ interface EventStoreSyncConnection
         int $start,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): StreamEventsSlice;
 
     public function readStreamEventsBackward(
@@ -84,43 +84,43 @@ interface EventStoreSyncConnection
         int $start,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): StreamEventsSlice;
 
     public function readAllEventsForward(
         Position $position,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): StreamEventsSlice;
 
     public function readAllEventsBackward(
         Position $position,
         int $count,
         bool $resolveLinkTos = true,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): StreamEventsSlice;
 
     public function setStreamMetadata(
         string $stream,
         int $expectedMetaStreamVersion,
         StreamMetadata $metadata,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): WriteResult;
 
-    public function getStreamMetadata(string $stream, UserCredentials $userCredentials = null): StreamMetadataResult;
+    public function getStreamMetadata(string $stream, ?UserCredentials $userCredentials = null): StreamMetadataResult;
 
-    public function setSystemSettings(SystemSettings $settings, UserCredentials $userCredentials = null): WriteResult;
+    public function setSystemSettings(SystemSettings $settings, ?UserCredentials $userCredentials = null): WriteResult;
 
     public function startTransaction(
         string $stream,
         int $expectedVersion,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): EventStoreSyncTransaction;
 
     public function continueTransaction(
         int $transactionId,
-        UserCredentials $userCredentials = null
+        ?UserCredentials $userCredentials = null
     ): EventStoreSyncTransaction;
 
     public function onConnected(callable $handler): ListenerHandler;

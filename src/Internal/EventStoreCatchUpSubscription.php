@@ -310,8 +310,8 @@ abstract class EventStoreCatchUpSubscription
                     public function __invoke(
                         EventStoreSubscription $subscription,
                         SubscriptionDropReason $reason,
-                        Throwable $exception = null): void
-                    {
+                        ?Throwable $exception = null
+                    ): void {
                         ($this->callback)($reason, $exception);
                     }
                 };

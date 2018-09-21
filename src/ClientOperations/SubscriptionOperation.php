@@ -23,8 +23,8 @@ interface SubscriptionOperation
 {
     public function dropSubscription(
         SubscriptionDropReason $reason,
-        Throwable $exception = null,
-        TcpPackageConnection $connection = null
+        ?Throwable $exception = null,
+        ?TcpPackageConnection $connection = null
     ): void;
 
     public function connectionClosed(): void;

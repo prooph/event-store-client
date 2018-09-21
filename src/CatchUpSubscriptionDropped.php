@@ -20,6 +20,6 @@ interface CatchUpSubscriptionDropped
     public function __invoke(
         EventStoreCatchUpSubscription $subscription,
         SubscriptionDropReason $reason,
-        Throwable $exception = null
+        ?Throwable $exception = null
     ): void;
 }
