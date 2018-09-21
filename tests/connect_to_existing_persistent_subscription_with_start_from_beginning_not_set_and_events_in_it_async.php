@@ -15,11 +15,11 @@ namespace ProophTest\EventStoreClient;
 use Amp\Deferred;
 use Amp\Promise;
 use Amp\Success;
+use Amp\TimeoutException;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
@@ -28,7 +28,7 @@ use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
 use function Amp\call;
 
-class connect_to_existing_persistent_subscription_with_start_from_beginning_not_set_and_events_in_it_then_event_written extends TestCase
+class connect_to_existing_persistent_subscription_with_start_from_beginning_not_set_and_events_in_it_async extends TestCase
 {
     use SpecificationWithConnection;
 
@@ -40,10 +40,6 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
     private $group = 'startinbeginning1';
     /** @var Deferred */
     private $resetEvent;
-    /** @var ResolvedEvent */
-    private $firstEvent;
-    /** @var EventId */
-    private $eventId;
 
     protected function setUp(): void
     {
@@ -67,27 +63,25 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
         );
 
         $deferred = $this->resetEvent;
-        $firstEvent = &$this->firstEvent;
 
-        $this->conn->connectToPersistentSubscription(
+        yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
-            new class($deferred, $firstEvent) implements EventAppearedOnPersistentSubscription {
+            new class($deferred) implements EventAppearedOnPersistentSubscription {
                 private $deferred;
-                private $firstEvent;
 
-                public function __construct($deferred, &$firstEvent)
+                public function __construct($deferred)
                 {
                     $this->deferred = $deferred;
-                    $this->firstEvent = &$firstEvent;
                 }
 
                 public function __invoke(
                     AbstractEventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent
                 ): Promise {
-                    $this->firstEvent = $resolvedEvent;
-                    $this->deferred->resolve(true);
+                    if ($resolvedEvent->originalEventNumber() === 0) {
+                        $this->deferred->resolve(true);
+                    }
 
                     return new Success();
                 }
@@ -103,12 +97,10 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
     {
         return call(function (): Generator {
             for ($i = 0; $i < 10; $i++) {
-                $this->ids[$i] = EventId::generate();
-
                 yield $this->conn->appendToStreamAsync(
                     $this->stream,
                     ExpectedVersion::ANY,
-                    [new EventData($this->ids[$i], 'test', true, '{"foo":"bar"}')],
+                    [new EventData(null, 'test', true, '{"foo":"bar"}')],
                     DefaultData::adminCredentials()
                 );
             }
@@ -117,28 +109,18 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
 
     protected function when(): Generator
     {
-        $this->eventId = EventId::generate();
-
-        yield $this->conn->appendToStreamAsync(
-            $this->stream,
-            ExpectedVersion::ANY,
-            [new EventData($this->eventId, 'test', true, '{"foo":"bar"}')],
-            DefaultData::adminCredentials()
-        );
+        yield $this->writeEvents();
     }
 
     /**
      * @test
      * @throws Throwable
      */
-    public function the_subscription_gets_the_written_event_as_its_first_event(): void
+    public function the_subscription_gets_no_events(): void
     {
         $this->executeCallback(function (): Generator {
-            $value = yield Promise\timeout($this->resetEvent->promise(), 10000);
-            $this->assertTrue($value);
-            $this->assertNotNull($this->firstEvent);
-            $this->assertSame(10, $this->firstEvent->originalEventNumber());
-            $this->assertTrue($this->firstEvent->originalEvent()->eventId()->equals($this->eventId));
+            $this->expectException(TimeoutException::class);
+            yield Promise\timeout($this->resetEvent->promise(), 1000);
         });
     }
 }

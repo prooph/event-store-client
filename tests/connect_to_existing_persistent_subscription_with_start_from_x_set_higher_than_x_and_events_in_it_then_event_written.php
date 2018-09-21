@@ -86,8 +86,8 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_higher_t
                     AbstractEventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent
                 ): Promise {
-                    $this->deferred->resolve(true);
                     $this->firstEvent = $resolvedEvent;
+                    $this->deferred->resolve(true);
 
                     return new Success();
                 }
