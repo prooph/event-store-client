@@ -121,8 +121,9 @@ class ReadStreamEventsBackwardOperation extends AbstractOperation
 
         foreach ($records as $record) {
             /** @var ResolvedIndexedEvent $record */
-            $event = EventMessageConverter::convertEventRecordMessageToEventRecord($record->getEvent());
-            $link = null;
+            if ($event = $record->getEvent()) {
+                $event = EventMessageConverter::convertEventRecordMessageToEventRecord($record->getEvent());
+            }
 
             if ($link = $record->getLink()) {
                 $link = EventMessageConverter::convertEventRecordMessageToEventRecord($link);

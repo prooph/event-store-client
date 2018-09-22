@@ -62,7 +62,7 @@ class happy_case_catching_up_to_link_to_events_manual_ack extends TestCase
      * @test
      * @throws Throwable
      */
-    public function do_test(): void
+    public function test(): void
     {
         $this->executeCallback(function () {
             $settings = PersistentSubscriptionSettings::create()

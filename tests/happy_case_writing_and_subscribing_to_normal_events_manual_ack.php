@@ -61,7 +61,7 @@ class happy_case_writing_and_subscribing_to_normal_events_manual_ack extends Tes
      * @test
      * @throws Throwable
      */
-    public function do_test(): void
+    public function test(): void
     {
         $this->executeCallback(function () {
             $settings = PersistentSubscriptionSettings::default();
