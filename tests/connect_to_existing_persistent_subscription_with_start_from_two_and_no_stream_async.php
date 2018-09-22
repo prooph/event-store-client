@@ -66,14 +66,10 @@ class connect_to_existing_persistent_subscription_with_start_from_two_and_no_str
             DefaultData::adminCredentials()
         );
 
-        $set = &$this->set;
-        $deferred = $this->resetEvent;
-        $firstEvent = &$this->firstEvent;
-
         yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
-            new class($set, $deferred, $firstEvent) implements EventAppearedOnPersistentSubscription {
+            new class($this->set, $this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
                 private $set;
                 private $deferred;
                 private $firstEvent;

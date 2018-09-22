@@ -66,13 +66,10 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
             DefaultData::adminCredentials()
         );
 
-        $deferred = $this->resetEvent;
-        $firstEvent = &$this->firstEvent;
-
         $this->conn->connectToPersistentSubscription(
             $this->stream,
             $this->group,
-            new class($deferred, $firstEvent) implements EventAppearedOnPersistentSubscription {
+            new class($this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
                 private $deferred;
                 private $firstEvent;
 

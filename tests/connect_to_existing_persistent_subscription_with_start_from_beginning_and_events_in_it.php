@@ -87,14 +87,10 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
 
     protected function when(): Generator
     {
-        $set = &$this->set;
-        $deferred = $this->resetEvent;
-        $firstEvent = &$this->firstEvent;
-
         $this->conn->connectToPersistentSubscription(
             $this->stream,
             $this->group,
-            new class($set, $deferred, $firstEvent) implements EventAppearedOnPersistentSubscription {
+            new class($this->set, $this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
                 private $set;
                 private $deferred;
                 private $firstEvent;

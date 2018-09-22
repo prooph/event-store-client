@@ -90,12 +90,16 @@ class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
             $this->conn->connectToPersistentSubscription(
                 $this->streamName,
                 $this->groupName,
-                new class($this->eventsReceived) implements EventAppearedOnPersistentSubscription {
-                    private $deferred;
+                new class($this->eventsReceived, $this->eventReceivedCount, self::EVENT_WRITE_COUNT) implements EventAppearedOnPersistentSubscription {
+                    private $eventsReceived;
+                    private $eventReceivedCount;
+                    private $eventWriteCount;
 
-                    public function __construct(Deferred $deferred)
+                    public function __construct(Deferred $eventsReceived, &$eventReceivedCount, $eventWriteCount)
                     {
-                        $this->deferred = $deferred;
+                        $this->eventsReceived = $eventsReceived;
+                        $this->eventReceivedCount = $eventReceivedCount;
+                        $this->eventWriteCount = $eventWriteCount;
                     }
 
                     public function __invoke(
@@ -103,7 +107,9 @@ class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
                         ResolvedEvent $resolvedEvent,
                         ?int $retryCount = null
                     ): Promise {
-                        $this->deferred->resolve(true);
+                        if (++$this->eventReceivedCount === $this->eventWriteCount) {
+                            $this->eventsReceived->resolve(true);
+                        }
 
                         return new Success();
                     }

@@ -18,17 +18,18 @@ use Amp\Success;
 use Amp\TimeoutException;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStoreClient\Common\SystemEventTypes;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\EventData;
+use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
-use function Amp\Promise\timeout;
 
-class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestCase
+class happy_case_catching_up_to_link_to_events_auto_ack extends TestCase
 {
     use SpecificationWithConnection;
 
@@ -40,10 +41,10 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
     private const BUFFER_COUNT = 10;
     private const EVENT_WRITE_COUNT = self::BUFFER_COUNT * 2;
 
-    /** @var int */
-    private $bufferCount = 10;
     /** @var Deferred */
     private $eventsReceived;
+    /** @var int */
+    private $eventReceivedCount;
 
     protected function setUp(): void
     {
@@ -64,7 +65,21 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
     public function do_test(): void
     {
         $this->executeCallback(function () {
-            $settings = PersistentSubscriptionSettings::default();
+            $settings = PersistentSubscriptionSettings::create()
+                ->startFromBeginning()
+                ->resolveLinkTos()
+                ->build();
+
+            for ($i = 0; $i < self::EVENT_WRITE_COUNT; $i++) {
+                $eventData = new EventData(EventId::generate(), 'SomeEvent', false, '', '');
+
+                yield $this->conn->appendToStreamAsync(
+                    $this->streamName . 'original',
+                    ExpectedVersion::ANY,
+                    [$eventData],
+                    DefaultData::adminCredentials()
+                );
+            }
 
             yield $this->conn->createPersistentSubscriptionAsync(
                 $this->streamName,
@@ -81,10 +96,10 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
                     private $eventReceivedCount;
                     private $eventWriteCount;
 
-                    public function __construct(Deferred $eventsReceived, &$eventReceivedCount, $eventWriteCount)
+                    public function __construct(Deferred $eventsReceived, &$eventReceivedCount, int $eventWriteCount)
                     {
                         $this->eventsReceived = $eventsReceived;
-                        $this->eventReceivedCount = $eventReceivedCount;
+                        $this->eventReceivedCount = &$eventReceivedCount;
                         $this->eventWriteCount = $eventWriteCount;
                     }
 
@@ -93,17 +108,28 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
                         ResolvedEvent $resolvedEvent,
                         ?int $retryCount = null
                     ): Promise {
+                        $this->eventReceivedCount++;
+
                         if (++$this->eventReceivedCount === $this->eventWriteCount) {
                             $this->eventsReceived->resolve(true);
                         }
 
                         return new Success();
                     }
-                }
+                },
+                null,
+                10,
+                true,
+                DefaultData::adminCredentials()
             );
 
             for ($i = 0; $i < self::EVENT_WRITE_COUNT; $i++) {
-                $eventData = new EventData(null, 'SomeEvent', false);
+                $eventData = new EventData(
+                    null,
+                    SystemEventTypes::LINK_TO,
+                    false,
+                    $i . '@' . $this->streamName . 'original'
+                );
 
                 yield $this->conn->appendToStreamAsync(
                     $this->streamName,
@@ -114,11 +140,12 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
             }
 
             try {
-                $result = yield timeout($this->eventsReceived->promise(), 10000);
-                $this->assertTrue($result);
+                $result = yield Promise\timeout($this->eventsReceived->promise(), 5000);
             } catch (TimeoutException $e) {
                 $this->fail('Timed out waiting for events');
             }
+
+            $this->assertTrue($result);
         });
     }
 }

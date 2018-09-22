@@ -28,7 +28,7 @@ use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
 use function Amp\Promise\timeout;
 
-class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestCase
+class happy_case_writing_and_subscribing_to_normal_events_manual_ack extends TestCase
 {
     use SpecificationWithConnection;
 
@@ -93,13 +93,17 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
                         ResolvedEvent $resolvedEvent,
                         ?int $retryCount = null
                     ): Promise {
+                        $subscription->acknowledge($resolvedEvent);
                         if (++$this->eventReceivedCount === $this->eventWriteCount) {
                             $this->eventsReceived->resolve(true);
                         }
 
                         return new Success();
                     }
-                }
+                },
+                null,
+                10,
+                false
             );
 
             for ($i = 0; $i < self::EVENT_WRITE_COUNT; $i++) {

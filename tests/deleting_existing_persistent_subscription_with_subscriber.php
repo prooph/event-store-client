@@ -56,8 +56,6 @@ class deleting_existing_persistent_subscription_with_subscriber extends TestCase
             DefaultData::adminCredentials()
         );
 
-        $called = &$this->called;
-
         $this->conn->connectToPersistentSubscription(
             $this->stream,
             'groupname123',
@@ -70,7 +68,7 @@ class deleting_existing_persistent_subscription_with_subscriber extends TestCase
                     return new Success();
                 }
             },
-            new class($called) implements PersistentSubscriptionDropped {
+            new class($this->called) implements PersistentSubscriptionDropped {
                 private $called;
 
                 public function __construct(&$called)
