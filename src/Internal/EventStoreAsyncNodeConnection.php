@@ -237,6 +237,10 @@ final class EventStoreAsyncNodeConnection implements
             throw new InvalidArgumentException('Stream cannot be empty');
         }
 
+        if ($start < 0) {
+            throw new InvalidArgumentException('Start must be positive');
+        }
+
         if ($count < 1) {
             throw new InvalidArgumentException('Count must be positive');
         }
