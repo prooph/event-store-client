@@ -17,20 +17,12 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Common\SystemEventTypes;
 use Prooph\EventStoreClient\Common\SystemRoles;
 use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\RecordedEvent;
-use Prooph\EventStoreClient\ResolvedEvent;
 use Prooph\EventStoreClient\SliceReadStatus;
 use Prooph\EventStoreClient\StreamEventsSlice;
 use Prooph\EventStoreClient\StreamMetadata;
-use Prooph\EventStoreClient\StreamPosition;
-use ProophTest\EventStoreClient\Helper\EventDataComparer;
-use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
-use function Amp\call;
-use function Amp\Promise\wait;
 
 class read_stream_events_with_unresolved_linkto extends TestCase
 {

@@ -445,15 +445,15 @@ final class EventStoreAsyncNodeConnection implements
                         $stream,
                         false,
                         $event ? $event->eventNumber() : -1,
-                        $event ? $event->data() : ''
+                        StreamMetadata::jsonUnserialize($event ? $event->data() : '')
                     ));
                     break;
                 case EventReadStatus::NOT_FOUND:
                 case EventReadStatus::NO_STREAM:
-                    $deferred->resolve(new StreamMetadataResult($stream, false, -1, ''));
+                    $deferred->resolve(new StreamMetadataResult($stream, false, -1, new StreamMetadata()));
                     break;
                 case EventReadStatus::STREAM_DELETED:
-                    $deferred->resolve(new StreamMetadataResult($stream, true, PHP_INT_MAX, ''));
+                    $deferred->resolve(new StreamMetadataResult($stream, true, PHP_INT_MAX, new StreamMetadata()));
                     break;
             }
         });

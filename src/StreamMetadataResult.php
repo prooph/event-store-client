@@ -20,12 +20,16 @@ class StreamMetadataResult
     private $isStreamDeleted;
     /** @var int */
     private $metastreamVersion;
-    /** @var string */
+    /** @var StreamMetadata */
     private $streamMetadata;
 
     /** @internal */
-    public function __construct(string $stream, bool $isStreamDeleted, int $metastreamVersion, string $streamMetadata)
-    {
+    public function __construct(
+        string $stream,
+        bool $isStreamDeleted,
+        int $metastreamVersion,
+        StreamMetadata $streamMetadata
+    ) {
         if (empty($stream)) {
             throw new \InvalidArgumentException('Stream cannot be empty');
         }
@@ -51,7 +55,7 @@ class StreamMetadataResult
         return $this->metastreamVersion;
     }
 
-    public function streamMetadata(): string
+    public function streamMetadata(): StreamMetadata
     {
         return $this->streamMetadata;
     }
