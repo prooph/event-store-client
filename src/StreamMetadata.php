@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient;
 
 use Prooph\EventStoreClient\Common\SystemMetadata;
+use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 
 class StreamMetadata
 {
@@ -77,12 +78,27 @@ class StreamMetadata
             throw new \InvalidArgumentException('cacheControl should be positive value');
         }
 
+        foreach ($customMetadata as $key => $value) {
+            if (! \is_string($key)) {
+                throw new InvalidArgumentException('CustomMetadata key must be a string');
+            }
+
+            if (! \is_scalar($value)) {
+                throw new InvalidArgumentException('CustomMetadata value must be a string');
+            }
+        }
+
         $this->maxCount = $maxCount;
         $this->maxAge = $maxAge;
         $this->truncateBefore = $truncateBefore;
         $this->cacheControl = $cacheControl;
         $this->acl = $acl;
         $this->customMetadata = $customMetadata;
+    }
+
+    public static function build(): StreamMetadataBuilder
+    {
+        return new StreamMetadataBuilder();
     }
 
     public function maxCount(): ?int
@@ -191,5 +207,16 @@ class StreamMetadata
             $params[SystemMetadata::ACL] ?? null,
             $params['customMetadata'] ?? []
         );
+    }
+
+    public static function fromJsonString(string $json): StreamMetadata
+    {
+        $data = \json_decode($json, true);
+
+        if (\JSON_ERROR_NONE !== \json_last_error()) {
+            throw new InvalidArgumentException('Could not json decode string');
+        }
+
+        return self::fromArray($data);
     }
 }
