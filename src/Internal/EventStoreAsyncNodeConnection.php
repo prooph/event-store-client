@@ -389,7 +389,7 @@ final class EventStoreAsyncNodeConnection implements
             null,
             SystemEventTypes::STREAM_METADATA,
             true,
-            $metadata ? \json_encode($metadata->toArray()) : null
+            $metadata ? $metadata->jsonSerialize() : null
         );
 
         $this->enqueueOperation(new AppendToStreamOperation(
@@ -462,7 +462,7 @@ final class EventStoreAsyncNodeConnection implements
         return $this->appendToStreamAsync(
             SystemStreams::SETTINGS_STREAM,
             ExpectedVersion::ANY,
-            [new EventData(null, SystemEventTypes::SETTINGS, true, \json_encode($settings->toArray()))],
+            [new EventData(null, SystemEventTypes::SETTINGS, true, $settings->jsonSerialize())],
             $userCredentials
         );
     }

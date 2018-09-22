@@ -12,10 +12,11 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
+use JsonSerializable;
 use Prooph\EventStoreClient\Common\SystemMetadata;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 
-class StreamMetadata
+class StreamMetadata implements JsonSerializable
 {
     /**
      * The maximum number of events allowed in the stream.
@@ -147,7 +148,7 @@ class StreamMetadata
         return $this->customMetadata[$key];
     }
 
-    public function toArray(): array
+    public function jsonSerialize(): string
     {
         $data = [];
 
@@ -175,11 +176,17 @@ class StreamMetadata
             $data[$key] = $value;
         }
 
-        return $data;
+        return \json_encode($data);
     }
 
-    public static function fromArray(array $data): StreamMetadata
+    public static function jsonUnserialize(string $json): StreamMetadata
     {
+        $data = \json_decode($json, true);
+
+        if (\JSON_ERROR_NONE !== \json_last_error()) {
+            throw new InvalidArgumentException('Could not json decode string');
+        }
+
         $internal = [
             SystemMetadata::MAX_COUNT,
             SystemMetadata::MAX_AGE,
@@ -207,16 +214,5 @@ class StreamMetadata
             $params[SystemMetadata::ACL] ?? null,
             $params['customMetadata'] ?? []
         );
-    }
-
-    public static function fromJsonString(string $json): StreamMetadata
-    {
-        $data = \json_decode($json, true);
-
-        if (\JSON_ERROR_NONE !== \json_last_error()) {
-            throw new InvalidArgumentException('Could not json decode string');
-        }
-
-        return self::fromArray($data);
     }
 }

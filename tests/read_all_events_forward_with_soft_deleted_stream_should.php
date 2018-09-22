@@ -103,7 +103,7 @@ class read_all_events_forward_with_soft_deleted_stream_should extends TestCase
             $lastEvent = $metadataEvents->events()[0]->event();
             $this->assertSame('$$' . $this->streamName, $lastEvent->eventStreamId());
             $this->assertSame(SystemEventTypes::STREAM_METADATA, $lastEvent->eventType());
-            $metadata = StreamMetadata::fromJsonString($lastEvent->data());
+            $metadata = StreamMetadata::jsonUnserialize($lastEvent->data());
             $this->assertSame(EventNumber::DELETED_STREAM, $metadata->truncateBefore());
         });
     }
