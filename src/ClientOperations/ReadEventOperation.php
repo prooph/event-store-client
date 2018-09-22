@@ -114,10 +114,8 @@ class ReadEventOperation extends AbstractOperation
     {
         /* @var ReadEventCompleted $response */
         $eventMessage = $response->getEvent();
-        $event = null;
-        $link = null;
 
-        if ($eventMessage->getEvent()) {
+        if ($event = $eventMessage->getEvent()) {
             $event = EventMessageConverter::convertEventRecordMessageToEventRecord($eventMessage->getEvent());
         }
 
@@ -125,7 +123,7 @@ class ReadEventOperation extends AbstractOperation
             $link = EventMessageConverter::convertEventRecordMessageToEventRecord($link);
         }
 
-        if ($event) {
+        if (EventReadStatus::SUCCESS === $response->getResult()) {
             $resolvedEvent = new ResolvedEvent($event, $link, null);
         } else {
             $resolvedEvent = null;
