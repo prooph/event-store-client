@@ -69,7 +69,7 @@ class connect_to_non_existing_persistent_subscription_with_permissions extends T
      */
     public function the_subscription_fails_to_connect_with_invalid_argument_exception(): void
     {
-        $this->executeCallback(function (): Generator {
+        $this->execute(function (): Generator {
             $this->assertNotNull($this->exception);
             $this->assertInstanceOf(InvalidArgumentException::class, $this->exception);
 

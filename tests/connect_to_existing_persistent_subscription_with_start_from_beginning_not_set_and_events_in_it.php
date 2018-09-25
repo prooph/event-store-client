@@ -119,7 +119,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
      */
     public function the_subscription_gets_no_events(): void
     {
-        $this->executeCallback(function (): Generator {
+        $this->execute(function (): Generator {
             $this->expectException(TimeoutException::class);
             yield Promise\timeout($this->resetEvent->promise(), 1000);
         });

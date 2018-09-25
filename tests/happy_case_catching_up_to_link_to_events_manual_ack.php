@@ -64,7 +64,7 @@ class happy_case_catching_up_to_link_to_events_manual_ack extends TestCase
      */
     public function test(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $settings = PersistentSubscriptionSettings::create()
                 ->startFromBeginning()
                 ->resolveLinkTos()

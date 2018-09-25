@@ -63,7 +63,7 @@ class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
      */
     public function test(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $settings = PersistentSubscriptionSettings::create()
                 ->startFromBeginning()
                 ->resolveLinkTos()

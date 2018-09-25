@@ -113,7 +113,7 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends Te
      */
     public function the_first_subscription_connects_successfully(): void
     {
-        $this->executeCallback(function (): Generator {
+        $this->execute(function (): Generator {
             $this->assertNotNull($this->firstSubscription);
 
             yield new Success();
@@ -126,7 +126,7 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends Te
      */
     public function the_second_subscription_throws_maximum_subscribers_reached_exception(): void
     {
-        $this->executeCallback(function (): Generator {
+        $this->execute(function (): Generator {
             $this->assertInstanceOf(MaximumSubscribersReachedException::class, $this->exception);
             yield new Success();
         });

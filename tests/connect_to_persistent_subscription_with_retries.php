@@ -120,7 +120,7 @@ class connect_to_persistent_subscription_with_retries extends TestCase
      */
     public function events_are_retried_until_success(): void
     {
-        $this->executeCallback(function (): Generator {
+        $this->execute(function (): Generator {
             $value = yield Promise\timeout($this->resetEvent->promise(), 10000);
             $this->assertTrue($value);
             $this->assertSame(5, $this->retryCount);

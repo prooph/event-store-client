@@ -131,7 +131,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
      */
     public function the_subscription_gets_the_written_event_as_its_first_event(): void
     {
-        $this->executeCallback(function (): Generator {
+        $this->execute(function (): Generator {
             $value = yield Promise\timeout($this->resetEvent->promise(), 10000);
             $this->assertTrue($value);
             $this->assertNotNull($this->firstEvent);

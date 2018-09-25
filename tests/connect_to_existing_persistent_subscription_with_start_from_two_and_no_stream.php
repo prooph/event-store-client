@@ -132,7 +132,7 @@ class connect_to_existing_persistent_subscription_with_start_from_two_and_no_str
      */
     public function the_subscription_gets_event_two_as_its_first_event(): void
     {
-        $this->executeCallback(function (): Generator {
+        $this->execute(function (): Generator {
             $value = yield Promise\timeout($this->resetEvent->promise(), 10000);
             $this->assertTrue($value);
             $this->assertSame(2, $this->firstEvent->originalEventNumber());

@@ -70,7 +70,7 @@ class read_stream_events_with_unresolved_linkto extends TestCase
         $this->stream = 'read_stream_events_with_unresolved_linkto_1';
         $this->links = 'read_stream_events_with_unresolved_linkto_links_1';
 
-        $this->executeCallback(function () {
+        $this->execute(function () {
             /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync(
                 $this->stream,
@@ -93,7 +93,7 @@ class read_stream_events_with_unresolved_linkto extends TestCase
         $this->stream = 'read_stream_events_with_unresolved_linkto_2';
         $this->links = 'read_stream_events_with_unresolved_linkto_links_2';
 
-        $this->executeCallback(function () {
+        $this->execute(function () {
             /** @var StreamEventsSlice $read */
             $read = yield $this->conn->readStreamEventsForwardAsync(
                 $this->links,

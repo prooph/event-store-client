@@ -40,7 +40,7 @@ class read_all_events_backward_with_linkto_deleted_event extends TestCase
      */
     public function one_event_is_read(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $this->assertCount(1, $this->read->events());
 
             yield new Success();
@@ -53,7 +53,7 @@ class read_all_events_backward_with_linkto_deleted_event extends TestCase
      */
     public function the_linked_event_is_not_resolved(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $this->assertNull($this->read->events()[0]->event());
 
             yield new Success();
@@ -66,7 +66,7 @@ class read_all_events_backward_with_linkto_deleted_event extends TestCase
      */
     public function the_link_event_is_included(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $this->assertNotNull($this->read->events()[0]->originalEvent());
 
             yield new Success();
@@ -79,7 +79,7 @@ class read_all_events_backward_with_linkto_deleted_event extends TestCase
      */
     public function the_event_is_not_resolved(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $this->assertFalse($this->read->events()[0]->isResolved());
 
             yield new Success();

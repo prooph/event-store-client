@@ -129,7 +129,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
      */
     public function the_subscription_gets_dropped(): void
     {
-        $this->executeCallback(function (): Generator {
+        $this->execute(function (): Generator {
             try {
                 $result = yield Promise\timeout($this->resetEvent->promise(), 5000);
             } catch (TimeoutException $e) {

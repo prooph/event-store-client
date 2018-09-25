@@ -33,7 +33,7 @@ trait SpecificationWithConnection
     abstract protected function when();
 
     /** @throws Throwable */
-    protected function executeCallback(callable $test): void
+    protected function execute(callable $test): void
     {
         wait(call(function () use ($test) {
             $this->conn = TestConnection::createAsync();

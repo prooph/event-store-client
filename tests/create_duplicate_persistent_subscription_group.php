@@ -53,7 +53,7 @@ class create_duplicate_persistent_subscription_group extends TestCase
      */
     public function the_completion_fails_with_invalid_operation_exception(): void
     {
-        $this->executeCallback(function (): Generator {
+        $this->execute(function (): Generator {
             $this->expectException(InvalidOperationException::class);
 
             yield $this->conn->createPersistentSubscriptionAsync(

@@ -74,7 +74,7 @@ class connect_to_existing_persistent_subscription_without_permissions extends Te
     {
         $this->expectException(AccessDeniedException::class);
 
-        $this->executeCallback(function (): Generator {
+        $this->execute(function (): Generator {
             yield new Success();
         });
     }

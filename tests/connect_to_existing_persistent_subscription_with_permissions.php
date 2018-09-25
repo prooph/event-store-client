@@ -73,7 +73,7 @@ class connect_to_existing_persistent_subscription_with_permissions extends TestC
      */
     public function the_subscription_suceeds(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $this->assertNotNull(yield $this->sub);
         });
     }

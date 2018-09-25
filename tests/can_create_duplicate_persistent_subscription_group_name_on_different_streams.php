@@ -53,7 +53,7 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
      */
     public function the_completion_succeeds(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             yield $this->conn->createPersistentSubscriptionAsync(
                 'someother' . $this->stream,
                 'group3211',
