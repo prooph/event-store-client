@@ -52,8 +52,7 @@ trait SpecificationWithConnection
 
     protected function end(): Generator
     {
-        // @todo is this a bug?
-        //$this->conn->close();
+        $this->conn->close();
 
         yield new Success();
     }
