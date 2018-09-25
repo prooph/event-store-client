@@ -45,7 +45,7 @@ class create_persistent_subscription_on_all_stream extends TestCase
      */
     public function the_completion_fails_with_invalid_stream(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             try {
                 yield $this->conn->createPersistentSubscriptionAsync(
                     '$all',

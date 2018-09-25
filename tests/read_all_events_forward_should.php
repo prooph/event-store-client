@@ -89,7 +89,7 @@ class read_all_events_forward_should extends TestCase
      */
     public function return_empty_slice_if_asked_to_read_from_end(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             /** @var AllEventsSlice $read */
             $read = yield $this->conn->readAllEventsForwardAsync(Position::end(), 1, false);
 
@@ -104,7 +104,7 @@ class read_all_events_forward_should extends TestCase
      */
     public function return_events_in_same_order_as_written(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             /** @var AllEventsSlice $read */
             $read = yield $this->conn->readAllEventsForwardAsync($this->from, \count($this->testEvents) + 10, false);
 
@@ -125,7 +125,7 @@ class read_all_events_forward_should extends TestCase
      */
     public function be_able_to_read_all_one_by_one_until_end_of_stream(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $all = [];
             $position = $this->from;
 
@@ -153,7 +153,7 @@ class read_all_events_forward_should extends TestCase
      */
     public function be_able_to_read_events_slice_at_time(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $all = [];
             $position = $this->from;
 
@@ -180,7 +180,7 @@ class read_all_events_forward_should extends TestCase
      */
     public function return_partial_slice_if_not_enough_events(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             /** @var AllEventsSlice $read */
             $read = yield $this->conn->readAllEventsForwardAsync($this->from, 30, false);
 
@@ -203,7 +203,7 @@ class read_all_events_forward_should extends TestCase
      */
     public function throw_when_got_int_max_value_as_maxcount(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $this->expectException(InvalidArgumentException::class);
 
             yield $this->conn->readAllEventsForwardAsync(Position::start(), \PHP_INT_MAX, false);

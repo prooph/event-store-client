@@ -54,7 +54,7 @@ class create_persistent_subscription_on_existing_stream extends TestCase
      */
     public function the_completion_succeeds(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             yield $this->conn->createPersistentSubscriptionAsync(
                 $this->stream,
                 'existing',

@@ -14,7 +14,6 @@ namespace Prooph\EventStoreClient;
 
 use Amp\Promise;
 use Prooph\EventStoreClient\Internal\EventStoreAllCatchUpSubscription;
-use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\EventStoreStreamCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\ListenerHandler;
 
@@ -196,16 +195,6 @@ interface EventStoreAsyncConnection
         ?CatchUpSubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): EventStoreAllCatchUpSubscription;
-
-    public function connectToPersistentSubscription(
-        string $stream,
-        string $groupName,
-        EventAppearedOnPersistentSubscription $eventAppeared,
-        ?PersistentSubscriptionDropped $subscriptionDropped = null,
-        int $bufferSize = 10,
-        bool $autoAck = true,
-        ?UserCredentials $userCredentials = null
-    ): EventStorePersistentSubscription;
 
     /**
      * @return Promise<AbstractEventStorePersistentSubscription>

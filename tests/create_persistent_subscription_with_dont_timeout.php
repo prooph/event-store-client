@@ -59,7 +59,7 @@ class create_persistent_subscription_with_dont_timeout extends TestCase
      */
     public function the_subscription_is_created_without_error(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             yield $this->conn->createPersistentSubscriptionAsync(
                 $this->stream,
                 'dont-timeout',

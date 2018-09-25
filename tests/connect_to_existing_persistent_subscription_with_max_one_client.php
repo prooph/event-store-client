@@ -12,15 +12,14 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
-use Error;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\Exception\MaximumSubscribersReachedException;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
+use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
@@ -34,8 +33,12 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends Te
     private $stream;
     /** @var PersistentSubscriptionSettings */
     private $settings;
+    /** @var Throwable */
+    private $exception;
     /** @var string */
     private $group = 'startinbeginning1';
+    /** @var EventStorePersistentSubscription|null */
+    private $firstSubscription;
 
     protected function setUp(): void
     {
@@ -56,7 +59,7 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends Te
             DefaultData::adminCredentials()
         );
 
-        $this->conn->connectToPersistentSubscription(
+        $this->firstSubscription = yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             new class() implements EventAppearedOnPersistentSubscription {
@@ -79,43 +82,53 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends Te
 
     protected function when(): Generator
     {
-        $this->conn->connectToPersistentSubscription(
-            $this->stream,
-            $this->group,
-            new class() implements EventAppearedOnPersistentSubscription {
-                public function __invoke(
-                    AbstractEventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent,
-                    ?int $retryCount = null
-                ): Promise {
-                    $subscription->acknowledge($resolvedEvent);
+        try {
+            yield $this->conn->connectToPersistentSubscriptionAsync(
+                $this->stream,
+                $this->group,
+                new class() implements EventAppearedOnPersistentSubscription {
+                    public function __invoke(
+                        AbstractEventStorePersistentSubscription $subscription,
+                        ResolvedEvent $resolvedEvent,
+                        ?int $retryCount = null
+                    ): Promise {
+                        $subscription->acknowledge($resolvedEvent);
 
-                    return new Success();
-                }
-            },
-            null,
-            10,
-            false,
-            DefaultData::adminCredentials()
-        );
-
-        yield new Delayed(50); // wait for it
+                        return new Success();
+                    }
+                },
+                null,
+                10,
+                false,
+                DefaultData::adminCredentials()
+            );
+        } catch (Throwable $e) {
+            $this->exception = $e;
+        }
     }
 
     /**
      * @test
      * @throws Throwable
      */
-    public function the_second_subscription_fails_to_connect(): void
+    public function the_first_subscription_connects_successfully(): void
     {
-        try {
-            $this->executeCallback(function (): Generator {
-                yield new Success();
-            });
+        $this->execute(function (): Generator {
+            $this->assertNotNull($this->firstSubscription);
 
-            $this->fail('Should have thrown');
-        } catch (Error $exception) {
-            $this->assertInstanceOf(MaximumSubscribersReachedException::class, $exception->getPrevious());
-        }
+            yield new Success();
+        });
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function the_second_subscription_throws_maximum_subscribers_reached_exception(): void
+    {
+        $this->execute(function (): Generator {
+            $this->assertInstanceOf(MaximumSubscribersReachedException::class, $this->exception);
+            yield new Success();
+        });
     }
 }

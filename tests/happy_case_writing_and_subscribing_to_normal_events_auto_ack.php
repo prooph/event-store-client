@@ -63,7 +63,7 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
      */
     public function test(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $settings = PersistentSubscriptionSettings::default();
 
             yield $this->conn->createPersistentSubscriptionAsync(
@@ -73,7 +73,7 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
                 DefaultData::adminCredentials()
             );
 
-            $this->conn->connectToPersistentSubscription(
+            yield $this->conn->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 new class($this->eventsReceived, $this->eventReceivedCount, self::EVENT_WRITE_COUNT) implements EventAppearedOnPersistentSubscription {

@@ -41,7 +41,7 @@ class read_event_of_linkto_to_deleted_event extends TestCase
      */
     public function the_linked_event_is_returned(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $this->assertNotNull($this->read->event()->link());
 
             yield new Success();
@@ -54,7 +54,7 @@ class read_event_of_linkto_to_deleted_event extends TestCase
      */
     public function the_deleted_event_is_not_resolved(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $this->assertNull($this->read->event()->event());
 
             yield new Success();
@@ -67,7 +67,7 @@ class read_event_of_linkto_to_deleted_event extends TestCase
      */
     public function the_status_is_success(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $this->assertTrue(EventReadStatus::success()->equals($this->read->status()));
 
             yield new Success();

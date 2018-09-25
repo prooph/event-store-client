@@ -66,7 +66,7 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_higher_t
             DefaultData::adminCredentials()
         );
 
-        $this->conn->connectToPersistentSubscription(
+        yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             new class($this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
@@ -131,7 +131,7 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_higher_t
      */
     public function the_subscription_gets_the_written_event_as_its_first_event(): void
     {
-        $this->executeCallback(function (): Generator {
+        $this->execute(function (): Generator {
             $value = yield Promise\timeout($this->resetEvent->promise(), 10000);
             $this->assertTrue($value);
             $this->assertNotNull($this->firstEvent);

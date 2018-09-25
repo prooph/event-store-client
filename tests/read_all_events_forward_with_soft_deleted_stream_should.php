@@ -75,7 +75,7 @@ class read_all_events_forward_with_soft_deleted_stream_should extends TestCase
      */
     public function ensure_deleted_stream(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync($this->streamName, 0, 100, false);
             $this->assertTrue($res->status()->equals(SliceReadStatus::streamNotFound()));
@@ -90,7 +90,7 @@ class read_all_events_forward_with_soft_deleted_stream_should extends TestCase
      */
     public function returns_all_events_including_tombstone(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             /** @var StreamEventsSlice $metadataEvents */
             $metadataEvents = yield $this->conn->readStreamEventsBackwardAsync(
                 '$$' . $this->streamName,

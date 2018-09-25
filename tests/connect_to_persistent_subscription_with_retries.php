@@ -64,7 +64,7 @@ class connect_to_persistent_subscription_with_retries extends TestCase
             DefaultData::adminCredentials()
         );
 
-        $this->conn->connectToPersistentSubscription(
+        yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             'agroupname55',
             new class($this->retryCount, $this->resetEvent) implements EventAppearedOnPersistentSubscription {
@@ -120,7 +120,7 @@ class connect_to_persistent_subscription_with_retries extends TestCase
      */
     public function events_are_retried_until_success(): void
     {
-        $this->executeCallback(function (): Generator {
+        $this->execute(function (): Generator {
             $value = yield Promise\timeout($this->resetEvent->promise(), 10000);
             $this->assertTrue($value);
             $this->assertSame(5, $this->retryCount);

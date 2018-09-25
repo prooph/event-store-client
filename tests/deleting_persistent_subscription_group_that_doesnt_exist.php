@@ -42,7 +42,7 @@ class deleting_persistent_subscription_group_that_doesnt_exist extends TestCase
      */
     public function the_delete_fails_with_argument_exception(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $this->expectException(InvalidOperationException::class);
 
             yield $this->conn->deletePersistentSubscriptionAsync(

@@ -53,7 +53,7 @@ class deleting_existing_persistent_subscription_group_with_permissions extends T
      */
     public function the_delete_of_group_succeeds(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             yield $this->conn->deletePersistentSubscriptionAsync(
                 $this->stream,
                 'groupname123',

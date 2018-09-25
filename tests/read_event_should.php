@@ -57,7 +57,7 @@ class read_event_should extends TestCase
      */
     public function throw_if_stream_id_is_empty(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $this->expectException(InvalidArgumentException::class);
             $this->conn->readEventAsync('', 0, false);
         });
@@ -69,7 +69,7 @@ class read_event_should extends TestCase
      */
     public function throw_if_event_number_is_less_than_minus_one(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $this->expectException(OutOfRangeException::class);
             $this->conn->readEventAsync('stream', -2, false);
         });
@@ -81,7 +81,7 @@ class read_event_should extends TestCase
      */
     public function notify_using_status_code_if_stream_not_found(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             /** @var EventReadResult $res */
             $res = yield $this->conn->readEventAsync('unexisting-stream', 5, false);
 
@@ -98,7 +98,7 @@ class read_event_should extends TestCase
      */
     public function return_no_stream_if_requested_last_event_in_empty_stream(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             /** @var EventReadResult $res */
             $res = yield $this->conn->readEventAsync('some-really-empty-stream', -1, false);
 
@@ -112,7 +112,7 @@ class read_event_should extends TestCase
      */
     public function notify_using_status_code_if_stream_was_deleted(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             /** @var EventReadResult $res */
             $res = yield $this->conn->readEventAsync($this->deletedStream, 5, false);
 
@@ -129,7 +129,7 @@ class read_event_should extends TestCase
      */
     public function notify_using_status_code_if_stream_does_not_have_event(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             /** @var EventReadResult $res */
             $res = yield $this->conn->readEventAsync($this->testStream, 5, false);
 
@@ -146,7 +146,7 @@ class read_event_should extends TestCase
      */
     public function return_existing_event(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             /** @var EventReadResult $res */
             $res = yield $this->conn->readEventAsync($this->testStream, 0, false);
 
@@ -164,7 +164,7 @@ class read_event_should extends TestCase
      */
     public function retrieve_the_is_json_flag_properly(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             /** @var EventReadResult $res */
             $res = yield $this->conn->readEventAsync($this->testStream, 1, false);
 
@@ -180,7 +180,7 @@ class read_event_should extends TestCase
      */
     public function return_last_event_in_stream_if_event_number_is_minus_one(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             /** @var EventReadResult $res */
             $res = yield $this->conn->readEventAsync($this->testStream, -1, false);
 

@@ -36,7 +36,7 @@ class read_all_events_forward_with_linkto_passed_max_count extends TestCase
      */
     public function one_event_is_read(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $this->assertCount(1, $this->read->events());
 
             yield new Success();

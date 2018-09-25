@@ -63,7 +63,7 @@ class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
      */
     public function test(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $settings = PersistentSubscriptionSettings::create()
                 ->startFromBeginning()
                 ->resolveLinkTos()
@@ -87,7 +87,7 @@ class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
                 DefaultData::adminCredentials()
             );
 
-            $this->conn->connectToPersistentSubscription(
+            yield $this->conn->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 new class($this->eventsReceived, $this->eventReceivedCount, self::EVENT_WRITE_COUNT) implements EventAppearedOnPersistentSubscription {

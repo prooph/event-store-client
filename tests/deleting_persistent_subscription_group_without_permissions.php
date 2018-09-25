@@ -42,7 +42,7 @@ class deleting_persistent_subscription_group_without_permissions extends TestCas
      */
     public function the_delete_fails_with_access_denied(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $this->expectException(AccessDeniedException::class);
 
             yield $this->conn->deletePersistentSubscriptionAsync(

@@ -68,7 +68,7 @@ class create_persistent_subscription_after_deleting_the_same extends TestCase
      */
     public function the_completion_succeeds(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             yield $this->conn->createPersistentSubscriptionAsync(
                 $this->stream,
                 'existing',

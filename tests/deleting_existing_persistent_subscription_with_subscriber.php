@@ -56,7 +56,7 @@ class deleting_existing_persistent_subscription_with_subscriber extends TestCase
             DefaultData::adminCredentials()
         );
 
-        $this->conn->connectToPersistentSubscription(
+        yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             'groupname123',
             new class() implements EventAppearedOnPersistentSubscription {
@@ -102,7 +102,7 @@ class deleting_existing_persistent_subscription_with_subscriber extends TestCase
      */
     public function the_subscription_is_dropped(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             $value = yield Promise\timeout($this->called->promise(), 5000);
             $this->assertTrue($value);
         });

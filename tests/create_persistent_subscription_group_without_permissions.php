@@ -49,7 +49,7 @@ class create_persistent_subscription_group_without_permissions extends TestCase
      */
     public function the_completion_succeeds(): void
     {
-        $this->executeCallback(function () {
+        $this->execute(function () {
             try {
                 yield $this->conn->createPersistentSubscriptionAsync(
                     $this->stream,
