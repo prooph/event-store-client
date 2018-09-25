@@ -616,7 +616,7 @@ final class EventStoreAsyncNodeConnection implements
             $settings
         );
 
-        Promise\rethrow($catchUpSubscription->startAsync());
+        $catchUpSubscription->startAsync();
 
         return $catchUpSubscription;
     }
@@ -671,45 +671,9 @@ final class EventStoreAsyncNodeConnection implements
             $settings
         );
 
-        Promise\rethrow($catchUpSubscription->startAsync());
+        $catchUpSubscription->startAsync();
 
         return $catchUpSubscription;
-    }
-
-    public function connectToPersistentSubscription(
-        string $stream,
-        string $groupName,
-        EventAppearedOnPersistentSubscription $eventAppeared,
-        ?PersistentSubscriptionDropped $subscriptionDropped = null,
-        int $bufferSize = 10,
-        bool $autoAck = true,
-        ?UserCredentials $userCredentials = null
-    ): EventStorePersistentSubscription {
-        if (empty($stream)) {
-            throw new InvalidArgumentException('Stream cannot be empty');
-        }
-
-        if (empty($groupName)) {
-            throw new InvalidArgumentException('Group cannot be empty');
-        }
-
-        $subscription = new EventStorePersistentSubscription(
-            $groupName,
-            $stream,
-            $eventAppeared,
-            $subscriptionDropped,
-            $userCredentials,
-            $this->settings->log(),
-            $this->settings->verboseLogging(),
-            $this->settings,
-            $this->handler,
-            $bufferSize,
-            $autoAck
-        );
-
-        Promise\rethrow($subscription->start());
-
-        return $subscription;
     }
 
     /** {@inheritdoc} */

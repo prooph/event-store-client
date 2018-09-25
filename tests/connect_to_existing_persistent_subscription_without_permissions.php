@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
@@ -51,36 +50,32 @@ class connect_to_existing_persistent_subscription_without_permissions extends Te
             $this->settings,
             DefaultData::adminCredentials()
         );
+
+        yield $this->conn->connectToPersistentSubscriptionAsync(
+            $this->stream,
+            'agroupname55',
+            new class() implements EventAppearedOnPersistentSubscription {
+                public function __invoke(
+                    AbstractEventStorePersistentSubscription $subscription,
+                    ResolvedEvent $resolvedEvent,
+                    ?int $retryCount = null
+                ): Promise {
+                    return new Success();
+                }
+            }
+        );
     }
 
     /**
      * @test
      * @throws Throwable
      */
-    public function the_subscription_fails_to_connect(): void
+    public function the_subscription_fails_to_connect_with_access_denied_exception(): void
     {
-        try {
-            $this->executeCallback(function (): Generator {
-                $this->conn->connectToPersistentSubscription(
-                    $this->stream,
-                    'agroupname55',
-                    new class() implements EventAppearedOnPersistentSubscription {
-                        public function __invoke(
-                            AbstractEventStorePersistentSubscription $subscription,
-                            ResolvedEvent $resolvedEvent,
-                            ?int $retryCount = null
-                        ): Promise {
-                            return new Success();
-                        }
-                    }
-                );
+        $this->expectException(AccessDeniedException::class);
 
-                yield new Delayed(50); // wait for it
-
-                $this->fail('Should have thrown');
-            });
-        } catch (Throwable $e) {
-            $this->assertInstanceOf(AccessDeniedException::class, $e->getPrevious());
-        }
+        $this->executeCallback(function (): Generator {
+            yield new Success();
+        });
     }
 }

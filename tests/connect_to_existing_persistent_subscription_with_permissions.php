@@ -52,7 +52,7 @@ class connect_to_existing_persistent_subscription_with_permissions extends TestC
             DefaultData::adminCredentials()
         );
 
-        $this->sub = $this->conn->connectToPersistentSubscription(
+        $this->sub = $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             'agroupname17',
             new class() implements EventAppearedOnPersistentSubscription {
@@ -74,9 +74,7 @@ class connect_to_existing_persistent_subscription_with_permissions extends TestC
     public function the_subscription_suceeds(): void
     {
         $this->executeCallback(function () {
-            $this->assertNotNull($this->sub);
-
-            yield new Success();
+            $this->assertNotNull(yield $this->sub);
         });
     }
 }

@@ -48,7 +48,6 @@ use Prooph\EventStoreClient\SystemData\TcpFlags;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
 use Throwable;
-use function Amp\Promise\rethrow;
 
 /** @internal */
 class EventStoreConnectionLogicHandler
@@ -250,8 +249,6 @@ class EventStoreConnectionLogicHandler
                 $deferred->resolve(null);
             }
         });
-
-        rethrow($promise);
     }
 
     /** @throws \Exception */
@@ -334,10 +331,7 @@ class EventStoreConnectionLogicHandler
         );
 
         Loop::defer(function (): Generator {
-            $promise = $this->connection->connectAsync();
-            rethrow($promise);
-
-            yield $promise;
+            yield $this->connection->connectAsync();
 
             if (! $this->connection->isClosed()) {
                 $this->connection->startReceiving();

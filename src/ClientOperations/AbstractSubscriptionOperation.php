@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
+use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
@@ -371,7 +372,9 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
             $this->dropSubscription(SubscriptionDropReason::userInitiated(), new \Exception('client buffer too big'));
         }
 
-        Promise\rethrow($this->executeActions());
+        Loop::defer(function (): Generator {
+            yield $this->executeActions();
+        });
     }
 
     /** @return Promise<void> */

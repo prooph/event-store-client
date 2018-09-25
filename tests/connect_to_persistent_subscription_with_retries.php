@@ -64,7 +64,7 @@ class connect_to_persistent_subscription_with_retries extends TestCase
             DefaultData::adminCredentials()
         );
 
-        $this->conn->connectToPersistentSubscription(
+        yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             'agroupname55',
             new class($this->retryCount, $this->resetEvent) implements EventAppearedOnPersistentSubscription {

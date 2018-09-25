@@ -20,7 +20,6 @@ use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
@@ -65,7 +64,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
 
         $deferred = $this->resetEvent;
 
-        $this->conn->connectToPersistentSubscription(
+        yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             new class($deferred) implements EventAppearedOnPersistentSubscription {
@@ -99,12 +98,10 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
     {
         return call(function (): Generator {
             for ($i = 0; $i < 10; $i++) {
-                $this->ids[$i] = EventId::generate();
-
                 yield $this->conn->appendToStreamAsync(
                     $this->stream,
                     ExpectedVersion::ANY,
-                    [new EventData($this->ids[$i], 'test', true, '{"foo":"bar"}')],
+                    [new EventData(null, 'test', true, '{"foo":"bar"}')],
                     DefaultData::adminCredentials()
                 );
             }

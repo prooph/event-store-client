@@ -87,7 +87,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
 
     protected function when(): Generator
     {
-        $this->conn->connectToPersistentSubscription(
+        yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             new class($this->set, $this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
@@ -121,8 +121,6 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
             true,
             DefaultData::adminCredentials()
         );
-
-        yield new Success();
     }
 
     /**

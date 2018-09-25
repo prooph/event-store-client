@@ -88,7 +88,7 @@ class happy_case_catching_up_to_link_to_events_manual_ack extends TestCase
                 DefaultData::adminCredentials()
             );
 
-            $this->conn->connectToPersistentSubscription(
+            yield $this->conn->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 new class($this->eventsReceived, $this->eventReceivedCount, self::EVENT_WRITE_COUNT) implements EventAppearedOnPersistentSubscription {

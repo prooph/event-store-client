@@ -56,7 +56,7 @@ class deleting_existing_persistent_subscription_with_subscriber extends TestCase
             DefaultData::adminCredentials()
         );
 
-        $this->conn->connectToPersistentSubscription(
+        yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             'groupname123',
             new class() implements EventAppearedOnPersistentSubscription {

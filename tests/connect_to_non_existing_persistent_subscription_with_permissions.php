@@ -12,10 +12,8 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
-use Error;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
@@ -30,6 +28,9 @@ class connect_to_non_existing_persistent_subscription_with_permissions extends T
 {
     use SpecificationWithConnection;
 
+    /** @var Throwable */
+    private $exception;
+
     protected function setUp(): void
     {
         $this->stream = '$' . UuidGenerator::generate();
@@ -41,37 +42,38 @@ class connect_to_non_existing_persistent_subscription_with_permissions extends T
 
     protected function when(): Generator
     {
-        $this->conn->connectToPersistentSubscription(
-            'nonexisting2',
-            'foo',
-            new class() implements EventAppearedOnPersistentSubscription {
-                public function __invoke(
-                    AbstractEventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent,
-                    ?int $retryCount = null
-                ): Promise {
-                    return new Success();
+        try {
+            yield $this->conn->connectToPersistentSubscriptionAsync(
+                'nonexisting2',
+                'foo',
+                new class() implements EventAppearedOnPersistentSubscription {
+                    public function __invoke(
+                        AbstractEventStorePersistentSubscription $subscription,
+                        ResolvedEvent $resolvedEvent,
+                        ?int $retryCount = null
+                    ): Promise {
+                        return new Success();
+                    }
                 }
-            }
-        );
+            );
 
-        yield new Delayed(50); // wait for it
-
-        $this->fail('should have thrown');
+            $this->fail('should have thrown');
+        } catch (Throwable $e) {
+            $this->exception = $e;
+        }
     }
 
     /**
      * @test
      * @throws Throwable
      */
-    public function the_completion_fails(): void
+    public function the_subscription_fails_to_connect_with_invalid_argument_exception(): void
     {
-        try {
-            $this->executeCallback(function (): Generator {
-                yield new Success();
-            });
-        } catch (Error $e) {
-            $this->assertInstanceOf(InvalidArgumentException::class, $e->getPrevious());
-        }
+        $this->executeCallback(function (): Generator {
+            $this->assertNotNull($this->exception);
+            $this->assertInstanceOf(InvalidArgumentException::class, $this->exception);
+
+            yield new Success();
+        });
     }
 }

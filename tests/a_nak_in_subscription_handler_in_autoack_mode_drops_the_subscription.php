@@ -77,7 +77,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
             $this->resetEvent->resolve(true);
         };
 
-        $this->conn->connectToPersistentSubscription(
+        yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             new class() implements EventAppearedOnPersistentSubscription {

@@ -349,11 +349,7 @@ abstract class AbstractEventStorePersistentSubscription
             $this->isProcessing = true;
 
             Loop::defer(function (): Generator {
-                $promise = $this->processQueue();
-
-                Promise\rethrow($promise);
-
-                yield $promise;
+                yield $this->processQueue();
             });
         }
     }

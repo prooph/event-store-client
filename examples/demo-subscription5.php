@@ -17,7 +17,6 @@ use Amp\Promise;
 use Amp\Success;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
-use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Messages\ClientMessages\CreatePersistentSubscription;
 use Throwable;
@@ -60,7 +59,7 @@ Loop::run(function () {
 
     \var_dump($result);
 
-    $subscription = $connection->connectToPersistentSubscription(
+    $connection->connectToPersistentSubscriptionAsync(
         'foo-bar',
         'test-persistent-subscription',
         new class() implements EventAppearedOnPersistentSubscription {
@@ -92,7 +91,4 @@ Loop::run(function () {
         true,
         new UserCredentials('admin', 'changeit')
     );
-
-    /** @var EventStorePersistentSubscription $subscription */
-    $subscription = yield $subscription->start();
 });

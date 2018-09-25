@@ -221,10 +221,7 @@ abstract class EventStoreCatchUpSubscription
         $this->connection->detach($this->connectListener);
 
         Loop::defer(function (): Generator {
-            $promise = $this->runSubscriptionAsync();
-            Promise\rethrow($promise);
-
-            yield $promise;
+            yield $this->runSubscriptionAsync();
         });
     }
 
@@ -462,10 +459,7 @@ abstract class EventStoreCatchUpSubscription
             $this->isProcessing = true;
 
             Loop::defer(function (): Generator {
-                $promise = $this->processLiveQueueAsync();
-                Promise\rethrow($promise);
-
-                yield $promise;
+                yield $this->processLiveQueueAsync();
             });
         }
     }
