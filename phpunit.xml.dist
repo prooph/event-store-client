@@ -21,8 +21,6 @@
         processIsolation="false"
         stopOnFailure="false"
         bootstrap="vendor/autoload.php"
-        timeoutForSmallTests="2"
-        enforceTimeLimit="true"
         failOnWarning="true"
         failOnRisky="true"
 >
