@@ -93,7 +93,7 @@ class EventStoreConnectionLogicHandler
     /** @var int */
     private $packageNumber = 0;
     /** @var int */
-    private $lastTimeoutsTimeStamp = 0;
+    private $lastTimeoutsTimeStamp;
 
     public function __construct(EventStoreAsyncConnection $connection, ConnectionSettings $settings)
     {
@@ -106,6 +106,8 @@ class EventStoreConnectionLogicHandler
         $this->subscriptions = new SubscriptionsManager($connection->connectionName(), $settings);
         $this->eventHandler = new EventHandler();
         $this->stopWatch = StopWatch::startNew();
+        // this allows first connection to connect quick
+        $this->lastTimeoutsTimeStamp = -$this->settings->operationTimeoutCheckPeriod();
 
         $this->handler->registerHandler(
             StartConnectionMessage::class,
@@ -482,12 +484,11 @@ class EventStoreConnectionLogicHandler
 
         $this->raiseConnectedEvent($this->connection->remoteEndPoint());
 
-        // @todo this leeds to a delay after first connection
-        //if ($this->stopWatch->elapsed() - $this->lastTimeoutsTimeStamp >= $this->settings->operationTimeoutCheckPeriod()) {
-        $this->operations->checkTimeoutsAndRetry($this->connection);
-        $this->subscriptions->checkTimeoutsAndRetry($this->connection);
-        $this->lastTimeoutsTimeStamp = $this->stopWatch->elapsed();
-        //}
+        if ($this->stopWatch->elapsed() - $this->lastTimeoutsTimeStamp >= $this->settings->operationTimeoutCheckPeriod()) {
+            $this->operations->checkTimeoutsAndRetry($this->connection);
+            $this->subscriptions->checkTimeoutsAndRetry($this->connection);
+            $this->lastTimeoutsTimeStamp = $this->stopWatch->elapsed();
+        }
     }
 
     private function timerTick(): void
