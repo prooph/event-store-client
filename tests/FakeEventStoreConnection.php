@@ -185,7 +185,21 @@ class FakeEventStoreConnection implements EventStoreAsyncConnection
         throw new \RuntimeException('Not implemented');
     }
 
+    public function setRawStreamMetadataAsync(
+        string $stream,
+        int $expectedMetaStreamVersion,
+        string $metadata = '',
+        ?UserCredentials $userCredentials = null
+    ): Promise {
+        throw new \RuntimeException('Not implemented');
+    }
+
     public function getStreamMetadataAsync(string $stream, ?UserCredentials $userCredentials = null): Promise
+    {
+        throw new \RuntimeException('Not implemented');
+    }
+
+    public function getRawStreamMetadataAsync(string $stream, ?UserCredentials $userCredentials = null): Promise
     {
         throw new \RuntimeException('Not implemented');
     }

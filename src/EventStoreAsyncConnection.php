@@ -116,8 +116,19 @@ interface EventStoreAsyncConnection
         ?UserCredentials $userCredentials = null
     ): Promise;
 
+    /** @return Promise<WriteResult> */
+    public function setRawStreamMetadataAsync(
+        string $stream,
+        int $expectedMetaStreamVersion,
+        string $metadata = '',
+        ?UserCredentials $userCredentials = null
+    ): Promise;
+
     /** @return Promise<StreamMetadataResult> */
     public function getStreamMetadataAsync(string $stream, ?UserCredentials $userCredentials = null): Promise;
+
+    /** @return Promise<RawStreamMetadataResult> */
+    public function getRawStreamMetadataAsync(string $stream, ?UserCredentials $userCredentials = null): Promise;
 
     /** @return Promise<WriteResult> */
     public function setSystemSettingsAsync(SystemSettings $settings, ?UserCredentials $userCredentials = null): Promise;

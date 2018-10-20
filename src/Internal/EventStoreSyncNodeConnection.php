@@ -28,6 +28,7 @@ use Prooph\EventStoreClient\EventStoreSyncTransaction;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Prooph\EventStoreClient\Position;
+use Prooph\EventStoreClient\RawStreamMetadataResult;
 use Prooph\EventStoreClient\StreamEventsSlice;
 use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\StreamMetadataResult;
@@ -227,9 +228,30 @@ final class EventStoreSyncNodeConnection implements
     }
 
     /** @throws Throwable */
+    public function setRawStreamMetadata(
+        string $stream,
+        int $expectedMetaStreamVersion,
+        string $metadata = '',
+        ?UserCredentials $userCredentials = null
+    ): WriteResult {
+        return Promise\wait($this->asyncConnection->setRawStreamMetadataAsync(
+            $stream,
+            $expectedMetaStreamVersion,
+            $metadata,
+            $userCredentials
+        ));
+    }
+
+    /** @throws Throwable */
     public function getStreamMetadata(string $stream, ?UserCredentials $userCredentials = null): StreamMetadataResult
     {
         return Promise\wait($this->asyncConnection->getStreamMetadataAsync($stream, $userCredentials));
+    }
+
+    /** @throws Throwable */
+    public function getRawStreamMetadataAsync(string $stream, ?UserCredentials $userCredentials = null): RawStreamMetadataResult
+    {
+        return Promise\wait($this->asyncConnection->getRawStreamMetadataAsync($stream, $userCredentials));
     }
 
     /** @throws Throwable */

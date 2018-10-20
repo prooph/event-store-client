@@ -20,6 +20,7 @@ use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\Exception\StreamDeletedException;
 use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
 use Prooph\EventStoreClient\ExpectedVersion;
+use Prooph\EventStoreClient\RawStreamMetadataResult;
 use Prooph\EventStoreClient\ResolvedEvent;
 use Prooph\EventStoreClient\SliceReadStatus;
 use Prooph\EventStoreClient\StreamEventsSlice;
@@ -690,17 +691,78 @@ class soft_delete extends TestCase
 
     /**
      * @test
+     * @throws Throwable
      */
     public function setting_nonjson_metadata_on_empty_soft_deleted_stream_recreates_stream_keeping_original_metadata(): void
     {
-        $this->markTestSkipped('GetStreamMetadataAsRawBytesAsync not implemented');
+        $this->execute(function () {
+            $stream = 'setting_nonjson_metadata_on_empty_soft_deleted_stream_recreates_stream_overriding_metadata';
+            $metadata = \random_bytes(256);
+
+            yield $this->conn->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, false);
+
+            /** @var WriteResult $result */
+            $result = yield $this->conn->setRawStreamMetadataAsync($stream, 0, $metadata);
+
+            $this->assertSame(1, $result->nextExpectedVersion());
+
+            /** @var StreamEventsSlice $result */
+            $result = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false);
+
+            $this->assertTrue(SliceReadStatus::streamNotFound()->equals($result->status()));
+            $this->assertSame(-1, $result->lastEventNumber());
+            $this->assertCount(0, $result->events());
+
+            /** @var RawStreamMetadataResult $meta */
+            $meta = yield $this->conn->getRawStreamMetadataAsync($stream);
+
+            $this->assertSame(1, $meta->metastreamVersion());
+            $this->assertSame($metadata, $meta->streamMetadata());
+        });
     }
 
     /**
      * @test
+     * @throws Throwable
      */
     public function setting_nonjson_metadata_on_nonempty_soft_deleted_stream_recreates_stream_keeping_original_metadata(): void
     {
-        $this->markTestSkipped('GetStreamMetadataAsRawBytesAsync not implemented');
+        $this->execute(function () {
+            $stream = 'setting_nonjson_metadata_on_nonempty_soft_deleted_stream_recreates_stream_overriding_metadata';
+            $metadata = \random_bytes(256);
+
+            /** @var WriteResult $result */
+            $result = yield $this->conn->appendToStreamAsync(
+                $stream,
+                ExpectedVersion::NO_STREAM,
+                TestEvent::newAmount(2)
+            );
+
+            $this->assertSame(1, $result->nextExpectedVersion());
+
+            yield $this->conn->deleteStreamAsync($stream, 1, false);
+
+            /** @var WriteResult $result */
+            $result = yield $this->conn->setRawStreamMetadataAsync(
+                $stream,
+                0,
+                $metadata
+            );
+
+            $this->assertSame(1, $result->nextExpectedVersion());
+
+            /** @var StreamEventsSlice $result */
+            $result = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false);
+
+            $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
+            $this->assertSame(1, $result->lastEventNumber());
+            $this->assertCount(2, $result->events());
+
+            /** @var RawStreamMetadataResult $meta */
+            $meta = yield $this->conn->getRawStreamMetadataAsync($stream);
+
+            $this->assertSame(1, $meta->metastreamVersion());
+            $this->assertSame($metadata, $meta->streamMetadata());
+        });
     }
 }

@@ -109,7 +109,16 @@ interface EventStoreSyncConnection
         ?UserCredentials $userCredentials = null
     ): WriteResult;
 
+    public function setRawStreamMetadata(
+        string $stream,
+        int $expectedMetaStreamVersion,
+        string $metadata = '',
+        ?UserCredentials $userCredentials = null
+    ): WriteResult;
+
     public function getStreamMetadata(string $stream, ?UserCredentials $userCredentials = null): StreamMetadataResult;
+
+    public function getRawStreamMetadata(string $stream, ?UserCredentials $userCredentials = null): RawStreamMetadataResult;
 
     public function setSystemSettings(SystemSettings $settings, ?UserCredentials $userCredentials = null): WriteResult;
 

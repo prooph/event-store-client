@@ -58,6 +58,7 @@ use Prooph\EventStoreClient\LiveProcessingStarted;
 use Prooph\EventStoreClient\PersistentSubscriptionDropped;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Prooph\EventStoreClient\Position;
+use Prooph\EventStoreClient\RawStreamMetadataResult;
 use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\StreamMetadataResult;
 use Prooph\EventStoreClient\SubscriptionDropped;
@@ -377,6 +378,20 @@ final class EventStoreAsyncNodeConnection implements
         ?StreamMetadata $metadata,
         ?UserCredentials $userCredentials = null
     ): Promise {
+        return $this->setRawStreamMetadataAsync(
+            $stream,
+            $expectedMetaStreamVersion,
+            $metadata ? $metadata->jsonSerialize() : '',
+            $userCredentials
+        );
+    }
+
+    public function setRawStreamMetadataAsync(
+        string $stream,
+        int $expectedMetaStreamVersion,
+        string $metadata = '',
+        ?UserCredentials $userCredentials = null
+    ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
         }
@@ -394,7 +409,7 @@ final class EventStoreAsyncNodeConnection implements
             null,
             SystemEventTypes::STREAM_METADATA,
             true,
-            $metadata ? $metadata->jsonSerialize() : null
+            $metadata
         );
 
         $this->enqueueOperation(new AppendToStreamOperation(
@@ -411,6 +426,50 @@ final class EventStoreAsyncNodeConnection implements
     }
 
     public function getStreamMetadataAsync(string $stream, ?UserCredentials $userCredentials = null): Promise
+    {
+        $deferred = new Deferred();
+
+        $promise = $this->getRawStreamMetadataAsync($stream, $userCredentials);
+        $promise->onResolve(function (?Throwable $e, ?RawStreamMetadataResult $result) use ($deferred) {
+            if (null !== $e) {
+                $deferred->fail($e);
+
+                return;
+            }
+
+            if (null === $result) {
+                $deferred->fail(new UnexpectedValueException(
+                    'Expected RawStreamMetadataResult but received null'
+                ));
+
+                return;
+            }
+
+            if ($result->streamMetadata() === null || \strlen($result->streamMetadata()) === 0) {
+                $deferred->resolve(new StreamMetadataResult(
+                    $result->stream(),
+                    $result->isStreamDeleted(),
+                    $result->metastreamVersion(),
+                    new StreamMetadata()
+                ));
+
+                return;
+            }
+
+            $metadata = StreamMetadata::jsonUnserialize($result->streamMetadata());
+
+            $deferred->resolve(new StreamMetadataResult(
+                $result->streamMetadata(),
+                $result->isStreamDeleted(),
+                $result->metastreamVersion(),
+                $metadata
+            ));
+        });
+
+        return $deferred->promise();
+    }
+
+    public function getRawStreamMetadataAsync(string $stream, ?UserCredentials $userCredentials = null): Promise
     {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
@@ -442,20 +501,36 @@ final class EventStoreAsyncNodeConnection implements
 
                     $event = $event->originalEvent();
 
-                    $deferred->resolve(new StreamMetadataResult(
+                    if (null === $event) {
+                        $deferred->resolve(new RawStreamMetadataResult(
+                            $stream,
+                            false,
+                            -1,
+                            ''
+                        ));
+
+                        break;
+                    }
+
+                    $deferred->resolve(new RawStreamMetadataResult(
                         $stream,
                         false,
-                        $event ? $event->eventNumber() : -1,
-                        StreamMetadata::jsonUnserialize($event ? $event->data() : '')
+                        $event->eventNumber(),
+                        $event->data()
                     ));
                     break;
                 case EventReadStatus::NOT_FOUND:
                 case EventReadStatus::NO_STREAM:
-                    $deferred->resolve(new StreamMetadataResult($stream, false, -1, new StreamMetadata()));
+                    $deferred->resolve(new RawStreamMetadataResult($stream, false, -1, ''));
                     break;
                 case EventReadStatus::STREAM_DELETED:
-                    $deferred->resolve(new StreamMetadataResult($stream, true, PHP_INT_MAX, new StreamMetadata()));
+                    $deferred->resolve(new RawStreamMetadataResult($stream, true, \PHP_INT_MAX, ''));
                     break;
+                default:
+                    throw new OutOfRangeException(\sprintf(
+                        'Unexpected ReadEventResult: %s',
+                        $eventReadResult->status()->name()
+                    ));
             }
         });
 

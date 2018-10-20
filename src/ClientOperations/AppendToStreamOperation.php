@@ -32,6 +32,7 @@ use Prooph\EventStoreClient\UserCredentials;
 use Prooph\EventStoreClient\WriteResult;
 use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
+use TypeError;
 
 /** @internal */
 class AppendToStreamOperation extends AbstractOperation
@@ -76,8 +77,13 @@ class AppendToStreamOperation extends AbstractOperation
         $message->setExpectedVersion($this->expectedVersion);
         $message->setRequireMaster($this->requireMaster);
 
-        foreach ($this->events as $event) {
-            $message->appendEvents(NewEventConverter::convert($event));
+        try {
+            foreach ($this->events as $event) {
+                $message->appendEvents(NewEventConverter::convert($event));
+            }
+        } catch (TypeError $e) {
+            // we need generics
+            $this->deferred->fail($e);
         }
 
         return $message;

@@ -38,7 +38,7 @@ abstract class AbstractOperation implements ClientOperation
     /** @var Logger */
     private $log;
     /** @var Deferred */
-    private $deferred;
+    protected $deferred;
     /** @var UserCredentials|null */
     protected $credentials;
     /** @var TcpCommand */
@@ -52,7 +52,7 @@ abstract class AbstractOperation implements ClientOperation
         Logger $logger,
         Deferred $deferred,
         ?UserCredentials $credentials,
-        TcpCommand $requestCommand,
+        TcpCommand $requestCommand,// we need generics
         TcpCommand $responseCommand,
         string $responseClassName
     ) {
@@ -68,6 +68,7 @@ abstract class AbstractOperation implements ClientOperation
 
     abstract protected function inspectResponse(ProtobufMessage $response): InspectionResult;
 
+    // we need generics
     abstract protected function transformResponse(ProtobufMessage $response);
 
     public function promise(): Promise
