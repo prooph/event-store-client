@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\Delayed;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventData;
@@ -123,6 +124,8 @@ class soft_delete extends TestCase
 
             $this->assertSame(4, $result->nextExpectedVersion());
 
+            yield new Delayed(100); // wait for server to update stream
+
             /** @var StreamEventsSlice $result */
             $result = yield $this->conn->readStreamEventsForwardAsync(
                 $stream,
@@ -196,6 +199,8 @@ class soft_delete extends TestCase
 
             $this->assertSame(4, $result->nextExpectedVersion());
 
+            yield new Delayed(100); // wait for server to update stream
+
             /** @var StreamEventsSlice $result */
             $result = yield $this->conn->readStreamEventsForwardAsync(
                 $stream,
@@ -268,6 +273,8 @@ class soft_delete extends TestCase
             );
 
             $this->assertSame(4, $result->nextExpectedVersion());
+
+            yield new Delayed(100); // wait for server to update stream
 
             /** @var StreamEventsSlice $result */
             $result = yield $this->conn->readStreamEventsForwardAsync(
@@ -358,6 +365,8 @@ class soft_delete extends TestCase
             );
 
             $this->assertSame(4, $result->nextExpectedVersion());
+
+            yield new Delayed(100); // wait for server to update stream
 
             /** @var StreamEventsSlice $result */
             $result = yield $this->conn->readStreamEventsForwardAsync(
@@ -603,6 +612,8 @@ class soft_delete extends TestCase
 
             $this->assertSame(1, $result->nextExpectedVersion());
 
+            yield new Delayed(100); // wait for server to update stream
+
             /** @var StreamEventsSlice $result */
             $result = yield $this->conn->readStreamEventsForwardAsync(
                 $stream,
@@ -664,6 +675,8 @@ class soft_delete extends TestCase
 
             $this->assertSame(1, $result->nextExpectedVersion());
 
+            yield new Delayed(100); // wait for server to update stream
+
             /** @var StreamEventsSlice $result */
             $result = yield $this->conn->readStreamEventsForwardAsync(
                 $stream,
@@ -705,6 +718,8 @@ class soft_delete extends TestCase
             $result = yield $this->conn->setRawStreamMetadataAsync($stream, 0, $metadata);
 
             $this->assertSame(1, $result->nextExpectedVersion());
+
+            yield new Delayed(100); // wait for server to update stream
 
             /** @var StreamEventsSlice $result */
             $result = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false);
@@ -750,6 +765,8 @@ class soft_delete extends TestCase
             );
 
             $this->assertSame(1, $result->nextExpectedVersion());
+
+            yield new Delayed(100); // wait for server to update stream
 
             /** @var StreamEventsSlice $result */
             $result = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false);
