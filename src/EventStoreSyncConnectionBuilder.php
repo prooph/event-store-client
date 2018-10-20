@@ -65,6 +65,8 @@ class EventStoreSyncConnectionBuilder
             $credentials = $user ? new UserCredentials($user, $pass) : null;
             if (null !== $credentials) {
                 $settings = new ConnectionSettings(
+                    $settings->log(),
+                    $settings->verboseLogging(),
                     $settings->maxQueueSize(),
                     $settings->maxConcurrentItems(),
                     $settings->maxRetries(),
@@ -80,13 +82,13 @@ class EventStoreSyncConnectionBuilder
                     $settings->failOnNoServerResponse(),
                     $settings->heartbeatInterval(),
                     $settings->heartbeatTimeout(),
-                    $settings->clientConnectionTimeout(),
                     $settings->clusterDns(),
-                    $settings->gossipSeeds(),
                     $settings->maxDiscoverAttempts(),
                     $settings->externalGossipPort(),
+                    $settings->gossipSeeds(),
                     $settings->gossipTimeout(),
-                    $settings->preferRandomNode()
+                    $settings->preferRandomNode(),
+                    $settings->clientConnectionTimeout()
                 );
             }
 

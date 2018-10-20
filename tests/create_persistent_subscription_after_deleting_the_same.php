@@ -19,6 +19,7 @@ use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
+use Throwable;
 
 class create_persistent_subscription_after_deleting_the_same extends TestCase
 {

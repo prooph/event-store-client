@@ -351,8 +351,7 @@ class ProjectionsClient
                 $endPoint,
                 $httpSchema,
                 '/projection/%s/state',
-                $name,
-                $partition
+                $name
             ),
             $userCredentials,
             HttpStatusCode::OK
