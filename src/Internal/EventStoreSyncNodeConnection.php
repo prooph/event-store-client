@@ -249,7 +249,7 @@ final class EventStoreSyncNodeConnection implements
     }
 
     /** @throws Throwable */
-    public function getRawStreamMetadataAsync(string $stream, ?UserCredentials $userCredentials = null): RawStreamMetadataResult
+    public function getRawStreamMetadata(string $stream, ?UserCredentials $userCredentials = null): RawStreamMetadataResult
     {
         return Promise\wait($this->asyncConnection->getRawStreamMetadataAsync($stream, $userCredentials));
     }
