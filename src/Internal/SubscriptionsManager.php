@@ -111,7 +111,7 @@ class SubscriptionsManager
             if ($subscription->connectionId() !== $connection->connectionId()) {
                 $this->retryPendingSubscriptions[] = $subscription;
             } elseif ($subscription->timeout() > 0
-                && DateTimeUtil::utcNow()->format('U.u') - $subscription->lastUpdated()->format('U.u') > $this->settings->operationTimeout()
+                && (float) DateTimeUtil::utcNow()->format('U.u') - (float) $subscription->lastUpdated()->format('U.u') > $this->settings->operationTimeout()
             ) {
                 $err = \sprintf(
                     'EventStoreNodeConnection \'%s\': subscription never got confirmation from server',

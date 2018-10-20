@@ -108,7 +108,7 @@ class OperationsManager
             if ($operation->connectionId() !== $connection->connectionId()) {
                 $retryOperations[] = $operation;
             } elseif ($operation->timeout() > 0
-                && DateTimeUtil::utcNow()->format('U.u') - $operation->lastUpdated()->format('U.u') > $this->settings->operationTimeout()
+                && (float) DateTimeUtil::utcNow()->format('U.u') - (float) $operation->lastUpdated()->format('U.u') > $this->settings->operationTimeout()
             ) {
                 $err = \sprintf(
                     'EventStoreNodeConnection \'%s\': subscription never got confirmation from server',

@@ -133,14 +133,14 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
         $this->execute(function (): Generator {
             try {
                 $result = yield Promise\timeout($this->resetEvent->promise(), 5000);
+
+                $this->assertTrue($result);
+                $this->assertTrue($this->reason->equals(SubscriptionDropReason::eventHandlerException()));
+                $this->assertInstanceOf(Exception::class, $this->exception);
+                $this->assertSame('test', $this->exception->getMessage());
             } catch (TimeoutException $e) {
                 $this->fail('Timed out');
             }
-
-            $this->assertTrue($result);
-            $this->assertTrue($this->reason->equals(SubscriptionDropReason::eventHandlerException()));
-            $this->assertInstanceOf(Exception::class, $this->exception);
-            $this->assertSame('test', $this->exception->getMessage());
         });
     }
 }

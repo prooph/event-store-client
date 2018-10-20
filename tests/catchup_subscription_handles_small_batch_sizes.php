@@ -101,11 +101,11 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
             try {
                 // we wait maximum 5 minutes
                 $result = yield timeout($deferred->promise(), 5 * 60 * 1000);
+
+                $this->assertTrue($result);
             } catch (TimeoutException $e) {
                 $this->fail('Timed out waiting for test to complete');
             }
-
-            $this->assertTrue($result);
 
             $this->tearDownTestCase();
         }));
@@ -135,11 +135,11 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
             try {
                 // we wait maximum 5 minutes
                 $result = yield timeout($deferred->promise(), 5 * 60 * 1000);
+
+                $this->assertTrue($result);
             } catch (TimeoutException $e) {
                 $this->fail('Timed out waiting for test to complete');
             }
-
-            $this->assertTrue($result);
 
             $this->tearDownTestCase();
         }));

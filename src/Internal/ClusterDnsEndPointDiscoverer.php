@@ -73,7 +73,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         int $gossipTimeout,
         bool $preferRandomNode
     ) {
-        $this->logger = $logger;
+        $this->log = $logger;
         $this->clusterDns = $clusterDns;
         $this->maxDiscoverAttempts = $maxDiscoverAttempts;
         $this->managerExternalHttpPort = $managerExternalHttpPort;

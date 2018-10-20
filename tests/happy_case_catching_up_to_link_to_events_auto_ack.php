@@ -142,11 +142,11 @@ class happy_case_catching_up_to_link_to_events_auto_ack extends TestCase
 
             try {
                 $result = yield Promise\timeout($this->eventsReceived->promise(), 5000);
+
+                $this->assertTrue($result);
             } catch (TimeoutException $e) {
                 $this->fail('Timed out waiting for events');
             }
-
-            $this->assertTrue($result);
         });
     }
 }

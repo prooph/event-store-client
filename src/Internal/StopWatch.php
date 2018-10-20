@@ -27,7 +27,7 @@ class StopWatch
     public static function startNew(): self
     {
         $now = DateTimeUtil::utcNow();
-        $started = (int) \floor($now->format('U.u') * 1000);
+        $started = (int) \floor((float) $now->format('U.u') * 1000);
 
         return new self($started);
     }
@@ -35,7 +35,7 @@ class StopWatch
     public function elapsed(): int
     {
         $now = DateTimeUtil::utcNow();
-        $timestamp = (int) \floor($now->format('U.u') * 1000);
+        $timestamp = (int) \floor((float) $now->format('U.u') * 1000);
 
         return $timestamp - $this->started;
     }

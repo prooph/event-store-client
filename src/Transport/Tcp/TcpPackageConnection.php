@@ -176,11 +176,8 @@ class TcpPackageConnection
 
     private function incomingMessageArrived(string $data): void
     {
-        $valid = false;
-
         try {
             $package = TcpPackage::fromRawData($data);
-            $valid = true;
             ($this->handlePackage)($this, $package);
         } catch (Throwable $e) {
             $this->connection->close();
@@ -188,7 +185,7 @@ class TcpPackageConnection
                 'TcpPackageConnection: [%s, %s]: Error when processing TcpPackage %s: %s. Connection will be closed',
                 $this->remoteEndPoint,
                 $this->connectionId,
-                $valid ? $package->command()->name() : '<invalid package>',
+                isset($package) ? $package->command()->name() : '<invalid package>',
                 $e->getMessage()
             );
 
