@@ -73,6 +73,7 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
             new class($this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
                 private $deferred;
                 private $firstEvent;
+                private $set = false;
 
                 public function __construct($deferred, &$firstEvent)
                 {
@@ -85,8 +86,11 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {
-                    $this->firstEvent = $resolvedEvent;
-                    $this->deferred->resolve(true);
+                    if (! $this->set) {
+                        $this->set = true;
+                        $this->firstEvent = $resolvedEvent;
+                        $this->deferred->resolve(true);
+                    }
 
                     return new Success();
                 }
