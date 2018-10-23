@@ -177,8 +177,6 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
                     yield ($this->eventAppeared)($this, $e);
                 } catch (Throwable $ex) {
                     $this->dropSubscription(SubscriptionDropReason::eventHandlerException(), $ex);
-
-                    throw $ex;
                 }
 
                 $this->lastProcessedEventNumber = $e->originalEventNumber();

@@ -394,20 +394,13 @@ class catch_up_subscription_handles_errors extends TestCase
 
             $finalEvent->resolve(true);
 
-            $promise = Promise\timeout($promise, self::$timeoutMs);
-
-            $promise->onResolve(function ($ex, $result): void {
-                $this->assertTrue($result);
-            });
-
-            yield new Success();
+            $this->assertNotNull(yield Promise\timeout($promise, self::$timeoutMs));
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @group by
      */
     public function when_live_processing_and_disconnected_reconnect_keeps_events_ordered(): void
     {
@@ -444,10 +437,7 @@ class catch_up_subscription_handles_errors extends TestCase
                 }
             );
 
-            $result = yield Promise\timeout($this->subscription->startAsync(), self::$timeoutMs);
-
-            $this->assertTrue($result);
-
+            $this->assertNotNull(yield Promise\timeout($this->subscription->startAsync(), self::$timeoutMs));
             $this->assertCount(0, $this->raisedEvents);
             $this->assertNotNull($innerSubscriptionDrop);
 

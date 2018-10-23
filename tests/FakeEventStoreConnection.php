@@ -30,9 +30,7 @@ use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\EventStoreAsyncTransaction;
 use Prooph\EventStoreClient\Internal\EventHandler;
-use Prooph\EventStoreClient\Internal\EventStoreAllCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
-use Prooph\EventStoreClient\Internal\EventStoreStreamCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\ListenerHandler;
 use Prooph\EventStoreClient\LiveProcessingStarted;
 use Prooph\EventStoreClient\PersistentSubscriptionDropped;
@@ -265,7 +263,7 @@ class FakeEventStoreConnection implements EventStoreAsyncConnection
         );
     }
 
-    public function subscribeToStreamFrom(
+    public function subscribeToStreamFromAsync(
         string $stream,
         ?int $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
@@ -273,7 +271,7 @@ class FakeEventStoreConnection implements EventStoreAsyncConnection
         ?LiveProcessingStarted $liveProcessingStarted = null,
         ?CatchUpSubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
-    ): EventStoreStreamCatchUpSubscription {
+    ): Promise {
         throw new \RuntimeException('Not implemented');
     }
 
@@ -291,14 +289,14 @@ class FakeEventStoreConnection implements EventStoreAsyncConnection
         );
     }
 
-    public function subscribeToAllFrom(
+    public function subscribeToAllFromAsync(
         ?Position $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
         EventAppearedOnCatchupSubscription $eventAppeared,
         ?LiveProcessingStarted $liveProcessingStarted = null,
         ?CatchUpSubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
-    ): EventStoreAllCatchUpSubscription {
+    ): Promise {
         throw new \RuntimeException('Not implemented');
     }
 

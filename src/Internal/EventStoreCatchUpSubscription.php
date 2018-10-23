@@ -41,7 +41,7 @@ use function Amp\call;
 abstract class EventStoreCatchUpSubscription
 {
     /** @var ResolvedEvent */
-    private static $dropSubscriptionEvent;
+    private static $dropSubscriptionEvent; // @todo: this is stateful - here must be a bug !!
 
     /** @var bool */
     private $isSubscribedToAll;
@@ -265,7 +265,7 @@ abstract class EventStoreCatchUpSubscription
                 $this->dropSubscription(SubscriptionDropReason::userInitiated(), null);
             }
 
-            return new Success(true);
+            return new Success($this);
         });
     }
 

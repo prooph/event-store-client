@@ -37,7 +37,7 @@ Loop::run(function () {
 
     yield $connection->connectAsync();
 
-    $connection->subscribeToAllFrom(
+    yield $connection->subscribeToAllFromAsync(
         null,
         CatchUpSubscriptionSettings::default(),
         new class() implements EventAppearedOnCatchupSubscription {
