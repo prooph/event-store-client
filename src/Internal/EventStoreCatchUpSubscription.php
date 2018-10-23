@@ -41,7 +41,7 @@ use function Amp\call;
 abstract class EventStoreCatchUpSubscription
 {
     /** @var ResolvedEvent */
-    private static $dropSubscriptionEvent; // @todo: this is stateful - here must be a bug !!
+    private static $dropSubscriptionEvent;
 
     /** @var bool */
     private $isSubscribedToAll;
