@@ -259,6 +259,7 @@ abstract class EventStoreCatchUpSubscription
                     yield $this->subscribeToStreamAsync();
                 } catch (Throwable $ex) {
                     $this->dropSubscription(SubscriptionDropReason::catchUpError(), $ex);
+
                     throw $ex;
                 }
             } else {
@@ -468,7 +469,6 @@ abstract class EventStoreCatchUpSubscription
     private function processLiveQueueAsync(): Promise
     {
         return call(function (): Generator {
-            $this->isProcessing = true;
             do {
                 /** @var ResolvedEvent $e */
                 while (! $this->liveQueue->isEmpty()) {
@@ -478,9 +478,7 @@ abstract class EventStoreCatchUpSubscription
                         $this->dropData = $this->dropData ?? new DropData(SubscriptionDropReason::unknown(), new \Exception('Drop reason not specified'));
                         $this->dropSubscription($this->dropData->reason(), $this->dropData->error());
 
-                        if ($this->isProcessing) {
-                            $this->isProcessing = false;
-                        }
+                        $this->isProcessing = false;
 
                         return null;
                     }
@@ -500,13 +498,9 @@ abstract class EventStoreCatchUpSubscription
                         return null;
                     }
                 }
+            } while ($this->liveQueue->count() > 0);
 
-                if ($this->isProcessing) {
-                    $this->isProcessing = false;
-                }
-            } while ($this->liveQueue->count() > 0 && ! $this->isProcessing);
-
-            $this->isProcessing = true;
+            $this->isProcessing = false;
         });
     }
 

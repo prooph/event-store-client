@@ -21,18 +21,21 @@ use Amp\TimeoutException;
 use Exception;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStoreClient\AllEventsSlice;
 use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
 use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\Common\SystemRoles;
 use Prooph\EventStoreClient\Common\SystemStreams;
 use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
 use Prooph\EventStoreClient\EventAppearedOnSubscription;
+use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\EventStoreAllCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
+use Prooph\EventStoreClient\Position;
 use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\UserCredentials;
@@ -288,5 +291,130 @@ class subscribe_to_all_catching_up_should extends TestCase
         });
     }
 
-    // @todo: 3 tests missing
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function read_all_existing_events_and_keep_listening_to_new_ones(): void
+    {
+        $this->execute(function () {
+            $store = TestConnection::createAsync();
+
+            yield $store->connectAsync();
+
+            /** @var AllEventsSlice $result */
+            $result = yield $this->conn->readAllEventsBackwardAsync(Position::end(), 1, false);
+            $position = $result->nextPosition();
+
+            $events = [];
+            $appearedCounter = 0;
+            $maxAppeared = 20;
+            $lastAppeared = new Deferred();
+            $dropped = new Deferred();
+
+            for ($i = 0; $i < 10; $i++) {
+                yield $store->appendToStreamAsync(
+                    'all_read_all_existing_events_and_keep_listening_to_new_ones-' . $i,
+                    -1,
+                    [new EventData(null, 'et-' . $i, false)]
+                );
+            }
+
+            /** @var EventStoreAllCatchUpSubscription $subscription */
+            $subscription = yield $store->subscribeToAllFromAsync(
+                $position,
+                CatchUpSubscriptionSettings::default(),
+                new class($events, $appearedCounter, $maxAppeared, $lastAppeared) implements EventAppearedOnCatchupSubscription {
+                    /** @var array */
+                    private $events;
+                    /** @var int */
+                    private $appearedCounter;
+                    /** @var Deferred */
+                    private $maxAppeared;
+                    /** @var Deferred */
+                    private $lastAppeared;
+
+                    public function __construct(array &$events, int &$appearedCounter, int $maxAppeared, Deferred $lastAppeared)
+                    {
+                        $this->events = &$events;
+                        $this->appearedCounter = &$appearedCounter;
+                        $this->maxAppeared = $maxAppeared;
+                        $this->lastAppeared = $lastAppeared;
+                    }
+
+                    public function __invoke(
+                        EventStoreCatchUpSubscription $subscription,
+                        ResolvedEvent $resolvedEvent
+                    ): Promise {
+                        if (! SystemStreams::isSystemStream($resolvedEvent->originalEvent()->eventStreamId())) {
+                            $this->events[] = $resolvedEvent;
+                            ++$this->appearedCounter;
+
+                            if ($this->appearedCounter === $this->maxAppeared) {
+                                $this->lastAppeared->resolve(true);
+                            }
+                        }
+
+                        return new Success();
+                    }
+                },
+                null,
+                new class($dropped) implements CatchUpSubscriptionDropped {
+                    /** @var Deferred */
+                    private $dropped;
+
+                    public function __construct(Deferred $dropped)
+                    {
+                        $this->dropped = $dropped;
+                    }
+
+                    public function __invoke(
+                        EventStoreCatchUpSubscription $subscription,
+                        SubscriptionDropReason $reason,
+                        ?Throwable $exception = null
+                    ): void {
+                        $this->dropped->resolve(true);
+                    }
+                }
+            );
+
+            for ($i = 10; $i < 20; $i++) {
+                yield $store->appendToStreamAsync(
+                    'all_read_all_existing_events_and_keep_listening_to_new_ones-' . $i,
+                    -1,
+                    [new EventData(null, 'et-' . $i, false)]
+                );
+            }
+
+            try {
+                yield Promise\timeout($lastAppeared->promise(), self::TIMEOUT);
+            } catch (TimeoutException $e) {
+                $this->fail('Could not wait for all events.');
+
+                return;
+            }
+
+            $this->assertCount(20, $events);
+
+            for ($i = 0; $i < 20; $i++) {
+                $this->assertSame('et-' . $i, $events[$i]->originalEvent()->eventType());
+            }
+
+            $wasDropped = true;
+
+            try {
+                yield Promise\timeout($dropped->promise(), 0);
+            } catch (TimeoutException $e) {
+                $wasDropped = false;
+            }
+
+            $this->assertFalse($wasDropped);
+
+            $subscription->stopWithTimeout(self::TIMEOUT);
+
+            $this->assertTrue(yield Promise\timeout($dropped->promise(), 0));
+        });
+    }
+
+    // @todo: 2 tests missing
 }
