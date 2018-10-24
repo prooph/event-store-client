@@ -265,7 +265,7 @@ abstract class EventStoreCatchUpSubscription
                 $this->dropSubscription(SubscriptionDropReason::userInitiated(), null);
             }
 
-            return new Success(true);
+            return new Success($this);
         });
     }
 

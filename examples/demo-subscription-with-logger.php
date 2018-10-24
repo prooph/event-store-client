@@ -42,7 +42,7 @@ Loop::run(function () {
 
     yield $connection->connectAsync();
 
-    $connection->subscribeToStreamFrom(
+    yield $connection->subscribeToStreamFromAsync(
         'foo-bar',
         null,
         CatchUpSubscriptionSettings::default(),

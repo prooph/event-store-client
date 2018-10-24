@@ -19,6 +19,10 @@ use Prooph\EventStoreClient\EventId;
 /** @internal */
 class TestEvent
 {
+    private function __construct()
+    {
+    }
+
     public static function new(?EventId $eventId = null, ?string $data = null, ?string $metadata = null): EventData
     {
         if (null === $eventId) {

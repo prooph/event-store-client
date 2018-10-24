@@ -179,7 +179,10 @@ interface EventStoreAsyncConnection
         ?UserCredentials $userCredentials = null
     ): Promise;
 
-    public function subscribeToStreamFrom(
+    /**
+     * @return Promise<EventStoreStreamCatchUpSubscription>
+     */
+    public function subscribeToStreamFromAsync(
         string $stream,
         ?int $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
@@ -187,7 +190,7 @@ interface EventStoreAsyncConnection
         ?LiveProcessingStarted $liveProcessingStarted = null,
         ?CatchUpSubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
-    ): EventStoreStreamCatchUpSubscription;
+    ): Promise;
 
     /**
      * @return Promise<EventStoreSubscription>
@@ -199,14 +202,17 @@ interface EventStoreAsyncConnection
         ?UserCredentials $userCredentials = null
     ): Promise;
 
-    public function subscribeToAllFrom(
+    /**
+     * @return Promise<EventStoreAllCatchUpSubscription>
+     */
+    public function subscribeToAllFromAsync(
         ?Position $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
         EventAppearedOnCatchupSubscription $eventAppeared,
         ?LiveProcessingStarted $liveProcessingStarted = null,
         ?CatchUpSubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
-    ): EventStoreAllCatchUpSubscription;
+    ): Promise;
 
     /**
      * @return Promise<AbstractEventStorePersistentSubscription>

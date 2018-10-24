@@ -659,7 +659,7 @@ final class EventStoreAsyncNodeConnection implements
     }
 
     /** {@inheritdoc} */
-    public function subscribeToStreamFrom(
+    public function subscribeToStreamFromAsync(
         string $stream,
         ?int $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
@@ -667,7 +667,7 @@ final class EventStoreAsyncNodeConnection implements
         ?LiveProcessingStarted $liveProcessingStarted = null,
         ?CatchUpSubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
-    ): EventStoreStreamCatchUpSubscription {
+    ): Promise {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
         }
@@ -680,7 +680,7 @@ final class EventStoreAsyncNodeConnection implements
             $settings->verboseLogging();
         }
 
-        $catchUpSubscription = new EventStoreStreamCatchUpSubscription(
+        return (new EventStoreStreamCatchUpSubscription(
             $this,
             $this->settings->log(),
             $stream,
@@ -690,11 +690,7 @@ final class EventStoreAsyncNodeConnection implements
             $liveProcessingStarted,
             $subscriptionDropped,
             $settings
-        );
-
-        $catchUpSubscription->startAsync();
-
-        return $catchUpSubscription;
+        ))->startAsync();
     }
 
     /** {@inheritdoc} */
@@ -720,14 +716,14 @@ final class EventStoreAsyncNodeConnection implements
         return $deferred->promise();
     }
 
-    public function subscribeToAllFrom(
+    public function subscribeToAllFromAsync(
         ?Position $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
         EventAppearedOnCatchupSubscription $eventAppeared,
         ?LiveProcessingStarted $liveProcessingStarted = null,
         ?CatchUpSubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
-    ): EventStoreAllCatchUpSubscription {
+    ): Promise {
         if (null === $settings) {
             $settings = CatchUpSubscriptionSettings::default();
         }
@@ -736,7 +732,7 @@ final class EventStoreAsyncNodeConnection implements
             $settings->verboseLogging();
         }
 
-        $catchUpSubscription = new EventStoreAllCatchUpSubscription(
+        return (new EventStoreAllCatchUpSubscription(
             $this,
             $this->settings->log(),
             $lastCheckpoint,
@@ -745,11 +741,7 @@ final class EventStoreAsyncNodeConnection implements
             $liveProcessingStarted,
             $subscriptionDropped,
             $settings
-        );
-
-        $catchUpSubscription->startAsync();
-
-        return $catchUpSubscription;
+        ))->startAsync();
     }
 
     /** {@inheritdoc} */

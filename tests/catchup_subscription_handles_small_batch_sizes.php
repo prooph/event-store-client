@@ -35,6 +35,8 @@ use function Amp\Promise\wait;
 
 class catchup_subscription_handles_small_batch_sizes extends TestCase
 {
+    private const TIMEOUT = 10000;
+
     /** @var string */
     private $streamName = 'TestStream';
     /** @var CatchUpSubscriptionSettings */
@@ -89,7 +91,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
 
             $deferred = new Deferred();
 
-            $this->connection->subscribeToAllFrom(
+            yield $this->connection->subscribeToAllFromAsync(
                 null,
                 $this->settings,
                 $this->eventAppearedResolver(),
@@ -99,8 +101,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
             );
 
             try {
-                // we wait maximum 5 minutes
-                $result = yield timeout($deferred->promise(), 5 * 60 * 1000);
+                $result = yield timeout($deferred->promise(), self::TIMEOUT);
 
                 $this->assertTrue($result);
             } catch (TimeoutException $e) {
@@ -122,7 +123,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
 
             $deferred = new Deferred();
 
-            $this->connection->subscribeToStreamFrom(
+            yield $this->connection->subscribeToStreamFromAsync(
                 $this->streamName,
                 null,
                 $this->settings,
@@ -133,8 +134,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
             );
 
             try {
-                // we wait maximum 5 minutes
-                $result = yield timeout($deferred->promise(), 5 * 60 * 1000);
+                $result = yield timeout($deferred->promise(), self::TIMEOUT);
 
                 $this->assertTrue($result);
             } catch (TimeoutException $e) {
