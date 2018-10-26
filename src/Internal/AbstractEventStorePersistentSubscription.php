@@ -25,7 +25,6 @@ use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\Exception\RuntimeException;
-use Prooph\EventStoreClient\Exception\TimeoutException;
 use Prooph\EventStoreClient\Internal\ResolvedEvent as InternalResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionDropped;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
@@ -77,11 +76,10 @@ abstract class AbstractEventStorePersistentSubscription
 
     /** @var int */
     private $isDropped;
-    //private readonly ManualResetEventSlim _stopped = new ManualResetEventSlim(true);
     /** @var int */
     private $bufferSize;
-    /** @var bool */
-    private $stopped = true;
+    /** @var ManualResetEventSlim */
+    private $stopped;
 
     /**
      * @internal
@@ -113,6 +111,7 @@ abstract class AbstractEventStorePersistentSubscription
         $this->bufferSize = $bufferSize;
         $this->autoAck = $autoAck;
         $this->queue = new SplQueue();
+        $this->stopped = new ManualResetEventSlim(true);
     }
 
     /**
@@ -122,7 +121,7 @@ abstract class AbstractEventStorePersistentSubscription
      */
     public function start(): Promise
     {
-        $this->stopped = false;
+        $this->stopped->reset();
 
         $eventAppearedCallback = function (
             EventStoreSubscription $subscription,
@@ -297,7 +296,7 @@ abstract class AbstractEventStorePersistentSubscription
         $this->subscription->notifyEventsFailed($ids, $action, $reason);
     }
 
-    public function stop(int $timeout): void
+    public function stop(?int $timeout = null): Promise
     {
         if ($this->verbose) {
             $this->log->debug(\sprintf(
@@ -308,11 +307,11 @@ abstract class AbstractEventStorePersistentSubscription
 
         $this->enqueueSubscriptionDropNotification(SubscriptionDropReason::userInitiated(), null);
 
-        Loop::delay($timeout, function (): void {
-            if (! $this->stopped) {
-                throw new TimeoutException('Could not stop subscription in time');
-            }
-        });
+        if (null === $timeout) {
+            return new Success();
+        }
+
+        return $this->stopped->wait($timeout);
     }
 
     private function enqueueSubscriptionDropNotification(SubscriptionDropReason $reason, ?Throwable $error): void
@@ -436,7 +435,7 @@ abstract class AbstractEventStorePersistentSubscription
                 ($this->subscriptionDropped)($this, $reason, $error);
             }
 
-            $this->stopped = true;
+            $this->stopped->set();
         }
     }
 }

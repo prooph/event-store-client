@@ -25,7 +25,6 @@ use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
 use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\EventStoreSubscription;
-use Prooph\EventStoreClient\Exception\TimeoutException;
 use Prooph\EventStoreClient\Internal\ResolvedEvent as InternalResolvedEvent;
 use Prooph\EventStoreClient\LiveProcessingStarted;
 use Prooph\EventStoreClient\ResolvedEvent;
@@ -89,7 +88,7 @@ abstract class EventStoreCatchUpSubscription
     protected $shouldStop;
     /** @var bool */
     private $isDropped;
-    /** @var bool */
+    /** @var ManualResetEventSlim */
     private $stopped;
 
     /** @var ListenerHandler */
@@ -125,6 +124,7 @@ abstract class EventStoreCatchUpSubscription
         $this->subscriptionName = $settings->subscriptionName() ?? '';
         $this->connectListener = function (): void {
         };
+        $this->stopped = new ManualResetEventSlim(true);
     }
 
     public function isSubscribedToAll(): bool
@@ -166,25 +166,7 @@ abstract class EventStoreCatchUpSubscription
         return $this->runSubscriptionAsync();
     }
 
-    public function stopWithTimeout(int $timeout): void
-    {
-        $this->stop();
-
-        if ($this->verbose) {
-            $this->log->debug(\sprintf(
-                'Waiting on subscription %s to stop',
-                $this->subscriptionName
-            ));
-        }
-
-        Loop::delay($timeout, function (): void {
-            if (! $this->stopped) {
-                throw new TimeoutException('Could not stop in time');
-            }
-        });
-    }
-
-    public function stop(): void
+    public function stop(?int $timeout = null): Promise
     {
         if ($this->verbose) {
             $this->log->debug(\sprintf(
@@ -202,6 +184,19 @@ abstract class EventStoreCatchUpSubscription
         $this->connection->detach($this->connectListener);
         $this->shouldStop = true;
         $this->enqueueSubscriptionDropNotification(SubscriptionDropReason::userInitiated(), null);
+
+        if (null === $timeout) {
+            return new Success();
+        }
+
+        if ($this->verbose) {
+            $this->log->debug(\sprintf(
+                'Waiting on subscription %s to stop',
+                $this->subscriptionName
+            ));
+        }
+
+        return $this->stopped->wait($timeout);
     }
 
     private function onReconnect(ClientConnectionEventArgs $clientConnectionEventArgs): void
@@ -241,7 +236,7 @@ abstract class EventStoreCatchUpSubscription
             ));
         }
 
-        $this->stopped = false;
+        $this->stopped->reset();
         $this->allowProcessing = false;
 
         return call(function (): Generator {
@@ -527,7 +522,7 @@ abstract class EventStoreCatchUpSubscription
                 ($this->subscriptionDropped)($this, $reason, $error);
             }
 
-            $this->stopped = true;
+            $this->stopped->set();
         }
     }
 }
