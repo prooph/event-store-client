@@ -108,7 +108,7 @@ class append_to_stream extends TestCase
             yield $connection->connectAsync();
 
             /** @var WriteResult $result */
-            $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::new()]);
+            $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
             $this->assertSame(0, $result->nextExpectedVersion());
 
             /** @var StreamEventsSlice $slice */
@@ -134,7 +134,7 @@ class append_to_stream extends TestCase
             yield $connection->connectAsync();
 
             /** @var WriteResult $result */
-            $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::new()]);
+            $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
             $this->assertSame(0, $result->nextExpectedVersion());
 
             /** @var StreamEventsSlice $slice */
@@ -158,7 +158,7 @@ class append_to_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            $events = [TestEvent::new(), TestEvent::new(), TestEvent::new(), TestEvent::new()];
+            $events = [TestEvent::newTestEvent(), TestEvent::newTestEvent(), TestEvent::newTestEvent(), TestEvent::newTestEvent()];
 
             /** @var WriteResult $result */
             $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::ANY, $events);
@@ -184,7 +184,7 @@ class append_to_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            $x = TestEvent::new();
+            $x = TestEvent::newTestEvent();
             $events = [$x, $x, $x, $x, $x, $x];
 
             /** @var WriteResult $result */
@@ -208,7 +208,7 @@ class append_to_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            $x = TestEvent::new();
+            $x = TestEvent::newTestEvent();
             $events = [$x, $x, $x, $x, $x, $x];
 
             /** @var WriteResult $result */
@@ -236,7 +236,7 @@ class append_to_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            $x = TestEvent::new();
+            $x = TestEvent::newTestEvent();
             $events = [$x, $x, $x, $x, $x, $x];
 
             /** @var WriteResult $result */
@@ -268,7 +268,7 @@ class append_to_stream extends TestCase
 
             try {
                 $this->expectException(StreamDeletedException::class);
-                yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::new()]);
+                yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
             } finally {
                 $connection->close();
             }
@@ -289,7 +289,7 @@ class append_to_stream extends TestCase
             yield $connection->connectAsync();
 
             /** @var WriteResult $result */
-            $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::new()]);
+            $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
             $this->assertGreaterThan(0, $result->logPosition()->preparePosition());
             $this->assertGreaterThan(0, $result->logPosition()->commitPosition());
 
@@ -318,7 +318,7 @@ class append_to_stream extends TestCase
 
             try {
                 $this->expectException(StreamDeletedException::class);
-                yield $connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::new()]);
+                yield $connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
             } finally {
                 $connection->close();
             }
@@ -342,7 +342,7 @@ class append_to_stream extends TestCase
 
             $this->expectException(StreamDeletedException::class);
             try {
-                yield $connection->appendToStreamAsync($stream, 5, [TestEvent::new()]);
+                yield $connection->appendToStreamAsync($stream, 5, [TestEvent::newTestEvent()]);
             } finally {
                 $connection->close();
             }
@@ -363,7 +363,7 @@ class append_to_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::new()]);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
 
             $connection->close();
         }));
@@ -383,10 +383,10 @@ class append_to_stream extends TestCase
             yield $connection->connectAsync();
 
             /** @var WriteResult $result */
-            $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::new()]);
+            $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
             $this->assertSame(0, $result->nextExpectedVersion());
 
-            $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::new()]);
+            $result = yield $connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
             $this->assertSame(1, $result->nextExpectedVersion());
 
             $connection->close();
@@ -408,7 +408,7 @@ class append_to_stream extends TestCase
 
             try {
                 $this->expectException(WrongExpectedVersionException::class);
-                yield $connection->appendToStreamAsync($stream, 1, [TestEvent::new()]);
+                yield $connection->appendToStreamAsync($stream, 1, [TestEvent::newTestEvent()]);
             } finally {
                 $connection->close();
             }
@@ -429,8 +429,8 @@ class append_to_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::new()]);
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::new()]);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
 
             $connection->close();
         }));
@@ -451,10 +451,10 @@ class append_to_stream extends TestCase
             yield $connection->connectAsync();
 
             for ($i = 0; $i < 5; $i++) {
-                yield $connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::new()]);
+                yield $connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
             }
 
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::new()]);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
 
             $connection->close();
         }));
@@ -482,7 +482,7 @@ class append_to_stream extends TestCase
                 )
             );
 
-            yield  $connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::new()]);
+            yield  $connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
 
             $connection->close();
         }));
@@ -503,7 +503,7 @@ class append_to_stream extends TestCase
 
             try {
                 $this->expectException(WrongExpectedVersionException::class);
-                yield $connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::new()]);
+                yield $connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
             } finally {
                 $connection->close();
             }
@@ -527,7 +527,7 @@ class append_to_stream extends TestCase
 
             try {
                 $this->expectException(StreamDeletedException::class);
-                yield $connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::new()]);
+                yield $connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
             } finally {
                 $connection->close();
             }
@@ -551,7 +551,7 @@ class append_to_stream extends TestCase
 
             try {
                 $this->expectException(StreamDeletedException::class);
-                yield $connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::new()]);
+                yield $connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
             } finally {
                 $connection->close();
             }
@@ -596,7 +596,7 @@ class append_to_stream extends TestCase
             yield $connection->connectAsync();
 
             /** @var ConditionalWriteResult $result */
-            $result = yield $connection->conditionalAppendToStreamAsync($stream, 7, [TestEvent::new()]);
+            $result = yield $connection->conditionalAppendToStreamAsync($stream, 7, [TestEvent::newTestEvent()]);
 
             $this->assertTrue($result->status()->equals(ConditionalWriteStatus::versionMismatch()));
 
@@ -618,7 +618,7 @@ class append_to_stream extends TestCase
             yield $connection->connectAsync();
 
             /** @var ConditionalWriteResult $result */
-            $result = yield $connection->conditionalAppendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::new()]);
+            $result = yield $connection->conditionalAppendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
 
             $this->assertTrue($result->status()->equals(ConditionalWriteStatus::succeeded()));
             $this->assertNotNull($result->logPosition());
@@ -641,12 +641,12 @@ class append_to_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::new()]);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
 
             yield $connection->deleteStreamAsync($stream, ExpectedVersion::ANY, true);
 
             /** @var ConditionalWriteResult $result */
-            $result = yield $connection->conditionalAppendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::new()]);
+            $result = yield $connection->conditionalAppendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
 
             $this->assertTrue($result->status()->equals(ConditionalWriteStatus::streamDeleted()));
 

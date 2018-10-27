@@ -56,7 +56,7 @@ class subscribe_should extends TestCase
                 $this->eventAppearedResolver($appeared)
             );
 
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::new()]);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
 
             try {
                 $result = yield timeout($appeared->promise(), self::TIMEOUT);
@@ -97,7 +97,7 @@ class subscribe_should extends TestCase
                 $this->eventAppearedResolver($appeared2)
             );
 
-            $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::new()]);
+            $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
 
             try {
                 $result = yield timeout($appeared1->promise(), self::TIMEOUT);

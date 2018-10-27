@@ -41,7 +41,7 @@ class when_committing_empty_transaction extends TestCase
 
     protected function setUp(): void
     {
-        $this->firstEvent = TestEvent::new();
+        $this->firstEvent = TestEvent::newTestEvent();
         $this->connection = TestConnection::createAsync();
         $this->stream = UuidGenerator::generate();
     }
@@ -54,7 +54,7 @@ class when_committing_empty_transaction extends TestCase
         $result = yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::NO_STREAM,
-            [$this->firstEvent, TestEvent::new(), TestEvent::new()]
+            [$this->firstEvent, TestEvent::newTestEvent(), TestEvent::newTestEvent()]
         );
 
         $this->assertSame(2, $result->nextExpectedVersion());
@@ -195,7 +195,7 @@ class when_committing_empty_transaction extends TestCase
             yield $this->connection->appendToStreamAsync(
                 $this->stream,
                 ExpectedVersion::NO_STREAM,
-                [TestEvent::new()]
+                [TestEvent::newTestEvent()]
             );
         }));
     }

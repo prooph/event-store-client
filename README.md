@@ -52,6 +52,14 @@ Run the server with memory database
 ./run-node.sh --run-projections=all --mem-db
 ```
 
+You need to ignore the `ignore` group
+
+```console
+./vendor/bin/phpunit --exclude-group=ignore
+```
+
+Those are tests that only work against an empty database and can only be run manually.
+
 Before next run, restart the server. This way you can always start with a clean server.
 
 ## Documentation

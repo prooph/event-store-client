@@ -101,7 +101,7 @@ class deleting_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::new()]);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
 
             /** @var DeleteResult $delete */
             $delete = yield $connection->deleteStreamAsync($stream, 0, true);

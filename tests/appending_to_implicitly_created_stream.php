@@ -155,7 +155,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            $events = [TestEvent::new()];
+            $events = [TestEvent::newTestEvent()];
 
             $writer = new StreamWriter($connection, $stream, ExpectedVersion::NO_STREAM);
 
@@ -185,7 +185,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            $events = [TestEvent::new()];
+            $events = [TestEvent::newTestEvent()];
 
             $writer = new StreamWriter($connection, $stream, ExpectedVersion::NO_STREAM);
 
@@ -215,7 +215,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            $events = [TestEvent::new()];
+            $events = [TestEvent::newTestEvent()];
 
             $writer = new StreamWriter($connection, $stream, ExpectedVersion::NO_STREAM);
 
@@ -386,7 +386,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
             yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
 
-            $events[] = TestEvent::new();
+            $events[] = TestEvent::newTestEvent();
 
             $this->expectException(WrongExpectedVersionException::class);
 
