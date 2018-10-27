@@ -282,7 +282,57 @@ class subscribe_to_stream_catching_up_should extends TestCase
      */
     public function read_all_existing_events_and_keep_listening_to_new_ones(): void
     {
-        $this->markTestIncomplete();
+        $this->execute(function () {
+            $stream = 'read_all_existing_events_and_keep_listening_to_new_ones';
+
+            /** @var ResolvedEvent $events */
+            $events = [];
+            $appeared = new CountdownEvent(20);
+            $dropped = new CountdownEvent(1);
+
+            for ($i = 0; $i < 10; $i++) {
+                yield $this->conn->appendToStreamAsync(
+                    $stream,
+                    $i - 1,
+                    [new EventData(null, 'et-' . $i, false)]
+                );
+            }
+
+            /** @var EventStoreStreamCatchUpSubscription $subscription */
+            $subscription = yield $this->conn->subscribeToStreamFromAsync(
+                $stream,
+                null,
+                CatchUpSubscriptionSettings::default(),
+                $this->appearedWithCountdownAndEventsAdd($events, $appeared),
+                null,
+                $this->droppedWithCountdown($dropped)
+            );
+
+            for ($i = 10; $i < 20; $i++) {
+                yield $this->conn->appendToStreamAsync(
+                    $stream,
+                    $i - 1,
+                    [new EventData(null, 'et-' . $i, false)]
+                );
+            }
+
+            if (! yield $appeared->wait(self::TIMEOUT)) {
+                $this->assertFalse(yield $dropped->wait(0), 'Subscription was dropped prematurely');
+                $this->fail('Could not wait for all events');
+
+                return;
+            }
+
+            $this->assertCount(20, $events);
+
+            for ($i = 0; $i < 20; $i++) {
+                $this->assertSame('et-' . $i, $events[$i]->originalEvent()->eventType());
+            }
+
+            $this->assertFalse(yield $dropped->wait(0));
+            yield $subscription->stop(self::TIMEOUT);
+            $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
+        });
     }
 
     /**
@@ -291,7 +341,61 @@ class subscribe_to_stream_catching_up_should extends TestCase
      */
     public function filter_events_and_keep_listening_to_new_ones(): void
     {
-        $this->markTestIncomplete();
+        $this->execute(function () {
+            $stream = 'filter_events_and_keep_listening_to_new_ones';
+
+            /** @var ResolvedEvent[] $events */
+            $events = [];
+            $appeared = new CountdownEvent(20); // skip first 10 events
+            $dropped = new CountdownEvent(1);
+
+            for ($i = 0; $i < 20; $i++) {
+                yield $this->conn->appendToStreamAsync(
+                    $stream,
+                    $i - 1,
+                    [new EventData(null, 'et-' . $i, false)]
+                );
+            }
+
+            /** @var EventStoreStreamCatchUpSubscription $subscription */
+            $subscription = yield $this->conn->subscribeToStreamFromAsync(
+                $stream,
+                9,
+                CatchUpSubscriptionSettings::default(),
+                $this->appearedWithCountdownAndEventsAdd($events, $appeared),
+                null,
+                $this->droppedWithCountdown($dropped)
+            );
+
+            for ($i = 20; $i < 30; $i++) {
+                yield $this->conn->appendToStreamAsync(
+                    $stream,
+                    $i - 1,
+                    [new EventData(null, 'et-' . $i, false)]
+                );
+            }
+
+            if (! yield $appeared->wait(self::TIMEOUT)) {
+                $this->assertFalse(yield $dropped->wait(0), 'Subscription was dropped prematurely');
+                $this->fail('Could not wait for all events');
+
+                return;
+            }
+
+            $this->assertCount(20, $events);
+
+            for ($i = 0; $i < 20; $i++) {
+                $this->assertSame('et-' . ($i + 10), $events[$i]->originalEvent()->eventType());
+            }
+
+            $this->assertFalse(yield $dropped->wait(0));
+            yield $subscription->stop(self::TIMEOUT);
+            $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
+
+            $this->assertSame($events[19]->originalEventNumber(), $subscription->lastProcessedEventNumber());
+
+            yield $subscription->stop(0);
+        });
     }
 
     /**
@@ -300,7 +404,51 @@ class subscribe_to_stream_catching_up_should extends TestCase
      */
     public function filter_events_and_work_if_nothing_was_written_after_subscription(): void
     {
-        $this->markTestIncomplete();
+        $this->execute(function () {
+            $stream = 'filter_events_and_work_if_nothing_was_written_after_subscription';
+
+            /** @var ResolvedEvent[] $events */
+            $events = [];
+            $appeared = new CountdownEvent(10);
+            $dropped = new CountdownEvent(1);
+
+            for ($i = 0; $i < 20; $i++) {
+                yield $this->conn->appendToStreamAsync(
+                    $stream,
+                    $i - 1,
+                    [new EventData(null, 'et-' . $i, false)]
+                );
+            }
+
+            /** @var EventStoreStreamCatchUpSubscription $subscription */
+            $subscription = yield $this->conn->subscribeToStreamFromAsync(
+                $stream,
+                9,
+                CatchUpSubscriptionSettings::default(),
+                $this->appearedWithCountdownAndEventsAdd($events, $appeared),
+                null,
+                $this->droppedWithCountdown($dropped)
+            );
+
+            if (! yield $appeared->wait(self::TIMEOUT)) {
+                $this->assertFalse(yield $dropped->wait(0), 'Subscription was dropped prematurely');
+                $this->fail('Could not wait for all events');
+
+                return;
+            }
+
+            $this->assertCount(10, $events);
+
+            for ($i = 0; $i < 10; $i++) {
+                $this->assertSame('et-' . ($i + 10), $events[$i]->originalEvent()->eventType());
+            }
+
+            $this->assertFalse(yield $dropped->wait(0));
+            yield $subscription->stop(self::TIMEOUT);
+            $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
+
+            $this->assertSame($events[9]->originalEventNumber(), $subscription->lastProcessedEventNumber());
+        });
     }
 
     private function appearedWithCountdown(CountdownEvent $appeared): EventAppearedOnCatchupSubscription
@@ -318,6 +466,32 @@ class subscribe_to_stream_catching_up_should extends TestCase
                 EventStoreCatchUpSubscription $subscription,
                 ResolvedEvent $resolvedEvent
             ): Promise {
+                $this->appeared->signal();
+
+                return new Success();
+            }
+        };
+    }
+
+    private function appearedWithCountdownAndEventsAdd(array &$events, CountdownEvent $appeared): EventAppearedOnCatchupSubscription
+    {
+        return new class($events, $appeared) implements EventAppearedOnCatchupSubscription {
+            /** @var array */
+            private $events;
+            /** @var CountdownEvent */
+            private $appeared;
+
+            public function __construct(array &$events, CountdownEvent $appeared)
+            {
+                $this->events = &$events;
+                $this->appeared = $appeared;
+            }
+
+            public function __invoke(
+                EventStoreCatchUpSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ): Promise {
+                $this->events[] = $resolvedEvent;
                 $this->appeared->signal();
 
                 return new Success();
