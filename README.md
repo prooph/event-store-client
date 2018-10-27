@@ -13,11 +13,17 @@ In the future, there will be also a server implementation written in pure PHP us
 
 Asynchronous operations are done via [Amp](https://amphp.org/) and sync operation are also supported.
 
+### Extensions
+
 You need to [allegro/php-protobuf](https://github.com/allegro/php-protobuf/) PHP extension.
 
 The protobuf extension from Google will not work, because it doesn't support proto2, only proto3.
 
-It's also recommended to install [uv](https://pecl.php.net/package/uv). 
+Additional extensions are only needed if your app necessitates a high numbers of concurrent socket connections.
+
+- [ev](https://pecl.php.net/package/ev)
+- [event](https://pecl.php.net/package/event)
+- [php-uv](https://github.com/bwoebi/php-uv) (experimental fork) 
 
 ## Installation
 
