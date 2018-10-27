@@ -63,7 +63,7 @@ class EventStoreAsyncTransaction
      *
      * @return Promise<void>
      */
-    public function writeAsync(array $events): Promise
+    public function writeAsync(array $events = []): Promise
     {
         if ($this->isRolledBack) {
             throw new \RuntimeException('Cannot commit a rolledback transaction');
