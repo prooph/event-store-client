@@ -31,6 +31,9 @@
     <filter>
         <whitelist>
             <directory>./../src/</directory>
+            <exclude>
+                <directory suffix=".php">./../src/Messages/ClientMessages</directory>
+            </exclude>
         </whitelist>
     </filter>
 
