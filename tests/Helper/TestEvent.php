@@ -23,7 +23,7 @@ class TestEvent
     {
     }
 
-    public static function new(?EventId $eventId = null, ?string $data = null, ?string $metadata = null): EventData
+    public static function newTestEvent(?EventId $eventId = null, ?string $data = null, ?string $metadata = null): EventData
     {
         if (null === $eventId) {
             $eventId = EventId::generate();
@@ -38,7 +38,7 @@ class TestEvent
         $events = [];
 
         for ($i = 0; $i < $amount; $i++) {
-            $events[] = self::new();
+            $events[] = self::newTestEvent();
         }
 
         return $events;

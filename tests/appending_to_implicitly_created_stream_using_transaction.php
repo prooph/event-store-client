@@ -369,7 +369,7 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
 
             $this->assertSame(1, $writeResult->nextExpectedVersion());
 
-            $events[] = TestEvent::new();
+            $events[] = TestEvent::newTestEvent();
 
             /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(-1);

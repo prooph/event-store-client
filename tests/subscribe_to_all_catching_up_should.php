@@ -147,7 +147,7 @@ class subscribe_to_all_catching_up_should extends TestCase
             yield $store->appendToStreamAsync(
                 $stream,
                 ExpectedVersion::ANY,
-                [TestEvent::new()]
+                [TestEvent::newTestEvent()]
             );
 
             $dropped = new CountdownEvent(1);
