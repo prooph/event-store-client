@@ -1,7 +1,19 @@
 # Change Log
 
-## [v1.0.0-beta-2](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-2)
+## [v1.0.0-beta-3](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-3)
 
+[Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-2...v1.0.0-beta-)
+
+**Implemented enhancements:**
+
+-  update EventStoreAsyncConnection interface  [\#21](https://github.com/prooph/event-store-client/pull/21) ([prolic](https://github.com/prolic))
+
+**Fixed bugs:**
+
+- bugfixes and tests [\#22](https://github.com/prooph/event-store-client/pull/22) ([prolic](https://github.com/prolic))
+-  update EventStoreAsyncConnection interface  [\#21](https://github.com/prooph/event-store-client/pull/21) ([prolic](https://github.com/prolic))
+
+## [v1.0.0-beta-2](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-2) (2018-10-21)
 [Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-1...v1.0.0-beta-2)
 
 **Fixed bugs:**
