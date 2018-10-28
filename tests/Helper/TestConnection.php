@@ -77,4 +77,21 @@ class TestConnection
 
         return new EndPoint($host, $port);
     }
+
+    public static function httpEndPoint(): EndPoint
+    {
+        $env = \getenv();
+
+        if (! isset(
+            $env['ES_HOST'],
+            $env['ES_HTTP_PORT']
+        )) {
+            throw new \RuntimeException('Environment settings for event store http endpoint not found');
+        }
+
+        $host = \getenv('ES_HOST');
+        $port = (int) \getenv('ES_HTTP_PORT');
+
+        return new EndPoint($host, $port);
+    }
 }
