@@ -46,7 +46,7 @@ class ParallelTransactionTask implements Task
 
         $writes = [];
 
-        for ($i = 0; $i < 500; $i++) {
+        for ($i = 0; $i < 250; $i++) {
             $writes[] = $transaction->writeAsync(
                 [TestEvent::newTestEvent(null, (string) $i, $this->metadata)]
             );

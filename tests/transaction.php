@@ -241,11 +241,11 @@ class transaction extends TestCase
             $slice = yield $store->readStreamEventsForwardAsync(
                 $stream,
                 0,
-                1000,
+                500,
                 false
             );
 
-            $this->assertCount(1000, $slice->events());
+            $this->assertCount(500, $slice->events());
 
             $totalTransWrites = 0;
             $totalPlainWrites = 0;
@@ -260,8 +260,8 @@ class transaction extends TestCase
                 }
             }
 
-            $this->assertSame(500, $totalTransWrites);
-            $this->assertSame(500, $totalPlainWrites);
+            $this->assertSame(250, $totalTransWrites);
+            $this->assertSame(250, $totalPlainWrites);
         });
     }
 
