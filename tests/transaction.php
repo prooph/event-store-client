@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\Parallel\Worker\DefaultPool;
 use Amp\Promise;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventData;
@@ -23,6 +24,7 @@ use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\StreamEventsSlice;
 use Prooph\EventStoreClient\WriteResult;
+use ProophTest\EventStoreClient\Helper\ParallelTransactionTask;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
@@ -213,11 +215,53 @@ class transaction extends TestCase
      * @test
      * @throws Throwable
      */
-    public function should_commit_when_writing_with_exp_ver_any_even_while_somene_is_writing_in_parallel(): void
+    public function should_commit_when_writing_with_exp_ver_any_even_while_someone_is_writing_in_parallel(): void
     {
-        $this->markTestIncomplete();
-
         $this->execute(function () {
+            $stream = 'should_commit_when_writing_with_exp_ver_any_even_while_someone_is_writing_in_parallel';
+
+            $task1 = new ParallelTransactionTask($stream, 'trans write');
+            $task2 = new ParallelTransactionTask($stream, 'plain write');
+
+            $pool = new DefaultPool();
+
+            $results = yield Promise\all([
+                $pool->enqueue($task1),
+                $pool->enqueue($task2),
+            ]);
+
+            $this->assertCount(2, $results);
+            $this->assertTrue($results[0]);
+            $this->assertTrue($results[1]);
+
+            $store = TestConnection::createAsync();
+            yield $store->connectAsync();
+
+            /** @var StreamEventsSlice $slice */
+            $slice = yield $store->readStreamEventsForwardAsync(
+                $stream,
+                0,
+                1000,
+                false
+            );
+
+            $this->assertCount(1000, $slice->events());
+
+            $totalTransWrites = 0;
+            $totalPlainWrites = 0;
+
+            foreach ($slice->events() as $event) {
+                if ($event->event()->metadata() === 'trans write') {
+                    $totalTransWrites++;
+                }
+
+                if ($event->event()->metadata() === 'plain write') {
+                    $totalPlainWrites++;
+                }
+            }
+
+            $this->assertSame(500, $totalTransWrites);
+            $this->assertSame(500, $totalPlainWrites);
         });
     }
 
