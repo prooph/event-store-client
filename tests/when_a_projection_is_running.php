@@ -39,7 +39,7 @@ class when_a_projection_is_running extends TestCase
         yield $this->postEvent($this->streamName, 'testEvent', '{"A": 2}');
     }
 
-    public function when(): Generator
+    protected function when(): Generator
     {
         $this->query = $this->createStandardQuery($this->streamName);
 
