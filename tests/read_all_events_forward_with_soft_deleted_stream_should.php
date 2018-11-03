@@ -20,6 +20,7 @@ use Prooph\EventStoreClient\Common\SystemRoles;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventNumber;
 use Prooph\EventStoreClient\ExpectedVersion;
+use Prooph\EventStoreClient\Internal\Json;
 use Prooph\EventStoreClient\SliceReadStatus;
 use Prooph\EventStoreClient\StreamEventsSlice;
 use Prooph\EventStoreClient\StreamMetadata;
@@ -104,7 +105,7 @@ class read_all_events_forward_with_soft_deleted_stream_should extends TestCase
             $lastEvent = $metadataEvents->events()[0]->event();
             $this->assertSame('$$' . $this->streamName, $lastEvent->eventStreamId());
             $this->assertSame(SystemEventTypes::STREAM_METADATA, $lastEvent->eventType());
-            $metadata = StreamMetadata::jsonUnserialize($lastEvent->data());
+            $metadata = StreamMetadata::createFromArray(Json::decode($lastEvent->data()));
             $this->assertSame(EventNumber::DELETED_STREAM, $metadata->truncateBefore());
         });
     }

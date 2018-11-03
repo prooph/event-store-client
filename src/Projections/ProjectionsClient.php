@@ -17,9 +17,10 @@ use Amp\Artax\Response;
 use Amp\Deferred;
 use Amp\Promise;
 use Prooph\EventStoreClient\EndPoint;
+use Prooph\EventStoreClient\Exception\JsonException;
 use Prooph\EventStoreClient\Exception\ProjectionCommandConflictException;
 use Prooph\EventStoreClient\Exception\ProjectionCommandFailedException;
-use Prooph\EventStoreClient\Exception\UnexpectedValueException;
+use Prooph\EventStoreClient\Internal\Json;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\Transport\Http\HttpAsyncClient;
 use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
@@ -201,12 +202,10 @@ class ProjectionsClient
                 return;
             }
 
-            $data = \json_decode($body, true);
-
-            if (\json_last_error() !== \JSON_ERROR_NONE) {
-                $deferred->fail(new UnexpectedValueException(
-                    'Could not json decode response from server'
-                ));
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
 
                 return;
             }
@@ -252,12 +251,10 @@ class ProjectionsClient
                 return;
             }
 
-            $data = \json_decode($body, true);
-
-            if (\json_last_error() !== \JSON_ERROR_NONE) {
-                $deferred->fail(new UnexpectedValueException(
-                    'Could not json decode response from server'
-                ));
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
 
                 return;
             }
@@ -303,12 +300,10 @@ class ProjectionsClient
                 return;
             }
 
-            $data = \json_decode($body, true);
-
-            if (\json_last_error() !== \JSON_ERROR_NONE) {
-                $deferred->fail(new UnexpectedValueException(
-                    'Could not json decode response from server'
-                ));
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
 
                 return;
             }

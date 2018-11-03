@@ -378,10 +378,12 @@ final class EventStoreAsyncNodeConnection implements
         ?StreamMetadata $metadata,
         ?UserCredentials $userCredentials = null
     ): Promise {
+        $string = $metadata ? Json::encode($metadata) : '';
+
         return $this->setRawStreamMetadataAsync(
             $stream,
             $expectedMetaStreamVersion,
-            $metadata ? $metadata->jsonSerialize() : '',
+            $string,
             $userCredentials
         );
     }
@@ -456,7 +458,7 @@ final class EventStoreAsyncNodeConnection implements
                 return;
             }
 
-            $metadata = StreamMetadata::jsonUnserialize($result->streamMetadata());
+            $metadata = StreamMetadata::createFromArray(Json::decode($result->streamMetadata()));
 
             $deferred->resolve(new StreamMetadataResult(
                 $result->streamMetadata(),
@@ -542,7 +544,7 @@ final class EventStoreAsyncNodeConnection implements
         return $this->appendToStreamAsync(
             SystemStreams::SETTINGS_STREAM,
             ExpectedVersion::ANY,
-            [new EventData(null, SystemEventTypes::SETTINGS, true, $settings->jsonSerialize())],
+            [new EventData(null, SystemEventTypes::SETTINGS, true, Json::encode($settings))],
             $userCredentials
         );
     }

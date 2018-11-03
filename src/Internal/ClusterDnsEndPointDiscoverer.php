@@ -252,12 +252,8 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
                 return null;
             }
 
-            $data = yield $response->getBody()->getInputStream()->read();
-            $data = \json_decode($data, true);
-
-            if (\JSON_ERROR_NONE !== \json_last_error()) {
-                return null;
-            }
+            $json = yield $response->getBody()->getInputStream()->read();
+            $data = Json::decode($json);
 
             $members = [];
 

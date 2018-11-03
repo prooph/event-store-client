@@ -17,10 +17,11 @@ use Amp\Artax\Response;
 use Amp\Deferred;
 use Amp\Promise;
 use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\Exception\UnexpectedValueException;
+use Prooph\EventStoreClient\Exception\JsonException;
 use Prooph\EventStoreClient\Exception\UserCommandConflictException;
 use Prooph\EventStoreClient\Exception\UserCommandFailedException;
 use Prooph\EventStoreClient\Internal\DateTimeUtil;
+use Prooph\EventStoreClient\Internal\Json;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\Transport\Http\HttpAsyncClient;
 use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
@@ -118,12 +119,10 @@ class UsersClient
                 return;
             }
 
-            $data = \json_decode($body, true);
-
-            if (\json_last_error() !== \JSON_ERROR_NONE) {
-                $deferred->fail(new UnexpectedValueException(
-                    'Could not json decode response from server'
-                ));
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
 
                 return;
             }
@@ -178,12 +177,10 @@ class UsersClient
                 return;
             }
 
-            $data = \json_decode($body, true);
-
-            if (\json_last_error() !== \JSON_ERROR_NONE) {
-                $deferred->fail(new UnexpectedValueException(
-                    'Could not json decode response from server'
-                ));
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
 
                 return;
             }
@@ -228,12 +225,10 @@ class UsersClient
                 return;
             }
 
-            $data = \json_decode($body, true);
-
-            if (\json_last_error() !== \JSON_ERROR_NONE) {
-                $deferred->fail(new UnexpectedValueException(
-                    'Could not json decode response from server'
-                ));
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
 
                 return;
             }
@@ -271,7 +266,7 @@ class UsersClient
                 $httpSchema,
                 '/users/'
             ),
-            \json_encode($newUser),
+            Json::encode($newUser),
             $userCredentials,
             HttpStatusCode::CREATED
         );
@@ -291,7 +286,7 @@ class UsersClient
                 '/users/%s',
                 $login
             ),
-            \json_encode($updatedUser),
+            Json::encode($updatedUser),
             $userCredentials,
             HttpStatusCode::OK
         );
@@ -311,7 +306,7 @@ class UsersClient
                 '/users/%s/command/change-password',
                 $login
             ),
-            \json_encode($changePasswordDetails),
+            Json::encode($changePasswordDetails),
             $userCredentials,
             HttpStatusCode::OK
         );
@@ -331,7 +326,7 @@ class UsersClient
                 '/users/%s/command/reset-password',
                 $login
             ),
-            \json_encode($resetPasswordDetails),
+            Json::encode($resetPasswordDetails),
             $userCredentials,
             HttpStatusCode::OK
         );

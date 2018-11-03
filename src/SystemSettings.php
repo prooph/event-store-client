@@ -16,7 +16,6 @@ namespace Prooph\EventStoreClient;
 use JsonSerializable;
 use Prooph\EventStoreClient\Common\SystemMetadata;
 use Prooph\EventStoreClient\Common\SystemRoles;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 
 class SystemSettings implements JsonSerializable
 {
@@ -68,22 +67,16 @@ class SystemSettings implements JsonSerializable
         return $this->systemStreamAcl;
     }
 
-    public function jsonSerialize(): string
+    public function jsonSerialize(): array
     {
-        return \json_encode([
+        return [
             SystemMetadata::USER_STREAM_ACL => $this->userStreamAcl->toArray(),
             SystemMetadata::SYSTEM_STREAM_ACL => $this->systemStreamAcl->toArray(),
-        ]);
+        ];
     }
 
-    public static function jsonUnserialize(string $json): SystemSettings
+    public static function createFromArray(array $data): SystemSettings
     {
-        $data = \json_decode($json, true);
-
-        if (\JSON_ERROR_NONE !== \json_last_error()) {
-            throw new InvalidArgumentException('Could not json decode string');
-        }
-
         if (! isset($data[SystemMetadata::USER_STREAM_ACL])) {
             throw new \InvalidArgumentException(SystemMetadata::USER_STREAM_ACL . ' is missing');
         }

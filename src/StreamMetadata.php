@@ -149,7 +149,7 @@ class StreamMetadata implements JsonSerializable
         return $this->customMetadata[$key];
     }
 
-    public function jsonSerialize(): string
+    public function jsonSerialize(): array
     {
         $data = [];
 
@@ -177,17 +177,11 @@ class StreamMetadata implements JsonSerializable
             $data[$key] = $value;
         }
 
-        return \json_encode($data);
+        return $data;
     }
 
-    public static function jsonUnserialize(string $json): StreamMetadata
+    public static function createFromArray(array $data): StreamMetadata
     {
-        $data = \json_decode($json, true);
-
-        if (\JSON_ERROR_NONE !== \json_last_error()) {
-            throw new InvalidArgumentException('Could not json decode string');
-        }
-
         $internal = [
             SystemMetadata::MAX_COUNT,
             SystemMetadata::MAX_AGE,
