@@ -18,7 +18,7 @@ use Amp\Loop;
 require __DIR__ . '/../vendor/autoload.php';
 
 Loop::run(function () {
-    $connection = EventStoreAsyncConnectionBuilder::createFromSettingsWithIpEndPoint(
+    $connection = EventStoreAsyncConnectionFactory::createFromSettingsWithIpEndPoint(
         new EndPoint('eventstore', 1113)
     );
 

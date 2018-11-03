@@ -20,7 +20,7 @@ use Prooph\EventStoreClient\Internal\EventStoreAsyncNodeConnection;
 use Prooph\EventStoreClient\Internal\SingleEndpointDiscoverer;
 use Prooph\EventStoreClient\Internal\StaticEndPointDiscoverer;
 
-class EventStoreAsyncConnectionBuilder
+class EventStoreAsyncConnectionFactory
 {
     /**
      * Sub-delimiters used in user info, query strings and fragments.

@@ -17,9 +17,9 @@ use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\ConnectionSettingsBuilder;
 use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
-use Prooph\EventStoreClient\EventStoreAsyncConnectionBuilder;
+use Prooph\EventStoreClient\EventStoreAsyncConnectionFactory;
 use Prooph\EventStoreClient\EventStoreSyncConnection;
-use Prooph\EventStoreClient\EventStoreSyncConnectionBuilder;
+use Prooph\EventStoreClient\EventStoreSyncConnectionFactory;
 use Prooph\EventStoreClient\UserCredentials;
 
 /** @internal */
@@ -29,7 +29,7 @@ class TestConnection
     {
         self::checkRequiredEnvironmentSettings();
 
-        return EventStoreAsyncConnectionBuilder::createFromSettingsWithIpEndPoint(
+        return EventStoreAsyncConnectionFactory::createFromSettingsWithIpEndPoint(
             self::endPoint(),
             self::settings($userCredentials)
         );
@@ -39,7 +39,7 @@ class TestConnection
     {
         self::checkRequiredEnvironmentSettings();
 
-        return EventStoreSyncConnectionBuilder::createFromSettingsWithEndPoint(
+        return EventStoreSyncConnectionFactory::createFromSettingsWithEndPoint(
             self::endPoint(),
             self::settings($userCredentials)
         );
