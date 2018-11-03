@@ -46,6 +46,7 @@ use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\EventStoreAsyncTransaction;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
+use Prooph\EventStoreClient\Exception\JsonException;
 use Prooph\EventStoreClient\Exception\MaxQueueSizeLimitReachedException;
 use Prooph\EventStoreClient\Exception\OutOfRangeException;
 use Prooph\EventStoreClient\Exception\UnexpectedValueException;
@@ -378,10 +379,22 @@ final class EventStoreAsyncNodeConnection implements
         ?StreamMetadata $metadata,
         ?UserCredentials $userCredentials = null
     ): Promise {
+        $string = '';
+
+        if ($metadata) {
+            $flags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
+
+            $string = \json_encode($metadata, $flags);
+
+            if ($error = \json_last_error()) {
+                throw new JsonException(\json_last_error_msg(), $error);
+            }
+        }
+
         return $this->setRawStreamMetadataAsync(
             $stream,
             $expectedMetaStreamVersion,
-            $metadata ? $metadata->jsonSerialize() : '',
+            $string,
             $userCredentials
         );
     }
@@ -539,10 +552,18 @@ final class EventStoreAsyncNodeConnection implements
 
     public function setSystemSettingsAsync(SystemSettings $settings, ?UserCredentials $userCredentials = null): Promise
     {
+        $flags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
+
+        $string = \json_encode($settings, $flags);
+
+        if ($error = \json_last_error()) {
+            throw new JsonException(\json_last_error_msg(), $error);
+        }
+
         return $this->appendToStreamAsync(
             SystemStreams::SETTINGS_STREAM,
             ExpectedVersion::ANY,
-            [new EventData(null, SystemEventTypes::SETTINGS, true, $settings->jsonSerialize())],
+            [new EventData(null, SystemEventTypes::SETTINGS, true, $string)],
             $userCredentials
         );
     }

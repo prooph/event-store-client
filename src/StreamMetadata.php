@@ -150,7 +150,7 @@ class StreamMetadata implements JsonSerializable
         return $this->customMetadata[$key];
     }
 
-    public function jsonSerialize(): string
+    public function jsonSerialize(): array
     {
         $data = [];
 
@@ -178,15 +178,7 @@ class StreamMetadata implements JsonSerializable
             $data[$key] = $value;
         }
 
-        $flags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
-
-        $string = \json_encode($data, $flags);
-
-        if ($error = \json_last_error()) {
-            throw new JsonException(\json_last_error_msg(), $error);
-        }
-
-        return $string;
+        return $data;
     }
 
     public static function jsonUnserialize(string $json): StreamMetadata

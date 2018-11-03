@@ -68,22 +68,12 @@ class SystemSettings implements JsonSerializable
         return $this->systemStreamAcl;
     }
 
-    public function jsonSerialize(): string
+    public function jsonSerialize(): array
     {
-        $data = [
+        return [
             SystemMetadata::USER_STREAM_ACL => $this->userStreamAcl->toArray(),
             SystemMetadata::SYSTEM_STREAM_ACL => $this->systemStreamAcl->toArray(),
         ];
-
-        $flags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
-
-        $string = \json_encode($data, $flags);
-
-        if ($error = \json_last_error()) {
-            throw new JsonException(\json_last_error_msg(), $error);
-        }
-
-        return $string;
     }
 
     public static function jsonUnserialize(string $json): SystemSettings
