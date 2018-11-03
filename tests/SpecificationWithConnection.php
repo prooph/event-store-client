@@ -31,7 +31,10 @@ trait SpecificationWithConnection
         yield new Success();
     }
 
-    abstract protected function when(): Generator;
+    protected function when(): Generator
+    {
+        yield new Success();
+    }
 
     /** @throws Throwable */
     protected function execute(callable $test): void
