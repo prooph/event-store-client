@@ -46,7 +46,6 @@ use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\EventStoreAsyncTransaction;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
-use Prooph\EventStoreClient\Exception\JsonException;
 use Prooph\EventStoreClient\Exception\MaxQueueSizeLimitReachedException;
 use Prooph\EventStoreClient\Exception\OutOfRangeException;
 use Prooph\EventStoreClient\Exception\UnexpectedValueException;
@@ -379,7 +378,7 @@ final class EventStoreAsyncNodeConnection implements
         ?StreamMetadata $metadata,
         ?UserCredentials $userCredentials = null
     ): Promise {
-        $string = $metadata ? Json::encode($metadata): '';
+        $string = $metadata ? Json::encode($metadata) : '';
 
         return $this->setRawStreamMetadataAsync(
             $stream,

@@ -24,7 +24,6 @@ use Generator;
 use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\Exception\ClusterException;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Exception\JsonException;
 use Prooph\EventStoreClient\GossipSeed;
 use Prooph\EventStoreClient\Messages\ClusterMessages\ClusterInfoDto;
 use Prooph\EventStoreClient\Messages\ClusterMessages\MemberInfoDto;

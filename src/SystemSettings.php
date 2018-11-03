@@ -16,7 +16,6 @@ namespace Prooph\EventStoreClient;
 use JsonSerializable;
 use Prooph\EventStoreClient\Common\SystemMetadata;
 use Prooph\EventStoreClient\Common\SystemRoles;
-use Prooph\EventStoreClient\Exception\JsonException;
 use Prooph\EventStoreClient\Internal\Json;
 
 class SystemSettings implements JsonSerializable

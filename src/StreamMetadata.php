@@ -16,7 +16,6 @@ namespace Prooph\EventStoreClient;
 use JsonSerializable;
 use Prooph\EventStoreClient\Common\SystemMetadata;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Exception\JsonException;
 use Prooph\EventStoreClient\Internal\Json;
 
 class StreamMetadata implements JsonSerializable

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Amp\Deferred;
 use Prooph\EventStoreClient\Exception\JsonException;
 
 class Json
