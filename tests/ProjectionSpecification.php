@@ -99,7 +99,7 @@ trait ProjectionSpecification
         return $this->projectionsManager->createContinuousAsync(
             $projectionName,
             $query,
-            null,
+            false,
             $type,
             $this->credentials
         );

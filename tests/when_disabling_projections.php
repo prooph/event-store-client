@@ -43,7 +43,7 @@ class when_disabling_projections extends TestCase
         yield $this->projectionsManager->createContinuousAsync(
             $this->projectionName,
             $this->query,
-            null,
+            false,
             'JS',
             $this->credentials
         );

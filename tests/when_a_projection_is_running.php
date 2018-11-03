@@ -46,7 +46,7 @@ class when_a_projection_is_running extends TestCase
         yield $this->projectionsManager->createContinuousAsync(
             $this->projectionName,
             $this->query,
-            null,
+            false,
             'JS',
             $this->credentials
         );
