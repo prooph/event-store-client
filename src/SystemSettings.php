@@ -16,7 +16,6 @@ namespace Prooph\EventStoreClient;
 use JsonSerializable;
 use Prooph\EventStoreClient\Common\SystemMetadata;
 use Prooph\EventStoreClient\Common\SystemRoles;
-use Prooph\EventStoreClient\Internal\Json;
 
 class SystemSettings implements JsonSerializable
 {
@@ -76,10 +75,8 @@ class SystemSettings implements JsonSerializable
         ];
     }
 
-    public static function jsonUnserialize(string $json): SystemSettings
+    public static function createFromArray(array $data): SystemSettings
     {
-        $data = Json::decode($json);
-
         if (! isset($data[SystemMetadata::USER_STREAM_ACL])) {
             throw new \InvalidArgumentException(SystemMetadata::USER_STREAM_ACL . ' is missing');
         }

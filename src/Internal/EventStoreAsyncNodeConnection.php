@@ -458,7 +458,7 @@ final class EventStoreAsyncNodeConnection implements
                 return;
             }
 
-            $metadata = StreamMetadata::jsonUnserialize($result->streamMetadata());
+            $metadata = StreamMetadata::createFromArray(Json::decode($result->streamMetadata()));
 
             $deferred->resolve(new StreamMetadataResult(
                 $result->streamMetadata(),
