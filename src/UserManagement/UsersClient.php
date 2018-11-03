@@ -21,6 +21,7 @@ use Prooph\EventStoreClient\Exception\JsonException;
 use Prooph\EventStoreClient\Exception\UserCommandConflictException;
 use Prooph\EventStoreClient\Exception\UserCommandFailedException;
 use Prooph\EventStoreClient\Internal\DateTimeUtil;
+use Prooph\EventStoreClient\Internal\Json;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\Transport\Http\HttpAsyncClient;
 use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
@@ -118,10 +119,10 @@ class UsersClient
                 return;
             }
 
-            $data = \json_decode($body, true, 512, \JSON_BIGINT_AS_STRING);
-
-            if ($error = \json_last_error()) {
-                $deferred->fail(new JsonException(\json_last_error_msg(), $error));
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
 
                 return;
             }
@@ -176,10 +177,10 @@ class UsersClient
                 return;
             }
 
-            $data = \json_decode($body, true, 512, \JSON_BIGINT_AS_STRING);
-
-            if ($error = \json_last_error()) {
-                $deferred->fail(new JsonException(\json_last_error_msg(), $error));
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
 
                 return;
             }
@@ -224,10 +225,10 @@ class UsersClient
                 return;
             }
 
-            $data = \json_decode($body, true, 512, \JSON_BIGINT_AS_STRING);
-
-            if ($error = \json_last_error()) {
-                $deferred->fail(new JsonException(\json_last_error_msg(), $error));
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
 
                 return;
             }
@@ -259,21 +260,13 @@ class UsersClient
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        $flags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
-
-        $string = \json_encode($newUser, $flags);
-
-        if ($error = \json_last_error()) {
-            throw new JsonException(\json_last_error_msg(), $error);
-        }
-
         return $this->sendPost(
             EndpointExtensions::rawUrlToHttpUrl(
                 $endPoint,
                 $httpSchema,
                 '/users/'
             ),
-            $string,
+            Json::encode($newUser),
             $userCredentials,
             HttpStatusCode::CREATED
         );
@@ -286,14 +279,6 @@ class UsersClient
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        $flags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
-
-        $string = \json_encode($updatedUser, $flags);
-
-        if ($error = \json_last_error()) {
-            throw new JsonException(\json_last_error_msg(), $error);
-        }
-
         return $this->sendPut(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
@@ -301,7 +286,7 @@ class UsersClient
                 '/users/%s',
                 $login
             ),
-            $string,
+            Json::encode($updatedUser),
             $userCredentials,
             HttpStatusCode::OK
         );
@@ -314,14 +299,6 @@ class UsersClient
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        $flags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
-
-        $string = \json_encode($changePasswordDetails, $flags);
-
-        if ($error = \json_last_error()) {
-            throw new JsonException(\json_last_error_msg(), $error);
-        }
-
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
@@ -329,7 +306,7 @@ class UsersClient
                 '/users/%s/command/change-password',
                 $login
             ),
-            $string,
+            Json::encode($changePasswordDetails),
             $userCredentials,
             HttpStatusCode::OK
         );
@@ -342,14 +319,6 @@ class UsersClient
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        $flags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
-
-        $string = \json_encode($resetPasswordDetails, $flags);
-
-        if ($error = \json_last_error()) {
-            throw new JsonException(\json_last_error_msg(), $error);
-        }
-
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
@@ -357,7 +326,7 @@ class UsersClient
                 '/users/%s/command/reset-password',
                 $login
             ),
-            $string,
+            Json::encode($resetPasswordDetails),
             $userCredentials,
             HttpStatusCode::OK
         );

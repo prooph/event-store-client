@@ -17,6 +17,7 @@ use JsonSerializable;
 use Prooph\EventStoreClient\Common\SystemMetadata;
 use Prooph\EventStoreClient\Common\SystemRoles;
 use Prooph\EventStoreClient\Exception\JsonException;
+use Prooph\EventStoreClient\Internal\Json;
 
 class SystemSettings implements JsonSerializable
 {
@@ -78,11 +79,7 @@ class SystemSettings implements JsonSerializable
 
     public static function jsonUnserialize(string $json): SystemSettings
     {
-        $data = \json_decode($json, true, 512, \JSON_BIGINT_AS_STRING);
-
-        if ($error = \json_last_error()) {
-            throw new JsonException(\json_last_error_msg(), $error);
-        }
+        $data = Json::decode($json);
 
         if (! isset($data[SystemMetadata::USER_STREAM_ACL])) {
             throw new \InvalidArgumentException(SystemMetadata::USER_STREAM_ACL . ' is missing');

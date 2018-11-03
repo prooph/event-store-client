@@ -379,17 +379,7 @@ final class EventStoreAsyncNodeConnection implements
         ?StreamMetadata $metadata,
         ?UserCredentials $userCredentials = null
     ): Promise {
-        $string = '';
-
-        if ($metadata) {
-            $flags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
-
-            $string = \json_encode($metadata, $flags);
-
-            if ($error = \json_last_error()) {
-                throw new JsonException(\json_last_error_msg(), $error);
-            }
-        }
+        $string = $metadata ? Json::encode($metadata): '';
 
         return $this->setRawStreamMetadataAsync(
             $stream,
@@ -552,18 +542,10 @@ final class EventStoreAsyncNodeConnection implements
 
     public function setSystemSettingsAsync(SystemSettings $settings, ?UserCredentials $userCredentials = null): Promise
     {
-        $flags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
-
-        $string = \json_encode($settings, $flags);
-
-        if ($error = \json_last_error()) {
-            throw new JsonException(\json_last_error_msg(), $error);
-        }
-
         return $this->appendToStreamAsync(
             SystemStreams::SETTINGS_STREAM,
             ExpectedVersion::ANY,
-            [new EventData(null, SystemEventTypes::SETTINGS, true, $string)],
+            [new EventData(null, SystemEventTypes::SETTINGS, true, Json::encode($settings))],
             $userCredentials
         );
     }
