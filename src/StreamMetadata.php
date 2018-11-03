@@ -16,6 +16,7 @@ namespace Prooph\EventStoreClient;
 use JsonSerializable;
 use Prooph\EventStoreClient\Common\SystemMetadata;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStoreClient\Exception\JsonException;
 
 class StreamMetadata implements JsonSerializable
 {
@@ -177,15 +178,23 @@ class StreamMetadata implements JsonSerializable
             $data[$key] = $value;
         }
 
-        return \json_encode($data);
+        $flags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
+
+        $string = \json_encode($data, $flags);
+
+        if ($error = \json_last_error()) {
+            throw new JsonException(\json_last_error_msg(), $error);
+        }
+
+        return $string;
     }
 
     public static function jsonUnserialize(string $json): StreamMetadata
     {
-        $data = \json_decode($json, true);
+        $data = \json_decode($json, true, 512, \JSON_BIGINT_AS_STRING);
 
-        if (\JSON_ERROR_NONE !== \json_last_error()) {
-            throw new InvalidArgumentException('Could not json decode string');
+        if ($error = \json_last_error()) {
+            throw new JsonException(\json_last_error_msg(), $error);
         }
 
         $internal = [

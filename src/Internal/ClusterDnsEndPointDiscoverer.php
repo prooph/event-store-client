@@ -24,6 +24,7 @@ use Generator;
 use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\Exception\ClusterException;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStoreClient\Exception\JsonException;
 use Prooph\EventStoreClient\GossipSeed;
 use Prooph\EventStoreClient\Messages\ClusterMessages\ClusterInfoDto;
 use Prooph\EventStoreClient\Messages\ClusterMessages\MemberInfoDto;
@@ -252,11 +253,11 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
                 return null;
             }
 
-            $data = yield $response->getBody()->getInputStream()->read();
-            $data = \json_decode($data, true);
+            $json = yield $response->getBody()->getInputStream()->read();
+            $data = \json_decode($json, true, 512, \JSON_BIGINT_AS_STRING);
 
-            if (\JSON_ERROR_NONE !== \json_last_error()) {
-                return null;
+            if ($error = \json_last_error()) {
+                throw new JsonException(\json_last_error_msg(), $error);
             }
 
             $members = [];

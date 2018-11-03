@@ -16,7 +16,7 @@ namespace Prooph\EventStoreClient;
 use JsonSerializable;
 use Prooph\EventStoreClient\Common\SystemMetadata;
 use Prooph\EventStoreClient\Common\SystemRoles;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStoreClient\Exception\JsonException;
 
 class SystemSettings implements JsonSerializable
 {
@@ -70,18 +70,28 @@ class SystemSettings implements JsonSerializable
 
     public function jsonSerialize(): string
     {
-        return \json_encode([
+        $data = [
             SystemMetadata::USER_STREAM_ACL => $this->userStreamAcl->toArray(),
             SystemMetadata::SYSTEM_STREAM_ACL => $this->systemStreamAcl->toArray(),
-        ]);
+        ];
+
+        $flags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
+
+        $string = \json_encode($data, $flags);
+
+        if ($error = \json_last_error()) {
+            throw new JsonException(\json_last_error_msg(), $error);
+        }
+
+        return $string;
     }
 
     public static function jsonUnserialize(string $json): SystemSettings
     {
-        $data = \json_decode($json, true);
+        $data = \json_decode($json, true, 512, \JSON_BIGINT_AS_STRING);
 
-        if (\JSON_ERROR_NONE !== \json_last_error()) {
-            throw new InvalidArgumentException('Could not json decode string');
+        if ($error = \json_last_error()) {
+            throw new JsonException(\json_last_error_msg(), $error);
         }
 
         if (! isset($data[SystemMetadata::USER_STREAM_ACL])) {
