@@ -143,7 +143,7 @@ class ProjectionsManager
     public function createContinuousAsync(
         string $name,
         string $query,
-        ?bool $trackEmittedStreams = null,
+        bool $trackEmittedStreams = false,
         string $type = 'JS',
         ?UserCredentials $userCredentials = null
     ): Promise {

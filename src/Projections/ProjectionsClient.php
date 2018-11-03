@@ -144,26 +144,11 @@ class ProjectionsClient
         EndPoint $endPoint,
         string $name,
         string $query,
-        ?bool $trackEmitted = null,
+        bool $trackEmittedStreams = false,
         string $type = 'JS',
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        if (null === $trackEmitted) {
-            return $this->sendPost(
-                EndpointExtensions::formatStringToHttpUrl(
-                    $endPoint,
-                    $httpSchema,
-                    '/projections/continuous?name=%s&type=%s&emit=1',
-                    $name,
-                    $type
-                ),
-                $query,
-                $userCredentials,
-                HttpStatusCode::CREATED
-            );
-        }
-
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
@@ -171,7 +156,7 @@ class ProjectionsClient
                 '/projections/continuous?name=%s&type=%s&emit=1&trackemittedstreams=%d',
                 $name,
                 $type,
-                (int) $trackEmitted
+                (int) $trackEmittedStreams
             ),
             $query,
             $userCredentials,
