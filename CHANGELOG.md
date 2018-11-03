@@ -1,8 +1,20 @@
 # Change Log
 
-## [v1.0.0-beta-3](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-3)
+## [v1.0.0-beta-4](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-4)
 
-[Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-2...v1.0.0-beta-)
+[Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-3...v1.0.0-beta-4)
+
+**Implemented enhancements:**
+
+- Rename builders to factories [\#25](https://github.com/prooph/event-store-client/pull/25) ([enumag](https://github.com/enumag))
+- use json flags [\#24](https://github.com/prooph/event-store-client/pull/24) ([prolic](https://github.com/prolic))
+
+**Merged pull requests:**
+
+- Update demo-sync.php [\#23](https://github.com/prooph/event-store-client/pull/23) ([enumag](https://github.com/enumag))
+
+## [v1.0.0-beta-3](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-3) (2018-10-28)
+[Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-2...v1.0.0-beta-3)
 
 **Implemented enhancements:**
 
