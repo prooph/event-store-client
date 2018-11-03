@@ -63,7 +63,7 @@ class when_creating_continuous_projection_with_track_emitted_streams extends Tes
      * @test
      * @throws Throwable
      */
-    public function should_create_projection(): string
+    public function should_return_continuous_projections(): string
     {
         $this->execute(function () {
             /** @var ProjectionDetails[] $allProjections */

@@ -466,7 +466,7 @@ class ProjectionsClient
         EndPoint $endPoint,
         string $name,
         string $query,
-        ?bool $emitEnabled = null,
+        bool $emitEnabled = false,
         string $type = 'JS',
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA

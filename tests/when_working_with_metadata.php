@@ -28,7 +28,7 @@ class when_working_with_metadata extends TestCase
      * @test
      * @throws Throwable
      */
-    public function should_be_able_to_get_the_projection_state(): void
+    public function when_getting_metadata_for_an_existing_stream_and_no_metadata_exists(): void
     {
         wait(call(function () {
             $connection = TestConnection::createAsync();

@@ -375,7 +375,7 @@ class ProjectionsManager
     public function updateQueryAsync(
         string $name,
         string $query,
-        ?bool $emitEnabled = null,
+        bool $emitEnabled = false,
         string $type = 'JS',
         ?UserCredentials $userCredentials = null
     ): Promise {
