@@ -20,7 +20,7 @@ use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\EventStoreAsyncConnectionBuilder;
+use Prooph\EventStoreClient\EventStoreAsyncConnectionFactory;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
 use Prooph\EventStoreClient\ExpectedVersion;
 use ProophTest\EventStoreClient\Helper\TestEvent;
@@ -46,7 +46,7 @@ class connect extends TestCase
     public function should_not_throw_exception_when_server_is_down(): void
     {
         wait(call(function () {
-            $connection = EventStoreAsyncConnectionBuilder::createFromSettingsWithIpEndPoint(
+            $connection = EventStoreAsyncConnectionFactory::createFromSettingsWithIpEndPoint(
                 $this->blackhole
             );
 
@@ -70,7 +70,7 @@ class connect extends TestCase
                 ->setReconnectionDelayTo(0)
                 ->failOnNoServerResponse();
 
-            $connection = EventStoreAsyncConnectionBuilder::createFromSettingsWithIpEndPoint(
+            $connection = EventStoreAsyncConnectionFactory::createFromSettingsWithIpEndPoint(
                 $this->blackhole,
                 $settings->build()
             );
@@ -107,7 +107,7 @@ class connect extends TestCase
                 ->setReconnectionDelayTo(0)
                 ->failOnNoServerResponse();
 
-            $connection = EventStoreAsyncConnectionBuilder::createFromSettingsWithIpEndPoint(
+            $connection = EventStoreAsyncConnectionFactory::createFromSettingsWithIpEndPoint(
                 $this->blackhole,
                 $settings->build()
             );
