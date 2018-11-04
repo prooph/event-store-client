@@ -21,8 +21,6 @@ use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
-use Prooph\EventStoreClient\Internal\UuidGenerator;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
 
 class connect_to_non_existing_persistent_subscription_with_permissions extends TestCase

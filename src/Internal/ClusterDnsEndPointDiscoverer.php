@@ -204,7 +204,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
     /**
      * @param MemberInfoDto[] $members
-     * @return MemberInfoDto[]
+     * @return GossipSeed[]
      */
     private function arrangeGossipCandidates(array $members): array
     {
@@ -212,7 +212,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         $i = -1;
         $j = \count($members);
 
-        for ($k = 0; $k < \count($members); ++$k) {
+        foreach ($members as $k => $member) {
             if ($members[$k]->state()->equals(VNodeState::manager())) {
                 $result[--$j] = new GossipSeed(new EndPoint($members[$k]->externalHttpIp(), $members[$k]->externalHttpPort()));
             } else {

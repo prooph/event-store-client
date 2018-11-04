@@ -45,6 +45,8 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
     private $bufferCount = 10;
     /** @var Deferred */
     private $eventsReceived;
+    /** @var int */
+    private $eventReceivedCount;
 
     protected function setUp(): void
     {

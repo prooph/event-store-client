@@ -63,7 +63,7 @@ class catch_up_subscription_handles_errors extends TestCase
     private $dropEvent;
     /** @var Deferred */
     private $raisedEventEvent;
-    /** @var Throwable */
+    /** @var Throwable|null */
     private $dropException;
     /** @var SubscriptionDropReason */
     private $dropReason;

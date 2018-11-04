@@ -122,8 +122,8 @@ abstract class EventStoreCatchUpSubscription
         $this->verbose = $settings->verboseLogging();
         $this->liveQueue = new SplQueue();
         $this->subscriptionName = $settings->subscriptionName() ?? '';
-        $this->connectListener = function (): void {
-        };
+        $this->connectListener = new ListenerHandler(function (): void {
+        });
         $this->stopped = new ManualResetEventSlim(true);
     }
 

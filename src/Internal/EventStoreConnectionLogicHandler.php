@@ -57,7 +57,7 @@ class EventStoreConnectionLogicHandler
 
     /** @var EventStoreAsyncConnection */
     private $esConnection;
-    /** @var TcpPackageConnection */
+    /** @var TcpPackageConnection|null */
     private $connection;
     /** @var ConnectionSettings */
     private $settings;
@@ -415,7 +415,7 @@ class EventStoreConnectionLogicHandler
     {
         if (! $this->state->equals(ConnectionState::connecting())
             || $this->connection !== $connection
-            || $this->connection->isClosed()
+            || ($this->connection && $this->connection->isClosed())
         ) {
             $this->logDebug('IGNORED (state %s, internal conn.Id %s, conn.Id %s, conn.closed %s): TCP connection to [%s] established',
                 $this->state,

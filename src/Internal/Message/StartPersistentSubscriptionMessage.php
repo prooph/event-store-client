@@ -16,7 +16,6 @@ namespace Prooph\EventStoreClient\Internal\Message;
 use Amp\Deferred;
 use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\SubscriptionDropped;
-use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\UserCredentials;
 
 /** @internal  */
@@ -34,7 +33,7 @@ class StartPersistentSubscriptionMessage implements Message
     private $userCredentials;
     /** @var EventAppearedOnSubscription */
     private $eventAppeared;
-    /** @var SubscriptionDropReason|null */
+    /** @var SubscriptionDropped|null */
     private $subscriptionDropped;
     /** @var int */
     private $maxRetries;

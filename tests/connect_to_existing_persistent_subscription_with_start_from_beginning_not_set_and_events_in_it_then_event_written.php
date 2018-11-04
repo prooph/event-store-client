@@ -27,7 +27,6 @@ use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Throwable;
-use function Amp\call;
 
 class connect_to_existing_persistent_subscription_with_start_from_beginning_not_set_and_events_in_it_then_event_written extends TestCase
 {

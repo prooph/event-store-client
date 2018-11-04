@@ -36,7 +36,7 @@ class CreatePersistentSubscriptionOperation extends AbstractOperation
 {
     /** @var string */
     private $stream;
-    /** @var int */
+    /** @var string */
     private $groupName;
     /** @var PersistentSubscriptionSettings */
     private $settings;

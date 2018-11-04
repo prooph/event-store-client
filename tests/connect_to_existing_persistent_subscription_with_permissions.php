@@ -28,7 +28,7 @@ class connect_to_existing_persistent_subscription_with_permissions extends TestC
 {
     use SpecificationWithConnection;
 
-    /** @var AbstractEventStorePersistentSubscription */
+    /** @var Promise */
     private $sub;
     /** @var string */
     private $stream;

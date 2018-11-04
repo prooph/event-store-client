@@ -69,7 +69,7 @@ abstract class AbstractEventStorePersistentSubscription
     private $subscription;
     /** @var SplQueue */
     private $queue;
-    /** @var int */
+    /** @var bool */
     private $isProcessing = false;
     /** @var DropData */
     private $dropData;
