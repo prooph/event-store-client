@@ -35,27 +35,6 @@ final class UserCreationInformation implements JsonSerializable
         $this->password = $password;
     }
 
-    public function loginName(): string
-    {
-        return $this->loginName;
-    }
-
-    public function fullName(): string
-    {
-        return $this->fullName;
-    }
-
-    /** @return string[] */
-    public function groups(): array
-    {
-        return $this->groups;
-    }
-
-    public function password(): string
-    {
-        return $this->password;
-    }
-
     public function jsonSerialize(): array
     {
         return [

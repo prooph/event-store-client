@@ -16,6 +16,7 @@ namespace Prooph\EventStoreClient;
 use JsonSerializable;
 use Prooph\EventStoreClient\Common\SystemMetadata;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStoreClient\Exception\RuntimeException;
 
 class StreamMetadata implements JsonSerializable
 {
@@ -139,7 +140,7 @@ class StreamMetadata implements JsonSerializable
     public function getValue(string $key)
     {
         if (! \array_key_exists($key, $this->customMetadata)) {
-            throw new \InvalidArgumentException('Key ' . $key . ' not found in custom metadata');
+            throw new RuntimeException('Key ' . $key . ' not found in custom metadata');
         }
 
         return $this->customMetadata[$key];

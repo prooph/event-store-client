@@ -20,6 +20,7 @@ use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\StreamDeletedException;
 use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
 use Prooph\EventStoreClient\ExpectedVersion;
+use Prooph\EventStoreClient\ReadDirection;
 use Prooph\EventStoreClient\StreamEventsSlice;
 use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\WriteResult;
@@ -74,6 +75,9 @@ class append_to_stream extends TestCase
             $slice = yield $connection->readStreamEventsForwardAsync($stream1, 0, 2, false);
             \assert($slice instanceof StreamEventsSlice);
             $this->assertCount(0, $slice->events());
+            $this->assertEquals($stream1, $slice->stream());
+            $this->assertEquals(0, $slice->fromEventNumber());
+            $this->assertEquals($slice->readDirection()->name(), ReadDirection::forward()->name());
 
             $result = yield $connection->appendToStreamAsync($stream2, ExpectedVersion::NO_STREAM, []);
             $this->assertSame(-1, $result->nextExpectedVersion());

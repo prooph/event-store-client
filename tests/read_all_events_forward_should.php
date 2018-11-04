@@ -22,6 +22,7 @@ use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\Position;
+use Prooph\EventStoreClient\ReadDirection;
 use Prooph\EventStoreClient\RecordedEvent;
 use Prooph\EventStoreClient\ResolvedEvent;
 use Prooph\EventStoreClient\StreamAcl;
@@ -117,6 +118,7 @@ class read_all_events_forward_should extends TestCase
             );
 
             $this->assertTrue(EventDataComparer::allEqual($this->testEvents, $events));
+            $this->assertTrue($read->readDirection()->equals(ReadDirection::forward()));
         });
     }
 
@@ -145,6 +147,7 @@ class read_all_events_forward_should extends TestCase
             $events = \array_slice($all, \count($all) - \count($this->testEvents));
 
             $this->assertTrue(EventDataComparer::allEqual($this->testEvents, $events));
+            $this->assertTrue($slice->fromPosition()->equals($position));
         });
     }
 

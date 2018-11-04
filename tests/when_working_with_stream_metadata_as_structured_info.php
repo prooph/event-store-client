@@ -15,6 +15,7 @@ namespace ProophTest\EventStoreClient;
 
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
+use Prooph\EventStoreClient\Exception\RuntimeException;
 use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\RawStreamMetadataResult;
@@ -91,6 +92,7 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
             $this->assertEquals($this->stream, $meta->stream());
             $this->assertFalse($meta->isStreamDeleted());
             $this->assertEquals(0, $meta->metastreamVersion());
+            $this->assertEmpty($meta->streamMetadata()->customMetadata());
             $this->assertEquals($metadata->maxCount(), $meta->streamMetadata()->maxCount());
             $this->assertEquals($metadata->maxAge(), $meta->streamMetadata()->maxAge());
             $this->assertEquals($metadata->truncateBefore(), $meta->streamMetadata()->truncateBefore());
@@ -114,6 +116,9 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
             $this->assertEquals($metadata->maxAge(), $meta->streamMetadata()->maxAge());
             $this->assertEquals($metadata->truncateBefore(), $meta->streamMetadata()->truncateBefore());
             $this->assertEquals($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
+
+            $this->expectException(RuntimeException::class);
+            $meta->streamMetadata()->getValue('unknown');
         });
     }
 

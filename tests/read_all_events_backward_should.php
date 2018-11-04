@@ -22,6 +22,7 @@ use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\Position;
+use Prooph\EventStoreClient\ReadDirection;
 use Prooph\EventStoreClient\RecordedEvent;
 use Prooph\EventStoreClient\ResolvedEvent;
 use Prooph\EventStoreClient\StreamAcl;
@@ -133,6 +134,9 @@ class read_all_events_backward_should extends TestCase
                 \array_reverse($this->testEvents),
                 $readEvents
             ));
+
+            $this->assertTrue($read->readDirection()->equals(ReadDirection::backward()));
+            $this->assertTrue($read->fromPosition()->equals($this->endOfEvents));
         });
     }
 

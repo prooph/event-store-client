@@ -76,7 +76,7 @@ final class UserDetails
         return $this->groups;
     }
 
-    public function dateLastUpdated(): DateTimeImmutable
+    public function dateLastUpdated(): ?DateTimeImmutable
     {
         return $this->dateLastUpdated;
     }
