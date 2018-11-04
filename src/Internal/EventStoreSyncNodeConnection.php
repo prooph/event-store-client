@@ -216,7 +216,7 @@ final class EventStoreSyncNodeConnection implements
     public function setStreamMetadata(
         string $stream,
         int $expectedMetaStreamVersion,
-        StreamMetadata $metadata,
+        ?StreamMetadata $metadata = null,
         ?UserCredentials $userCredentials = null
     ): WriteResult {
         return Promise\wait($this->asyncConnection->setStreamMetadataAsync(

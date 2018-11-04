@@ -18,7 +18,6 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Common\SystemEventTypes;
 use Prooph\EventStoreClient\Common\SystemRoles;
 use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventNumber;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\Json;
 use Prooph\EventStoreClient\SliceReadStatus;

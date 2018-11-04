@@ -112,7 +112,7 @@ interface EventStoreAsyncConnection
     public function setStreamMetadataAsync(
         string $stream,
         int $expectedMetaStreamVersion,
-        ?StreamMetadata $metadata,
+        ?StreamMetadata $metadata = null,
         ?UserCredentials $userCredentials = null
     ): Promise;
 

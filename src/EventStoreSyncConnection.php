@@ -105,7 +105,7 @@ interface EventStoreSyncConnection
     public function setStreamMetadata(
         string $stream,
         int $expectedMetaStreamVersion,
-        StreamMetadata $metadata,
+        ?StreamMetadata $metadata = null,
         ?UserCredentials $userCredentials = null
     ): WriteResult;
 
