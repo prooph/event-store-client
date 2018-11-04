@@ -45,7 +45,7 @@ class update_non_existing_persistent_subscription extends TestCase
      * @test
      * @throws Throwable
      */
-    public function the_completion_fails_with_access_denied(): void
+    public function the_completion_fails_with_not_found(): void
     {
         $this->execute(function () {
             $this->expectException(InvalidOperationException::class);
