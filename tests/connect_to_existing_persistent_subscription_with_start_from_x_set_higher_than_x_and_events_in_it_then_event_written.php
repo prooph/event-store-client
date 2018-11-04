@@ -58,7 +58,16 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_higher_t
 
     protected function given(): Generator
     {
-        yield $this->writeEvents();
+        for ($i = 0; $i < 10; $i++) {
+            $ids[$i] = EventId::generate();
+
+            yield $this->conn->appendToStreamAsync(
+                $this->stream,
+                ExpectedVersion::ANY,
+                [new EventData($ids[$i], 'test', true, '{"foo":"bar"}')],
+                DefaultData::adminCredentials()
+            );
+        }
 
         yield $this->conn->createPersistentSubscriptionAsync(
             $this->stream,
@@ -96,22 +105,6 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_higher_t
             true,
             DefaultData::adminCredentials()
         );
-    }
-
-    private function writeEvents(): Promise
-    {
-        return call(function (): Generator {
-            for ($i = 0; $i < 10; $i++) {
-                $this->ids[$i] = EventId::generate();
-
-                yield $this->conn->appendToStreamAsync(
-                    $this->stream,
-                    ExpectedVersion::ANY,
-                    [new EventData($this->ids[$i], 'test', true, '{"foo":"bar"}')],
-                    DefaultData::adminCredentials()
-                );
-            }
-        });
     }
 
     protected function when(): Generator

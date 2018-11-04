@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+/** @internal */
 class ListenerHandler
 {
     /** @var callable */

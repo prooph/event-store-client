@@ -131,6 +131,7 @@ class read_all_events_forward_should extends TestCase
         $this->execute(function () {
             $all = [];
             $position = $this->from;
+            $slice = null;
 
             while (true) {
                 $slice = yield $this->conn->readAllEventsForwardAsync($position, 1, false);

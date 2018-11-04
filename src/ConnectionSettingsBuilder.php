@@ -347,7 +347,7 @@ class ConnectionSettingsBuilder
         return $this;
     }
 
-    /** @param EndPoint[] */
+    /** @param EndPoint[] $gossipSeeds */
     public function setGossipSeedEndPoints(array $gossipSeeds): self
     {
         if (empty($gossipSeeds)) {
@@ -365,7 +365,7 @@ class ConnectionSettingsBuilder
         return $this;
     }
 
-    /** @param GossipSeed[] */
+    /** @param GossipSeed[] $gossipSeeds */
     public function setGossipSeeds(array $gossipSeeds): self
     {
         if (empty($gossipSeeds)) {

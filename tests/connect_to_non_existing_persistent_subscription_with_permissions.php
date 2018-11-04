@@ -32,15 +32,6 @@ class connect_to_non_existing_persistent_subscription_with_permissions extends T
     /** @var Throwable */
     private $exception;
 
-    protected function setUp(): void
-    {
-        $this->stream = '$' . UuidGenerator::generate();
-        $this->settings = PersistentSubscriptionSettings::create()
-            ->doNotResolveLinkTos()
-            ->startFromCurrent()
-            ->build();
-    }
-
     protected function when(): Generator
     {
         try {

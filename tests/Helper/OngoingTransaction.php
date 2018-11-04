@@ -31,7 +31,7 @@ class OngoingTransaction
     }
 
     /**
-     * @param EventData[]
+     * @param EventData[] $events
      * @return Promise<OngoingTransaction>
      */
     public function writeAsync(array $events): Promise

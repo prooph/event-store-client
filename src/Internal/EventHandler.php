@@ -40,6 +40,7 @@ class EventHandler
     public function connected(ClientConnectionEventArgs $args): void
     {
         foreach ($this->handlers['connected'] as $handler) {
+            \assert($handler instanceof ListenerHandler);
             $handler->callback()($args);
         }
     }
@@ -47,6 +48,7 @@ class EventHandler
     public function disconnected(ClientConnectionEventArgs $args): void
     {
         foreach ($this->handlers['disconnected'] as $handler) {
+            \assert($handler instanceof ListenerHandler);
             $handler->callback()($args);
         }
     }
@@ -54,6 +56,7 @@ class EventHandler
     public function reconnecting(ClientReconnectingEventArgs $args): void
     {
         foreach ($this->handlers['reconnecting'] as $handler) {
+            \assert($handler instanceof ListenerHandler);
             $handler->callback()($args);
         }
     }
@@ -61,6 +64,7 @@ class EventHandler
     public function closed(ClientClosedEventArgs $args): void
     {
         foreach ($this->handlers['closed'] as $handler) {
+            \assert($handler instanceof ListenerHandler);
             $handler->callback()($args);
         }
     }
@@ -68,6 +72,7 @@ class EventHandler
     public function errorOccurred(ClientErrorEventArgs $args): void
     {
         foreach ($this->handlers['errorOccurred'] as $handler) {
+            \assert($handler instanceof ListenerHandler);
             $handler->callback()($args);
         }
     }
@@ -75,6 +80,7 @@ class EventHandler
     public function authenticationFailed(ClientAuthenticationFailedEventArgs $args): void
     {
         foreach ($this->handlers['authenticationFailed'] as $handler) {
+            \assert($handler instanceof ListenerHandler);
             $handler->callback()($args);
         }
     }
