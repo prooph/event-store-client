@@ -141,9 +141,8 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
                 : $this->getGossipCandidatesFromDns();
 
             foreach ($gossipCandidates as $candidate) {
-
-                /** @var ClusterInfoDto|null $gossip */
                 $gossip = yield $this->tryGetGossipFrom($candidate);
+                \assert(null === $gossip || $gossip instanceof ClusterInfoDto);
 
                 if (null === $gossip || empty($gossip->members())) {
                     continue;
@@ -242,8 +241,8 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
                     $request = $request->withHeader($headerData[0], $headerData[1]);
                 }
 
-                /** @var Response $response */
                 $response = yield $this->client->request($request);
+                \assert($response instanceof Response);
             } catch (Throwable $e) {
                 return null;
             }
@@ -290,7 +289,12 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
             return null;
         }
 
-        $key = \rand(0, \count($nodes) - 1);
+        $key = 0;
+
+        if ($preferRandomNode) {
+            $key = \rand(0, \count($nodes) - 1);
+        }
+
         $node = $nodes[$key];
 
         $normTcp = new EndPoint($node->externalTcpIp(), $node->externalTcpPort());

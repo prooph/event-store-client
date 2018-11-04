@@ -21,7 +21,6 @@ use Prooph\EventStoreClient\Internal\EventMessageConverter;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadAllEvents;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadAllEventsCompleted;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadAllEventsCompleted_ReadAllResult as ReadAllResult;
-use Prooph\EventStoreClient\Messages\ClientMessages\ResolvedIndexedEvent;
 use Prooph\EventStoreClient\Position;
 use Prooph\EventStoreClient\ReadDirection;
 use Prooph\EventStoreClient\ResolvedEvent;
@@ -82,7 +81,8 @@ class ReadAllEventsBackwardOperation extends AbstractOperation
 
     protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
-        /** @var ReadAllEventsCompleted $response */
+        \assert($response instanceof ReadAllEventsCompleted);
+
         switch ($response->getResult()) {
             case ReadAllResult::Success:
                 $this->succeed($response);
@@ -110,7 +110,8 @@ class ReadAllEventsBackwardOperation extends AbstractOperation
         $resolvedEvents = [];
 
         foreach ($records as $record) {
-            /** @var ResolvedIndexedEvent $record */
+            \assert($response instanceof ReadAllEventsCompleted);
+
             if ($event = $record->getEvent()) {
                 $event = EventMessageConverter::convertEventRecordMessageToEventRecord($record->getEvent());
             }

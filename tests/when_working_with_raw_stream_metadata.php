@@ -59,8 +59,8 @@ class when_working_with_raw_stream_metadata extends TestCase
                 ExpectedVersion::EMPTY_STREAM
             );
 
-            /** @var RawStreamMetadataResult $meta */
             $meta = yield $this->conn->getRawStreamMetadataAsync($this->stream);
+            \assert($meta instanceof RawStreamMetadataResult);
             $this->assertEquals($this->stream, $meta->stream());
             $this->assertFalse($meta->isStreamDeleted());
             $this->assertEquals(0, $meta->metastreamVersion());
@@ -80,8 +80,8 @@ class when_working_with_raw_stream_metadata extends TestCase
                 ExpectedVersion::EMPTY_STREAM
             );
 
-            /** @var RawStreamMetadataResult $meta */
             $meta = yield $this->conn->getRawStreamMetadataAsync($this->stream);
+            \assert($meta instanceof RawStreamMetadataResult);
             $this->assertEquals($this->stream, $meta->stream());
             $this->assertFalse($meta->isStreamDeleted());
             $this->assertEquals(0, $meta->metastreamVersion());
@@ -92,8 +92,8 @@ class when_working_with_raw_stream_metadata extends TestCase
                 0
             );
 
-            /** @var RawStreamMetadataResult $meta */
             $meta = yield $this->conn->getRawStreamMetadataAsync($this->stream);
+            \assert($meta instanceof RawStreamMetadataResult);
             $this->assertEquals($this->stream, $meta->stream());
             $this->assertFalse($meta->isStreamDeleted());
             $this->assertEquals(1, $meta->metastreamVersion());
@@ -129,8 +129,8 @@ class when_working_with_raw_stream_metadata extends TestCase
                 ExpectedVersion::ANY
             );
 
-            /** @var RawStreamMetadataResult $meta */
             $meta = yield $this->conn->getRawStreamMetadataAsync($this->stream);
+            \assert($meta instanceof RawStreamMetadataResult);
             $this->assertEquals($this->stream, $meta->stream());
             $this->assertFalse($meta->isStreamDeleted());
             $this->assertEquals(0, $meta->metastreamVersion());
@@ -141,8 +141,8 @@ class when_working_with_raw_stream_metadata extends TestCase
                 ExpectedVersion::ANY
             );
 
-            /** @var RawStreamMetadataResult $meta */
             $meta = yield $this->conn->getRawStreamMetadataAsync($this->stream);
+            \assert($meta instanceof RawStreamMetadataResult);
             $this->assertEquals($this->stream, $meta->stream());
             $this->assertFalse($meta->isStreamDeleted());
             $this->assertEquals(1, $meta->metastreamVersion());
@@ -162,8 +162,8 @@ class when_working_with_raw_stream_metadata extends TestCase
                 ExpectedVersion::EMPTY_STREAM
             );
 
-            /** @var RawStreamMetadataResult $meta */
             $meta = yield $this->conn->getRawStreamMetadataAsync($this->stream);
+            \assert($meta instanceof RawStreamMetadataResult);
             $this->assertEquals($this->stream, $meta->stream());
             $this->assertFalse($meta->isStreamDeleted());
             $this->assertEquals(0, $meta->metastreamVersion());
@@ -189,8 +189,8 @@ class when_working_with_raw_stream_metadata extends TestCase
                 ExpectedVersion::EMPTY_STREAM
             );
 
-            /** @var RawStreamMetadataResult $meta */
             $meta = yield $this->conn->getRawStreamMetadataAsync($this->stream);
+            \assert($meta instanceof RawStreamMetadataResult);
             $this->assertEquals($this->stream, $meta->stream());
             $this->assertFalse($meta->isStreamDeleted());
             $this->assertEquals(0, $meta->metastreamVersion());
@@ -227,8 +227,8 @@ class when_working_with_raw_stream_metadata extends TestCase
     public function getting_metadata_for_nonexisting_stream_returns_empty_string(): void
     {
         $this->execute(function () {
-            /** @var RawStreamMetadataResult $meta */
             $meta = yield $this->conn->getRawStreamMetadataAsync($this->stream);
+            \assert($meta instanceof RawStreamMetadataResult);
             $this->assertEquals($this->stream, $meta->stream());
             $this->assertFalse($meta->isStreamDeleted());
             $this->assertEquals(-1, $meta->metastreamVersion());
@@ -247,8 +247,8 @@ class when_working_with_raw_stream_metadata extends TestCase
 
             yield $this->conn->deleteStreamAsync($this->stream, ExpectedVersion::NO_STREAM, true);
 
-            /** @var RawStreamMetadataResult $meta */
             $meta = yield $this->conn->getRawStreamMetadataAsync($this->stream);
+            \assert($meta instanceof RawStreamMetadataResult);
             $this->assertEquals($this->stream, $meta->stream());
             $this->assertTrue($meta->isStreamDeleted());
             $this->assertEquals(EventNumber::DELETED_STREAM, $meta->metastreamVersion());

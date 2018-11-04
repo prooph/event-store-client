@@ -50,23 +50,23 @@ class when_committing_empty_transaction extends TestCase
     {
         yield $this->connection->connectAsync();
 
-        /** @var WriteResult $result */
         $result = yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::NO_STREAM,
             [$this->firstEvent, TestEvent::newTestEvent(), TestEvent::newTestEvent()]
         );
+        \assert($result instanceof WriteResult);
 
         $this->assertSame(2, $result->nextExpectedVersion());
 
-        /** @var EventStoreAsyncTransaction $transaction */
         $transaction = yield $this->connection->startTransactionAsync(
             $this->stream,
             2
         );
+        \assert($transaction instanceof EventStoreAsyncTransaction);
 
-        /** @var WriteResult $result */
         $result = yield $transaction->commitAsync();
+        \assert($result instanceof WriteResult);
 
         $this->assertSame(2, $result->nextExpectedVersion());
     }
@@ -85,22 +85,22 @@ class when_committing_empty_transaction extends TestCase
         wait(call(function () {
             yield from $this->bootstrap();
 
-            /** @var WriteResult $result */
             $result = yield $this->connection->appendToStreamAsync(
                 $this->stream,
                 2,
                 TestEvent::newAmount(2)
             );
+            \assert($result instanceof WriteResult);
 
             $this->assertSame(4, $result->nextExpectedVersion());
 
-            /** @var StreamEventsSlice $result */
             $result = yield $this->connection->readStreamEventsForwardAsync(
                 $this->stream,
                 0,
                 100,
                 false
             );
+            \assert($result instanceof StreamEventsSlice);
 
             $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
             $this->assertCount(5, $result->events());
@@ -120,22 +120,22 @@ class when_committing_empty_transaction extends TestCase
         wait(call(function () {
             yield from $this->bootstrap();
 
-            /** @var WriteResult $result */
             $result = yield $this->connection->appendToStreamAsync(
                 $this->stream,
                 ExpectedVersion::ANY,
                 TestEvent::newAmount(2)
             );
+            \assert($result instanceof WriteResult);
 
             $this->assertSame(4, $result->nextExpectedVersion());
 
-            /** @var StreamEventsSlice $result */
             $result = yield $this->connection->readStreamEventsForwardAsync(
                 $this->stream,
                 0,
                 100,
                 false
             );
+            \assert($result instanceof StreamEventsSlice);
 
             $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
             $this->assertCount(5, $result->events());
@@ -155,22 +155,22 @@ class when_committing_empty_transaction extends TestCase
         wait(call(function () {
             yield from $this->bootstrap();
 
-            /** @var WriteResult $result */
             $result = yield $this->connection->appendToStreamAsync(
                 $this->stream,
                 ExpectedVersion::NO_STREAM,
                 [$this->firstEvent]
             );
+            \assert($result instanceof WriteResult);
 
             $this->assertSame(0, $result->nextExpectedVersion());
 
-            /** @var StreamEventsSlice $result */
             $result = yield $this->connection->readStreamEventsForwardAsync(
                 $this->stream,
                 0,
                 100,
                 false
             );
+            \assert($result instanceof StreamEventsSlice);
 
             $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
             $this->assertCount(3, $result->events());

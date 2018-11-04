@@ -59,7 +59,8 @@ class SubscriptionsManager
         }
 
         while (! $this->waitingSubscriptions->isEmpty()) {
-            /** @var SubscriptionItem $subscriptionItem */
+            \assert($subscriptionItem instanceof SubscriptionItem);
+
             $subscriptionItem = $this->waitingSubscriptions->dequeue();
             $subscriptionItem->operation()->dropSubscription(
                 SubscriptionDropReason::connectionClosed(),
@@ -92,7 +93,8 @@ class SubscriptionsManager
         }
 
         while (! $subscriptionsToRemove->isEmpty()) {
-            /** @var SubscriptionItem $subscriptionItem */
+            \assert($subscriptionItem instanceof SubscriptionItem);
+
             $subscriptionItem = $subscriptionsToRemove->dequeue();
             unset($this->activeSubscriptions[$subscriptionItem->correlationId()]);
         }

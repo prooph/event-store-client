@@ -70,7 +70,8 @@ class CommitTransactionOperation extends AbstractOperation
 
     protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
-        /** @var TransactionCommitCompleted $response */
+        \assert($response instanceof TransactionCommitCompleted);
+
         switch ($response->getResult()) {
             case OperationResult::Success:
                 $this->succeed($response);
@@ -110,7 +111,8 @@ class CommitTransactionOperation extends AbstractOperation
 
     protected function transformResponse(ProtobufMessage $response): WriteResult
     {
-        /** @var TransactionCommitCompleted $response */
+        \assert($response instanceof TransactionCommitCompleted);
+
         return new WriteResult(
             $response->getLastEventNumber(),
             new Position(

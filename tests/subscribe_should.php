@@ -132,7 +132,6 @@ class subscribe_should extends TestCase
 
             $dropped = new Deferred();
 
-            /** @var EventStoreSubscription $subscription */
             $subscription = yield $connection->subscribeToStreamAsync(
                 $stream,
                 false,
@@ -146,6 +145,7 @@ class subscribe_should extends TestCase
                 },
                 $this->subscriptionDroppedResolver($dropped)
             );
+            \assert($subscription instanceof EventStoreSubscription);
 
             $subscription->unsubscribe();
 
@@ -175,7 +175,6 @@ class subscribe_should extends TestCase
 
             $appeared = new Deferred();
 
-            /** @var EventStoreSubscription $subscription */
             yield $connection->subscribeToStreamAsync(
                 $stream,
                 false,

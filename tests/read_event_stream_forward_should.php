@@ -88,13 +88,13 @@ class read_event_stream_forward_should extends TestCase
             $store = TestConnection::createAsync();
             yield $store->connectAsync();
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsForwardAsync(
                 $stream,
                 StreamPosition::START,
                 1,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $this->assertTrue(SliceReadStatus::streamNotFound()->equals($read->status()));
         }));
@@ -113,13 +113,13 @@ class read_event_stream_forward_should extends TestCase
             yield $store->connectAsync();
             yield $store->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsForwardAsync(
                 $stream,
                 StreamPosition::START,
                 1,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $this->assertTrue(SliceReadStatus::streamDeleted()->equals($read->status()));
         }));
@@ -137,13 +137,13 @@ class read_event_stream_forward_should extends TestCase
             $store = TestConnection::createAsync();
             yield $store->connectAsync();
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsForwardAsync(
                 $stream,
                 StreamPosition::START,
                 1,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $this->assertCount(0, $read->events());
         }));
@@ -168,13 +168,13 @@ class read_event_stream_forward_should extends TestCase
                 $testEvents
             );
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsForwardAsync(
                 $stream,
                 11,
                 5,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $this->assertCount(0, $read->events());
         }));
@@ -199,13 +199,13 @@ class read_event_stream_forward_should extends TestCase
                 $testEvents
             );
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsForwardAsync(
                 $stream,
                 9,
                 5,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $this->assertCount(1, $read->events());
         }));
@@ -251,13 +251,13 @@ class read_event_stream_forward_should extends TestCase
                 $testEvents
             );
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsForwardAsync(
                 $stream,
                 StreamPosition::START,
                 10,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $events = \array_map(
                 function (ResolvedEvent $e): RecordedEvent {
@@ -289,13 +289,13 @@ class read_event_stream_forward_should extends TestCase
                 $testEvents
             );
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsForwardAsync(
                 $stream,
                 5,
                 2,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $events = \array_map(
                 function (ResolvedEvent $e): RecordedEvent {

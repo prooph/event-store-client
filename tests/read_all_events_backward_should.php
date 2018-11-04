@@ -67,15 +67,15 @@ class read_all_events_backward_should extends TestCase
 
         yield $this->conn->appendToStreamAsync('stream-' . UuidGenerator::generate(), ExpectedVersion::EMPTY_STREAM, $this->testEvents);
 
-        /** @var WriteResult $result */
         $result = yield $this->conn->appendToStreamAsync('stream-' . UuidGenerator::generate(), ExpectedVersion::NO_STREAM, $this->testEvents);
+        \assert($result instanceof WriteResult);
 
         $lastId = $this->testEvents[19]->eventId();
         $this->endOfEvents = $result->logPosition();
 
         do {
-            /** @var AllEventsSlice $slice */
             $slice = yield $this->conn->readAllEventsBackwardAsync($this->endOfEvents, 1, false);
+            \assert($slice instanceof AllEventsSlice);
 
             if ($slice->events()[0]->event()->eventId()->equals($lastId)) {
                 break;
@@ -104,8 +104,8 @@ class read_all_events_backward_should extends TestCase
     public function return_empty_slice_if_asked_to_read_from_start(): void
     {
         $this->execute(function () {
-            /** @var AllEventsSlice $read */
             $read = yield $this->conn->readAllEventsBackwardAsync(Position::start(), 1, false);
+            \assert($read instanceof AllEventsSlice);
 
             $this->assertTrue($read->isEndOfStream());
             $this->assertCount(0, $read->events());
@@ -119,8 +119,8 @@ class read_all_events_backward_should extends TestCase
     public function return_events_in_reversed_order_compared_to_written(): void
     {
         $this->execute(function () {
-            /** @var AllEventsSlice $read */
             $read = yield $this->conn->readAllEventsBackwardAsync($this->endOfEvents, \count($this->testEvents), false);
+            \assert($read instanceof AllEventsSlice);
 
             $readEvents = \array_map(
                 function (ResolvedEvent $resolvedEvent): RecordedEvent {
@@ -147,8 +147,8 @@ class read_all_events_backward_should extends TestCase
             $position = $this->endOfEvents;
 
             while (true) {
-                /** @var AllEventsSlice $slice */
                 $slice = yield $this->conn->readAllEventsBackwardAsync($position, 1, false);
+                \assert($slice instanceof AllEventsSlice);
 
                 if ($slice->isEndOfStream()) {
                     break;
@@ -175,8 +175,8 @@ class read_all_events_backward_should extends TestCase
             $position = $this->endOfEvents;
 
             do {
-                /** @var AllEventsSlice $slice */
                 $slice = yield $this->conn->readAllEventsBackwardAsync($position, 5, false);
+                \assert($slice instanceof AllEventsSlice);
 
                 foreach ($slice->events() as $event) {
                     $all[] = $event->event();

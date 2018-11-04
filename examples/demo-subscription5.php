@@ -50,13 +50,13 @@ Loop::run(function () {
         echo 'no such subscription exists (yet)' . PHP_EOL;
     }
 
-    /** @var CreatePersistentSubscription $result */
     $result = yield $connection->createPersistentSubscriptionAsync(
         'foo-bar',
         'test-persistent-subscription',
         PersistentSubscriptionSettings::default(),
         new UserCredentials('admin', 'changeit')
     );
+    \assert($result instanceof CreatePersistentSubscription);
 
     \var_dump($result);
 

@@ -383,8 +383,8 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
     {
         return call(function (): Generator {
             while (! $this->actionQueue->isEmpty()) {
-                /** @var callable $action */
                 $action = $this->actionQueue->dequeue();
+                \assert(\is_callable($action));
 
                 try {
                     yield $action();

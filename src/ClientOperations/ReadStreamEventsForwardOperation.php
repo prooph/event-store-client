@@ -86,7 +86,8 @@ class ReadStreamEventsForwardOperation extends AbstractOperation
 
     protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
-        /** @var ReadStreamEventsCompleted $response */
+        \assert($response instanceof ReadStreamEventsCompleted);
+
         switch ($response->getResult()) {
             case ReadStreamResult::Success:
                 $this->succeed($response);
@@ -121,7 +122,8 @@ class ReadStreamEventsForwardOperation extends AbstractOperation
         $resolvedEvents = [];
 
         foreach ($records as $record) {
-            /** @var ResolvedIndexedEvent $record */
+            \assert($record instanceof ResolvedIndexedEvent);
+
             if ($event = $record->getEvent()) {
                 $event = EventMessageConverter::convertEventRecordMessageToEventRecord($record->getEvent());
             }

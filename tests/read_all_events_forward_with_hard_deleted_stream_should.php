@@ -60,8 +60,8 @@ class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
             new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
         );
 
-        /** @var AllEventsSlice $result */
         $result = yield $this->conn->readAllEventsBackwardAsync(Position::end(), 1, false);
+        \assert($result instanceof AllEventsSlice);
 
         $this->from = $result->nextPosition();
 
@@ -87,8 +87,8 @@ class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
     public function ensure_deleted_stream(): void
     {
         $this->execute(function () {
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync($this->streamName, 0, 100, false);
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::streamDeleted()));
             $this->assertCount(0, $res->events());
         });
@@ -101,8 +101,8 @@ class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
     public function returns_all_events_including_tombstone(): void
     {
         $this->execute(function () {
-            /** @var AllEventsSlice $read */
             $read = yield $this->conn->readAllEventsForwardAsync($this->from, \count($this->testEvents) + 10, false);
+            \assert($read instanceof AllEventsSlice);
 
             $events = [];
             foreach ($read->events() as $event) {

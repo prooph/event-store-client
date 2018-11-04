@@ -88,7 +88,8 @@ class UpdatePersistentSubscriptionOperation extends AbstractOperation
 
     protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
-        /** @var UpdatePersistentSubscriptionCompleted $response */
+        \assert($response instanceof UpdatePersistentSubscriptionCompleted);
+
         switch ($response->getResult()) {
             case UpdatePersistentSubscriptionResult::Success:
                 $this->succeed($response);
@@ -122,7 +123,8 @@ class UpdatePersistentSubscriptionOperation extends AbstractOperation
 
     protected function transformResponse(ProtobufMessage $response): PersistentSubscriptionUpdateResult
     {
-        /** @var UpdatePersistentSubscriptionCompleted $response */
+        \assert($response instanceof UpdatePersistentSubscriptionCompleted);
+
         return new PersistentSubscriptionUpdateResult(
             PersistentSubscriptionUpdateStatus::success()
         );

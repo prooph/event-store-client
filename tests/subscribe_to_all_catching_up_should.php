@@ -93,7 +93,6 @@ class subscribe_to_all_catching_up_should extends TestCase
 
             $dropped = new CountdownEvent(1);
 
-            /** @var EventStoreAllCatchUpSubscription $subscription */
             $subscription = yield $store->subscribeToAllFromAsync(
                 null,
                 CatchUpSubscriptionSettings::default(),
@@ -124,6 +123,7 @@ class subscribe_to_all_catching_up_should extends TestCase
                     }
                 }
             );
+            \assert($subscription instanceof EventStoreAllCatchUpSubscription);
 
             $this->assertFalse(yield $dropped->wait(0));
             yield $subscription->stop(self::TIMEOUT);
@@ -152,7 +152,6 @@ class subscribe_to_all_catching_up_should extends TestCase
 
             $dropped = new CountdownEvent(1);
 
-            /** @var EventStoreAllCatchUpSubscription $subscription */
             $subscription = yield $store->subscribeToAllFromAsync(
                 null,
                 CatchUpSubscriptionSettings::default(),
@@ -183,6 +182,7 @@ class subscribe_to_all_catching_up_should extends TestCase
                     }
                 }
             );
+            \assert($subscription instanceof EventStoreAllCatchUpSubscription);
 
             yield $subscription->stop(self::TIMEOUT);
 
@@ -207,7 +207,6 @@ class subscribe_to_all_catching_up_should extends TestCase
             $appeared = new ManualResetEventSlim();
             $dropped = new CountdownEvent(1);
 
-            /** @var EventStoreAllCatchUpSubscription $subscription */
             $subscription = yield $store->subscribeToAllFromAsync(
                 null,
                 CatchUpSubscriptionSettings::default(),
@@ -250,6 +249,7 @@ class subscribe_to_all_catching_up_should extends TestCase
                     }
                 }
             );
+            \assert($subscription instanceof EventStoreAllCatchUpSubscription);
 
             yield new Delayed(5000); // give time for first pull phase
 
@@ -287,8 +287,8 @@ class subscribe_to_all_catching_up_should extends TestCase
 
             yield $store->connectAsync();
 
-            /** @var AllEventsSlice $result */
             $result = yield $this->conn->readAllEventsBackwardAsync(Position::end(), 1, false);
+            \assert($result instanceof AllEventsSlice);
             $position = $result->nextPosition();
 
             $events = [];
@@ -303,7 +303,6 @@ class subscribe_to_all_catching_up_should extends TestCase
                 );
             }
 
-            /** @var EventStoreAllCatchUpSubscription $subscription */
             $subscription = yield $store->subscribeToAllFromAsync(
                 $position,
                 CatchUpSubscriptionSettings::default(),
@@ -350,6 +349,7 @@ class subscribe_to_all_catching_up_should extends TestCase
                     }
                 }
             );
+            \assert($subscription instanceof EventStoreAllCatchUpSubscription);
 
             for ($i = 10; $i < 20; $i++) {
                 yield $store->appendToStreamAsync(
@@ -404,12 +404,11 @@ class subscribe_to_all_catching_up_should extends TestCase
                 );
             }
 
-            /** @var AllEventsSlice $allSlice */
             $allSlice = yield $store->readAllEventsForwardAsync(Position::start(), 100, false);
-            /** @var ResolvedEvent $lastEvent */
+            \assert($allSlice instanceof AllEventsSlice);
             $lastEvent = \array_values(\array_slice($allSlice->events(), -1))[0];
+            \assert($lastEvent instanceof ResolvedEvent);
 
-            /** @var EventStoreAllCatchUpSubscription $subscription */
             $subscription = yield $store->subscribeToAllFromAsync(
                 $lastEvent->originalPosition(),
                 CatchUpSubscriptionSettings::default(),
@@ -457,6 +456,7 @@ class subscribe_to_all_catching_up_should extends TestCase
                     }
                 }
             );
+            \assert($subscription instanceof EventStoreAllCatchUpSubscription);
 
             for ($i = 10; $i < 20; $i++) {
                 yield $store->appendToStreamAsync(
@@ -483,8 +483,8 @@ class subscribe_to_all_catching_up_should extends TestCase
             yield $subscription->stop();
             $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
 
-            /** @var ResolvedEvent $lastEvent */
             $lastEvent = \array_values(\array_slice($events, -1))[0];
+            \assert($lastEvent instanceof ResolvedEvent);
             $this->assertTrue($lastEvent->originalPosition()->equals($subscription->lastProcessedPosition()));
         });
     }
@@ -516,11 +516,10 @@ class subscribe_to_all_catching_up_should extends TestCase
                 );
             }
 
-            /** @var AllEventsSlice $allSlice */
             $allSlice = yield $store->readAllEventsBackwardAsync(Position::end(), 2, false);
+            \assert($allSlice instanceof AllEventsSlice);
             $lastEvent = $allSlice->events()[1];
 
-            /** @var EventStoreAllCatchUpSubscription $subscription */
             $subscription = yield $store->subscribeToAllFromAsync(
                 $lastEvent->originalPosition(),
                 CatchUpSubscriptionSettings::default(),
@@ -565,6 +564,7 @@ class subscribe_to_all_catching_up_should extends TestCase
                     }
                 }
             );
+            \assert($subscription instanceof EventStoreAllCatchUpSubscription);
 
             if (! yield $appeared->wait(self::TIMEOUT)) {
                 $this->assertFalse(yield $dropped->wait(0), 'Subscription was dropped prematurely');

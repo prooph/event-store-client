@@ -75,7 +75,6 @@ class when_having_max_count_set_for_stream extends TestCase
     public function read_stream_forward_respects_max_count(): void
     {
         $this->execute(function (): Generator {
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync(
                 $this->stream,
                 0,
@@ -83,6 +82,7 @@ class when_having_max_count_set_for_stream extends TestCase
                 false,
                 DefaultData::adminCredentials()
             );
+            \assert($res instanceof StreamEventsSlice);
 
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
@@ -103,7 +103,6 @@ class when_having_max_count_set_for_stream extends TestCase
     public function read_stream_backward_respects_max_count(): void
     {
         $this->execute(function (): Generator {
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsBackwardAsync(
                 $this->stream,
                 -1,
@@ -111,6 +110,7 @@ class when_having_max_count_set_for_stream extends TestCase
                 false,
                 DefaultData::adminCredentials()
             );
+            \assert($res instanceof StreamEventsSlice);
 
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
@@ -131,7 +131,6 @@ class when_having_max_count_set_for_stream extends TestCase
     public function after_setting_less_strict_max_count_read_stream_forward_reads_more_events(): void
     {
         $this->execute(function (): Generator {
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync(
                 $this->stream,
                 0,
@@ -139,6 +138,7 @@ class when_having_max_count_set_for_stream extends TestCase
                 false,
                 DefaultData::adminCredentials()
             );
+            \assert($res instanceof StreamEventsSlice);
 
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
@@ -157,7 +157,6 @@ class when_having_max_count_set_for_stream extends TestCase
                 DefaultData::adminCredentials()
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync(
                 $this->stream,
                 0,
@@ -165,6 +164,7 @@ class when_having_max_count_set_for_stream extends TestCase
                 false,
                 DefaultData::adminCredentials()
             );
+            \assert($res instanceof StreamEventsSlice);
 
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(4, $res->events());
@@ -185,7 +185,6 @@ class when_having_max_count_set_for_stream extends TestCase
     public function after_setting_more_strict_max_count_read_stream_forward_reads_less_events(): void
     {
         $this->execute(function (): Generator {
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync(
                 $this->stream,
                 0,
@@ -193,6 +192,7 @@ class when_having_max_count_set_for_stream extends TestCase
                 false,
                 DefaultData::adminCredentials()
             );
+            \assert($res instanceof StreamEventsSlice);
 
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
@@ -211,7 +211,6 @@ class when_having_max_count_set_for_stream extends TestCase
                 DefaultData::adminCredentials()
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync(
                 $this->stream,
                 0,
@@ -219,6 +218,7 @@ class when_having_max_count_set_for_stream extends TestCase
                 false,
                 DefaultData::adminCredentials()
             );
+            \assert($res instanceof StreamEventsSlice);
 
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(2, $res->events());
@@ -239,7 +239,6 @@ class when_having_max_count_set_for_stream extends TestCase
     public function after_setting_less_strict_max_count_read_stream_backward_reads_more_events(): void
     {
         $this->execute(function (): Generator {
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsBackwardAsync(
                 $this->stream,
                 -1,
@@ -247,6 +246,7 @@ class when_having_max_count_set_for_stream extends TestCase
                 false,
                 DefaultData::adminCredentials()
             );
+            \assert($res instanceof StreamEventsSlice);
 
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
@@ -265,7 +265,6 @@ class when_having_max_count_set_for_stream extends TestCase
                 DefaultData::adminCredentials()
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsBackwardAsync(
                 $this->stream,
                 -1,
@@ -273,6 +272,7 @@ class when_having_max_count_set_for_stream extends TestCase
                 false,
                 DefaultData::adminCredentials()
             );
+            \assert($res instanceof StreamEventsSlice);
 
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(4, $res->events());
@@ -293,7 +293,6 @@ class when_having_max_count_set_for_stream extends TestCase
     public function after_setting_more_strict_max_count_read_stream_backward_reads_less_events(): void
     {
         $this->execute(function (): Generator {
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsBackwardAsync(
                 $this->stream,
                 -1,
@@ -301,6 +300,7 @@ class when_having_max_count_set_for_stream extends TestCase
                 false,
                 DefaultData::adminCredentials()
             );
+            \assert($res instanceof StreamEventsSlice);
 
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
@@ -319,7 +319,6 @@ class when_having_max_count_set_for_stream extends TestCase
                 DefaultData::adminCredentials()
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsBackwardAsync(
                 $this->stream,
                 -1,
@@ -327,6 +326,7 @@ class when_having_max_count_set_for_stream extends TestCase
                 false,
                 DefaultData::adminCredentials()
             );
+            \assert($res instanceof StreamEventsSlice);
 
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(2, $res->events());

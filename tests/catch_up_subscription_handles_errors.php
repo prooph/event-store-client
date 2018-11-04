@@ -423,15 +423,15 @@ class catch_up_subscription_handles_errors extends TestCase
                 }
             );
 
-            /** @var VolatileEventStoreSubscription|null $volatileEventStoreSubscription */
             $volatileEventStoreSubscription = null;
-            /** @var SubscriptionDropped|null $innerSubscriptionDrop */
             $innerSubscriptionDrop = null;
 
             $this->connection->handleSubscribeToStreamAsync(
                 function ($stream, $raise, $drop) use (&$innerSubscriptionDrop, &$volatileEventStoreSubscription): Promise {
                     $innerSubscriptionDrop = $drop;
+                    \assert($innerSubscriptionDrop instanceof SubscriptionDropped);
                     $volatileEventStoreSubscription = $this->createVolatileSubscription($raise, $drop, null);
+                    \assert($volatileEventStoreSubscription instanceof VolatileEventStoreSubscription);
 
                     return new Success($volatileEventStoreSubscription);
                 }

@@ -43,8 +43,8 @@ class StreamWriter
         return call(function () use ($events) {
             foreach ($events as $key => $event) {
                 $expVer = $this->version === ExpectedVersion::ANY ? ExpectedVersion::ANY : $this->version + $key;
-                /** @var WriteResult $result */
                 $result = yield $this->connection->appendToStreamAsync($this->stream, $expVer, [$event]);
+                \assert($result instanceof WriteResult);
                 $nextExpVer = $result->nextExpectedVersion();
 
                 if ($this->version !== ExpectedVersion::ANY

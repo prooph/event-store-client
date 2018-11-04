@@ -92,12 +92,12 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)
             );
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 1);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::notFound()));
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 2);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::success()));
             $this->assertTrue($this->testEvents[2]->eventId()->equals($res->event()->originalEvent()->eventId()));
         });
@@ -119,8 +119,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
 
@@ -144,8 +144,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
 
@@ -169,12 +169,12 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)
             );
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 1);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::notFound()));
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 2);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::success()));
             $this->assertTrue($this->testEvents[2]->eventId()->equals($res->event()->originalEvent()->eventId()));
 
@@ -184,12 +184,12 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(1)
             );
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 0);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::notFound()));
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 1);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::success()));
             $this->assertTrue($this->testEvents[1]->eventId()->equals($res->event()->originalEvent()->eventId()));
         });
@@ -211,12 +211,12 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)
             );
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 1);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::notFound()));
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 2);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::success()));
             $this->assertTrue($this->testEvents[2]->eventId()->equals($res->event()->originalEvent()->eventId()));
 
@@ -226,12 +226,12 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(3)
             );
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 2);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::notFound()));
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 3);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::success()));
             $this->assertTrue($this->testEvents[3]->eventId()->equals($res->event()->originalEvent()->eventId()));
         });
@@ -253,12 +253,12 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)
             );
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 1);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::notFound()));
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 2);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::success()));
             $this->assertTrue($this->testEvents[2]->eventId()->equals($res->event()->originalEvent()->eventId()));
 
@@ -268,12 +268,12 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)->setMaxCount(4)
             );
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 1);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::notFound()));
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 2);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::success()));
             $this->assertTrue($this->testEvents[2]->eventId()->equals($res->event()->originalEvent()->eventId()));
         });
@@ -295,12 +295,12 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)
             );
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 1);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::notFound()));
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 2);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::success()));
             $this->assertTrue($this->testEvents[2]->eventId()->equals($res->event()->originalEvent()->eventId()));
 
@@ -310,12 +310,12 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)->setMaxCount(2)
             );
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 2);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::notFound()));
 
-            /** @var EventReadResult $res */
             $res = yield $this->readEvent($stream, 3);
+            \assert($res instanceof EventReadResult);
             $this->assertTrue($res->status()->equals(EventReadStatus::success()));
             $this->assertTrue($this->testEvents[3]->eventId()->equals($res->event()->originalEvent()->eventId()));
         });
@@ -337,8 +337,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
 
@@ -350,8 +350,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(1)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(4, $res->events());
 
@@ -375,8 +375,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
 
@@ -388,8 +388,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(3)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(2, $res->events());
 
@@ -413,8 +413,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
 
@@ -426,8 +426,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)->setMaxCount(4)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
 
@@ -451,8 +451,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
 
@@ -464,8 +464,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)->setMaxCount(2)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(2, $res->events());
 
@@ -489,8 +489,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
 
@@ -502,8 +502,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(1)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(4, $res->events());
 
@@ -527,8 +527,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
 
@@ -540,8 +540,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(3)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(2, $res->events());
 
@@ -565,8 +565,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
 
@@ -578,8 +578,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)->setMaxCount(4)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
 
@@ -603,8 +603,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(3, $res->events());
 
@@ -616,8 +616,8 @@ class when_having_truncatebefore_set_for_stream extends TestCase
                 StreamMetadata::build()->setTruncateBefore(2)->setMaxCount(2)
             );
 
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
+            \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
             $this->assertCount(2, $res->events());
 

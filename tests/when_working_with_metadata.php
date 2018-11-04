@@ -42,8 +42,8 @@ class when_working_with_metadata extends TestCase
                 [TestEvent::newTestEvent()]
             );
 
-            /** @var RawStreamMetadataResult $meta */
             $meta = yield $connection->getRawStreamMetadataAsync($stream);
+            \assert($meta instanceof RawStreamMetadataResult);
 
             $this->assertSame($stream, $meta->stream());
             $this->assertFalse($meta->isStreamDeleted());

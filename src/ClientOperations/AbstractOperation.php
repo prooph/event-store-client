@@ -99,8 +99,8 @@ abstract class AbstractOperation implements ClientOperation
     public function inspectPackage(TcpPackage $package): InspectionResult
     {
         if ($package->command()->equals($this->responseCommand)) {
-            /** @var ProtobufMessage $responseMessage */
             $responseMessage = new $this->responseClassName();
+            \assert($responseMessage instanceof ProtobufMessage);
             $responseMessage->parseFromString($package->data());
 
             return $this->inspectResponse($responseMessage);
@@ -152,8 +152,8 @@ abstract class AbstractOperation implements ClientOperation
 
     private function inspectNotHandled(TcpPackage $package): InspectionResult
     {
-        /** @var NotHandled $message */
         $message = $package->data();
+        \assert($message instanceof NotHandled);
 
         switch ($message->getReason()) {
             case NotHandledReason::NotReady:

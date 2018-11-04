@@ -103,8 +103,8 @@ class deleting_stream extends TestCase
 
             yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
 
-            /** @var DeleteResult $delete */
             $delete = yield $connection->deleteStreamAsync($stream, 0, true);
+            \assert($delete instanceof DeleteResult);
 
             $this->assertGreaterThan(0, $delete->logPosition()->preparePosition());
             $this->assertGreaterThan(0, $delete->logPosition()->commitPosition());

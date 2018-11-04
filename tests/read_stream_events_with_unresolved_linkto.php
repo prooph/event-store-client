@@ -72,13 +72,13 @@ class read_stream_events_with_unresolved_linkto extends TestCase
         $this->links = 'read_stream_events_with_unresolved_linkto_links_1';
 
         $this->execute(function () {
-            /** @var StreamEventsSlice $res */
             $res = yield $this->conn->readStreamEventsForwardAsync(
                 $this->stream,
                 0,
                 100,
                 false
             );
+            \assert($res instanceof StreamEventsSlice);
 
             $this->assertTrue(SliceReadStatus::streamNotFound()->equals($res->status()));
             $this->assertCount(0, $res->events());
@@ -95,13 +95,13 @@ class read_stream_events_with_unresolved_linkto extends TestCase
         $this->links = 'read_stream_events_with_unresolved_linkto_links_2';
 
         $this->execute(function () {
-            /** @var StreamEventsSlice $read */
             $read = yield $this->conn->readStreamEventsForwardAsync(
                 $this->links,
                 0,
                 1,
                 true
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $this->assertCount(1, $read->events());
             $this->assertNull($read->events()[0]->event());

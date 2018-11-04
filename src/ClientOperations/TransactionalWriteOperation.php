@@ -75,7 +75,8 @@ class TransactionalWriteOperation extends AbstractOperation
 
     protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
-        /** @var TransactionWriteCompleted $response */
+        \assert($response instanceof TransactionWriteCompleted);
+
         switch ($response->getResult()) {
             case OperationResult::Success:
                 $this->succeed($response);

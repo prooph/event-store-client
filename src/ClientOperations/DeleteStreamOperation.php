@@ -120,7 +120,8 @@ class DeleteStreamOperation extends AbstractOperation
 
     protected function transformResponse(ProtobufMessage $response): DeleteResult
     {
-        /** @var DeleteStreamCompleted $response */
+        \assert($response instanceof DeleteStreamCompleted);
+
         return new DeleteResult(new Position(
             $response->getCommitPosition() ?? -1,
             $response->getCommitPosition() ?? -1)

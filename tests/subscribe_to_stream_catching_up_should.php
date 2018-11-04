@@ -71,7 +71,6 @@ class subscribe_to_stream_catching_up_should extends TestCase
             $appeared = new ManualResetEventSlim(false);
             $dropped = new CountdownEvent(1);
 
-            /** @var EventStoreStreamCatchUpSubscription $subscription */
             $subscription = yield $this->conn->subscribeToStreamFromAsync(
                 $stream,
                 null,
@@ -80,6 +79,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
                 null,
                 $this->droppedWithCountdown($dropped)
             );
+            \assert($subscription instanceof EventStoreStreamCatchUpSubscription);
 
             yield new Delayed(self::TIMEOUT); // give time for first pull phase
 
@@ -119,7 +119,6 @@ class subscribe_to_stream_catching_up_should extends TestCase
             $appeared = new CountdownEvent(1);
             $dropped = new CountdownEvent(1);
 
-            /** @var EventStoreStreamCatchUpSubscription $subscription */
             $subscription = yield $this->conn->subscribeToStreamFromAsync(
                 $stream,
                 null,
@@ -128,6 +127,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
                 null,
                 $this->droppedWithCountdown($dropped)
             );
+            \assert($subscription instanceof EventStoreStreamCatchUpSubscription);
 
             yield $this->conn->appendToStreamAsync(
                 $stream,
@@ -161,7 +161,6 @@ class subscribe_to_stream_catching_up_should extends TestCase
             $dropped1 = new ManualResetEventSlim(false);
             $dropped2 = new ManualResetEventSlim(false);
 
-            /** @var EventStoreStreamCatchUpSubscription $sub1 */
             $sub1 = yield $this->conn->subscribeToStreamFromAsync(
                 $stream,
                 null,
@@ -170,8 +169,8 @@ class subscribe_to_stream_catching_up_should extends TestCase
                 null,
                 $this->droppedWithResetEvent($dropped1)
             );
+            \assert($sub1 instanceof EventStoreStreamCatchUpSubscription);
 
-            /** @var EventStoreStreamCatchUpSubscription $sub2 */
             $sub2 = yield $this->conn->subscribeToStreamFromAsync(
                 $stream,
                 null,
@@ -180,6 +179,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
                 null,
                 $this->droppedWithResetEvent($dropped2)
             );
+            \assert($sub2 instanceof EventStoreStreamCatchUpSubscription);
 
             yield $this->conn->appendToStreamAsync(
                 $stream,
@@ -216,7 +216,6 @@ class subscribe_to_stream_catching_up_should extends TestCase
 
             $dropped = new CountdownEvent(1);
 
-            /** @var EventStoreStreamCatchUpSubscription $subscription */
             $subscription = yield $this->conn->subscribeToStreamFromAsync(
                 $stream,
                 null,
@@ -232,6 +231,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
                 null,
                 $this->droppedWithCountdown($dropped)
             );
+            \assert($subscription instanceof EventStoreStreamCatchUpSubscription);
 
             $this->assertFalse(yield $dropped->wait(0));
             yield $subscription->stop(self::TIMEOUT);
@@ -285,7 +285,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
         $this->execute(function () {
             $stream = 'read_all_existing_events_and_keep_listening_to_new_ones';
 
-            /** @var ResolvedEvent $events */
+            /** @var ResolvedEvent[] $events */
             $events = [];
             $appeared = new CountdownEvent(20);
             $dropped = new CountdownEvent(1);
@@ -298,7 +298,6 @@ class subscribe_to_stream_catching_up_should extends TestCase
                 );
             }
 
-            /** @var EventStoreStreamCatchUpSubscription $subscription */
             $subscription = yield $this->conn->subscribeToStreamFromAsync(
                 $stream,
                 null,
@@ -307,6 +306,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
                 null,
                 $this->droppedWithCountdown($dropped)
             );
+            \assert($subscription instanceof EventStoreStreamCatchUpSubscription);
 
             for ($i = 10; $i < 20; $i++) {
                 yield $this->conn->appendToStreamAsync(
@@ -357,7 +357,6 @@ class subscribe_to_stream_catching_up_should extends TestCase
                 );
             }
 
-            /** @var EventStoreStreamCatchUpSubscription $subscription */
             $subscription = yield $this->conn->subscribeToStreamFromAsync(
                 $stream,
                 9,
@@ -366,6 +365,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
                 null,
                 $this->droppedWithCountdown($dropped)
             );
+            \assert($subscription instanceof EventStoreStreamCatchUpSubscription);
 
             for ($i = 20; $i < 30; $i++) {
                 yield $this->conn->appendToStreamAsync(
@@ -420,7 +420,6 @@ class subscribe_to_stream_catching_up_should extends TestCase
                 );
             }
 
-            /** @var EventStoreStreamCatchUpSubscription $subscription */
             $subscription = yield $this->conn->subscribeToStreamFromAsync(
                 $stream,
                 9,
@@ -429,6 +428,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
                 null,
                 $this->droppedWithCountdown($dropped)
             );
+            \assert($subscription instanceof EventStoreStreamCatchUpSubscription);
 
             if (! yield $appeared->wait(self::TIMEOUT)) {
                 $this->assertFalse(yield $dropped->wait(0), 'Subscription was dropped prematurely');

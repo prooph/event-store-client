@@ -94,13 +94,13 @@ class when_creating_continuous_projection extends TestCase
     public function should_have_turn_on_emit_to_stream(string $projectionId): void
     {
         $this->execute(function () use ($projectionId) {
-            /** @var EventReadResult $event */
             $event = yield $this->connection->readEventAsync(
                 '$projections-' . $projectionId,
                 0,
                 true,
                 $this->credentials
             );
+            \assert($event instanceof EventReadResult);
             $data = $event->event()->event()->data();
             $eventData = \json_decode($data, true);
             $this->assertTrue((bool) $eventData['emitEnabled']);

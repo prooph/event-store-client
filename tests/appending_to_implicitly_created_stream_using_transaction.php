@@ -43,19 +43,19 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
             $events = TestEvent::newAmount(6);
             $writer = new TransactionalWriter($connection, $stream);
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(-1);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync($events);
-            /** @var WriteResult $writeResult */
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(5, $writeResult->nextExpectedVersion());
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(-1);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync([\current($events)]);
-            /** @var WriteResult $writeResult */
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(0, $writeResult->nextExpectedVersion());
 
@@ -79,19 +79,21 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
             $events = TestEvent::newAmount(6);
             $writer = new TransactionalWriter($connection, $stream);
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(-1);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync($events);
-            /** @var WriteResult $writeResult */
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(5, $writeResult->nextExpectedVersion());
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(ExpectedVersion::ANY);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync([\current($events)]);
-            /** @var WriteResult $writeResult */
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(0, $writeResult->nextExpectedVersion());
 
@@ -115,19 +117,21 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
             $events = TestEvent::newAmount(6);
             $writer = new TransactionalWriter($connection, $stream);
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(-1);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync($events);
-            /** @var WriteResult $writeResult */
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(5, $writeResult->nextExpectedVersion());
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(5);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync([\current($events)]);
-            /** @var WriteResult $writeResult */
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(6, $writeResult->nextExpectedVersion());
 
@@ -151,17 +155,19 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
             $events = TestEvent::newAmount(6);
             $writer = new TransactionalWriter($connection, $stream);
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(-1);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync($events);
-            /** @var WriteResult $writeResult */
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(5, $writeResult->nextExpectedVersion());
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(6);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync([\current($events)]);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
 
             $this->expectException(WrongExpectedVersionException::class);
 
@@ -184,17 +190,19 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
             $events = TestEvent::newAmount(6);
             $writer = new TransactionalWriter($connection, $stream);
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(-1);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync($events);
-            /** @var WriteResult $writeResult */
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(5, $writeResult->nextExpectedVersion());
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(4);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync([\current($events)]);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
 
             $this->expectException(WrongExpectedVersionException::class);
 
@@ -217,19 +225,21 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
             $events = TestEvent::newAmount(1);
             $writer = new TransactionalWriter($connection, $stream);
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(-1);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync($events);
-            /** @var WriteResult $writeResult */
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(0, $writeResult->nextExpectedVersion());
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(0);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync([\current($events)]);
-            /** @var WriteResult $writeResult */
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(1, $writeResult->nextExpectedVersion());
 
@@ -253,19 +263,21 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
             $events = TestEvent::newAmount(1);
             $writer = new TransactionalWriter($connection, $stream);
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(-1);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync($events);
-            /** @var WriteResult $writeResult */
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(0, $writeResult->nextExpectedVersion());
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(ExpectedVersion::ANY);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync([\current($events)]);
-            /** @var WriteResult $writeResult */
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(0, $writeResult->nextExpectedVersion());
 
@@ -289,19 +301,21 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
             $events = TestEvent::newAmount(1);
             $writer = new TransactionalWriter($connection, $stream);
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(-1);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync($events);
-            /** @var WriteResult $writeResult */
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(0, $writeResult->nextExpectedVersion());
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(-1);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync([\current($events)]);
-            /** @var WriteResult $writeResult */
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(0, $writeResult->nextExpectedVersion());
 
@@ -325,19 +339,21 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
             $events = TestEvent::newAmount(3);
             $writer = new TransactionalWriter($connection, $stream);
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(-1);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync($events);
-            /** @var WriteResult $writeResult */
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(2, $writeResult->nextExpectedVersion());
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(ExpectedVersion::ANY);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync([$events[1]]);
-            /** @var WriteResult $writeResult */
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(1, $writeResult->nextExpectedVersion());
 
@@ -361,19 +377,21 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
             $events = TestEvent::newAmount(2);
             $writer = new TransactionalWriter($connection, $stream);
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(-1);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync($events);
-            /** @var WriteResult $writeResult */
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $writeResult = yield $ongoingTransaction->commitAsync();
+            \assert($writeResult instanceof WriteResult);
 
             $this->assertSame(1, $writeResult->nextExpectedVersion());
 
             $events[] = TestEvent::newTestEvent();
 
-            /** @var OngoingTransaction $ongoingTransaction */
             $ongoingTransaction = yield $writer->startTransaction(-1);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
             $ongoingTransaction = yield $ongoingTransaction->writeAsync($events);
+            \assert($ongoingTransaction instanceof OngoingTransaction);
 
             $this->expectException(WrongExpectedVersionException::class);
 

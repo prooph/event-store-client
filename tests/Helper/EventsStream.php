@@ -31,8 +31,8 @@ class EventsStream
             $result = 0;
 
             while (true) {
-                /** @var StreamEventsSlice $slice */
                 $slice = yield $connection->readStreamEventsForwardAsync($stream, $result, self::SLICE_SIZE, false);
+                \assert($slice instanceof StreamEventsSlice);
                 $result += \count($slice->events());
 
                 if ($slice->isEndOfStream()) {

@@ -84,7 +84,8 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
 
     protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
-        /** @var WriteEventsCompleted $response */
+        \assert($response instanceof WriteEventsCompleted);
+
         switch ($response->getResult()) {
             case OperationResult::Success:
                 $this->succeed($response);
@@ -121,7 +122,8 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
 
     protected function transformResponse(ProtobufMessage $response): ConditionalWriteResult
     {
-        /** @var WriteEventsCompleted $response */
+        \assert($response instanceof WriteEventsCompleted);
+
         if ($response->getResult() === OperationResult::WrongExpectedVersion) {
             return ConditionalWriteResult::fail(ConditionalWriteStatus::versionMismatch());
         }

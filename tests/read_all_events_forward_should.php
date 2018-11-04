@@ -62,8 +62,8 @@ class read_all_events_forward_should extends TestCase
             DefaultData::adminCredentials()
         );
 
-        /** @var AllEventsSlice $result */
         $result = yield $this->conn->readAllEventsBackwardAsync(Position::end(), 1, false);
+        \assert($result instanceof AllEventsSlice);
 
         $this->from = $result->nextPosition();
         $this->testEvents = TestEvent::newAmount(20);
@@ -91,8 +91,8 @@ class read_all_events_forward_should extends TestCase
     public function return_empty_slice_if_asked_to_read_from_end(): void
     {
         $this->execute(function () {
-            /** @var AllEventsSlice $read */
             $read = yield $this->conn->readAllEventsForwardAsync(Position::end(), 1, false);
+            \assert($read instanceof AllEventsSlice);
 
             $this->assertTrue($read->isEndOfStream());
             $this->assertCount(0, $read->events());
@@ -106,8 +106,8 @@ class read_all_events_forward_should extends TestCase
     public function return_events_in_same_order_as_written(): void
     {
         $this->execute(function () {
-            /** @var AllEventsSlice $read */
             $read = yield $this->conn->readAllEventsForwardAsync($this->from, \count($this->testEvents) + 10, false);
+            \assert($read instanceof AllEventsSlice);
 
             $events = \array_map(
                 function (ResolvedEvent $e): RecordedEvent {
@@ -131,8 +131,8 @@ class read_all_events_forward_should extends TestCase
             $position = $this->from;
 
             while (true) {
-                /** @var AllEventsSlice $slice */
                 $slice = yield $this->conn->readAllEventsForwardAsync($position, 1, false);
+                \assert($slice instanceof AllEventsSlice);
 
                 if ($slice->isEndOfStream()) {
                     break;
@@ -159,8 +159,8 @@ class read_all_events_forward_should extends TestCase
             $position = $this->from;
 
             do {
-                /** @var AllEventsSlice $slice */
                 $slice = yield $this->conn->readAllEventsForwardAsync($position, 5, false);
+                \assert($slice instanceof AllEventsSlice);
 
                 foreach ($slice->events() as $event) {
                     $all[] = $event->event();
@@ -182,8 +182,8 @@ class read_all_events_forward_should extends TestCase
     public function return_partial_slice_if_not_enough_events(): void
     {
         $this->execute(function () {
-            /** @var AllEventsSlice $read */
             $read = yield $this->conn->readAllEventsForwardAsync($this->from, 30, false);
+            \assert($read instanceof AllEventsSlice);
 
             $this->assertLessThan(30, \count($read->events()));
 

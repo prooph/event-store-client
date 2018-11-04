@@ -77,7 +77,8 @@ class StartTransactionOperation extends AbstractOperation
 
     protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
-        /** @var TransactionStartCompleted $response */
+        \assert($response instanceof TransactionStartCompleted);
+
         switch ($response->getResult()) {
             case OperationResult::Success:
                 $this->succeed($response);
@@ -117,7 +118,8 @@ class StartTransactionOperation extends AbstractOperation
 
     protected function transformResponse(ProtobufMessage $response): EventStoreSyncTransaction
     {
-        /** @var TransactionStartCompleted $response */
+        \assert($response instanceof TransactionStartCompleted);
+
         return new EventStoreSyncTransaction(
             $response->getTransactionId(),
             $this->credentials,

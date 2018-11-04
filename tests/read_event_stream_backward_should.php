@@ -65,13 +65,13 @@ class read_event_stream_backward_should extends TestCase
             $store = TestConnection::createAsync();
             yield $store->connectAsync();
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsBackwardAsync(
                 $stream,
                 StreamPosition::END,
                 1,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $this->assertTrue(SliceReadStatus::streamNotFound()->equals($read->status()));
         }));
@@ -90,13 +90,13 @@ class read_event_stream_backward_should extends TestCase
             yield $store->connectAsync();
             yield $store->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsBackwardAsync(
                 $stream,
                 StreamPosition::END,
                 1,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $this->assertTrue(SliceReadStatus::streamDeleted()->equals($read->status()));
         }));
@@ -114,13 +114,13 @@ class read_event_stream_backward_should extends TestCase
             $store = TestConnection::createAsync();
             yield $store->connectAsync();
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsBackwardAsync(
                 $stream,
                 StreamPosition::END,
                 1,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $this->assertCount(0, $read->events());
         }));
@@ -145,13 +145,13 @@ class read_event_stream_backward_should extends TestCase
                 $testEvents
             );
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsBackwardAsync(
                 $stream,
                 1,
                 5,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $this->assertCount(2, $read->events());
         }));
@@ -176,13 +176,13 @@ class read_event_stream_backward_should extends TestCase
                 $testEvents
             );
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsBackwardAsync(
                 $stream,
                 StreamPosition::END,
                 10,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $events = \array_map(
                 function (ResolvedEvent $e): RecordedEvent {
@@ -214,13 +214,13 @@ class read_event_stream_backward_should extends TestCase
                 $testEvents
             );
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsBackwardAsync(
                 $stream,
                 7,
                 1,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $this->assertTrue(EventDataComparer::equal($testEvents[7], $read->events()[0]->event()));
         }));
@@ -245,13 +245,13 @@ class read_event_stream_backward_should extends TestCase
                 $testEvents
             );
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsBackwardAsync(
                 $stream,
                 StreamPosition::START,
                 1,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $this->assertCount(1, $read->events());
         }));
@@ -276,13 +276,13 @@ class read_event_stream_backward_should extends TestCase
                 $testEvents
             );
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsBackwardAsync(
                 $stream,
                 StreamPosition::END,
                 1,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $this->assertTrue(EventDataComparer::equal($testEvents[9], $read->events()[0]->event()));
         }));
@@ -307,13 +307,13 @@ class read_event_stream_backward_should extends TestCase
                 $testEvents
             );
 
-            /** @var StreamEventsSlice $read */
             $read = yield $store->readStreamEventsBackwardAsync(
                 $stream,
                 3,
                 2,
                 false
             );
+            \assert($read instanceof StreamEventsSlice);
 
             $events = \array_map(
                 function (ResolvedEvent $e): RecordedEvent {

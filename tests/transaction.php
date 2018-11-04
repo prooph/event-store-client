@@ -60,16 +60,16 @@ class transaction extends TestCase
         $this->execute(function () {
             $stream = 'should_start_on_non_existing_stream_with_correct_exp_ver_and_create_stream_on_commit';
 
-            /** @var EventStoreAsyncTransaction $transaction */
             $transaction = yield $this->conn->startTransactionAsync(
                 $stream,
                 ExpectedVersion::NO_STREAM
             );
+            \assert($transaction instanceof EventStoreAsyncTransaction);
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
-            /** @var WriteResult $result */
             $result = yield $transaction->commitAsync();
+            \assert($result instanceof WriteResult);
 
             $this->assertSame(0, $result->nextExpectedVersion());
         });
@@ -84,16 +84,16 @@ class transaction extends TestCase
         $this->execute(function () {
             $stream = 'should_start_on_non_existing_stream_with_exp_ver_any_and_create_stream_on_commit';
 
-            /** @var EventStoreAsyncTransaction $transaction */
             $transaction = yield $this->conn->startTransactionAsync(
                 $stream,
                 ExpectedVersion::ANY
             );
+            \assert($transaction instanceof EventStoreAsyncTransaction);
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
-            /** @var WriteResult $result */
             $result = yield $transaction->commitAsync();
+            \assert($result instanceof WriteResult);
 
             $this->assertSame(0, $result->nextExpectedVersion());
         });
@@ -108,11 +108,11 @@ class transaction extends TestCase
         $this->execute(function () {
             $stream = 'should_fail_to_commit_non_existing_stream_with_wrong_exp_ver';
 
-            /** @var EventStoreAsyncTransaction $transaction */
             $transaction = yield $this->conn->startTransactionAsync(
                 $stream,
                 1
             );
+            \assert($transaction instanceof EventStoreAsyncTransaction);
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
@@ -131,24 +131,24 @@ class transaction extends TestCase
         $this->execute(function () {
             $stream = 'should_do_nothing_if_commits_no_events_to_empty_stream';
 
-            /** @var EventStoreAsyncTransaction $transaction */
             $transaction = yield $this->conn->startTransactionAsync(
                 $stream,
                 ExpectedVersion::NO_STREAM
             );
+            \assert($transaction instanceof EventStoreAsyncTransaction);
 
-            /** @var WriteResult $result */
             $result = yield $transaction->commitAsync();
+            \assert($result instanceof WriteResult);
 
             $this->assertSame(-1, $result->nextExpectedVersion());
 
-            /** @var StreamEventsSlice $result */
             $result = yield $this->conn->readStreamEventsForwardAsync(
                 $stream,
                 0,
                 1,
                 false
             );
+            \assert($result instanceof StreamEventsSlice);
 
             $this->assertCount(0, $result->events());
         });
@@ -163,26 +163,26 @@ class transaction extends TestCase
         $this->execute(function () {
             $stream = 'should_do_nothing_if_transactionally_writing_no_events_to_empty_stream';
 
-            /** @var EventStoreAsyncTransaction $transaction */
             $transaction = yield $this->conn->startTransactionAsync(
                 $stream,
                 ExpectedVersion::NO_STREAM
             );
+            \assert($transaction instanceof EventStoreAsyncTransaction);
 
             yield $transaction->writeAsync();
 
-            /** @var WriteResult $result */
             $result = yield $transaction->commitAsync();
+            \assert($result instanceof WriteResult);
 
             $this->assertSame(-1, $result->nextExpectedVersion());
 
-            /** @var StreamEventsSlice $result */
             $result = yield $this->conn->readStreamEventsForwardAsync(
                 $stream,
                 0,
                 1,
                 false
             );
+            \assert($result instanceof StreamEventsSlice);
 
             $this->assertCount(0, $result->events());
         });
@@ -197,11 +197,11 @@ class transaction extends TestCase
         $this->execute(function () {
             $stream = 'should_validate_expectations_on_commit';
 
-            /** @var EventStoreAsyncTransaction $transaction */
             $transaction = yield $this->conn->startTransactionAsync(
                 $stream,
                 100500
             );
+            \assert($transaction instanceof EventStoreAsyncTransaction);
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
@@ -237,13 +237,13 @@ class transaction extends TestCase
             $store = TestConnection::createAsync();
             yield $store->connectAsync();
 
-            /** @var StreamEventsSlice $slice */
             $slice = yield $store->readStreamEventsForwardAsync(
                 $stream,
                 0,
                 500,
                 false
             );
+            \assert($slice instanceof StreamEventsSlice);
 
             $this->assertCount(500, $slice->events());
 
@@ -274,11 +274,11 @@ class transaction extends TestCase
         $this->execute(function () {
             $stream = 'should_fail_to_commit_if_started_with_correct_ver_but_committing_with_bad';
 
-            /** @var EventStoreAsyncTransaction $transaction */
             $transaction = yield $this->conn->startTransactionAsync(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM
             );
+            \assert($transaction instanceof EventStoreAsyncTransaction);
 
             yield $this->conn->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
 
@@ -299,18 +299,18 @@ class transaction extends TestCase
         $this->execute(function () {
             $stream = 'should_not_fail_to_commit_if_started_with_wrong_ver_but_committing_with_correct_ver';
 
-            /** @var EventStoreAsyncTransaction $transaction */
             $transaction = yield $this->conn->startTransactionAsync(
                 $stream,
                 0
             );
+            \assert($transaction instanceof EventStoreAsyncTransaction);
 
             yield $this->conn->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
-            /** @var WriteResult $result */
             $result = yield $transaction->commitAsync();
+            \assert($result instanceof WriteResult);
 
             $this->assertSame(1, $result->nextExpectedVersion());
         });
@@ -325,11 +325,11 @@ class transaction extends TestCase
         $this->execute(function () {
             $stream = 'should_fail_to_commit_if_started_with_correct_ver_but_on_commit_stream_was_deleted';
 
-            /** @var EventStoreAsyncTransaction $transaction */
             $transaction = yield $this->conn->startTransactionAsync(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM
             );
+            \assert($transaction instanceof EventStoreAsyncTransaction);
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
@@ -352,33 +352,33 @@ class transaction extends TestCase
 
             $event = new EventData(null, 'SomethingHappened', true, '{Value:42}');
 
-            /** @var EventStoreAsyncTransaction $transaction1 */
             $transaction1 = yield $this->conn->startTransactionAsync(
                 $stream,
                 ExpectedVersion::ANY
             );
+            \assert($transaction1 instanceof EventStoreAsyncTransaction);
             yield $transaction1->writeAsync([$event]);
-            /** @var WriteResult $result1 */
             $result1 = yield $transaction1->commitAsync();
+            \assert($result1 instanceof WriteResult);
             $this->assertEquals(0, $result1->nextExpectedVersion());
 
-            /** @var EventStoreAsyncTransaction $transaction1 */
             $transaction2 = yield $this->conn->startTransactionAsync(
                 $stream,
                 ExpectedVersion::ANY
             );
+            \assert($transaction2 instanceof EventStoreAsyncTransaction);
             yield $transaction2->writeAsync([$event]);
-            /** @var WriteResult $result1 */
             $result2 = yield $transaction2->commitAsync();
+            \assert($result2 instanceof WriteResult);
             $this->assertEquals(0, $result2->nextExpectedVersion());
 
-            /** @var StreamEventsSlice $result */
             $result = yield $this->conn->readStreamEventsForwardAsync(
                 $stream,
                 0,
                 100,
                 false
             );
+            \assert($result instanceof StreamEventsSlice);
 
             $this->assertCount(1, $result->events());
             $this->assertTrue($event->eventId()->equals($result->events()[0]->event()->eventId()));

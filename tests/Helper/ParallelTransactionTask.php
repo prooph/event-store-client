@@ -38,11 +38,11 @@ class ParallelTransactionTask implements Task
 
         yield $store->connectAsync();
 
-        /** @var EventStoreAsyncTransaction $transaction */
         $transaction = yield $store->startTransactionAsync(
             $this->stream,
             ExpectedVersion::ANY
         );
+        \assert($transaction instanceof EventStoreAsyncTransaction);
 
         $writes = [];
 

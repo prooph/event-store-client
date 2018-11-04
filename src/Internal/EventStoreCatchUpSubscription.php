@@ -465,9 +465,9 @@ abstract class EventStoreCatchUpSubscription
     {
         return call(function (): Generator {
             do {
-                /** @var ResolvedEvent $e */
                 while (! $this->liveQueue->isEmpty()) {
                     $e = $this->liveQueue->dequeue();
+                    \assert($e instanceof ResolvedEvent);
 
                     if ($e === self::$dropSubscriptionEvent) {
                         $this->dropData = $this->dropData ?? new DropData(SubscriptionDropReason::unknown(), new \Exception('Drop reason not specified'));

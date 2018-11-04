@@ -68,7 +68,8 @@ class DeletePersistentSubscriptionOperation extends AbstractOperation
 
     protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
-        /** @var DeletePersistentSubscriptionCompleted $response */
+        \assert($response instanceof DeletePersistentSubscriptionCompleted);
+
         switch ($response->getResult()) {
             case DeletePersistentSubscriptionResult::Success:
                 $this->succeed($response);
@@ -102,7 +103,8 @@ class DeletePersistentSubscriptionOperation extends AbstractOperation
 
     protected function transformResponse(ProtobufMessage $response): PersistentSubscriptionDeleteResult
     {
-        /** @var DeletePersistentSubscriptionCompleted $response */
+        \assert($response instanceof DeletePersistentSubscriptionCompleted);
+
         if (0 === $response->getResult()) {
             $status = PersistentSubscriptionDeleteStatus::success();
         } else {

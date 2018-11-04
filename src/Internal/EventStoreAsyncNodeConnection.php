@@ -491,7 +491,7 @@ final class EventStoreAsyncNodeConnection implements
                 $deferred->fail($e);
             }
 
-            /** @var EventReadResult $eventReadResult */
+            \assert($eventReadResult instanceof EventReadResult);
 
             switch ($eventReadResult->status()->value()) {
                 case EventReadStatus::SUCCESS:

@@ -363,8 +363,9 @@ abstract class AbstractEventStorePersistentSubscription
                     yield new Delayed(1000);
                 } else {
                     while (! $this->queue->isEmpty()) {
-                        /** @var PersistentSubscriptionResolvedEvent $e */
                         $e = $this->queue->dequeue();
+                        \assert($e instanceof PersistentSubscriptionResolvedEvent);
+
                         if ($e->event() === self::$dropSubscriptionEvent) {
                             // drop subscription artificial ResolvedEvent
 

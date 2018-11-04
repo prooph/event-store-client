@@ -66,6 +66,6 @@ Loop::run(function () {
         new UserCredentials('admin', 'changeit')
     );
 
-    /** @var VolatileEventStoreSubscription $subscription */
+    \assert($subscription instanceof VolatileEventStoreSubscription);
     echo 'last event number: ' . $subscription->lastCommitPosition() . PHP_EOL;
 });

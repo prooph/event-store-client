@@ -83,8 +83,8 @@ class read_event_should extends TestCase
     public function notify_using_status_code_if_stream_not_found(): void
     {
         $this->execute(function () {
-            /** @var EventReadResult $res */
             $res = yield $this->conn->readEventAsync('unexisting-stream', 5, false);
+            \assert($res instanceof EventReadResult);
 
             $this->assertTrue($res->status()->equals(EventReadStatus::noStream()));
             $this->assertNull($res->event());
@@ -100,8 +100,8 @@ class read_event_should extends TestCase
     public function return_no_stream_if_requested_last_event_in_empty_stream(): void
     {
         $this->execute(function () {
-            /** @var EventReadResult $res */
             $res = yield $this->conn->readEventAsync('some-really-empty-stream', -1, false);
+            \assert($res instanceof EventReadResult);
 
             $this->assertTrue($res->status()->equals(EventReadStatus::noStream()));
         });
@@ -114,8 +114,8 @@ class read_event_should extends TestCase
     public function notify_using_status_code_if_stream_was_deleted(): void
     {
         $this->execute(function () {
-            /** @var EventReadResult $res */
             $res = yield $this->conn->readEventAsync($this->deletedStream, 5, false);
+            \assert($res instanceof EventReadResult);
 
             $this->assertTrue($res->status()->equals(EventReadStatus::streamDeleted()));
             $this->assertNull($res->event());
@@ -131,8 +131,8 @@ class read_event_should extends TestCase
     public function notify_using_status_code_if_stream_does_not_have_event(): void
     {
         $this->execute(function () {
-            /** @var EventReadResult $res */
             $res = yield $this->conn->readEventAsync($this->testStream, 5, false);
+            \assert($res instanceof EventReadResult);
 
             $this->assertTrue($res->status()->equals(EventReadStatus::notFound()));
             $this->assertNull($res->event());
@@ -148,8 +148,8 @@ class read_event_should extends TestCase
     public function return_existing_event(): void
     {
         $this->execute(function () {
-            /** @var EventReadResult $res */
             $res = yield $this->conn->readEventAsync($this->testStream, 0, false);
+            \assert($res instanceof EventReadResult);
 
             $this->assertTrue($res->status()->equals(EventReadStatus::success()));
             $this->assertTrue($res->event()->originalEvent()->eventId()->equals($this->eventId0));
@@ -166,8 +166,8 @@ class read_event_should extends TestCase
     public function retrieve_the_is_json_flag_properly(): void
     {
         $this->execute(function () {
-            /** @var EventReadResult $res */
             $res = yield $this->conn->readEventAsync($this->testStream, 1, false);
+            \assert($res instanceof EventReadResult);
 
             $this->assertTrue($res->status()->equals(EventReadStatus::success()));
             $this->assertTrue($res->event()->originalEvent()->eventId()->equals($this->eventId1));
@@ -182,8 +182,8 @@ class read_event_should extends TestCase
     public function return_last_event_in_stream_if_event_number_is_minus_one(): void
     {
         $this->execute(function () {
-            /** @var EventReadResult $res */
             $res = yield $this->conn->readEventAsync($this->testStream, -1, false);
+            \assert($res instanceof EventReadResult);
 
             $this->assertTrue($res->status()->equals(EventReadStatus::success()));
             $this->assertTrue($res->event()->originalEvent()->eventId()->equals($this->eventId1));

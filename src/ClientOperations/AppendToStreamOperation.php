@@ -91,7 +91,8 @@ class AppendToStreamOperation extends AbstractOperation
 
     protected function inspectResponse(ProtobufMessage $response): InspectionResult
     {
-        /** @var WriteEventsCompleted $response */
+        \assert($response instanceof WriteEventsCompleted);
+
         switch ($response->getResult()) {
             case OperationResult::Success:
                 $this->succeed($response);
@@ -130,7 +131,8 @@ class AppendToStreamOperation extends AbstractOperation
 
     protected function transformResponse(ProtobufMessage $response)
     {
-        /** @var WriteEventsCompleted $response */
+        \assert($response instanceof WriteEventsCompleted);
+
         return new WriteResult(
             $response->getLastEventNumber(),
             new Position(
