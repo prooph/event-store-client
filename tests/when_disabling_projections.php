@@ -73,7 +73,7 @@ class when_disabling_projections extends TestCase
             );
             $status = $projectionStatus['status'];
 
-            $this->assertSame('Stopped', $status);
+            $this->assertStringStartsWith('Stopped', $status);
         });
     }
 }

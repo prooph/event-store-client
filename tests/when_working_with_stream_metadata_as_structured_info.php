@@ -37,8 +37,8 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
     private function execute(callable $function): void
     {
         wait(call(function () use ($function) {
-            $this->stream = $this->getName();
-            $this->conn = TestConnection::createAsync();
+            $this->stream = __CLASS__ . '\\' . $this->getName();
+            $this->conn = TestConnection::createAsync(DefaultData::adminCredentials());
             yield $this->conn->connectAsync();
 
             yield from $function();

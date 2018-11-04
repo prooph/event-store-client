@@ -37,7 +37,7 @@ class when_working_with_raw_stream_metadata extends TestCase
     private function execute(callable $function): void
     {
         wait(call(function () use ($function): Generator {
-            $this->stream = $this->getName();
+            $this->stream = __CLASS__ . '\\' . $this->getName();
             $this->conn = TestConnection::createAsync();
             yield $this->conn->connectAsync();
 

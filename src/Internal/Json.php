@@ -23,12 +23,16 @@ class Json
      */
     public static function encode($value): string
     {
-        $flags = \JSON_FORCE_OBJECT | \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
+        $flags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
 
         $string = \json_encode($value, $flags);
 
         if ($error = \json_last_error()) {
             throw new JsonException(\json_last_error_msg(), $error);
+        }
+
+        if ('[]' === $string) {
+            $string = '{}';
         }
 
         return $string;
