@@ -441,6 +441,7 @@ class catch_up_subscription_handles_errors extends TestCase
             $this->assertCount(0, $this->raisedEvents);
             $this->assertNotNull($innerSubscriptionDrop);
 
+            \assert($innerSubscriptionDrop instanceof SubscriptionDropped);
             $innerSubscriptionDrop($volatileEventStoreSubscription, SubscriptionDropReason::connectionClosed(), null);
 
             $result = yield Promise\timeout($this->dropEvent->promise(), self::$timeoutMs);
