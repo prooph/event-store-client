@@ -99,9 +99,9 @@ class update_existing_persistent_subscription_with_subscribers extends TestCase
                     SubscriptionDropReason $reason,
                     ?Throwable $exception = null
                 ): void {
-                    $this->dropped->resolve(true);
                     $this->reason = $reason;
                     $this->exception = $exception;
+                    $this->dropped->resolve(true);
                 }
             }
         );
