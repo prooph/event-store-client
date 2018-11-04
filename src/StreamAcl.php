@@ -129,30 +129,12 @@ class StreamAcl
 
     public static function fromArray(array $data): StreamAcl
     {
-        $values = [
-            SystemMetadata::ACL_READ,
-            SystemMetadata::ACL_WRITE,
-            SystemMetadata::ACL_DELETE,
-            SystemMetadata::ACL_META_READ,
-            SystemMetadata::ACL_META_WRITE,
-        ];
-
-        foreach ($values as $value) {
-            if (! isset($data[$value])) {
-                throw new \InvalidArgumentException($value . ' is missing');
-            }
-
-            if (! \is_array($data[$value])) {
-                throw new \InvalidArgumentException($value . ' is not an array');
-            }
-        }
-
         return new self(
-            $data[SystemMetadata::ACL_READ],
-            $data[SystemMetadata::ACL_WRITE],
-            $data[SystemMetadata::ACL_DELETE],
-            $data[SystemMetadata::ACL_META_READ],
-            $data[SystemMetadata::ACL_META_WRITE]
+            $data[SystemMetadata::ACL_READ] ?? [],
+            $data[SystemMetadata::ACL_WRITE] ?? [],
+            $data[SystemMetadata::ACL_DELETE] ?? [],
+            $data[SystemMetadata::ACL_META_READ] ?? [],
+            $data[SystemMetadata::ACL_META_WRITE] ?? []
         );
     }
 }

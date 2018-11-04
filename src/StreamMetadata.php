@@ -84,10 +84,6 @@ class StreamMetadata implements JsonSerializable
             if (! \is_string($key)) {
                 throw new InvalidArgumentException('CustomMetadata key must be a string');
             }
-
-            if (! \is_scalar($value)) {
-                throw new InvalidArgumentException('CustomMetadata value must be a string');
-            }
         }
 
         $this->maxCount = $maxCount;
@@ -142,7 +138,7 @@ class StreamMetadata implements JsonSerializable
      */
     public function getValue(string $key)
     {
-        if (! isset($this->customMetadata[$key])) {
+        if (! \array_key_exists($key, $this->customMetadata)) {
             throw new \InvalidArgumentException('Key ' . $key . ' not found in custom metadata');
         }
 
@@ -182,7 +178,7 @@ class StreamMetadata implements JsonSerializable
 
     public static function createFromArray(array $data): StreamMetadata
     {
-        $internal = [
+        $internals = [
             SystemMetadata::MAX_COUNT,
             SystemMetadata::MAX_AGE,
             SystemMetadata::TRUNCATE_BEFORE,
@@ -192,7 +188,7 @@ class StreamMetadata implements JsonSerializable
         $params = [];
 
         foreach ($data as $key => $value) {
-            if (\in_array($key, $internal, true)) {
+            if (\in_array($key, $internals, true)) {
                 $params[$key] = $value;
             } elseif ($key === SystemMetadata::ACL) {
                 $params[SystemMetadata::ACL] = StreamAcl::fromArray($value);

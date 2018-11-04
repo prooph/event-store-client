@@ -447,7 +447,7 @@ final class EventStoreAsyncNodeConnection implements
                 return;
             }
 
-            if ($result->streamMetadata() === null || \strlen($result->streamMetadata()) === 0) {
+            if ($result->streamMetadata() === '') {
                 $deferred->resolve(new StreamMetadataResult(
                     $result->stream(),
                     $result->isStreamDeleted(),
@@ -461,7 +461,7 @@ final class EventStoreAsyncNodeConnection implements
             $metadata = StreamMetadata::createFromArray(Json::decode($result->streamMetadata()));
 
             $deferred->resolve(new StreamMetadataResult(
-                $result->streamMetadata(),
+                $result->stream(),
                 $result->isStreamDeleted(),
                 $result->metastreamVersion(),
                 $metadata

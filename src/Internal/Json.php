@@ -23,7 +23,7 @@ class Json
      */
     public static function encode($value): string
     {
-        $flags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
+        $flags = \JSON_FORCE_OBJECT | \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION;
 
         $string = \json_encode($value, $flags);
 

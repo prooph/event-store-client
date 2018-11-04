@@ -155,7 +155,7 @@ class StreamMetadataBuilder
     }
 
     /** Sets role names with metadata read permission for the stream */
-    public function setMetaReadRoles(string ...$metaReadRoles): StreamMetadataBuilder
+    public function setMetadataReadRoles(string ...$metaReadRoles): StreamMetadataBuilder
     {
         $this->aclMetaRead = $metaReadRoles;
 
@@ -163,7 +163,7 @@ class StreamMetadataBuilder
     }
 
     /** Sets role names with metadata write permission for the stream */
-    public function setMetaWriteRoles(string ...$metaWriteRoles): StreamMetadataBuilder
+    public function setMetadataWriteRoles(string ...$metaWriteRoles): StreamMetadataBuilder
     {
         $this->aclMetaWrite = $metaWriteRoles;
 
@@ -172,10 +172,6 @@ class StreamMetadataBuilder
 
     public function setCustomProperty(string $key, $value): StreamMetadataBuilder
     {
-        if (! \is_scalar($value)) {
-            throw new InvalidArgumentException('Value must be a scalar');
-        }
-
         $this->customMetadata[$key] = $value;
 
         return $this;
