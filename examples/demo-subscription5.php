@@ -18,8 +18,8 @@ use Amp\Promise;
 use Amp\Success;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
+use Prooph\EventStoreClient\Internal\PersistentSubscriptionCreateResult;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
-use Prooph\EventStoreClient\Messages\ClientMessages\CreatePersistentSubscription;
 use Throwable;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -56,7 +56,7 @@ Loop::run(function () {
         PersistentSubscriptionSettings::default(),
         new UserCredentials('admin', 'changeit')
     );
-    \assert($result instanceof CreatePersistentSubscription);
+    \assert($result instanceof PersistentSubscriptionCreateResult);
 
     \var_dump($result);
 
