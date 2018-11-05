@@ -282,7 +282,7 @@ class EventStoreConnectionLogicHandler
 
         $this->logInfo('Closed. Reason: %s', $reason);
 
-        if (null !== $exception ) {
+        if (null !== $exception) {
             $this->raiseErrorOccurred($exception);
         }
 
