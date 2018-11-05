@@ -60,7 +60,7 @@ Loop::run(function () {
 
     \var_dump($result);
 
-    $connection->connectToPersistentSubscriptionAsync(
+    yield $connection->connectToPersistentSubscriptionAsync(
         'foo-bar',
         'test-persistent-subscription',
         new class() implements EventAppearedOnPersistentSubscription {
