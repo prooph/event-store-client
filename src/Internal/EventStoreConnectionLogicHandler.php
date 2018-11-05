@@ -15,6 +15,7 @@ namespace Prooph\EventStoreClient\Internal;
 
 use Amp\Deferred;
 use Amp\Loop;
+use Exception;
 use Generator;
 use Prooph\EventStoreClient\ClientAuthenticationFailedEventArgs;
 use Prooph\EventStoreClient\ClientClosedEventArgs;
@@ -254,7 +255,7 @@ class EventStoreConnectionLogicHandler
         });
     }
 
-    /** @throws \Exception */
+    /** @throws Exception */
     private function closeConnection(string $reason, ?Throwable $exception = null): void
     {
         if ($this->state->equals(ConnectionState::closed())) {
@@ -281,7 +282,7 @@ class EventStoreConnectionLogicHandler
 
         $this->logInfo('Closed. Reason: %s', $reason);
 
-        if (null !== $exception) {
+        if (null !== $exception ) {
             $this->raiseErrorOccurred($exception);
         }
 
@@ -336,7 +337,7 @@ class EventStoreConnectionLogicHandler
         Loop::defer(function (): Generator {
             yield $this->connection->connectAsync();
 
-            if (! $this->connection->isClosed()) {
+            if (null !== $this->connection && ! $this->connection->isClosed()) {
                 $this->connection->startReceiving();
             }
         });
@@ -415,7 +416,7 @@ class EventStoreConnectionLogicHandler
     {
         if (! $this->state->equals(ConnectionState::connecting())
             || $this->connection !== $connection
-            || ($this->connection && $this->connection->isClosed())
+            || $this->connection->isClosed()
         ) {
             $this->logDebug('IGNORED (state %s, internal conn.Id %s, conn.Id %s, conn.closed %s): TCP connection to [%s] established',
                 $this->state,
@@ -491,6 +492,7 @@ class EventStoreConnectionLogicHandler
         }
     }
 
+    /** @throws Exception */
     private function timerTick(): void
     {
         $elapsed = $this->stopWatch->elapsed();
@@ -506,7 +508,9 @@ class EventStoreConnectionLogicHandler
 
                     $this->reconnInfo = new ReconnectionInfo($this->reconnInfo->reconnectionAttempt() + 1, $this->stopWatch->elapsed());
 
-                    if ($this->settings->maxReconnections() >= 0 && $this->reconnInfo->reconnectionAttempt() > $this->settings->maxReconnections()) {
+                    $maxReconnections = $this->settings->maxReconnections();
+
+                    if ($maxReconnections >= 0 && $this->reconnInfo->reconnectionAttempt() > $maxReconnections) {
                         $this->closeConnection('Reconnection limit reached');
                     } else {
                         $this->raiseReconnecting();
@@ -550,6 +554,7 @@ class EventStoreConnectionLogicHandler
         }
     }
 
+    /** @throws Exception */
     private function manageHeartbeats(): void
     {
         if (null === $this->connection) {
@@ -730,6 +735,7 @@ class EventStoreConnectionLogicHandler
         }
     }
 
+    /** @throws Exception */
     private function handleTcpPackage(TcpPackageConnection $connection, TcpPackage $package): void
     {
         if ($this->connection !== $connection
@@ -869,6 +875,7 @@ class EventStoreConnectionLogicHandler
         }
     }
 
+    /** @throws Exception */
     private function reconnectTo(NodeEndPoints $endPoints): void
     {
         $endPoint = $this->settings->useSslConnection()
