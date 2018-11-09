@@ -272,7 +272,7 @@ abstract class AbstractEventStorePersistentSubscription
     /**
      * Mark a message failed processing. The server will be take action based upon the action paramter
      */
-    public function fail(ResolvedEvent $event, PersistentSubscriptionNakEventAction $action, string $reason): void
+    public function fail(InternalResolvedEvent $event, PersistentSubscriptionNakEventAction $action, string $reason): void
     {
         $this->subscription->notifyEventsFailed([$event->originalEvent()->eventId()], $action, $reason);
     }
@@ -280,14 +280,14 @@ abstract class AbstractEventStorePersistentSubscription
     /**
      * Mark n messages that have failed processing. The server will take action based upon the action parameter
      *
-     * @param ResolvedEvent[] $events
+     * @param InternalResolvedEvent[] $events
      * @param PersistentSubscriptionNakEventAction $action
      * @param string $reason
      */
     public function failMultiple(array $events, PersistentSubscriptionNakEventAction $action, string $reason): void
     {
         $ids = \array_map(
-            function (ResolvedEvent $event): EventId {
+            function (InternalResolvedEvent $event): EventId {
                 return $event->originalEvent()->eventId();
             },
             $events

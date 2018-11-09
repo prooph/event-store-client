@@ -193,7 +193,10 @@ abstract class AbstractOperation implements ClientOperation
             $package->flags(),
             $package->correlationId()
         ));
-        $this->log->error('Operation (%s)', \get_class($this));
+        $this->log->error(\sprintf(
+            'Operation (%s)',
+            \get_class($this)
+        ));
         $this->log->error('TcpPackage Data Dump:');
         $this->log->error($package->data());
 

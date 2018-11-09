@@ -220,7 +220,10 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
                                 )
                             );
                         default:
-                            $this->log->error('Unknown NotHandledReason: %s', $message->getReason());
+                            $this->log->error(\sprintf(
+                                'Unknown NotHandledReason: %s',
+                                $message->getReason()
+                            ));
 
                             return new InspectionResult(InspectionDecision::retry(), 'NotHandledException - <unknown>');
                     }
