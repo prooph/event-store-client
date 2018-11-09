@@ -471,17 +471,11 @@ class ProjectionsClient
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        if (null === $emitEnabled) {
-            $url = '/projection/%s/query?type=%s';
-        } else {
-            $url = '/projection/%s/query?emit=' . (int) $emitEnabled . '&type=%s';
-        }
-
         return $this->sendPut(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
-                $url,
+                '/projection/%s/query?emit=' . (int) $emitEnabled . '&type=%s',
                 $name,
                 $type
             ),

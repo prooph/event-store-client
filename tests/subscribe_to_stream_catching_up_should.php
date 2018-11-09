@@ -135,7 +135,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
                 [TestEvent::newTestEvent()]
             );
 
-            if (! $appeared->wait(self::TIMEOUT)) {
+            if (! yield $appeared->wait(self::TIMEOUT)) {
                 $this->assertFalse(yield $dropped->wait(0), 'Subscription was dropped prematurely');
                 $this->fail('Appeared countdown event timed out');
 

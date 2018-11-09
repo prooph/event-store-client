@@ -152,8 +152,8 @@ abstract class AbstractOperation implements ClientOperation
 
     private function inspectNotHandled(TcpPackage $package): InspectionResult
     {
-        $message = $package->data();
-        \assert($message instanceof NotHandled);
+        $message = new NotHandled();
+        $message->parseFromString($package->data());
 
         switch ($message->getReason()) {
             case NotHandledReason::NotReady:

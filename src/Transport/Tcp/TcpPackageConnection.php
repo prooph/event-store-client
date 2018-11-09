@@ -46,7 +46,7 @@ class TcpPackageConnection
     private $validateServer;
     /** @var int */
     private $timeout;
-    /** @var ClientSocket */
+    /** @var ClientSocket|null */
     private $connection;
     /** @var bool */
     private $isClosed = true;

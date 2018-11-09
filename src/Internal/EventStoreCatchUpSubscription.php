@@ -76,7 +76,7 @@ abstract class EventStoreCatchUpSubscription
 
     /** @var SplQueue<ResolvedEvent> */
     private $liveQueue;
-    /** @var EventStoreSubscription */
+    /** @var EventStoreSubscription|null */
     private $subscription;
     /** @var DropData|null */
     private $dropData;
