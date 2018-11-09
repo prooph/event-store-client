@@ -26,7 +26,7 @@ abstract class TestWithNode extends TestCase
     {
         $this->manager = new SyncUsersManager(
             new EndPoint(
-                \getenv('ES_HOST'),
+                (string) \getenv('ES_HOST'),
                 (int) \getenv('ES_HTTP_PORT')
             ),
             5000

@@ -359,7 +359,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
                 $e->originalStreamName(),
                 $e->originalEventNumber(),
                 $e->originalEvent()->eventType(),
-                $e->originalPosition() ?? '<null>'
+                $e->originalPosition() ? $e->originalPosition()->__toString() : '<null>'
             ));
         }
 

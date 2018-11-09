@@ -125,7 +125,7 @@ class QueryManager
     ): Promise {
         return call(function () use ($attempts, $initialPollingDelay, $maximumPollingDelay): Generator {
             $delayInMilliseconds = $initialPollingDelay * (2 ** $attempts - 1);
-            $delayInMilliseconds = \min($delayInMilliseconds, $maximumPollingDelay);
+            $delayInMilliseconds = (int) \min($delayInMilliseconds, $maximumPollingDelay);
 
             yield new Delayed($delayInMilliseconds);
         });

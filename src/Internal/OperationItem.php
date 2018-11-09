@@ -19,6 +19,7 @@ use Prooph\EventStoreClient\ClientOperations\ClientOperation;
 /** @internal */
 class OperationItem
 {
+    /** @var int */
     private static $nextSeqNo = -1;
     /** @var int */
     private $segNo;

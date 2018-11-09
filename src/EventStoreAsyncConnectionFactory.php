@@ -60,6 +60,10 @@ class EventStoreAsyncConnectionFactory
             throw new \Exception('Setting ConnectTo as well as GossipSeeds and/or ClusterDNS on the connection string is currently not supported');
         }
 
+        if (null === $settings) {
+            $settings = ConnectionSettings::default();
+        }
+
         if (null !== $connectionString) {
             list($scheme, $host, $port, $user, $pass) = self::parseUri($connectionString);
             $credentials = $user ? new UserCredentials($user, $pass) : null;

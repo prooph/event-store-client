@@ -58,8 +58,8 @@ class Position
             throw new InvalidArgumentException('string too short');
         }
 
-        $commitPosition = \hexdec(\substr($string, 0, 16));
-        $preparePosition = \hexdec(\substr($string, 16, 16));
+        $commitPosition = (int) \hexdec(\substr($string, 0, 16));
+        $preparePosition = (int) \hexdec(\substr($string, 16, 16));
 
         return new Position($commitPosition, $preparePosition);
     }
