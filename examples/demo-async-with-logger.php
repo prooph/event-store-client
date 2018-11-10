@@ -22,7 +22,7 @@ Loop::run(function () {
     $builder->enableVerboseLogging();
     $builder->useConsoleLogger();
 
-    $connection = EventStoreAsyncConnectionFactory::createFromSettingsWithIpEndPoint(
+    $connection = EventStoreAsyncConnectionFactory::createFromSettingsWithEndPoint(
         new EndPoint('eventstore', 1113),
         $builder->build()
     );

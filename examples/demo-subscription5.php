@@ -25,7 +25,7 @@ use Throwable;
 require __DIR__ . '/../vendor/autoload.php';
 
 Loop::run(function () {
-    $connection = EventStoreAsyncConnectionFactory::createFromSettingsWithIpEndPoint(
+    $connection = EventStoreAsyncConnectionFactory::createFromSettingsWithEndPoint(
         new EndPoint('eventstore', 1113)
     );
 

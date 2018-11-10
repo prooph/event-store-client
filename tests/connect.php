@@ -48,7 +48,7 @@ class connect extends TestCase
     public function should_not_throw_exception_when_server_is_down(): void
     {
         wait(call(function () {
-            $connection = EventStoreAsyncConnectionFactory::createFromSettingsWithIpEndPoint(
+            $connection = EventStoreAsyncConnectionFactory::createFromSettingsWithEndPoint(
                 $this->blackhole
             );
 
@@ -72,7 +72,7 @@ class connect extends TestCase
                 ->setReconnectionDelayTo(0)
                 ->failOnNoServerResponse();
 
-            $connection = EventStoreAsyncConnectionFactory::createFromSettingsWithIpEndPoint(
+            $connection = EventStoreAsyncConnectionFactory::createFromSettingsWithEndPoint(
                 $this->blackhole,
                 $settings->build()
             );
@@ -109,7 +109,7 @@ class connect extends TestCase
                 ->setReconnectionDelayTo(0)
                 ->failOnNoServerResponse();
 
-            $connection = EventStoreAsyncConnectionFactory::createFromSettingsWithIpEndPoint(
+            $connection = EventStoreAsyncConnectionFactory::createFromSettingsWithEndPoint(
                 $this->blackhole,
                 $settings->build()
             );

@@ -125,10 +125,10 @@ class EventStoreAsyncConnectionFactory
     ): AsyncConnection {
         $builder = $builder ?? new ConnectionSettingsBuilder();
 
-        return self::createFromSettingsWithIpEndPoint($endPoint, $builder->build(), $connectionName);
+        return self::createFromSettingsWithEndPoint($endPoint, $builder->build(), $connectionName);
     }
 
-    public static function createFromSettingsWithIpEndPoint(
+    public static function createFromSettingsWithEndPoint(
         EndPoint $endPoint,
         ?ConnectionSettings $settings = null,
         ?string $connectionName = null

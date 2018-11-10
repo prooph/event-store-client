@@ -29,7 +29,7 @@ class TestConnection
     {
         self::checkRequiredEnvironmentSettings();
 
-        return EventStoreAsyncConnectionFactory::createFromSettingsWithIpEndPoint(
+        return EventStoreAsyncConnectionFactory::createFromSettingsWithEndPoint(
             self::endPoint(),
             self::settings($userCredentials)
         );
