@@ -9,13 +9,12 @@ PHP 7.2 Event Store Client Implementation.
 ## Overview
 
 Prooph Event Store Client supports async non-blocking communication via TCP to [EventStore](https://eventstore.org/).
-In the future, there will be also a server implementation written in pure PHP using Postgres (maybe also MySQL) as backend.
 
-Asynchronous operations are done via [Amp](https://amphp.org/) and sync operation are also supported.
+The `EventStoreAsyncConnection` or `EventStoreSyncConnection` maintains a full-duplex connection between the client and the Event Store server.
 
 ### Extensions
 
-You need to [allegro/php-protobuf](https://github.com/allegro/php-protobuf/) PHP extension.
+You need the [allegro/php-protobuf](https://github.com/allegro/php-protobuf/) PHP extension.
 
 The protobuf extension from Google will not work, because it doesn't support proto2, only proto3.
 
@@ -23,17 +22,17 @@ Additional extensions are only needed if your app necessitates a high numbers of
 
 - [ev](https://pecl.php.net/package/ev)
 - [event](https://pecl.php.net/package/event)
-- [php-uv](https://github.com/bwoebi/php-uv) (experimental fork) 
+- [php-uv](https://github.com/bwoebi/php-uv) (experimental fork)
 
 ## Installation
 
-You can install prooph/event-store-client via composer by adding `"prooph/event-store-client": "dev-master"` as requirement to your composer.json.
+### Client
 
-To install EventStore Server, check the manual at [https://eventstore.org/docs/getting-started/index.html](https://eventstore.org/docs/getting-started/index.html)
+You can install prooph/event-store-client via composer by adding `"prooph/event-store-client": "dev-master"` as requirement to your composer.json.
 
 To install allegro/php-protobuf:
 
-```
+```bash
 git clone https://github.com/allegro/php-protobuf
 cd php-protobuf
 git checkout v0.12.3
@@ -41,8 +40,21 @@ phpize
 ./configure
 make
 sudo make install
+
 add "extensions=protobuf.so" to your php.ini
 ```
+
+### Server
+
+Using docker:
+
+```bash
+docker run --name eventstore-node -it -p 2113:2113 -p 1113:1113 eventstore/eventstore
+```
+
+Please refer to the documentation of [eventstore.org](https://eventstore.org).
+
+See [server section](https://eventstore.org/docs/server/index.html).
 
 In the docker-folder you'll find three different docker-compose setups (single node, 3-node-cluster and 3-node-dns-cluster).
 
@@ -70,14 +82,7 @@ Before next run, restart the server. This way you can always start with a clean 
 
 ## Documentation
 
-Documentation is [in the doc tree](docs/), and can be compiled using [bookdown](http://bookdown.io).
-
-```console
-$ php ./vendor/bin/bookdown docs/bookdown.json
-$ php -S 0.0.0.0:8080 -t docs/html/
-```
-
-Then browse to [http://localhost:8080/](http://localhost:8080/)
+Documentation is on the [prooph website](http://docs.getprooph.org/).
 
 ## Support
 
