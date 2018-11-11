@@ -62,7 +62,7 @@ class ConnectionSettings
     /** @var int */
     private $externalGossipPort;
     /** @var GossipSeed[] */
-    private $gossipSeeds;
+    private $gossipSeeds = [];
     /** @var int */
     private $gossipTimeout;
     /** @var bool */
@@ -255,5 +255,13 @@ class ConnectionSettings
     public function clientConnectionTimeout(): int
     {
         return $this->clientConnectionTimeout;
+    }
+
+    public function withDefaultCredentials(UserCredentials $userCredentials): self
+    {
+        $clone = clone $this;
+        $clone->defaultUserCredentials = $userCredentials;
+
+        return $clone;
     }
 }

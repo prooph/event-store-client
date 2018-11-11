@@ -23,7 +23,6 @@ Loop::run(function () {
     $builder->setClusterGossipPort(2113);
 
     $connection = EventStoreAsyncConnectionFactory::createFromSettings(
-        null,
         $builder->build(),
         'dns-cluster-connection'
     );

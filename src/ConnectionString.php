@@ -1,0 +1,167 @@
+<?php
+
+/**
+ * This file is part of `prooph/event-store-client`.
+ * (c) 2018-2018 prooph software GmbH <contact@prooph.de>
+ * (c) 2018-2018 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace Prooph\EventStoreClient;
+
+use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use ReflectionObject;
+
+class ConnectionString
+{
+    private static $allowedValues = [
+        'verboselogging' => 'bool',
+        'maxqueuesize' => 'int',
+        'maxconcurrentitems' => 'int',
+        'maxretries' => 'int',
+        'maxreconnections' => 'int',
+        'requiremaster' => 'bool',
+        'reconnectiondelay' => 'int',
+        'operationtimeout' => 'int',
+        'operationtimeoutcheckperiod' => 'int',
+        'defaultusercredentials' => UserCredentials::class,
+        'usesslconnection' => 'bool',
+        'targethost' => 'string',
+        'validateserver' => 'bool',
+        'failonnoserverresponse' => 'bool',
+        'heartbeatinterval' => 'int',
+        'heartbeattimeout' => 'int',
+        'clusterdns' => 'string',
+        'maxdiscoverattempts' => 'int',
+        'externalgossipport' => 'int',
+        'gossipseeds' => GossipSeed::class,
+        'gossiptimeout' => 'int',
+        'preferrandomNode' => 'bool',
+        'clientconnectiontimeout' => 'int',
+    ];
+
+    public static function getConnectionSettings(
+        string $connectionString,
+        ?ConnectionSettings $settings = null
+    ): ConnectionSettings {
+        $settings = $settings ?? ConnectionSettings::default();
+        $reflection = new ReflectionObject($settings);
+        $properties = $reflection->getProperties();
+        $values = \explode(';', $connectionString);
+
+        foreach ($values as $value) {
+            list($key, $value) = \explode('=', $value);
+            $key = \strtolower($key);
+
+            if (! \array_key_exists($key, self::$allowedValues)) {
+                throw new InvalidArgumentException(\sprintf(
+                    'Key %s is not an allowed key in %s',
+                    $key,
+                    __CLASS__
+                ));
+            }
+
+            $type = self::$allowedValues[$key];
+
+            switch ($type) {
+                case 'bool':
+                    $filteredValue = \filter_var($value, \FILTER_VALIDATE_BOOLEAN);
+                    break;
+                case 'int':
+                    $filteredValue = \filter_var($value, \FILTER_VALIDATE_INT);
+
+                    if (false === $filteredValue) {
+                        throw new InvalidArgumentException(\sprintf(
+                            'Expected type for key %s is %s, but %s given',
+                            $key,
+                            $type,
+                            $value
+                        ));
+                    }
+                    break;
+                case 'string':
+                    $filteredValue = $value;
+                    break;
+                case UserCredentials::class:
+                    $exploded = \explode(':', $value);
+
+                    if (\count($exploded) !== 2) {
+                        throw new InvalidArgumentException(\sprintf(
+                            'Expected user credentials in format user:pass, %s given',
+                            $value
+                        ));
+                    }
+
+                    $filteredValue = new UserCredentials($exploded[0], $exploded[1]);
+                    break;
+                case GossipSeed::class:
+                    $gossipSeeds = [];
+
+                    foreach (\explode(',', $value) as $v) {
+                        $exploded = \explode(':', $v);
+
+                        if (\count($exploded) !== 2) {
+                            throw new InvalidArgumentException(\sprintf(
+                                'Expected user credentials in format user:pass, %s given',
+                                $value
+                            ));
+                        }
+
+                        $host = $exploded[0];
+                        $port = \filter_var($exploded[1], \FILTER_VALIDATE_INT);
+
+                        if (false === $port) {
+                            throw new InvalidArgumentException(\sprintf(
+                                'Expected type for port of gossip seed is int, but %s given',
+                                $exploded[1]
+                            ));
+                        }
+
+                        $gossipSeeds[] = new GossipSeed(new EndPoint($host, $port));
+                    }
+
+                    if (empty($gossipSeeds)) {
+                        throw new InvalidArgumentException(\sprintf(
+                            'No gossip seeds specified in connection string'
+                        ));
+                    }
+
+                    $filteredValue = $gossipSeeds;
+                    break;
+            }
+
+            foreach ($properties as $property) {
+                if (\strtolower($property->getName()) === $key) {
+                    $property->setAccessible(true);
+                    $property->setValue($settings, $filteredValue);
+                    break;
+                }
+            }
+        }
+
+        return $settings;
+    }
+
+    public static function getUriFromConnectionString(string $connectionString): ?Uri
+    {
+        $values = \explode(';', $connectionString);
+
+        if (1 === \count($values)) {
+            return new Uri($connectionString);
+        }
+
+        foreach ($values as $value) {
+            list($key, $value) = \explode('=', $value);
+
+            if (\strtolower($key) === 'connectto') {
+                return new Uri($value);
+            }
+        }
+
+        return null;
+    }
+}
