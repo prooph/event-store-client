@@ -40,7 +40,19 @@ class Uri
     /** @var int */
     private $port;
 
-    public function __construct(string $uri)
+    public function __construct(
+        string $scheme,
+        string $host,
+        int $port,
+        ?UserCredentials $userCredentials = null
+    ) {
+        $this->scheme = $scheme;
+        $this->host = $host;
+        $this->port = $port;
+        $this->userCredentials = $userCredentials;
+    }
+
+    public static function fromString(string $uri): self
     {
         $parts = \parse_url($uri);
 
@@ -50,16 +62,19 @@ class Uri
             );
         }
 
-        $this->scheme = isset($parts['scheme']) ? self::filterScheme($parts['scheme']) : '';
-        $this->host = isset($parts['host']) ? \strtolower($parts['host']) : '';
-        $this->port = isset($parts['port']) ? (int) $parts['port'] : self::TCP_PORT_DEFAULT;
+        $scheme = isset($parts['scheme']) ? self::filterScheme($parts['scheme']) : '';
+        $host = isset($parts['host']) ? \strtolower($parts['host']) : '';
+        $port = isset($parts['port']) ? (int) $parts['port'] : self::TCP_PORT_DEFAULT;
+        $userCredentials = null;
 
         if (isset($parts['user'])) {
             $user = self::filterUserInfoPart($parts['user']);
             $pass = $pass['pass'] ?? '';
 
-            $this->userCredentials = new UserCredentials($user, $pass);
+            $userCredentials = new UserCredentials($user, $pass);
         }
+
+        return new self($scheme, $host, $port, $userCredentials);
     }
 
     public function scheme(): string
