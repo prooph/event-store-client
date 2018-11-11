@@ -33,6 +33,11 @@ class ClusterSettings
     /** @var bool */
     private $preferRandomNode;
 
+    public static function create(): ClusterSettingsBuilder
+    {
+        return new ClusterSettingsBuilder();
+    }
+
     public static function fromGossipSeeds(
         array $gossipSeeds,
         int $maxDiscoverAttempts,
