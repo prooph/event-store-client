@@ -26,7 +26,6 @@ Loop::run(function () {
     ]);
 
     $connection = EventStoreAsyncConnectionFactory::createFromSettings(
-        null,
         $builder->build(),
         'cluster-connection'
     );

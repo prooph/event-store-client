@@ -15,7 +15,7 @@ namespace Prooph\EventStoreClient;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$connection = EventStoreSyncConnectionFactory::createFromSettingsWithEndPoint(
+$connection = EventStoreSyncConnectionFactory::createFromEndPoint(
     new EndPoint('eventstore', 1113)
 );
 

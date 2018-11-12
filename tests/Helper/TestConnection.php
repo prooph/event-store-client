@@ -29,7 +29,7 @@ class TestConnection
     {
         self::checkRequiredEnvironmentSettings();
 
-        return EventStoreAsyncConnectionFactory::createFromSettingsWithEndPoint(
+        return EventStoreAsyncConnectionFactory::createFromEndPoint(
             self::endPoint(),
             self::settings($userCredentials)
         );
@@ -39,7 +39,7 @@ class TestConnection
     {
         self::checkRequiredEnvironmentSettings();
 
-        return EventStoreSyncConnectionFactory::createFromSettingsWithEndPoint(
+        return EventStoreSyncConnectionFactory::createFromEndPoint(
             self::endPoint(),
             self::settings($userCredentials)
         );

@@ -41,7 +41,7 @@ class not_connected_tests extends TestCase
             $ip = '8.8.8.8'; //NOTE: This relies on Google DNS server being configured to swallow nonsense traffic
             $port = 4567;
 
-            $connection = EventStoreAsyncConnectionFactory::createFromSettingsWithEndPoint(
+            $connection = EventStoreAsyncConnectionFactory::createFromEndPoint(
                 new EndPoint($ip, $port),
                 $settingsBuilder->build(),
                 'test-connection'
