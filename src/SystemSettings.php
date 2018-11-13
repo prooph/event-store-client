@@ -71,7 +71,7 @@ class SystemSettings implements JsonSerializable
     public function jsonSerialize(): object
     {
         $object = new stdClass();
-        $object->{SystemMetadata::USER_STREAM_ACL} = $this->userStreamAcl->toArray(),
+        $object->{SystemMetadata::USER_STREAM_ACL} = $this->userStreamAcl->toArray();
         $object->{SystemMetadata::SYSTEM_STREAM_ACL} = $this->systemStreamAcl->toArray();
 
         return $object;
