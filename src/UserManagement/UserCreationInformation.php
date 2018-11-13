@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\UserManagement;
 
 use JsonSerializable;
+use stdClass;
 
 /** @internal */
 final class UserCreationInformation implements JsonSerializable
@@ -35,13 +36,14 @@ final class UserCreationInformation implements JsonSerializable
         $this->password = $password;
     }
 
-    public function jsonSerialize(): array
+    public function jsonSerialize(): object
     {
-        return [
-            'loginName' => $this->loginName,
-            'fullName' => $this->fullName,
-            'groups' => $this->groups,
-            'password' => $this->password,
-        ];
+        $object = new stdClass();
+        $object->loginName = $this->loginName;
+        $object->fullName = $this->fullName;
+        $object->groups = $this->groups;
+        $object->password = $this->password;
+
+        return $object;
     }
 }

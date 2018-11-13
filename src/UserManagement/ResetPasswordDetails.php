@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\UserManagement;
 
 use JsonSerializable;
+use stdClass;
 
 /** @internal */
 class ResetPasswordDetails implements JsonSerializable
@@ -26,10 +27,11 @@ class ResetPasswordDetails implements JsonSerializable
         $this->newPassword = $newPassword;
     }
 
-    public function jsonSerialize(): array
+    public function jsonSerialize(): object
     {
-        return [
-            'newPassword' => $this->newPassword,
-        ];
+        $object = new stdClass();
+        $object->newPassword = $this->newPassword;
+
+        return $object;
     }
 }

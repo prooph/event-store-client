@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use Prooph\EventStoreClient\Util\DateTime;
+
 /** @internal */
 class StopWatch
 {
@@ -26,7 +28,7 @@ class StopWatch
 
     public static function startNew(): self
     {
-        $now = DateTimeUtil::utcNow();
+        $now = DateTime::utcNow();
         $started = (int) \floor((float) $now->format('U.u') * 1000);
 
         return new self($started);
@@ -34,7 +36,7 @@ class StopWatch
 
     public function elapsed(): int
     {
-        $now = DateTimeUtil::utcNow();
+        $now = DateTime::utcNow();
         $timestamp = (int) \floor((float) $now->format('U.u') * 1000);
 
         return $timestamp - $this->started;

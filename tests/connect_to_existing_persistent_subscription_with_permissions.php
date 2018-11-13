@@ -20,8 +20,8 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
-use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
+use Prooph\EventStoreClient\Util\UuidGenerator;
 use Throwable;
 
 class connect_to_existing_persistent_subscription_with_permissions extends TestCase
@@ -37,7 +37,7 @@ class connect_to_existing_persistent_subscription_with_permissions extends TestC
 
     protected function setUp(): void
     {
-        $this->stream = UuidGenerator::generate();
+        $this->stream = UuidGenerator::generateWithoutDash();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

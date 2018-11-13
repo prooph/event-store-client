@@ -11,12 +11,12 @@
 
 declare(strict_types=1);
 
-namespace Prooph\EventStoreClient\Internal;
+namespace Prooph\EventStoreClient\Util;
 
 use DateTimeImmutable;
 use DateTimeZone;
 
-abstract class DateTimeUtil
+class DateTime
 {
     public static function utcNow(): DateTimeImmutable
     {
@@ -35,5 +35,9 @@ abstract class DateTimeUtil
     public static function format(DateTimeImmutable $dateTime): string
     {
         return $dateTime->format('Y-m-d\TH:i:s.uP');
+    }
+
+    final private function __construct()
+    {
     }
 }

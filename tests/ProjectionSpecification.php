@@ -19,9 +19,9 @@ use Generator;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\Projections\ProjectionsManager;
 use Prooph\EventStoreClient\UserCredentials;
+use Prooph\EventStoreClient\Util\UuidGenerator;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use Throwable;
 use function Amp\call;
@@ -87,14 +87,14 @@ trait ProjectionSpecification
 
     protected function createOneTimeProjection(string $type): Promise
     {
-        $query = $this->createStandardQuery(UuidGenerator::generate());
+        $query = $this->createStandardQuery(UuidGenerator::generateWithoutDash());
 
         return $this->projectionsManager->createOneTimeAsync($query, $type, $this->credentials);
     }
 
     protected function createContinuousProjection(string $projectionName, string $type): Promise
     {
-        $query = $this->createStandardQuery(UuidGenerator::generate());
+        $query = $this->createStandardQuery(UuidGenerator::generateWithoutDash());
 
         return $this->projectionsManager->createContinuousAsync(
             $projectionName,

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Prooph\EventStoreClient\Internal;
+namespace Prooph\EventStoreClient\Util;
 
 use Prooph\EventStoreClient\Exception\JsonException;
 
@@ -31,10 +31,6 @@ class Json
             throw new JsonException(\json_last_error_msg(), $error);
         }
 
-        if ('[]' === $string) {
-            $string = '{}';
-        }
-
         return $string;
     }
 
@@ -51,5 +47,9 @@ class Json
         }
 
         return $data;
+    }
+
+    final private function __construct()
+    {
     }
 }

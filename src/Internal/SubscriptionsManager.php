@@ -19,6 +19,8 @@ use Prooph\EventStoreClient\Exception\OperationTimedOutException;
 use Prooph\EventStoreClient\Exception\RetriesLimitReachedException;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
+use Prooph\EventStoreClient\Util\DateTime;
+use Prooph\EventStoreClient\Util\UuidGenerator;
 use SplQueue;
 
 /** @internal  */
@@ -111,7 +113,7 @@ class SubscriptionsManager
             if ($subscription->connectionId() !== $connection->connectionId()) {
                 $this->retryPendingSubscriptions[] = $subscription;
             } elseif ($subscription->timeout() > 0
-                && (float) DateTimeUtil::utcNow()->format('U.u') - (float) $subscription->lastUpdated()->format('U.u') > $this->settings->operationTimeout()
+                && (float) DateTime::utcNow()->format('U.u') - (float) $subscription->lastUpdated()->format('U.u') > $this->settings->operationTimeout()
             ) {
                 $err = \sprintf(
                     'EventStoreNodeConnection \'%s\': subscription never got confirmation from server',
@@ -199,10 +201,10 @@ class SubscriptionsManager
             return;
         }
 
-        $correlationId = UuidGenerator::generate();
+        $correlationId = UuidGenerator::generateWithoutDash();
         $subscription->setCorrelationId($correlationId);
         $subscription->setConnectionId($connection->connectionId());
-        $subscription->setLastUpdated(DateTimeUtil::utcNow());
+        $subscription->setLastUpdated(DateTime::utcNow());
 
         $this->activeSubscriptions[$correlationId] = $subscription;
 

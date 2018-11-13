@@ -49,6 +49,7 @@ use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\SystemData\TcpFlags;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
+use Prooph\EventStoreClient\Util\UuidGenerator;
 use Throwable;
 
 /** @internal */
@@ -315,7 +316,7 @@ class EventStoreConnectionLogicHandler
         $this->connection = new TcpPackageConnection(
             $this->settings->log(),
             $endPoint,
-            UuidGenerator::generate(),
+            UuidGenerator::generateWithoutDash(),
             $this->settings->useSslConnection(),
             $this->settings->targetHost(),
             $this->settings->validateServer(),
@@ -437,7 +438,7 @@ class EventStoreConnectionLogicHandler
         if ($this->settings->defaultUserCredentials() !== null) {
             $this->connectingPhase = ConnectingPhase::authentication();
 
-            $this->authInfo = new AuthInfo(UuidGenerator::generate(), $elapsed);
+            $this->authInfo = new AuthInfo(UuidGenerator::generateWithoutDash(), $elapsed);
 
             $login = null;
             $pass = null;
@@ -463,7 +464,7 @@ class EventStoreConnectionLogicHandler
     private function goToIdentifyState(): void
     {
         $this->connectingPhase = ConnectingPhase::identification();
-        $this->identityInfo = new IdentifyInfo(UuidGenerator::generate(), $this->stopWatch->elapsed());
+        $this->identityInfo = new IdentifyInfo(UuidGenerator::generateWithoutDash(), $this->stopWatch->elapsed());
 
         $message = new IdentifyClient();
         $message->setVersion(self::CLIENT_VERSION);
@@ -581,7 +582,7 @@ class EventStoreConnectionLogicHandler
             $this->connection->enqueueSend(new TcpPackage(
                 TcpCommand::heartbeatRequestCommand(),
                 TcpFlags::none(),
-                UuidGenerator::generate()
+                UuidGenerator::generateWithoutDash()
             ));
 
             $this->heartbeatInfo = new HeartbeatInfo($this->heartbeatInfo->lastPackageNumber(), false, $elapsed);

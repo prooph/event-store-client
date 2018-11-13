@@ -15,8 +15,8 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
+use Prooph\EventStoreClient\Util\UuidGenerator;
 use Throwable;
 
 class deleting_existing_persistent_subscription_group_with_permissions extends TestCase
@@ -30,7 +30,7 @@ class deleting_existing_persistent_subscription_group_with_permissions extends T
 
     protected function setUp(): void
     {
-        $this->stream = UuidGenerator::generate();
+        $this->stream = UuidGenerator::generateWithoutDash();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

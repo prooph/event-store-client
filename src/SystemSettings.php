@@ -16,6 +16,7 @@ namespace Prooph\EventStoreClient;
 use JsonSerializable;
 use Prooph\EventStoreClient\Common\SystemMetadata;
 use Prooph\EventStoreClient\Common\SystemRoles;
+use stdClass;
 
 class SystemSettings implements JsonSerializable
 {
@@ -67,12 +68,13 @@ class SystemSettings implements JsonSerializable
         return $this->systemStreamAcl;
     }
 
-    public function jsonSerialize(): array
+    public function jsonSerialize(): object
     {
-        return [
-            SystemMetadata::USER_STREAM_ACL => $this->userStreamAcl->toArray(),
-            SystemMetadata::SYSTEM_STREAM_ACL => $this->systemStreamAcl->toArray(),
-        ];
+        $object = new stdClass();
+        $object->{SystemMetadata::USER_STREAM_ACL} = $this->userStreamAcl->toArray();
+        $object->{SystemMetadata::SYSTEM_STREAM_ACL} = $this->systemStreamAcl->toArray();
+
+        return $object;
     }
 
     public static function createFromArray(array $data): SystemSettings

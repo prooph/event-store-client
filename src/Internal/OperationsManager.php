@@ -19,6 +19,8 @@ use Prooph\EventStoreClient\Exception\ConnectionClosedException;
 use Prooph\EventStoreClient\Exception\OperationTimedOutException;
 use Prooph\EventStoreClient\Exception\RetriesLimitReachedException;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
+use Prooph\EventStoreClient\Util\DateTime;
+use Prooph\EventStoreClient\Util\UuidGenerator;
 use SplQueue;
 
 /** @internal */
@@ -108,7 +110,7 @@ class OperationsManager
             if ($operation->connectionId() !== $connection->connectionId()) {
                 $retryOperations[] = $operation;
             } elseif ($operation->timeout() > 0
-                && (float) DateTimeUtil::utcNow()->format('U.u') - (float) $operation->lastUpdated()->format('U.u') > $this->settings->operationTimeout()
+                && (float) DateTime::utcNow()->format('U.u') - (float) $operation->lastUpdated()->format('U.u') > $this->settings->operationTimeout()
             ) {
                 $err = \sprintf(
                     'EventStoreNodeConnection \'%s\': subscription never got confirmation from server',
@@ -139,7 +141,7 @@ class OperationsManager
 
             foreach ($this->retryPendingOperations as $operation) {
                 $oldCorrId = $operation->correlationId();
-                $operation->setCorrelationId(UuidGenerator::generate());
+                $operation->setCorrelationId(UuidGenerator::generateWithoutDash());
                 $operation->incRetryCount();
                 $this->logDebug('retrying, old corrId %s, operation %s', $oldCorrId, $operation);
                 $this->scheduleOperation($operation, $connection);
@@ -195,7 +197,7 @@ class OperationsManager
     public function executeOperation(OperationItem $operation, TcpPackageConnection $connection): void
     {
         $operation->setConnectionId($connection->connectionId());
-        $operation->setLastUpdated(DateTimeUtil::utcNow());
+        $operation->setLastUpdated(DateTime::utcNow());
 
         $correlationId = $operation->correlationId();
         $this->activeOperations[$correlationId] = $operation;

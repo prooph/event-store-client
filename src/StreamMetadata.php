@@ -17,6 +17,7 @@ use JsonSerializable;
 use Prooph\EventStoreClient\Common\SystemMetadata;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\RuntimeException;
+use stdClass;
 
 class StreamMetadata implements JsonSerializable
 {
@@ -146,35 +147,35 @@ class StreamMetadata implements JsonSerializable
         return $this->customMetadata[$key];
     }
 
-    public function jsonSerialize(): array
+    public function jsonSerialize(): object
     {
-        $data = [];
+        $object = new stdClass();
 
         if (null !== $this->maxCount) {
-            $data[SystemMetadata::MAX_COUNT] = $this->maxCount;
+            $object->{SystemMetadata::MAX_COUNT} = $this->maxCount;
         }
 
         if (null !== $this->maxAge) {
-            $data[SystemMetadata::MAX_AGE] = $this->maxAge;
+            $object->{SystemMetadata::MAX_AGE} = $this->maxAge;
         }
 
         if (null !== $this->truncateBefore) {
-            $data[SystemMetadata::TRUNCATE_BEFORE] = $this->truncateBefore;
+            $object->{SystemMetadata::TRUNCATE_BEFORE} = $this->truncateBefore;
         }
 
         if (null !== $this->cacheControl) {
-            $data[SystemMetadata::CACHE_CONTROL] = $this->cacheControl;
+            $object->{SystemMetadata::CACHE_CONTROL} = $this->cacheControl;
         }
 
         if (null !== $this->acl) {
-            $data[SystemMetadata::ACL] = $this->acl->toArray();
+            $object->{SystemMetadata::ACL} = $this->acl->toArray();
         }
 
         foreach ($this->customMetadata as $key => $value) {
-            $data[$key] = $value;
+            $object->{$key} = $value;
         }
 
-        return $data;
+        return $object;
     }
 
     public static function createFromArray(array $data): StreamMetadata

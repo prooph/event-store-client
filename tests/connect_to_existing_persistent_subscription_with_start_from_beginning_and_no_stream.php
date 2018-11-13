@@ -24,8 +24,8 @@ use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
-use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
+use Prooph\EventStoreClient\Util\UuidGenerator;
 use Throwable;
 use function Amp\call;
 
@@ -50,7 +50,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
 
     protected function setUp(): void
     {
-        $this->stream = '$' . UuidGenerator::generate();
+        $this->stream = '$' . UuidGenerator::generateWithoutDash();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromBeginning()

@@ -20,13 +20,13 @@ use Prooph\EventStoreClient\Common\SystemRoles;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\Position;
 use Prooph\EventStoreClient\ReadDirection;
 use Prooph\EventStoreClient\RecordedEvent;
 use Prooph\EventStoreClient\ResolvedEvent;
 use Prooph\EventStoreClient\StreamAcl;
 use Prooph\EventStoreClient\StreamMetadata;
+use Prooph\EventStoreClient\Util\UuidGenerator;
 use ProophTest\EventStoreClient\Helper\EventDataComparer;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
@@ -68,7 +68,7 @@ class read_all_events_forward_should extends TestCase
 
         $this->from = $result->nextPosition();
         $this->testEvents = TestEvent::newAmount(20);
-        $this->stream = 'read_all_events_forward_should-' . UuidGenerator::generate();
+        $this->stream = 'read_all_events_forward_should-' . UuidGenerator::generateWithoutDash();
 
         yield $this->conn->appendToStreamAsync($this->stream, ExpectedVersion::EMPTY_STREAM, $this->testEvents);
     }

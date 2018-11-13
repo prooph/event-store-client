@@ -17,8 +17,8 @@ use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
-use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
+use Prooph\EventStoreClient\Util\UuidGenerator;
 use Throwable;
 
 class update_non_existing_persistent_subscription extends TestCase
@@ -32,7 +32,7 @@ class update_non_existing_persistent_subscription extends TestCase
 
     protected function given(): Generator
     {
-        $this->stream = UuidGenerator::generate();
+        $this->stream = UuidGenerator::generateWithoutDash();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

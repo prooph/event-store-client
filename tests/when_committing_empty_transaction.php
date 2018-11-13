@@ -20,9 +20,9 @@ use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\EventStoreAsyncTransaction;
 use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\SliceReadStatus;
 use Prooph\EventStoreClient\StreamEventsSlice;
+use Prooph\EventStoreClient\Util\UuidGenerator;
 use Prooph\EventStoreClient\WriteResult;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
@@ -43,7 +43,7 @@ class when_committing_empty_transaction extends TestCase
     {
         $this->firstEvent = TestEvent::newTestEvent();
         $this->connection = TestConnection::createAsync();
-        $this->stream = UuidGenerator::generate();
+        $this->stream = UuidGenerator::generateWithoutDash();
     }
 
     private function bootstrap(): Generator

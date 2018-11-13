@@ -31,7 +31,6 @@ use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
 use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\EventStoreSubscription;
-use Prooph\EventStoreClient\Internal\DateTimeUtil;
 use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\EventStoreStreamCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
@@ -43,6 +42,7 @@ use Prooph\EventStoreClient\SliceReadStatus;
 use Prooph\EventStoreClient\StreamEventsSlice;
 use Prooph\EventStoreClient\SubscriptionDropped;
 use Prooph\EventStoreClient\SubscriptionDropReason;
+use Prooph\EventStoreClient\Util\DateTime;
 use Psr\Log\NullLogger;
 use Throwable;
 use function Amp\call;
@@ -481,7 +481,7 @@ class catch_up_subscription_handles_errors extends TestCase
                     false,
                     '',
                     '',
-                    DateTimeUtil::utcNow()
+                    DateTime::utcNow()
                 ),
                 null,
                 null
@@ -595,7 +595,7 @@ class catch_up_subscription_handles_errors extends TestCase
                     false,
                     '',
                     '',
-                    DateTimeUtil::utcNow()
+                    DateTime::utcNow()
                 ),
                 null,
                 null
