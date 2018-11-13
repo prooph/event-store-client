@@ -41,7 +41,7 @@ phpize
 make
 sudo make install
 
-add "extensions=protobuf.so" to your php.ini
+add "extension=protobuf.so" to your php.ini
 ```
 
 ### Server
