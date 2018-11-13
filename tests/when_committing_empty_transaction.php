@@ -43,7 +43,7 @@ class when_committing_empty_transaction extends TestCase
     {
         $this->firstEvent = TestEvent::newTestEvent();
         $this->connection = TestConnection::createAsync();
-        $this->stream = UuidGenerator::generate();
+        $this->stream = UuidGenerator::generateWithoutDash();
     }
 
     private function bootstrap(): Generator

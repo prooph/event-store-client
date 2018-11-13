@@ -29,7 +29,7 @@ class deleting_persistent_subscription_group_without_permissions extends TestCas
 
     protected function setUp(): void
     {
-        $this->stream = UuidGenerator::generate();
+        $this->stream = UuidGenerator::generateWithoutDash();
     }
 
     protected function when(): Generator
@@ -48,7 +48,7 @@ class deleting_persistent_subscription_group_without_permissions extends TestCas
 
             yield $this->conn->deletePersistentSubscriptionAsync(
                 $this->stream,
-                UuidGenerator::generate()
+                UuidGenerator::generateWithoutDash()
             );
         });
     }

@@ -68,7 +68,7 @@ class read_all_events_forward_should extends TestCase
 
         $this->from = $result->nextPosition();
         $this->testEvents = TestEvent::newAmount(20);
-        $this->stream = 'read_all_events_forward_should-' . UuidGenerator::generate();
+        $this->stream = 'read_all_events_forward_should-' . UuidGenerator::generateWithoutDash();
 
         yield $this->conn->appendToStreamAsync($this->stream, ExpectedVersion::EMPTY_STREAM, $this->testEvents);
     }

@@ -87,14 +87,14 @@ trait ProjectionSpecification
 
     protected function createOneTimeProjection(string $type): Promise
     {
-        $query = $this->createStandardQuery(UuidGenerator::generate());
+        $query = $this->createStandardQuery(UuidGenerator::generateWithoutDash());
 
         return $this->projectionsManager->createOneTimeAsync($query, $type, $this->credentials);
     }
 
     protected function createContinuousProjection(string $projectionName, string $type): Promise
     {
-        $query = $this->createStandardQuery(UuidGenerator::generate());
+        $query = $this->createStandardQuery(UuidGenerator::generateWithoutDash());
 
         return $this->projectionsManager->createContinuousAsync(
             $projectionName,

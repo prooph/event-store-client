@@ -31,7 +31,7 @@ class when_creating_transient_projection extends TestCase
 
     public function given(): Generator
     {
-        $id = UuidGenerator::generate();
+        $id = UuidGenerator::generateWithoutDash();
         $this->projectionName = 'when_creating_transient_projection-' . $id;
         $this->streamName = 'test-stream-' . $id;
 

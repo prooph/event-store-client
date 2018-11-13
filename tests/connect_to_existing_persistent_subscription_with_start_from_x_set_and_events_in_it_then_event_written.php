@@ -48,7 +48,7 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
 
     protected function setUp(): void
     {
-        $this->stream = '$' . UuidGenerator::generate();
+        $this->stream = '$' . UuidGenerator::generateWithoutDash();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFrom(10)

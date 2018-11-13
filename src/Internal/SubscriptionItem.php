@@ -47,7 +47,7 @@ class SubscriptionItem
         $this->maxRetries = $maxRetries;
         $this->timeout = $timeout;
         $this->created = DateTime::utcNow();
-        $this->correlationId = UuidGenerator::generate();
+        $this->correlationId = UuidGenerator::generateWithoutDash();
         $this->retryCount = 0;
         $this->lastUpdated = $this->created;
         $this->isSubscribed = false;

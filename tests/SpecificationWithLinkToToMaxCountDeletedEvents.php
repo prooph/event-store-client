@@ -34,8 +34,8 @@ trait SpecificationWithLinkToToMaxCountDeletedEvents
     {
         $creds = DefaultData::adminCredentials();
 
-        $this->deletedStreamName = UuidGenerator::generate();
-        $this->linkedStreamName = UuidGenerator::generate();
+        $this->deletedStreamName = UuidGenerator::generateWithoutDash();
+        $this->linkedStreamName = UuidGenerator::generateWithoutDash();
 
         yield $this->conn->appendToStreamAsync(
             $this->deletedStreamName,

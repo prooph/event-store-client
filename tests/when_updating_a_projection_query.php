@@ -32,7 +32,7 @@ class when_updating_a_projection_query extends TestCase
     protected function given(): Generator
     {
         $this->projectionName = 'when_updating_a_projection_query';
-        $this->streamName = 'test-stream-' . UuidGenerator::generate();
+        $this->streamName = 'test-stream-' . UuidGenerator::generateWithoutDash();
 
         yield $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');
         yield $this->postEvent($this->streamName, 'testEvent', '{"A": 2}');

@@ -31,8 +31,8 @@ trait SpecificationWithLinkToToDeletedEvents
     protected function given(): Generator
     {
         $creds = DefaultData::adminCredentials();
-        $this->linkedStreamName = UuidGenerator::generate();
-        $this->deletedStreamName = UuidGenerator::generate();
+        $this->linkedStreamName = UuidGenerator::generateWithoutDash();
+        $this->deletedStreamName = UuidGenerator::generateWithoutDash();
 
         yield $this->conn->appendToStreamAsync(
             $this->deletedStreamName,

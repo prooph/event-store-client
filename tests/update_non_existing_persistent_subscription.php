@@ -32,7 +32,7 @@ class update_non_existing_persistent_subscription extends TestCase
 
     protected function given(): Generator
     {
-        $this->stream = UuidGenerator::generate();
+        $this->stream = UuidGenerator::generateWithoutDash();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

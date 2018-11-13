@@ -18,6 +18,7 @@ use Ramsey\Uuid\UuidInterface;
 
 class EventId
 {
+    /** @var UuidInterface */
     private $uuid;
 
     public static function generate(): EventId

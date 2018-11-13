@@ -36,7 +36,7 @@ class connect_to_existing_persistent_subscription_without_permissions extends Te
 
     protected function setUp(): void
     {
-        $this->stream = '$' . UuidGenerator::generate();
+        $this->stream = '$' . UuidGenerator::generateWithoutDash();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

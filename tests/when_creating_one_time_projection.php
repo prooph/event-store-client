@@ -29,7 +29,7 @@ class when_creating_one_time_projection extends TestCase
 
     public function given(): Generator
     {
-        $id = UuidGenerator::generate();
+        $id = UuidGenerator::generateWithoutDash();
         $this->streamName = 'test-stream-' . $id;
 
         yield $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');

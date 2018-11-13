@@ -49,8 +49,8 @@ class happy_case_catching_up_to_link_to_events_auto_ack extends TestCase
 
     protected function setUp(): void
     {
-        $this->streamName = UuidGenerator::generate();
-        $this->groupName = UuidGenerator::generate();
+        $this->streamName = UuidGenerator::generateWithoutDash();
+        $this->groupName = UuidGenerator::generateWithoutDash();
         $this->eventsReceived = new Deferred();
     }
 

@@ -31,7 +31,7 @@ class when_a_projection_is_running extends TestCase
 
     public function given(): Generator
     {
-        $id = UuidGenerator::generate();
+        $id = UuidGenerator::generateWithoutDash();
         $this->projectionName = 'when_getting_projection_information-' . $id;
         $this->streamName = 'test-stream-' . $id;
 

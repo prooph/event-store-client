@@ -33,7 +33,7 @@ class update_existing_persistent_subscription_without_permissions extends TestCa
 
     protected function given(): Generator
     {
-        $this->stream = UuidGenerator::generate();
+        $this->stream = UuidGenerator::generateWithoutDash();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

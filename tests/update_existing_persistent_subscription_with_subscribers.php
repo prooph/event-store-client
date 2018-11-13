@@ -48,7 +48,7 @@ class update_existing_persistent_subscription_with_subscribers extends TestCase
 
     protected function given(): Generator
     {
-        $this->stream = UuidGenerator::generate();
+        $this->stream = UuidGenerator::generateWithoutDash();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()->build();
