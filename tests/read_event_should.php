@@ -21,7 +21,7 @@ use Prooph\EventStoreClient\EventReadResult;
 use Prooph\EventStoreClient\EventReadStatus;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\OutOfRangeException;
-use Prooph\EventStoreClient\Internal\UuidGenerator;
+use Prooph\EventStoreClient\Util\UuidGenerator;
 use Throwable;
 
 class read_event_should extends TestCase

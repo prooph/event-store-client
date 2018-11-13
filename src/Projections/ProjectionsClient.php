@@ -20,11 +20,11 @@ use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\Exception\JsonException;
 use Prooph\EventStoreClient\Exception\ProjectionCommandConflictException;
 use Prooph\EventStoreClient\Exception\ProjectionCommandFailedException;
-use Prooph\EventStoreClient\Internal\Json;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\Transport\Http\HttpAsyncClient;
 use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
 use Prooph\EventStoreClient\UserCredentials;
+use Prooph\EventStoreClient\Util\Json;
 use Throwable;
 
 /** @internal */

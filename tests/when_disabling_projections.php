@@ -15,7 +15,7 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Internal\UuidGenerator;
+use Prooph\EventStoreClient\Util\UuidGenerator;
 use Throwable;
 
 class when_disabling_projections extends TestCase

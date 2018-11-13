@@ -49,6 +49,7 @@ use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\SystemData\TcpFlags;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
+use Prooph\EventStoreClient\Util\UuidGenerator;
 use Throwable;
 
 /** @internal */

@@ -28,6 +28,7 @@ use Prooph\EventStoreClient\GossipSeed;
 use Prooph\EventStoreClient\Messages\ClusterMessages\ClusterInfoDto;
 use Prooph\EventStoreClient\Messages\ClusterMessages\MemberInfoDto;
 use Prooph\EventStoreClient\Messages\ClusterMessages\VNodeState;
+use Prooph\EventStoreClient\Util\Json;
 use Psr\Log\LoggerInterface as Logger;
 use Throwable;
 use function Amp\call;

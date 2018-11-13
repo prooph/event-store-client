@@ -11,11 +11,10 @@
 
 declare(strict_types=1);
 
-namespace Prooph\EventStoreClient\Internal;
+namespace Prooph\EventStoreClient\Util;
 
 use Ramsey\Uuid\Uuid;
 
-/** @internal */
 class UuidGenerator
 {
     public static function generate(): string
@@ -26,5 +25,9 @@ class UuidGenerator
     public static function empty(): string
     {
         return '00000000-0000-0000-0000-000000000000';
+    }
+
+    final private function __construct()
+    {
     }
 }

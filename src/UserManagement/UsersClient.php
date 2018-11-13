@@ -20,12 +20,12 @@ use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\Exception\JsonException;
 use Prooph\EventStoreClient\Exception\UserCommandConflictException;
 use Prooph\EventStoreClient\Exception\UserCommandFailedException;
-use Prooph\EventStoreClient\Internal\DateTimeUtil;
-use Prooph\EventStoreClient\Internal\Json;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\Transport\Http\HttpAsyncClient;
 use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
 use Prooph\EventStoreClient\UserCredentials;
+use Prooph\EventStoreClient\Util\DateTime;
+use Prooph\EventStoreClient\Util\Json;
 use Throwable;
 
 /** @internal */
@@ -189,7 +189,7 @@ class UsersClient
                 $data['data']['loginName'],
                 $data['data']['fullName'],
                 $data['data']['groups'],
-                DateTimeUtil::create($data['data']['dateLastUpdated']),
+                DateTime::create($data['data']['dateLastUpdated']),
                 $data['data']['disabled'],
                 []
             ));
@@ -244,7 +244,7 @@ class UsersClient
                 $data['data']['fullName'],
                 $data['data']['groups'],
                 isset($data['data']['dateLastUpdated'])
-                    ? DateTimeUtil::create($data['data']['dateLastUpdated'])
+                    ? DateTime::create($data['data']['dateLastUpdated'])
                     : null,
                 $data['data']['disabled'],
                 $links

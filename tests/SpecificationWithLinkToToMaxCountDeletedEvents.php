@@ -18,8 +18,8 @@ use Prooph\EventStoreClient\Common\SystemEventTypes;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Internal\UuidGenerator;
 use Prooph\EventStoreClient\StreamMetadata;
+use Prooph\EventStoreClient\Util\UuidGenerator;
 
 trait SpecificationWithLinkToToMaxCountDeletedEvents
 {

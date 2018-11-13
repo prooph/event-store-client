@@ -64,6 +64,8 @@ use Prooph\EventStoreClient\StreamMetadataResult;
 use Prooph\EventStoreClient\SubscriptionDropped;
 use Prooph\EventStoreClient\SystemSettings;
 use Prooph\EventStoreClient\UserCredentials;
+use Prooph\EventStoreClient\Util\Json;
+use Prooph\EventStoreClient\Util\UuidGenerator;
 use Throwable;
 
 final class EventStoreAsyncNodeConnection implements
