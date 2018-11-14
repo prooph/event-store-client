@@ -126,11 +126,11 @@ class PersistentSubscriptionSettings
         string $namedConsumerStrategy
     ) {
         if ($checkPointAfterMilliseconds > self::INT_32_MAX) {
-            throw new InvalidArgumentException('checkPointAfterMilliseconds must smaller then ' . self::INT_32_MAX);
+            throw new InvalidArgumentException('checkPointAfterMilliseconds must smaller than ' . self::INT_32_MAX);
         }
 
         if ($messageTimeoutMilliseconds > self::INT_32_MAX) {
-            throw new InvalidArgumentException('messageTimeoutMilliseconds must smaller then ' . self::INT_32_MAX);
+            throw new InvalidArgumentException('messageTimeoutMilliseconds must smaller than ' . self::INT_32_MAX);
         }
 
         $this->resolveLinkTos = $resolveLinkTos;
