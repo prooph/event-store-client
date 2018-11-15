@@ -155,7 +155,7 @@ class ConnectionString
         $values = \explode(';', $connectionString);
 
         if (1 === \count($values)) {
-            return new Uri($connectionString);
+            return Uri::fromString($connectionString);
         }
 
         foreach ($values as $value) {
