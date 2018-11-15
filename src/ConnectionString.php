@@ -154,10 +154,6 @@ class ConnectionString
     {
         $values = \explode(';', $connectionString);
 
-        if (1 === \count($values)) {
-            return Uri::fromString($connectionString);
-        }
-
         foreach ($values as $value) {
             list($key, $value) = \explode('=', $value);
 
