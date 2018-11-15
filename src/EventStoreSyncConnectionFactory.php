@@ -25,7 +25,7 @@ class EventStoreSyncConnectionFactory
     public static function createFromConnectionString(
         string $connectionString,
         ConnectionSettings $settings = null,
-        string $connectionName = ''
+        ?string $connectionName = null
     ): SyncConnection {
         $settings = ConnectionString::getConnectionSettings(
             $connectionString,
@@ -52,7 +52,7 @@ class EventStoreSyncConnectionFactory
     public static function createFromUri(
         ?Uri $uri,
         ?ConnectionSettings $connectionSettings = null,
-        string $connectionName = ''
+        ?string $connectionName = null
     ): SyncConnection {
         $connectionSettings = $connectionSettings ?? ConnectionSettings::default();
 
@@ -141,7 +141,7 @@ class EventStoreSyncConnectionFactory
     public static function createFromEndPoint(
         EndPoint $endPoint,
         ?ConnectionSettings $settings = null,
-        string $connectionName = ''
+        ?string $connectionName = null
     ): SyncConnection {
         $settings = $settings ?? ConnectionSettings::default();
 
@@ -158,7 +158,7 @@ class EventStoreSyncConnectionFactory
 
     public static function createFromSettings(
         ConnectionSettings $settings,
-        string $connectionName = ''
+        ?string $connectionName = null
     ): SyncConnection {
         return self::createFromUri(null, $settings, $connectionName);
     }

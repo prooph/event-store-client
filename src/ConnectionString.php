@@ -60,7 +60,7 @@ class ConnectionString
             if ('connectto' === $key) {
                 continue;
             }
-            
+
             if (! \array_key_exists($key, self::$allowedValues)) {
                 throw new InvalidArgumentException(\sprintf(
                     'Key %s is not an allowed key in %s',
@@ -153,10 +153,6 @@ class ConnectionString
     public static function getUriFromConnectionString(string $connectionString): ?Uri
     {
         $values = \explode(';', $connectionString);
-
-        if (1 === \count($values)) {
-            return Uri::fromString($connectionString);
-        }
 
         foreach ($values as $value) {
             list($key, $value) = \explode('=', $value);
