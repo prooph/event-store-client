@@ -162,7 +162,7 @@ class ConnectionString
             list($key, $value) = \explode('=', $value);
 
             if (\strtolower($key) === 'connectto') {
-                return new Uri($value);
+                return Uri::fromString($value);
             }
         }
 
