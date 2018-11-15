@@ -60,7 +60,7 @@ class ConnectionString
             if ('connectto' === $key) {
                 continue;
             }
-            
+
             if (! \array_key_exists($key, self::$allowedValues)) {
                 throw new InvalidArgumentException(\sprintf(
                     'Key %s is not an allowed key in %s',
