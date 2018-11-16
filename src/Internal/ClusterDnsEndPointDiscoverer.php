@@ -131,7 +131,10 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         });
     }
 
-    /** @return Promise<NodeEndPoints|null> */
+    /**
+     * @param null|EndPoint $failedTcpEndPoint
+     * @return Promise<NodeEndPoints|null>
+     */
     private function discoverEndPoint(?EndPoint $failedTcpEndPoint): Promise
     {
         return call(function () use ($failedTcpEndPoint): Generator {
@@ -226,7 +229,10 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         return $result;
     }
 
-    /** @return Promise<ClusterInfoDto|null> */
+    /**
+     * @param GossipSeed $endPoint
+     * @return Promise<ClusterInfoDto|null>
+     */
     private function tryGetGossipFrom(GossipSeed $endPoint): Promise
     {
         return call(function () use ($endPoint): Generator {

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient;
 
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStoreClient\Exception\OutOfRangeException;
 
 /**
  * All times are milliseconds
@@ -27,7 +28,7 @@ class ClusterSettings
     /** @var int */
     private $externalGossipPort;
     /** @var GossipSeed[]|null */
-    private $gossipSeeds;
+    private $gossipSeeds = [];
     /** @var int */
     private $gossipTimeout;
     /** @var bool */
@@ -57,7 +58,9 @@ class ClusterSettings
             $clusterSettings->gossipSeeds[] = $gossipSeed;
         }
 
+        $clusterSettings->clusterDns = '';
         $clusterSettings->maxDiscoverAttempts = $maxDiscoverAttempts;
+        $clusterSettings->externalGossipPort = 0;
         $clusterSettings->gossipTimeout = $gossipTimeout;
         $clusterSettings->preferRandomNode = $preferRandomNode;
 
@@ -72,6 +75,26 @@ class ClusterSettings
         bool $preferRandomNode
     ): self {
         $clusterSettings = new self();
+
+        if (empty($clusterDns)) {
+            throw new InvalidArgumentException(
+                'Cluster DNS cannot be empty'
+            );
+        }
+
+        if ($maxDiscoverAttempts < -1) {
+            throw new OutOfRangeException(\sprintf(
+                'maxDiscoverAttempts value is out of range: %d. Allowed range: [-1, infinity].',
+                $maxDiscoverAttempts
+            ));
+        }
+
+        if ($externalGossipPort < 1) {
+            throw new OutOfRangeException(\sprintf(
+                'externalGossipPort value is out of range: %d. Allowed range: [1, infinity].',
+                $externalGossipPort
+            ));
+        }
 
         $clusterSettings->clusterDns = $clusterDns;
         $clusterSettings->maxDiscoverAttempts = $maxDiscoverAttempts;
@@ -97,7 +120,7 @@ class ClusterSettings
         return $this->externalGossipPort;
     }
 
-    public function gossipSeeds(): ?array
+    public function gossipSeeds(): array
     {
         return $this->gossipSeeds;
     }

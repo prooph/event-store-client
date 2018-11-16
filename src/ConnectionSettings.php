@@ -83,7 +83,7 @@ class ConnectionSettings
     /** @internal */
     public function __construct(
         Log $logger,
-        bool $verboseLoggin,
+        bool $verboseLogging,
         int $maxQueueSize,
         int $maxConcurrentItems,
         int $maxRetries,
@@ -108,11 +108,11 @@ class ConnectionSettings
         int $clientConnectionTimeout
     ) {
         if ($heartbeatInterval >= 5000) {
-            throw new InvalidArgumentException('Heartbeat interval must be less then 5000ms');
+            throw new InvalidArgumentException('Heartbeat interval must be less than 5000ms');
         }
 
         $this->log = $logger;
-        $this->verboseLogging = $verboseLoggin;
+        $this->verboseLogging = $verboseLogging;
         $this->maxQueueSize = $maxQueueSize;
         $this->maxConcurrentItems = $maxConcurrentItems;
         $this->maxRetries = $maxRetries;
