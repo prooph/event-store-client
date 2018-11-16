@@ -1,14 +1,23 @@
 <?php
 
+/**
+ * This file is part of `prooph/event-store-client`.
+ * (c) 2018-2018 prooph software GmbH <contact@prooph.de>
+ * (c) 2018-2018 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\ClusterSettings;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\EventStoreAsyncConnectionFactory as Factory;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\GossipSeed;
 use Prooph\EventStoreClient\Uri;
@@ -118,8 +127,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
             ->setMaxDiscoverAttempts(self::MAX_DISCOVER_ATTEMPTS)
             ->setGossipTimeout(self::CONNECT_TIMEOUT)
             ->preferRandomNode()
-            ->build()
-        ;
+            ->build();
 
         $clusterSettings = ClusterSettings::fromGossipSeeds(
             $this->getGossipSeeds(),
@@ -167,12 +175,10 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
             ->setDefaultUserCredentials(
                 new UserCredentials('admin', 'changeit')
             )
-            ->build()
-        ;
+            ->build();
 
         $this->assertSame(self::CONNECTION_NAME, $conn->connectionName());
         $this->assertEquals($connectionSettings, $conn->connectionSettings());
-
     }
 
     /**
@@ -193,8 +199,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
                 new GossipSeed(new EndPoint('192.168.0.2', 1111)),
                 new GossipSeed(new EndPoint('192.168.0.3', 1111)),
             ])
-            ->build()
-        ;
+            ->build();
 
         $this->assertSame(self::CONNECTION_NAME, $conn->connectionName());
         $this->assertEquals($connectionSettings, $conn->connectionSettings());
@@ -250,6 +255,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         $this->assertSame(self::CONNECTION_NAME, $conn->connectionName());
         $this->assertSame($connectionSettings, $conn->connectionSettings());
     }
+
     /**
      * @test
      */
@@ -284,8 +290,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
             ->setGossipSeeds(
                 $this->getGossipSeeds()
             )
-            ->build()
-        ;
+            ->build();
 
         $conn = Factory::createFromSettings(
             $connectionSettings,
@@ -319,8 +324,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
             ->setDefaultUserCredentials(
                 new UserCredentials('admin', 'changeit')
             )
-            ->build()
-        ;
+            ->build();
 
         $conn = Factory::createFromEndPoint(
             $this->getEndpoint(),
@@ -331,7 +335,6 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         $this->assertSame(self::CONNECTION_NAME, $conn->connectionName());
         $this->assertSame($connectionSettings, $conn->connectionSettings());
     }
-
 
     /**
      * @test
@@ -354,7 +357,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
     private function getGossipSeeds(): array
     {
         return [
-            new GossipSeed($this->getEndpoint())
+            new GossipSeed($this->getEndpoint()),
         ];
     }
 

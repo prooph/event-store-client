@@ -26,9 +26,6 @@ require __DIR__ . '/../vendor/autoload.php';
 
 Loop::run(function () {
     $builder = new ConnectionSettingsBuilder();
-    $builder->enableVerboseLogging();
-    $builder->performOnAnyNode();
-    $builder->useConsoleLogger();
     $builder->setClusterDns('escluster.net');
     $builder->setClusterGossipPort(2113);
 

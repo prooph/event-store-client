@@ -5,7 +5,7 @@ services:
   php:
     image: prooph/php:7.2-cli
     volumes:
-      - ./..:/app
+      - ../..:/app
     command: tail -f /dev/null
     networks:
       clusternetwork:
