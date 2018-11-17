@@ -2,15 +2,6 @@ version: "3"
 
 services:
 
-  php:
-    image: prooph/php:7.2-cli
-    volumes:
-      - ./..:/app
-    command: tail -f /dev/null
-    networks:
-      clusternetwork:
-        ipv4_address: 172.16.0.16
-
   eventstore1:
    image: eventstore/eventstore:release-4.1.0
    env_file:

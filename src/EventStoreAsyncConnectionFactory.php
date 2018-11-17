@@ -135,6 +135,33 @@ class EventStoreAsyncConnectionFactory
             );
         }
 
+        if ('' !== $connectionSettings->clusterDns()) {
+            $clusterSettings = ClusterSettings::fromClusterDns(
+                $connectionSettings->clusterDns(),
+                $connectionSettings->maxDiscoverAttempts(),
+                $connectionSettings->externalGossipPort(),
+                $connectionSettings->gossipTimeout(),
+                $connectionSettings->preferRandomNode()
+            );
+
+            $endPointDiscoverer = new ClusterDnsEndPointDiscoverer(
+                $connectionSettings->log(),
+                $clusterSettings->clusterDns(),
+                $clusterSettings->maxDiscoverAttempts(),
+                $clusterSettings->externalGossipPort(),
+                $clusterSettings->gossipSeeds(),
+                $clusterSettings->gossipTimeout(),
+                $clusterSettings->preferRandomNode()
+            );
+
+            return new EventStoreAsyncNodeConnection(
+                $connectionSettings,
+                $clusterSettings,
+                $endPointDiscoverer,
+                $connectionName
+            );
+        }
+
         throw new InvalidArgumentException('Must specify uri or gossip seeds');
     }
 
