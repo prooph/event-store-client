@@ -86,7 +86,7 @@ class StreamMetadataBuilder
     public function setMaxCount(int $maxCount): StreamMetadataBuilder
     {
         if ($maxCount < 0) {
-            throw new InvalidArgumentException('MaxCount must be positive');
+            throw new InvalidArgumentException('Max count must be positive');
         }
 
         $this->maxCount = $maxCount;
@@ -98,7 +98,7 @@ class StreamMetadataBuilder
     public function setMaxAge(int $maxAge): StreamMetadataBuilder
     {
         if ($maxAge < 0) {
-            throw new InvalidArgumentException('MaxAge must be positive');
+            throw new InvalidArgumentException('Max age must be positive');
         }
 
         $this->maxAge = $maxAge;
@@ -110,7 +110,7 @@ class StreamMetadataBuilder
     public function setTruncateBefore(int $truncateBefore): StreamMetadataBuilder
     {
         if ($truncateBefore < 0) {
-            throw new InvalidArgumentException('TruncateBefore must be positive');
+            throw new InvalidArgumentException('Truncate before must be positive');
         }
 
         $this->truncateBefore = $truncateBefore;

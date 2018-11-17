@@ -80,16 +80,16 @@ class ClusterSettings
             );
         }
 
-        if ($maxDiscoverAttempts < -1) {
+        if ($maxDiscoverAttempts < 1) {
             throw new OutOfRangeException(\sprintf(
-                'maxDiscoverAttempts value is out of range: %d. Allowed range: [-1, infinity].',
+                'Max discover attempts value is out of range: %d. Allowed range: [1, PHP_INT_MAX].',
                 $maxDiscoverAttempts
             ));
         }
 
         if ($externalGossipPort < 1) {
             throw new OutOfRangeException(\sprintf(
-                'externalGossipPort value is out of range: %d. Allowed range: [1, infinity].',
+                'External gossip port value is out of range: %d. Allowed range: [1, PHP_INT_MAX].',
                 $externalGossipPort
             ));
         }

@@ -43,9 +43,9 @@ class DnsClusterSettingsBuilder
 
     public function setMaxDiscoverAttempts(int $maxDiscoverAttempts): self
     {
-        if ($maxDiscoverAttempts <= 0) {
+        if ($maxDiscoverAttempts < 1) {
             throw new OutOfRangeException(\sprintf(
-                'maxDiscoverAttempts value is out of range: %d. Allowed range: [0, PHP_INT_MAX]',
+                'Max discover attempts value is out of range: %d. Allowed range: [1, PHP_INT_MAX]',
                 $maxDiscoverAttempts
             ));
         }

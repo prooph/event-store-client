@@ -252,7 +252,7 @@ class PersistentSubscriptionSettingsBuilder
     public function withMaxSubscriberCountOf(int $count): self
     {
         if ($count < 0) {
-            throw new InvalidArgumentException('MaxSubscriberCount cannot be negative');
+            throw new InvalidArgumentException('Max subscriber count cannot be negative');
         }
 
         $this->maxSubscriberCount = $count;
