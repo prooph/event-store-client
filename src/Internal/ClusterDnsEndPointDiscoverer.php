@@ -132,7 +132,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
     }
 
     /**
-     * @param null|EndPoint $failedTcpEndPoint
+     * @param EndPoint|null $failedTcpEndPoint
      * @return Promise<NodeEndPoints|null>
      */
     private function discoverEndPoint(?EndPoint $failedTcpEndPoint): Promise

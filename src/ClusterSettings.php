@@ -21,16 +21,16 @@ use Prooph\EventStoreClient\Exception\OutOfRangeException;
  */
 class ClusterSettings
 {
-    /** @var string|null */
-    private $clusterDns;
+    /** @var string */
+    private $clusterDns = '';
     /** @var int */
     private $maxDiscoverAttempts;
     /** @var int */
-    private $externalGossipPort;
-    /** @var GossipSeed[]|null */
+    private $externalGossipPort = 0;
+    /** @var GossipSeed[] */
     private $gossipSeeds = [];
     /** @var int */
-    private $gossipTimeout;
+    private $gossipTimeout = 0;
     /** @var bool */
     private $preferRandomNode;
 
@@ -58,9 +58,7 @@ class ClusterSettings
             $clusterSettings->gossipSeeds[] = $gossipSeed;
         }
 
-        $clusterSettings->clusterDns = '';
         $clusterSettings->maxDiscoverAttempts = $maxDiscoverAttempts;
-        $clusterSettings->externalGossipPort = 0;
         $clusterSettings->gossipTimeout = $gossipTimeout;
         $clusterSettings->preferRandomNode = $preferRandomNode;
 
@@ -105,7 +103,7 @@ class ClusterSettings
         return $clusterSettings;
     }
 
-    public function clusterDns(): ?string
+    public function clusterDns(): string
     {
         return $this->clusterDns;
     }
@@ -120,6 +118,7 @@ class ClusterSettings
         return $this->externalGossipPort;
     }
 
+    /** @return GossipSeed[] */
     public function gossipSeeds(): array
     {
         return $this->gossipSeeds;

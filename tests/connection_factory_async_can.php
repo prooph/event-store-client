@@ -23,7 +23,7 @@ use Prooph\EventStoreClient\GossipSeed;
 use Prooph\EventStoreClient\Uri;
 use Prooph\EventStoreClient\UserCredentials;
 
-final class EventStoreAsyncConnectionFactoryTest extends TestCase
+final class connection_factory_async_can extends TestCase
 {
     private const CONNECTION_NAME = 'test-conn';
     private const CLUSTER_DNS = 'escluster.net';
@@ -31,9 +31,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
     private const MAX_DISCOVER_ATTEMPTS = 3;
     private const EXTERNAL_GOSSIP_PORT = 2112;
 
-    /**
-     * @test
-     */
+    /** @test */
     public function create_from_uri_with_discover_scheme(): void
     {
         $conn = Factory::createFromUri(
@@ -56,9 +54,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         $this->assertEquals($connectionSettings, $conn->connectionSettings());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function create_from_uri_with_discover_scheme_defaults_to_uri_credentials(): void
     {
         $conn = Factory::createFromUri(
@@ -71,9 +67,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function create_from_uri_with_tcp_scheme(): void
     {
         $conn = Factory::createFromUri(
@@ -88,9 +82,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         $this->assertEquals($connectionSettings, $conn->connectionSettings());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function create_from_uri_with_tcp_scheme_defaults_to_uri_credentials(): void
     {
         $conn = Factory::createFromUri(
@@ -103,10 +95,8 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function create_from_uri_with_unknown_scheme_throws(): void
+    /** @test */
+    public function not_create_from_uri_with_unknown_scheme(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown scheme for connection');
@@ -116,9 +106,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function create_from_uri_with_gossip_seeds(): void
     {
         $connectionSettings = ConnectionSettings
@@ -147,10 +135,8 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         $this->assertEquals($clusterSettings, $conn->clusterSettings());
     }
 
-    /**
-     * @test
-     */
-    public function create_from_uri_without_arguments_throws(): void
+    /** @test */
+    public function not_create_from_uri_without_arguments(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Must specify uri or gossip seeds');
@@ -158,9 +144,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         Factory::createFromUri(null);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function create_from_connection_string(): void
     {
         $conn = Factory::createFromConnectionString(
@@ -181,9 +165,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         $this->assertEquals($connectionSettings, $conn->connectionSettings());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function create_from_connection_string_with_gossip_seeds(): void
     {
         $conn = Factory::createFromConnectionString(
@@ -205,9 +187,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         $this->assertEquals($connectionSettings, $conn->connectionSettings());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function create_from_connection_string_requires_connectto_or_gossip_seeds(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -218,9 +198,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function create_from_connection_string_requires_only_one_of_connectto_and_gossip_seeds(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -231,9 +209,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function create_from_cluster_settings_with_dns(): void
     {
         $connectionSettings = ConnectionSettings::default();
@@ -256,9 +232,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         $this->assertSame($connectionSettings, $conn->connectionSettings());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function create_from_cluster_settings_with_gossip_seeds(): void
     {
         $connectionSettings = ConnectionSettings::default();
@@ -280,9 +254,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         $this->assertSame($connectionSettings, $conn->connectionSettings());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function create_from_settings_with_gossip_seeds(): void
     {
         $connectionSettings = ConnectionSettings
@@ -301,10 +273,8 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         $this->assertSame($connectionSettings, $conn->connectionSettings());
     }
 
-    /**
-     * @test
-     */
-    public function create_from_settings_without_gossip_seeds_throws(): void
+    /** @test */
+    public function not_create_from_settings_without_gossip_seeds(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -313,13 +283,10 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function create_from_endpoint(): void
     {
-        $connectionSettings = ConnectionSettings
-            ::create()
+        $connectionSettings = ConnectionSettings::create()
             ->performOnAnyNode()
             ->setDefaultUserCredentials(
                 new UserCredentials('admin', 'changeit')
@@ -336,10 +303,8 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         $this->assertSame($connectionSettings, $conn->connectionSettings());
     }
 
-    /**
-     * @test
-     */
-    public function create_from_endpoint_uses_default_settings(): void
+    /** @test */
+    public function create_from_endpoint_using_default_settings(): void
     {
         $conn = Factory::createFromEndPoint(
             $this->getEndpoint(),
@@ -351,9 +316,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         $this->assertEquals(ConnectionSettings::default(), $conn->connectionSettings());
     }
 
-    /**
-     * @return array
-     */
+    /** @return array */
     private function getGossipSeeds(): array
     {
         return [
@@ -361,9 +324,7 @@ final class EventStoreAsyncConnectionFactoryTest extends TestCase
         ];
     }
 
-    /**
-     * @return EndPoint
-     */
+    /** @return EndPoint */
     private function getEndpoint(): EndPoint
     {
         return new EndPoint('127.0.0.1', 1113);

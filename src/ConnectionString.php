@@ -172,6 +172,6 @@ class ConnectionString
      */
     private static function getParts(string $connectionString): array
     {
-        return \array_map('\trim', \explode(';', $connectionString));
+        return \explode(';', \str_replace(' ', '', $connectionString));
     }
 }
