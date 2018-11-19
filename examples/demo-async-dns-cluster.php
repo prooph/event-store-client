@@ -17,13 +17,20 @@ use Amp\Loop;
 
 require __DIR__ . '/../vendor/autoload.php';
 
+/**
+ * Start docker/local-3-node-dns-cluster and run this script from host machine.
+ * This is because the cluster advertises as 127.0.0.1, which does not resolve
+ * to the event store in the PHP container, if you run it in Docker.
+ */
+
 Loop::run(function () {
-    $builder = new ConnectionSettingsBuilder();
-    $builder->setClusterDns('escluster.net');
-    $builder->setClusterGossipPort(2113);
+    $settings = ConnectionSettings::create()
+        ->setClusterDns('127.0.0.1')
+        ->setClusterGossipPort(2113)
+        ->build();
 
     $connection = EventStoreAsyncConnectionFactory::createFromSettings(
-        $builder->build(),
+        $settings,
         'dns-cluster-connection'
     );
 

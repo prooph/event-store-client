@@ -67,19 +67,19 @@ class StreamMetadata implements JsonSerializable
         array $customMetadata = []
     ) {
         if (null !== $maxCount && $maxCount <= 0) {
-            throw new \InvalidArgumentException('maxCount should be positive value');
+            throw new \InvalidArgumentException('Max count should be positive value');
         }
 
         if (null !== $maxAge && $maxAge < 1) {
-            throw new \InvalidArgumentException('maxAge should be positive value');
+            throw new \InvalidArgumentException('Max age should be positive value');
         }
 
         if (null !== $truncateBefore && $truncateBefore < 0) {
-            throw new \InvalidArgumentException('truncateBefore should be non-negative value');
+            throw new \InvalidArgumentException('Truncate before should be non-negative value');
         }
 
         if (null !== $cacheControl && $cacheControl < 1) {
-            throw new \InvalidArgumentException('cacheControl should be positive value');
+            throw new \InvalidArgumentException('Cache control should be positive value');
         }
 
         foreach ($customMetadata as $key => $value) {

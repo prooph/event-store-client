@@ -123,6 +123,8 @@ class CreatePersistentSubscriptionOperation extends AbstractOperation
 
     protected function transformResponse(ProtobufMessage $response): PersistentSubscriptionCreateResult
     {
+        \assert($response instanceof CreatePersistentSubscriptionCompleted);
+
         return new PersistentSubscriptionCreateResult(
             PersistentSubscriptionCreateStatus::success()
         );

@@ -69,7 +69,7 @@ class Uri
 
         if (isset($parts['user'])) {
             $user = self::filterUserInfoPart($parts['user']);
-            $pass = $pass['pass'] ?? '';
+            $pass = $parts['pass'] ?? '';
 
             $userCredentials = new UserCredentials($user, $pass);
         }

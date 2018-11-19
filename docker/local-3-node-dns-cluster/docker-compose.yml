@@ -2,14 +2,6 @@ version: "3"
 # from https://github.com/nissbran/eventstore-cluster-docker-compose/tree/master/local-3-node-dns-cluster
 services:
 
-  php:
-    image: prooph/php:7.2-cli
-    volumes:
-      - ./..:/app
-    command: tail -f /dev/null
-    networks:
-      clusternetwork:
-
   eventstore1:
    image: eventstore/eventstore:release-4.1.0
    env_file:

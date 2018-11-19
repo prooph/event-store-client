@@ -14,22 +14,23 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient;
 
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStoreClient\Exception\OutOfRangeException;
 
 /**
  * All times are milliseconds
  */
 class ClusterSettings
 {
-    /** @var string|null */
-    private $clusterDns;
+    /** @var string */
+    private $clusterDns = '';
     /** @var int */
     private $maxDiscoverAttempts;
     /** @var int */
-    private $externalGossipPort;
-    /** @var GossipSeed[]|null */
-    private $gossipSeeds;
+    private $externalGossipPort = 0;
+    /** @var GossipSeed[] */
+    private $gossipSeeds = [];
     /** @var int */
-    private $gossipTimeout;
+    private $gossipTimeout = 0;
     /** @var bool */
     private $preferRandomNode;
 
@@ -73,6 +74,26 @@ class ClusterSettings
     ): self {
         $clusterSettings = new self();
 
+        if (empty($clusterDns)) {
+            throw new InvalidArgumentException(
+                'Cluster DNS cannot be empty'
+            );
+        }
+
+        if ($maxDiscoverAttempts < 1) {
+            throw new OutOfRangeException(\sprintf(
+                'Max discover attempts value is out of range: %d. Allowed range: [1, PHP_INT_MAX].',
+                $maxDiscoverAttempts
+            ));
+        }
+
+        if ($externalGossipPort < 1) {
+            throw new OutOfRangeException(\sprintf(
+                'External gossip port value is out of range: %d. Allowed range: [1, PHP_INT_MAX].',
+                $externalGossipPort
+            ));
+        }
+
         $clusterSettings->clusterDns = $clusterDns;
         $clusterSettings->maxDiscoverAttempts = $maxDiscoverAttempts;
         $clusterSettings->externalGossipPort = $externalGossipPort;
@@ -82,7 +103,7 @@ class ClusterSettings
         return $clusterSettings;
     }
 
-    public function clusterDns(): ?string
+    public function clusterDns(): string
     {
         return $this->clusterDns;
     }
@@ -97,7 +118,8 @@ class ClusterSettings
         return $this->externalGossipPort;
     }
 
-    public function gossipSeeds(): ?array
+    /** @return GossipSeed[] */
+    public function gossipSeeds(): array
     {
         return $this->gossipSeeds;
     }

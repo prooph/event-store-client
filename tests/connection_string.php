@@ -33,6 +33,13 @@ class connection_string extends TestCase
     }
 
     /** @test */
+    public function can_set_with_spaces(): void
+    {
+        $settings = ConnectionString::getConnectionSettings('Verbose Logging=true');
+        $this->assertTrue($settings->verboseLogging());
+    }
+
+    /** @test */
     public function can_set_int(): void
     {
         $settings = ConnectionString::getConnectionSettings('maxretries=55');

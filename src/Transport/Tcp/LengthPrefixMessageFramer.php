@@ -32,7 +32,7 @@ class LengthPrefixMessageFramer
     public function __construct(int $maxPackageSize = 64 * 1024 * 1024)
     {
         if ($maxPackageSize < 1) {
-            throw new InvalidArgumentException('MaxPackageSize must be positive');
+            throw new InvalidArgumentException('Max package size must be positive');
         }
 
         $this->maxPackageSize = $maxPackageSize;

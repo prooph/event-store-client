@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient;
 
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStoreClient\Exception\OutOfRangeException;
 use Psr\Log\LoggerInterface as Log;
 
 /**
@@ -83,7 +84,7 @@ class ConnectionSettings
     /** @internal */
     public function __construct(
         Log $logger,
-        bool $verboseLoggin,
+        bool $verboseLogging,
         int $maxQueueSize,
         int $maxConcurrentItems,
         int $maxRetries,
@@ -108,11 +109,37 @@ class ConnectionSettings
         int $clientConnectionTimeout
     ) {
         if ($heartbeatInterval >= 5000) {
-            throw new InvalidArgumentException('Heartbeat interval must be less then 5000ms');
+            throw new InvalidArgumentException('Heartbeat interval must be less than 5000ms');
+        }
+
+        if ($maxQueueSize < 1) {
+            throw new InvalidArgumentException('Max queue size must be positive');
+        }
+
+        if ($maxConcurrentItems < 1) {
+            throw new InvalidArgumentException('Max concurrent items must be positive');
+        }
+
+        if ($maxRetries < -1) {
+            throw new OutOfRangeException(\sprintf(
+                'Max retries is out of range %d. Allowed range: [-1, PHP_INT_MAX].',
+                $maxReconnections
+            ));
+        }
+
+        if ($maxReconnections < -1) {
+            throw new OutOfRangeException(\sprintf(
+                'Max reconnections is out of range %d. Allowed range: [-1, PHP_INT_MAX].',
+                $maxReconnections
+            ));
+        }
+
+        if ($useSslConnection && empty($targetHost)) {
+            throw new InvalidArgumentException('Target host must be not empty when using SSL');
         }
 
         $this->log = $logger;
-        $this->verboseLogging = $verboseLoggin;
+        $this->verboseLogging = $verboseLogging;
         $this->maxQueueSize = $maxQueueSize;
         $this->maxConcurrentItems = $maxConcurrentItems;
         $this->maxRetries = $maxRetries;

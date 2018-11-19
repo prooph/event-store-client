@@ -51,10 +51,10 @@ class ConnectionString
         $settings = $settings ?? ConnectionSettings::default();
         $reflection = new ReflectionObject($settings);
         $properties = $reflection->getProperties();
-        $values = \explode(';', $connectionString);
+        $values = self::getParts($connectionString);
 
         foreach ($values as $value) {
-            list($key, $value) = \explode('=', $value);
+            [$key, $value] = \explode('=', $value);
             $key = \strtolower($key);
 
             if ('connectto' === $key) {
@@ -152,10 +152,10 @@ class ConnectionString
 
     public static function getUriFromConnectionString(string $connectionString): ?Uri
     {
-        $values = \explode(';', $connectionString);
+        $values = self::getParts($connectionString);
 
         foreach ($values as $value) {
-            list($key, $value) = \explode('=', $value);
+            [$key, $value] = \explode('=', $value);
 
             if (\strtolower($key) === 'connectto') {
                 return Uri::fromString($value);
@@ -163,5 +163,15 @@ class ConnectionString
         }
 
         return null;
+    }
+
+    /**
+     * @param string $connectionString
+     *
+     * @return string[]
+     */
+    private static function getParts(string $connectionString): array
+    {
+        return \explode(';', \str_replace(' ', '', $connectionString));
     }
 }

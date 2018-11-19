@@ -146,6 +146,8 @@ class OperationsManager
                 $this->logDebug('retrying, old corrId %s, operation %s', $oldCorrId, $operation);
                 $this->scheduleOperation($operation, $connection);
             }
+
+            $this->retryPendingOperations = [];
         }
 
         $this->tryScheduleWaitingOperations($connection);

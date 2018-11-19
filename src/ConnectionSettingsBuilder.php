@@ -309,8 +309,11 @@ class ConnectionSettingsBuilder
 
     public function setMaxDiscoverAttempts(int $maxDiscoverAttempts): self
     {
-        if ($maxDiscoverAttempts <= 0) {
-            throw new InvalidArgumentException('Max discover attempts is out of range');
+        if ($maxDiscoverAttempts < 1) {
+            throw new InvalidArgumentException(\sprintf(
+                'Max discover attempts is out of range %d. Allowed range: [1, PHP_INT_MAX].',
+                $maxDiscoverAttempts
+            ));
         }
 
         $this->maxDiscoverAttempts = $maxDiscoverAttempts;

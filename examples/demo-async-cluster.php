@@ -17,12 +17,18 @@ use Amp\Loop;
 
 require __DIR__ . '/../vendor/autoload.php';
 
+/**
+ * Start docker/local-3-node-cluster and run this script from host machine.
+ * This is because the cluster advertises as 127.0.0.1, which does not resolve
+ * to the event store in the PHP container, if you run it in Docker.
+ */
+
 Loop::run(function () {
     $builder = new ConnectionSettingsBuilder();
     $builder->setGossipSeedEndPoints([
-        new EndPoint('eventstore1', 2113),
-        new EndPoint('eventstore2', 2123),
-        new EndPoint('eventstore3', 2133),
+        new EndPoint('localhost', 2113),
+        new EndPoint('localhost', 2123),
+        new EndPoint('localhost', 2133),
     ]);
 
     $connection = EventStoreAsyncConnectionFactory::createFromSettings(
