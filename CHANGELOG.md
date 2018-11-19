@@ -1,7 +1,32 @@
 # Change Log
 
-## [v1.0.0-beta-4](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-4)
+## [v1.0.0-beta-6](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-6)
 
+[Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-5...v1.0.0-beta-6)
+
+**Implemented enhancements:**
+
+- Allow connection settings in connection string [\#27](https://github.com/prooph/event-store-client/issues/27)
+- Use objects for json encoding [\#30](https://github.com/prooph/event-store-client/pull/30) ([prolic](https://github.com/prolic))
+- change factory methods [\#28](https://github.com/prooph/event-store-client/pull/28) ([prolic](https://github.com/prolic))
+
+**Fixed bugs:**
+
+- Connecting to cluster does not work [\#34](https://github.com/prooph/event-store-client/issues/34)
+- use Guid Codec for UUIDs [\#38](https://github.com/prooph/event-store-client/pull/38) ([prolic](https://github.com/prolic))
+- Fix Operations Manager + Connection Factory [\#36](https://github.com/prooph/event-store-client/pull/36) ([prolic](https://github.com/prolic))
+- Connection factory fixes [\#35](https://github.com/prooph/event-store-client/pull/35) ([pkruithof](https://github.com/pkruithof))
+- Fix connection string usage [\#33](https://github.com/prooph/event-store-client/pull/33) ([prolic](https://github.com/prolic))
+
+**Merged pull requests:**
+
+- Small typo fix [\#31](https://github.com/prooph/event-store-client/pull/31) ([pkruithof](https://github.com/pkruithof))
+- Fix readme [\#29](https://github.com/prooph/event-store-client/pull/29) ([enumag](https://github.com/enumag))
+
+## [v1.0.0-beta-5](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-5) (2018-11-09)
+[Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-4...v1.0.0-beta-5)
+
+## [v1.0.0-beta-4](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-4) (2018-11-03)
 [Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-3...v1.0.0-beta-4)
 
 **Implemented enhancements:**
