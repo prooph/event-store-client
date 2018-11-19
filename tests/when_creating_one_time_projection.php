@@ -15,7 +15,7 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use Throwable;
 
 class when_creating_one_time_projection extends TestCase
@@ -29,7 +29,7 @@ class when_creating_one_time_projection extends TestCase
 
     public function given(): Generator
     {
-        $id = UuidGenerator::generateWithoutDash();
+        $id = Uuid::generateAsHex();
         $this->streamName = 'test-stream-' . $id;
 
         yield $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');

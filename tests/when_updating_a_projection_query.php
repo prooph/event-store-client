@@ -15,7 +15,7 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use Throwable;
 
 class when_updating_a_projection_query extends TestCase
@@ -32,7 +32,7 @@ class when_updating_a_projection_query extends TestCase
     protected function given(): Generator
     {
         $this->projectionName = 'when_updating_a_projection_query';
-        $this->streamName = 'test-stream-' . UuidGenerator::generateWithoutDash();
+        $this->streamName = 'test-stream-' . Uuid::generateAsHex();
 
         yield $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');
         yield $this->postEvent($this->streamName, 'testEvent', '{"A": 2}');

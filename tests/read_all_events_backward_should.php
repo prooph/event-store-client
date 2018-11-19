@@ -26,7 +26,7 @@ use Prooph\EventStoreClient\RecordedEvent;
 use Prooph\EventStoreClient\ResolvedEvent;
 use Prooph\EventStoreClient\StreamAcl;
 use Prooph\EventStoreClient\StreamMetadata;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use Prooph\EventStoreClient\WriteResult;
 use ProophTest\EventStoreClient\Helper\EventDataComparer;
 use ProophTest\EventStoreClient\Helper\TestEvent;
@@ -66,9 +66,9 @@ class read_all_events_backward_should extends TestCase
 
         $this->testEvents = TestEvent::newAmount(20);
 
-        yield $this->conn->appendToStreamAsync('stream-' . UuidGenerator::generateWithoutDash(), ExpectedVersion::EMPTY_STREAM, $this->testEvents);
+        yield $this->conn->appendToStreamAsync('stream-' . Uuid::generateAsHex(), ExpectedVersion::EMPTY_STREAM, $this->testEvents);
 
-        $result = yield $this->conn->appendToStreamAsync('stream-' . UuidGenerator::generateWithoutDash(), ExpectedVersion::NO_STREAM, $this->testEvents);
+        $result = yield $this->conn->appendToStreamAsync('stream-' . Uuid::generateAsHex(), ExpectedVersion::NO_STREAM, $this->testEvents);
         \assert($result instanceof WriteResult);
 
         $lastId = $this->testEvents[19]->eventId();

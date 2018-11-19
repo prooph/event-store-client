@@ -18,7 +18,7 @@ use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\SystemData\TcpFlags;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 
 class clientapi_tcp_package extends TestCase
 {
@@ -27,7 +27,7 @@ class clientapi_tcp_package extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new TcpPackage(TcpCommand::badRequest(), TcpFlags::authenticated(), UuidGenerator::generateWithoutDash(), '');
+        new TcpPackage(TcpCommand::badRequest(), TcpFlags::authenticated(), Uuid::generateAsHex(), '');
     }
 
     /** @test */
@@ -35,7 +35,7 @@ class clientapi_tcp_package extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new TcpPackage(TcpCommand::badRequest(), TcpFlags::authenticated(), UuidGenerator::generateWithoutDash(), '', 'login');
+        new TcpPackage(TcpCommand::badRequest(), TcpFlags::authenticated(), Uuid::generateAsHex(), '', 'login');
     }
 
     /** @test */
@@ -43,7 +43,7 @@ class clientapi_tcp_package extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new TcpPackage(TcpCommand::badRequest(), TcpFlags::none(), UuidGenerator::generateWithoutDash(), '', 'login', null);
+        new TcpPackage(TcpCommand::badRequest(), TcpFlags::none(), Uuid::generateAsHex(), '', 'login', null);
     }
 
     /** @test */
@@ -51,13 +51,13 @@ class clientapi_tcp_package extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new TcpPackage(TcpCommand::badRequest(), TcpFlags::none(), UuidGenerator::generateWithoutDash(), '', null, 'pa$$');
+        new TcpPackage(TcpCommand::badRequest(), TcpFlags::none(), Uuid::generateAsHex(), '', null, 'pa$$');
     }
 
     /** @test */
     public function not_authorized_with_data_should_serialize_and_deserialize_correctly(): void
     {
-        $corrId = UuidGenerator::generateWithoutDash();
+        $corrId = Uuid::generateAsHex();
         $refPkg = new TcpPackage(TcpCommand::badRequest(), TcpFlags::none(), $corrId, 'data');
         $bytes = $refPkg->asBytes();
         $pkg = TcpPackage::fromRawData($bytes);
@@ -73,7 +73,7 @@ class clientapi_tcp_package extends TestCase
     /** @test */
     public function not_authorized_with_empty_data_should_serialize_and_deserialize_correctly(): void
     {
-        $corrId = UuidGenerator::generateWithoutDash();
+        $corrId = Uuid::generateAsHex();
         $refPkg = new TcpPackage(TcpCommand::badRequest(), TcpFlags::none(), $corrId);
         $bytes = $refPkg->asBytes();
         $pkg = TcpPackage::fromRawData($bytes);
@@ -89,7 +89,7 @@ class clientapi_tcp_package extends TestCase
     /** @test */
     public function authorized_with_data_should_serialize_and_deserialize_correctly(): void
     {
-        $corrId = UuidGenerator::generateWithoutDash();
+        $corrId = Uuid::generateAsHex();
         $refPkg = new TcpPackage(TcpCommand::badRequest(), TcpFlags::authenticated(), $corrId, 'data', 'login', 'password');
         $bytes = $refPkg->asBytes();
         $pkg = TcpPackage::fromRawData($bytes);
@@ -105,7 +105,7 @@ class clientapi_tcp_package extends TestCase
     /** @test */
     public function authorized_with_empty_data_should_serialize_and_deserialize_correctly(): void
     {
-        $corrId = UuidGenerator::generateWithoutDash();
+        $corrId = Uuid::generateAsHex();
         $refPkg = new TcpPackage(TcpCommand::badRequest(), TcpFlags::authenticated(), $corrId, '', 'login', 'password');
         $bytes = $refPkg->asBytes();
         $pkg = TcpPackage::fromRawData($bytes);
@@ -121,7 +121,7 @@ class clientapi_tcp_package extends TestCase
     /** @test */
     public function should_throw_argument_exception_on_serialization_when_login_too_long(): void
     {
-        $corrId = UuidGenerator::generateWithoutDash();
+        $corrId = Uuid::generateAsHex();
         $pkg = new TcpPackage(TcpCommand::badRequest(), TcpFlags::authenticated(), $corrId, '', \str_repeat('*', 256), 'password');
 
         $this->expectException(InvalidArgumentException::class);
@@ -132,7 +132,7 @@ class clientapi_tcp_package extends TestCase
     /** @test */
     public function should_throw_argument_exception_on_serialization_when_password_too_long(): void
     {
-        $corrId = UuidGenerator::generateWithoutDash();
+        $corrId = Uuid::generateAsHex();
         $pkg = new TcpPackage(TcpCommand::badRequest(), TcpFlags::authenticated(), $corrId, '', 'login', \str_repeat('*', 256));
 
         $this->expectException(InvalidArgumentException::class);

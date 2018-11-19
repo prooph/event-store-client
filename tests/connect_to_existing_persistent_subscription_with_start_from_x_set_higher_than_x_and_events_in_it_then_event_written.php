@@ -25,7 +25,7 @@ use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use Throwable;
 
 class connect_to_existing_persistent_subscription_with_start_from_x_set_higher_than_x_and_events_in_it_then_event_written extends TestCase
@@ -47,7 +47,7 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_higher_t
 
     protected function setUp(): void
     {
-        $this->stream = '$' . UuidGenerator::generateWithoutDash();
+        $this->stream = '$' . Uuid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFrom(10)

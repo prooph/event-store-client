@@ -24,7 +24,7 @@ use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionDropped;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Prooph\EventStoreClient\SubscriptionDropReason;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use Throwable;
 
 class deleting_existing_persistent_subscription_with_subscriber extends TestCase
@@ -40,7 +40,7 @@ class deleting_existing_persistent_subscription_with_subscriber extends TestCase
 
     protected function setUp(): void
     {
-        $this->stream = UuidGenerator::generateWithoutDash();
+        $this->stream = Uuid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

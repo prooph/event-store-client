@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-use Ramsey\Uuid\Uuid;
+use Prooph\EventStoreClient\Util\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 class EventId
@@ -23,7 +23,7 @@ class EventId
 
     public static function generate(): EventId
     {
-        return new self(Uuid::uuid4());
+        return new self(Uuid::generate());
     }
 
     public static function fromString(string $eventId): EventId

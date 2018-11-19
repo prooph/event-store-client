@@ -17,7 +17,7 @@ use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use Throwable;
 
 class create_persistent_subscription_with_dont_timeout extends TestCase
@@ -31,7 +31,7 @@ class create_persistent_subscription_with_dont_timeout extends TestCase
 
     protected function setUp(): void
     {
-        $this->stream = UuidGenerator::generateWithoutDash();
+        $this->stream = Uuid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

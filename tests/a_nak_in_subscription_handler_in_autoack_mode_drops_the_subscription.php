@@ -29,7 +29,7 @@ use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionDropped;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Prooph\EventStoreClient\SubscriptionDropReason;
-use Ramsey\Uuid\Uuid;
+use Prooph\EventStoreClient\Util\Uuid;
 use Throwable;
 
 class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription extends TestCase
@@ -51,7 +51,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
 
     protected function setUp()
     {
-        $this->stream = '$' . Uuid::uuid4()->toString();
+        $this->stream = '$' . Uuid::generateString();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromBeginning()

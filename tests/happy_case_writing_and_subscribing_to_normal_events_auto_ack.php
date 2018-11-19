@@ -25,7 +25,7 @@ use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use Throwable;
 use function Amp\Promise\timeout;
 
@@ -50,8 +50,8 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
 
     protected function setUp(): void
     {
-        $this->streamName = UuidGenerator::generateWithoutDash();
-        $this->groupName = UuidGenerator::generateWithoutDash();
+        $this->streamName = Uuid::generateAsHex();
+        $this->groupName = Uuid::generateAsHex();
         $this->eventsReceived = new Deferred();
     }
 

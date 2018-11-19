@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\Artax\DefaultClient;
+use Amp\Artax\Request;
+use Amp\Artax\Response;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\ConditionalWriteResult;
 use Prooph\EventStoreClient\ConditionalWriteStatus;
@@ -23,6 +26,7 @@ use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\ReadDirection;
 use Prooph\EventStoreClient\StreamEventsSlice;
 use Prooph\EventStoreClient\StreamMetadata;
+use Prooph\EventStoreClient\Util\Json;
 use Prooph\EventStoreClient\WriteResult;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
@@ -655,6 +659,58 @@ class append_to_stream extends TestCase
             $this->assertTrue($result->status()->equals(ConditionalWriteStatus::streamDeleted()));
 
             $connection->close();
+        }));
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function writes_predefined_event_id(): void
+    {
+        wait(call(function () {
+            $stream = 'writes_predefined_event_id';
+
+            $connection = TestConnection::createAsync();
+
+            yield $connection->connectAsync();
+
+            $event = TestEvent::newTestEvent();
+
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [$event]);
+
+            $events = yield $connection->readStreamEventsBackwardAsync($stream, -1, 1);
+            \assert($events instanceof StreamEventsSlice);
+
+            $readEvent = $events->events()[0]->event();
+
+            $connection->close();
+
+            $this->assertEquals($event->eventId()->toString(), $readEvent->eventId()->toString());
+
+            $url = \sprintf(
+                'http://%s:%s/streams/%s/head/backward/1?embed=body',
+                \getenv('ES_HOST'),
+                \getenv('ES_HTTP_PORT'),
+                $stream
+            );
+
+            $request = new Request($url, 'GET');
+            $request = $request->withAddedHeader('Accept', 'application/vnd.eventstore.atom+json');
+
+            $client = new DefaultClient();
+
+            $response = yield $client->request($request);
+
+            \assert($response instanceof Response);
+
+            $body = yield $response->getBody()->read();
+
+            $json = Json::decode($body);
+
+            $eventId = $json['entries'][0]['eventId'];
+
+            $this->assertEquals($event->eventId()->toString(), $eventId);
         }));
     }
 }

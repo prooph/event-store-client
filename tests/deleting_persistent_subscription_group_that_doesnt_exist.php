@@ -17,7 +17,7 @@ use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use Throwable;
 
 class deleting_persistent_subscription_group_that_doesnt_exist extends TestCase
@@ -29,7 +29,7 @@ class deleting_persistent_subscription_group_that_doesnt_exist extends TestCase
 
     protected function setUp(): void
     {
-        $this->stream = UuidGenerator::generateWithoutDash();
+        $this->stream = Uuid::generateAsHex();
     }
 
     protected function when(): Generator
@@ -48,7 +48,7 @@ class deleting_persistent_subscription_group_that_doesnt_exist extends TestCase
 
             yield $this->conn->deletePersistentSubscriptionAsync(
                 $this->stream,
-                UuidGenerator::generateWithoutDash(),
+                Uuid::generateAsHex(),
                 DefaultData::adminCredentials()
             );
         });

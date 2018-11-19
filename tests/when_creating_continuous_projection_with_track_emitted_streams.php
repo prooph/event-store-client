@@ -17,7 +17,7 @@ use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventReadResult;
 use Prooph\EventStoreClient\Projections\ProjectionDetails;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use Throwable;
 
 class when_creating_continuous_projection_with_track_emitted_streams extends TestCase
@@ -37,7 +37,7 @@ class when_creating_continuous_projection_with_track_emitted_streams extends Tes
 
     public function given(): Generator
     {
-        $id = UuidGenerator::generateWithoutDash();
+        $id = Uuid::generateAsHex();
         $this->projectionName = 'when_creating_transient_projection-' . $id;
         $this->streamName = 'test-stream-' . $id;
         $this->emittedStreamName = 'emittedStream-' . $id;

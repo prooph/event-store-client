@@ -429,7 +429,6 @@ class subscribe_to_all_catching_up_should extends TestCase
                         ResolvedEvent $resolvedEvent
                     ): Promise {
                         if (! SystemStreams::isSystemStream($resolvedEvent->originalEvent()->eventStreamId())) {
-                            //\var_dump($resolvedEvent->originalEvent()->eventStreamId());
                             $this->events[] = $resolvedEvent;
                             $this->appeared->signal();
                         }
