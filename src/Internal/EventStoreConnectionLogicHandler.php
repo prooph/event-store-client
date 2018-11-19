@@ -279,7 +279,7 @@ class EventStoreConnectionLogicHandler
 
         $this->operations->cleanUp();
         $this->subscriptions->cleanUp();
-        $this->closeTcpConnection($reason);
+        $this->closeTcpConnection();
 
         $this->logInfo('Closed. Reason: %s', $reason);
 
@@ -358,7 +358,7 @@ class EventStoreConnectionLogicHandler
     }
 
     /** @throws \Exception */
-    private function closeTcpConnection(string $reason): void
+    private function closeTcpConnection(): void
     {
         if (null === $this->connection) {
             $this->logDebug('CloseTcpConnection IGNORED because connection === null');
@@ -529,9 +529,8 @@ class EventStoreConnectionLogicHandler
                 if ($this->connectingPhase->equals(ConnectingPhase::identification())
                     && $elapsed - $this->identityInfo->timestamp() >= $this->settings->operationTimeout()
                 ) {
-                    $msg = 'Timed out waiting for client to be identified';
-                    $this->logDebug($msg);
-                    $this->closeTcpConnection($msg);
+                    $this->logDebug('Timed out waiting for client to be identified');
+                    $this->closeTcpConnection();
                 }
 
                 if ($this->connectingPhase->value() > ConnectingPhase::CONNECTION_ESTABLISHING) {
@@ -596,7 +595,7 @@ class EventStoreConnectionLogicHandler
             );
 
             $this->settings->log()->info($msg);
-            $this->closeTcpConnection($msg);
+            $this->closeTcpConnection();
         }
     }
 
@@ -906,7 +905,7 @@ class EventStoreConnectionLogicHandler
             $this->settings->log()->info($msg);
         }
 
-        $this->closeTcpConnection($msg);
+        $this->closeTcpConnection();
 
         $this->state = ConnectionState::connecting();
         $this->connectingPhase = ConnectingPhase::endPointDiscovery();
