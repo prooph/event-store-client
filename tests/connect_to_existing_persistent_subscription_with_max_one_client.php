@@ -43,7 +43,7 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends Te
 
     protected function setUp(): void
     {
-        $this->stream = '$' . Uuid::generateWithoutDash();
+        $this->stream = '$' . Uuid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

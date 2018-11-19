@@ -91,7 +91,7 @@ final class EventStoreAsyncNodeConnection implements
     ) {
         $this->settings = $settings;
         $this->clusterSettings = $clusterSettings;
-        $this->connectionName = $connectionName ?? Uuid::generateWithoutDash();
+        $this->connectionName = $connectionName ?? Uuid::generateAsHex();
         $this->endPointDiscoverer = $endPointDiscoverer;
         $this->handler = new EventStoreConnectionLogicHandler($this, $settings);
     }

@@ -32,7 +32,7 @@ class create_persistent_subscription_on_existing_stream extends TestCase
 
     protected function setUp(): void
     {
-        $this->stream = Uuid::generateWithoutDash();
+        $this->stream = Uuid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

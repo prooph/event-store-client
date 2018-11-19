@@ -50,7 +50,7 @@ class connect_to_existing_persistent_subscription_with_start_from_two_and_no_str
     protected function setUp(): void
     {
         $this->eventId = EventId::generate();
-        $this->stream = '$' . Uuid::generateWithoutDash();
+        $this->stream = '$' . Uuid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFrom(2)

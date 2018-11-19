@@ -31,7 +31,7 @@ class when_listing_continuous_projections extends TestCase
 
     protected function given(): Generator
     {
-        $this->projectionName = Uuid::generateWithoutDash();
+        $this->projectionName = Uuid::generateAsHex();
         yield $this->createContinuousProjection($this->projectionName, 'JS');
     }
 

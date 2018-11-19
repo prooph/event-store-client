@@ -37,7 +37,7 @@ class when_creating_continuous_projection_with_track_emitted_streams extends Tes
 
     public function given(): Generator
     {
-        $id = Uuid::generateWithoutDash();
+        $id = Uuid::generateAsHex();
         $this->projectionName = 'when_creating_transient_projection-' . $id;
         $this->streamName = 'test-stream-' . $id;
         $this->emittedStreamName = 'emittedStream-' . $id;

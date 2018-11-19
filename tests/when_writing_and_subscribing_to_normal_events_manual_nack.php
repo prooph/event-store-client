@@ -47,8 +47,8 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends TestCase
 
     protected function setUp(): void
     {
-        $this->streamName = Uuid::generateWithoutDash();
-        $this->groupName = Uuid::generateWithoutDash();
+        $this->streamName = Uuid::generateAsHex();
+        $this->groupName = Uuid::generateAsHex();
         $this->eventsReceived = new Deferred();
     }
 

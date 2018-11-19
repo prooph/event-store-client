@@ -316,7 +316,7 @@ class EventStoreConnectionLogicHandler
         $this->connection = new TcpPackageConnection(
             $this->settings->log(),
             $endPoint,
-            Uuid::generateWithoutDash(),
+            Uuid::generateAsHex(),
             $this->settings->useSslConnection(),
             $this->settings->targetHost(),
             $this->settings->validateServer(),
@@ -438,7 +438,7 @@ class EventStoreConnectionLogicHandler
         if ($this->settings->defaultUserCredentials() !== null) {
             $this->connectingPhase = ConnectingPhase::authentication();
 
-            $this->authInfo = new AuthInfo(Uuid::generateWithoutDash(), $elapsed);
+            $this->authInfo = new AuthInfo(Uuid::generateAsHex(), $elapsed);
 
             $login = null;
             $pass = null;
@@ -464,7 +464,7 @@ class EventStoreConnectionLogicHandler
     private function goToIdentifyState(): void
     {
         $this->connectingPhase = ConnectingPhase::identification();
-        $this->identityInfo = new IdentifyInfo(Uuid::generateWithoutDash(), $this->stopWatch->elapsed());
+        $this->identityInfo = new IdentifyInfo(Uuid::generateAsHex(), $this->stopWatch->elapsed());
 
         $message = new IdentifyClient();
         $message->setVersion(self::CLIENT_VERSION);
@@ -582,7 +582,7 @@ class EventStoreConnectionLogicHandler
             $this->connection->enqueueSend(new TcpPackage(
                 TcpCommand::heartbeatRequestCommand(),
                 TcpFlags::none(),
-                Uuid::generateWithoutDash()
+                Uuid::generateAsHex()
             ));
 
             $this->heartbeatInfo = new HeartbeatInfo($this->heartbeatInfo->lastPackageNumber(), false, $elapsed);

@@ -47,7 +47,7 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_higher_t
 
     protected function setUp(): void
     {
-        $this->stream = '$' . Uuid::generateWithoutDash();
+        $this->stream = '$' . Uuid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFrom(10)

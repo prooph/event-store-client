@@ -41,8 +41,8 @@ class read_event_should extends TestCase
     {
         $this->eventId0 = EventId::generate();
         $this->eventId1 = EventId::generate();
-        $this->testStream = 'test-stream-' . Uuid::generateWithoutDash();
-        $this->deletedStream = 'deleted-stream' . Uuid::generateWithoutDash();
+        $this->testStream = 'test-stream-' . Uuid::generateAsHex();
+        $this->deletedStream = 'deleted-stream' . Uuid::generateAsHex();
 
         yield $this->conn->appendToStreamAsync($this->testStream, -1, [
             new EventData($this->eventId0, 'event0', false, '123', '456'),

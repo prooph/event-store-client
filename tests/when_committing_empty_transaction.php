@@ -43,7 +43,7 @@ class when_committing_empty_transaction extends TestCase
     {
         $this->firstEvent = TestEvent::newTestEvent();
         $this->connection = TestConnection::createAsync();
-        $this->stream = Uuid::generateWithoutDash();
+        $this->stream = Uuid::generateAsHex();
     }
 
     private function bootstrap(): Generator

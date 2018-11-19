@@ -49,7 +49,7 @@ class OperationItem
         $this->maxRetries = $maxRetries;
         $this->timeout = $timeout;
         $this->created = DateTime::utcNow();
-        $this->correlationId = Uuid::generateWithoutDash();
+        $this->correlationId = Uuid::generateAsHex();
         $this->retryCount = 0;
         $this->lastUpdated = $this->created;
     }

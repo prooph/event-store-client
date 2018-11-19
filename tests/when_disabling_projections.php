@@ -31,7 +31,7 @@ class when_disabling_projections extends TestCase
 
     public function given(): Generator
     {
-        $id = Uuid::generateWithoutDash();
+        $id = Uuid::generateAsHex();
         $this->projectionName = 'when_disabling_projection-' . $id;
         $this->streamName = 'test-stream-' . $id;
 

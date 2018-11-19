@@ -32,9 +32,9 @@ class Uuid
         return self::generate()->toString();
     }
 
-    public static function generateWithoutDash(): string
+    public static function generateAsHex(): string
     {
-        return \str_replace('-', '', self::generateString());
+        return self::generate()->getHex();
     }
 
     public static function fromString(string $uuid): UuidInterface

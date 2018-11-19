@@ -30,7 +30,7 @@ class deleting_existing_persistent_subscription_group_with_permissions extends T
 
     protected function setUp(): void
     {
-        $this->stream = Uuid::generateWithoutDash();
+        $this->stream = Uuid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

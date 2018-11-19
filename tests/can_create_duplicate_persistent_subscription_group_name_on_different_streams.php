@@ -30,7 +30,7 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
 
     protected function setUp(): void
     {
-        $this->stream = Uuid::generateWithoutDash();
+        $this->stream = Uuid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

@@ -29,7 +29,7 @@ class deleting_persistent_subscription_group_that_doesnt_exist extends TestCase
 
     protected function setUp(): void
     {
-        $this->stream = Uuid::generateWithoutDash();
+        $this->stream = Uuid::generateAsHex();
     }
 
     protected function when(): Generator
@@ -48,7 +48,7 @@ class deleting_persistent_subscription_group_that_doesnt_exist extends TestCase
 
             yield $this->conn->deletePersistentSubscriptionAsync(
                 $this->stream,
-                Uuid::generateWithoutDash(),
+                Uuid::generateAsHex(),
                 DefaultData::adminCredentials()
             );
         });

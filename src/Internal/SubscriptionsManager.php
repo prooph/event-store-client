@@ -201,7 +201,7 @@ class SubscriptionsManager
             return;
         }
 
-        $correlationId = Uuid::generateWithoutDash();
+        $correlationId = Uuid::generateAsHex();
         $subscription->setCorrelationId($correlationId);
         $subscription->setConnectionId($connection->connectionId());
         $subscription->setLastUpdated(DateTime::utcNow());

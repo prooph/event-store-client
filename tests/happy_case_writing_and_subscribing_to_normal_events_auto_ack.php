@@ -50,8 +50,8 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends TestC
 
     protected function setUp(): void
     {
-        $this->streamName = Uuid::generateWithoutDash();
-        $this->groupName = Uuid::generateWithoutDash();
+        $this->streamName = Uuid::generateAsHex();
+        $this->groupName = Uuid::generateAsHex();
         $this->eventsReceived = new Deferred();
     }
 
