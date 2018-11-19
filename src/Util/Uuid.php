@@ -17,7 +17,7 @@ use Ramsey\Uuid\FeatureSet;
 use Ramsey\Uuid\UuidFactory;
 use Ramsey\Uuid\UuidInterface;
 
-class UuidGenerator
+class Uuid
 {
     /** @var UuidFactory */
     private static $factory;

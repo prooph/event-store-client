@@ -20,7 +20,7 @@ use Prooph\EventStoreClient\Exception\RetriesLimitReachedException;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
 use Prooph\EventStoreClient\Util\DateTime;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use SplQueue;
 
 /** @internal  */
@@ -201,7 +201,7 @@ class SubscriptionsManager
             return;
         }
 
-        $correlationId = UuidGenerator::generateWithoutDash();
+        $correlationId = Uuid::generateWithoutDash();
         $subscription->setCorrelationId($correlationId);
         $subscription->setConnectionId($connection->connectionId());
         $subscription->setLastUpdated(DateTime::utcNow());

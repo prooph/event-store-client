@@ -19,7 +19,7 @@ use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\Exception\AccessDeniedException;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use Throwable;
 
 class update_existing_persistent_subscription_without_permissions extends TestCase
@@ -33,7 +33,7 @@ class update_existing_persistent_subscription_without_permissions extends TestCa
 
     protected function given(): Generator
     {
-        $this->stream = UuidGenerator::generateWithoutDash();
+        $this->stream = Uuid::generateWithoutDash();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

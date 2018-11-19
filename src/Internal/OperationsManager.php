@@ -20,7 +20,7 @@ use Prooph\EventStoreClient\Exception\OperationTimedOutException;
 use Prooph\EventStoreClient\Exception\RetriesLimitReachedException;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
 use Prooph\EventStoreClient\Util\DateTime;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use SplQueue;
 
 /** @internal */
@@ -141,7 +141,7 @@ class OperationsManager
 
             foreach ($this->retryPendingOperations as $operation) {
                 $oldCorrId = $operation->correlationId();
-                $operation->setCorrelationId(UuidGenerator::generateWithoutDash());
+                $operation->setCorrelationId(Uuid::generateWithoutDash());
                 $operation->incRetryCount();
                 $this->logDebug('retrying, old corrId %s, operation %s', $oldCorrId, $operation);
                 $this->scheduleOperation($operation, $connection);

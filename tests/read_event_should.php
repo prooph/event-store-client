@@ -21,7 +21,7 @@ use Prooph\EventStoreClient\EventReadResult;
 use Prooph\EventStoreClient\EventReadStatus;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\OutOfRangeException;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use Throwable;
 
 class read_event_should extends TestCase
@@ -41,8 +41,8 @@ class read_event_should extends TestCase
     {
         $this->eventId0 = EventId::generate();
         $this->eventId1 = EventId::generate();
-        $this->testStream = 'test-stream-' . UuidGenerator::generateWithoutDash();
-        $this->deletedStream = 'deleted-stream' . UuidGenerator::generateWithoutDash();
+        $this->testStream = 'test-stream-' . Uuid::generateWithoutDash();
+        $this->deletedStream = 'deleted-stream' . Uuid::generateWithoutDash();
 
         yield $this->conn->appendToStreamAsync($this->testStream, -1, [
             new EventData($this->eventId0, 'event0', false, '123', '456'),

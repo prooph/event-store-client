@@ -17,7 +17,7 @@ use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Projections\ProjectionDetails;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use Throwable;
 
 class when_listing_continuous_projections extends TestCase
@@ -31,7 +31,7 @@ class when_listing_continuous_projections extends TestCase
 
     protected function given(): Generator
     {
-        $this->projectionName = UuidGenerator::generateWithoutDash();
+        $this->projectionName = Uuid::generateWithoutDash();
         yield $this->createContinuousProjection($this->projectionName, 'JS');
     }
 

@@ -19,7 +19,7 @@ use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\StreamMetadata;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 
 trait SpecificationWithLinkToToMaxCountDeletedEvents
 {
@@ -34,8 +34,8 @@ trait SpecificationWithLinkToToMaxCountDeletedEvents
     {
         $creds = DefaultData::adminCredentials();
 
-        $this->deletedStreamName = UuidGenerator::generateWithoutDash();
-        $this->linkedStreamName = UuidGenerator::generateWithoutDash();
+        $this->deletedStreamName = Uuid::generateWithoutDash();
+        $this->linkedStreamName = Uuid::generateWithoutDash();
 
         yield $this->conn->appendToStreamAsync(
             $this->deletedStreamName,

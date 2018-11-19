@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use ProophTest\EventStoreClient\DefaultData;
 
 abstract class TestWithUser extends TestWithNode
@@ -25,7 +25,7 @@ abstract class TestWithUser extends TestWithNode
     {
         parent::setUp();
 
-        $this->username = UuidGenerator::generateString();
+        $this->username = Uuid::generateString();
 
         $this->manager->createUser(
             $this->username,

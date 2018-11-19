@@ -15,7 +15,7 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use Throwable;
 
 class when_disabling_projections extends TestCase
@@ -31,7 +31,7 @@ class when_disabling_projections extends TestCase
 
     public function given(): Generator
     {
-        $id = UuidGenerator::generateWithoutDash();
+        $id = Uuid::generateWithoutDash();
         $this->projectionName = 'when_disabling_projection-' . $id;
         $this->streamName = 'test-stream-' . $id;
 

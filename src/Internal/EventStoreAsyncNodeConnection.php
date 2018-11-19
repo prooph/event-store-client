@@ -65,7 +65,7 @@ use Prooph\EventStoreClient\SubscriptionDropped;
 use Prooph\EventStoreClient\SystemSettings;
 use Prooph\EventStoreClient\UserCredentials;
 use Prooph\EventStoreClient\Util\Json;
-use Prooph\EventStoreClient\Util\UuidGenerator;
+use Prooph\EventStoreClient\Util\Uuid;
 use Throwable;
 
 final class EventStoreAsyncNodeConnection implements
@@ -91,7 +91,7 @@ final class EventStoreAsyncNodeConnection implements
     ) {
         $this->settings = $settings;
         $this->clusterSettings = $clusterSettings;
-        $this->connectionName = $connectionName ?? UuidGenerator::generateWithoutDash();
+        $this->connectionName = $connectionName ?? Uuid::generateWithoutDash();
         $this->endPointDiscoverer = $endPointDiscoverer;
         $this->handler = new EventStoreConnectionLogicHandler($this, $settings);
     }
