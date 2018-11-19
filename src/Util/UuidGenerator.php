@@ -13,18 +13,38 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Util;
 
-use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\FeatureSet;
+use Ramsey\Uuid\UuidFactory;
+use Ramsey\Uuid\UuidInterface;
 
 class UuidGenerator
 {
-    public static function generate(): string
+    /** @var UuidFactory */
+    private static $factory;
+
+    public static function generate(): UuidInterface
     {
-        return Uuid::uuid4()->toString();
+        return self::factory()->uuid4();
+    }
+
+    public static function generateString(): string
+    {
+        return self::generate()->toString();
     }
 
     public static function generateWithoutDash(): string
     {
-        return \str_replace('-', '', self::generate());
+        return \str_replace('-', '', self::generateString());
+    }
+
+    public static function fromString(string $uuid): UuidInterface
+    {
+        return self::factory()->fromString($uuid);
+    }
+
+    public static function fromBytes(string $bytes): UuidInterface
+    {
+        return self::factory()->fromBytes($bytes);
     }
 
     public static function empty(): string
@@ -34,5 +54,14 @@ class UuidGenerator
 
     final private function __construct()
     {
+    }
+
+    private static function factory(): UuidFactory
+    {
+        if (null === self::$factory) {
+            self::$factory = new UuidFactory(new FeatureSet(true));
+        }
+
+        return self::$factory;
     }
 }
