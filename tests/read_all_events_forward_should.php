@@ -26,7 +26,7 @@ use Prooph\EventStoreClient\RecordedEvent;
 use Prooph\EventStoreClient\ResolvedEvent;
 use Prooph\EventStoreClient\StreamAcl;
 use Prooph\EventStoreClient\StreamMetadata;
-use Prooph\EventStoreClient\Util\Uuid;
+use Prooph\EventStoreClient\Util\Guid;
 use ProophTest\EventStoreClient\Helper\EventDataComparer;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
@@ -68,7 +68,7 @@ class read_all_events_forward_should extends TestCase
 
         $this->from = $result->nextPosition();
         $this->testEvents = TestEvent::newAmount(20);
-        $this->stream = 'read_all_events_forward_should-' . Uuid::generateAsHex();
+        $this->stream = 'read_all_events_forward_should-' . Guid::generateAsHex();
 
         yield $this->conn->appendToStreamAsync($this->stream, ExpectedVersion::EMPTY_STREAM, $this->testEvents);
     }

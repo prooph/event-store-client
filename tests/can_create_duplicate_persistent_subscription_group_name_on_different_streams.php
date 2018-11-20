@@ -16,7 +16,7 @@ namespace ProophTest\EventStoreClient;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Util\Uuid;
+use Prooph\EventStoreClient\Util\Guid;
 use Throwable;
 
 class can_create_duplicate_persistent_subscription_group_name_on_different_streams extends TestCase
@@ -30,7 +30,7 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
 
     protected function setUp(): void
     {
-        $this->stream = Uuid::generateAsHex();
+        $this->stream = Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

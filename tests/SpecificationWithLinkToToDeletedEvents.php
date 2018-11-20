@@ -17,7 +17,7 @@ use Generator;
 use Prooph\EventStoreClient\Common\SystemEventTypes;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Util\Uuid;
+use Prooph\EventStoreClient\Util\Guid;
 
 trait SpecificationWithLinkToToDeletedEvents
 {
@@ -31,8 +31,8 @@ trait SpecificationWithLinkToToDeletedEvents
     protected function given(): Generator
     {
         $creds = DefaultData::adminCredentials();
-        $this->linkedStreamName = Uuid::generateAsHex();
-        $this->deletedStreamName = Uuid::generateAsHex();
+        $this->linkedStreamName = Guid::generateAsHex();
+        $this->deletedStreamName = Guid::generateAsHex();
 
         yield $this->conn->appendToStreamAsync(
             $this->deletedStreamName,

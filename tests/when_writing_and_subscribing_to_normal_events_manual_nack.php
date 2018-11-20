@@ -25,7 +25,7 @@ use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Util\Uuid;
+use Prooph\EventStoreClient\Util\Guid;
 use Throwable;
 
 class when_writing_and_subscribing_to_normal_events_manual_nack extends TestCase
@@ -47,8 +47,8 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends TestCase
 
     protected function setUp(): void
     {
-        $this->streamName = Uuid::generateAsHex();
-        $this->groupName = Uuid::generateAsHex();
+        $this->streamName = Guid::generateAsHex();
+        $this->groupName = Guid::generateAsHex();
         $this->eventsReceived = new Deferred();
     }
 
