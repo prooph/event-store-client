@@ -26,7 +26,7 @@ use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Util\Uuid;
+use Prooph\EventStoreClient\Util\Guid;
 use Throwable;
 
 class connect_to_persistent_subscription_with_retries extends TestCase
@@ -47,7 +47,7 @@ class connect_to_persistent_subscription_with_retries extends TestCase
 
     protected function setUp(): void
     {
-        $this->stream = Uuid::generateAsHex();
+        $this->stream = Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromBeginning()

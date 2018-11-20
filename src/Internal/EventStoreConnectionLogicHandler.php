@@ -49,7 +49,7 @@ use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\SystemData\TcpFlags;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
-use Prooph\EventStoreClient\Util\Uuid;
+use Prooph\EventStoreClient\Util\Guid;
 use Throwable;
 
 /** @internal */
@@ -316,7 +316,7 @@ class EventStoreConnectionLogicHandler
         $this->connection = new TcpPackageConnection(
             $this->settings->log(),
             $endPoint,
-            Uuid::generateAsHex(),
+            Guid::generateAsHex(),
             $this->settings->useSslConnection(),
             $this->settings->targetHost(),
             $this->settings->validateServer(),
@@ -386,7 +386,7 @@ class EventStoreConnectionLogicHandler
         ) {
             $this->logDebug('IGNORED (state: %s, internal conn.ID: {1:B}, conn.ID: %s): TCP connection to [%s] closed',
                 $this->state,
-                null === $this->connection ? Uuid::empty() : $this->connection->connectionId(),
+                null === $this->connection ? Guid::empty() : $this->connection->connectionId(),
                 $connection->connectionId(),
                 $connection->remoteEndPoint()
             );
@@ -421,7 +421,7 @@ class EventStoreConnectionLogicHandler
         ) {
             $this->logDebug('IGNORED (state %s, internal conn.Id %s, conn.Id %s, conn.closed %s): TCP connection to [%s] established',
                 $this->state,
-                null === $this->connection ? Uuid::empty() : $this->connection->connectionId(),
+                null === $this->connection ? Guid::empty() : $this->connection->connectionId(),
                 $connection->connectionId(),
                 $connection->isClosed() ? 'yes' : 'no',
                 $connection->remoteEndPoint()
@@ -438,7 +438,7 @@ class EventStoreConnectionLogicHandler
         if ($this->settings->defaultUserCredentials() !== null) {
             $this->connectingPhase = ConnectingPhase::authentication();
 
-            $this->authInfo = new AuthInfo(Uuid::generateAsHex(), $elapsed);
+            $this->authInfo = new AuthInfo(Guid::generateAsHex(), $elapsed);
 
             $login = null;
             $pass = null;
@@ -464,7 +464,7 @@ class EventStoreConnectionLogicHandler
     private function goToIdentifyState(): void
     {
         $this->connectingPhase = ConnectingPhase::identification();
-        $this->identityInfo = new IdentifyInfo(Uuid::generateAsHex(), $this->stopWatch->elapsed());
+        $this->identityInfo = new IdentifyInfo(Guid::generateAsHex(), $this->stopWatch->elapsed());
 
         $message = new IdentifyClient();
         $message->setVersion(self::CLIENT_VERSION);
@@ -581,7 +581,7 @@ class EventStoreConnectionLogicHandler
             $this->connection->enqueueSend(new TcpPackage(
                 TcpCommand::heartbeatRequestCommand(),
                 TcpFlags::none(),
-                Uuid::generateAsHex()
+                Guid::generateAsHex()
             ));
 
             $this->heartbeatInfo = new HeartbeatInfo($this->heartbeatInfo->lastPackageNumber(), false, $elapsed);

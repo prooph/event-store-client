@@ -27,7 +27,7 @@ use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Util\Uuid;
+use Prooph\EventStoreClient\Util\Guid;
 use Throwable;
 
 class happy_case_catching_up_to_link_to_events_auto_ack extends TestCase
@@ -49,8 +49,8 @@ class happy_case_catching_up_to_link_to_events_auto_ack extends TestCase
 
     protected function setUp(): void
     {
-        $this->streamName = Uuid::generateAsHex();
-        $this->groupName = Uuid::generateAsHex();
+        $this->streamName = Guid::generateAsHex();
+        $this->groupName = Guid::generateAsHex();
         $this->eventsReceived = new Deferred();
     }
 

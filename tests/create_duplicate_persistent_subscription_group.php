@@ -17,7 +17,7 @@ use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Util\Uuid;
+use Prooph\EventStoreClient\Util\Guid;
 use Throwable;
 
 class create_duplicate_persistent_subscription_group extends TestCase
@@ -31,7 +31,7 @@ class create_duplicate_persistent_subscription_group extends TestCase
 
     protected function setUp(): void
     {
-        $this->stream = Uuid::generateAsHex();
+        $this->stream = Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

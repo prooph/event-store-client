@@ -15,7 +15,7 @@ namespace ProophTest\EventStoreClient\UserManagement;
 
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\UserCommandFailedException;
-use Prooph\EventStoreClient\Util\Uuid;
+use Prooph\EventStoreClient\Util\Guid;
 use ProophTest\EventStoreClient\DefaultData;
 
 class updating_a_user extends TestWithNode
@@ -41,13 +41,13 @@ class updating_a_user extends TestWithNode
     {
         $this->expectException(UserCommandFailedException::class);
 
-        $this->manager->updateUser(Uuid::generateString(), 'bar', ['foo'], DefaultData::adminCredentials());
+        $this->manager->updateUser(Guid::generateString(), 'bar', ['foo'], DefaultData::adminCredentials());
     }
 
     /** @test */
     public function updating_a_user_with_parameters_can_be_read(): void
     {
-        $name = Uuid::generateString();
+        $name = Guid::generateString();
 
         $this->manager->createUser($name, 'ourofull', ['foo', 'bar'], 'password', DefaultData::adminCredentials());
 

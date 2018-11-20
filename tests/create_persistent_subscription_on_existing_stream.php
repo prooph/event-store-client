@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Util\Uuid;
+use Prooph\EventStoreClient\Util\Guid;
 use Throwable;
 
 class create_persistent_subscription_on_existing_stream extends TestCase
@@ -32,7 +32,7 @@ class create_persistent_subscription_on_existing_stream extends TestCase
 
     protected function setUp(): void
     {
-        $this->stream = Uuid::generateAsHex();
+        $this->stream = Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()

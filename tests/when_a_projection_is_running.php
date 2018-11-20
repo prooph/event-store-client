@@ -15,7 +15,7 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Util\Uuid;
+use Prooph\EventStoreClient\Util\Guid;
 use Throwable;
 
 class when_a_projection_is_running extends TestCase
@@ -31,7 +31,7 @@ class when_a_projection_is_running extends TestCase
 
     public function given(): Generator
     {
-        $id = Uuid::generateAsHex();
+        $id = Guid::generateAsHex();
         $this->projectionName = 'when_getting_projection_information-' . $id;
         $this->streamName = 'test-stream-' . $id;
 

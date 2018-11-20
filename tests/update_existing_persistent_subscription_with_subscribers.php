@@ -26,7 +26,7 @@ use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionDropped;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Prooph\EventStoreClient\SubscriptionDropReason;
-use Prooph\EventStoreClient\Util\Uuid;
+use Prooph\EventStoreClient\Util\Guid;
 use Throwable;
 
 class update_existing_persistent_subscription_with_subscribers extends TestCase
@@ -48,7 +48,7 @@ class update_existing_persistent_subscription_with_subscribers extends TestCase
 
     protected function given(): Generator
     {
-        $this->stream = Uuid::generateAsHex();
+        $this->stream = Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()->build();

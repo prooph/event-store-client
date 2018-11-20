@@ -17,7 +17,7 @@ use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\UserCommandFailedException;
 use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
 use Prooph\EventStoreClient\UserManagement\UserDetails;
-use Prooph\EventStoreClient\Util\Uuid;
+use Prooph\EventStoreClient\Util\Guid;
 use ProophTest\EventStoreClient\DefaultData;
 
 class deleting_a_user extends TestWithNode
@@ -28,7 +28,7 @@ class deleting_a_user extends TestWithNode
         $this->expectException(UserCommandFailedException::class);
 
         try {
-            $this->manager->deleteUser(Uuid::generateString(), DefaultData::adminCredentials());
+            $this->manager->deleteUser(Guid::generateString(), DefaultData::adminCredentials());
         } catch (UserCommandFailedException $e) {
             $this->assertSame(HttpStatusCode::NOT_FOUND, $e->httpStatusCode());
 
@@ -42,7 +42,7 @@ class deleting_a_user extends TestWithNode
      */
     public function deleting_created_user_deletes_it(): void
     {
-        $user = Uuid::generateString();
+        $user = Guid::generateString();
 
         $this->manager->createUser($user, 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
         $this->manager->deleteUser($user, DefaultData::adminCredentials());
@@ -59,7 +59,7 @@ class deleting_a_user extends TestWithNode
     /** @test */
     public function can_delete_a_user(): void
     {
-        $name = Uuid::generateString();
+        $name = Guid::generateString();
 
         $this->manager->createUser(
             $name,

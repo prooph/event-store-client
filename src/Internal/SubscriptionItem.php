@@ -16,7 +16,7 @@ namespace Prooph\EventStoreClient\Internal;
 use DateTimeImmutable;
 use Prooph\EventStoreClient\ClientOperations\SubscriptionOperation;
 use Prooph\EventStoreClient\Util\DateTime;
-use Prooph\EventStoreClient\Util\Uuid;
+use Prooph\EventStoreClient\Util\Guid;
 
 /** @internal  */
 class SubscriptionItem
@@ -47,7 +47,7 @@ class SubscriptionItem
         $this->maxRetries = $maxRetries;
         $this->timeout = $timeout;
         $this->created = DateTime::utcNow();
-        $this->correlationId = Uuid::generateAsHex();
+        $this->correlationId = Guid::generateAsHex();
         $this->retryCount = 0;
         $this->lastUpdated = $this->created;
         $this->isSubscribed = false;

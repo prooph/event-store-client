@@ -15,7 +15,7 @@ namespace ProophTest\EventStoreClient\UserManagement;
 
 use Exception;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Util\Uuid;
+use Prooph\EventStoreClient\Util\Guid;
 use ProophTest\EventStoreClient\DefaultData;
 
 class creating_a_user extends TestWithNode
@@ -70,7 +70,7 @@ class creating_a_user extends TestWithNode
     /** @test */
     public function creating_a_user_with_parameters_can_be_read(): void
     {
-        $login = Uuid::generateString();
+        $login = Guid::generateString();
 
         $this->manager->createUser(
             $login,
