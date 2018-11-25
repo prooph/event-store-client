@@ -24,7 +24,7 @@ class EventStoreSyncConnectionFactory
 {
     public static function createFromConnectionString(
         string $connectionString,
-        ConnectionSettings $settings = null,
+        ?ConnectionSettings $settings = null,
         ?string $connectionName = null
     ): SyncConnection {
         $settings = ConnectionString::getConnectionSettings(
