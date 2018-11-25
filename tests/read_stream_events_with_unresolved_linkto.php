@@ -41,7 +41,7 @@ class read_stream_events_with_unresolved_linkto extends TestCase
         yield $this->conn->setStreamMetadataAsync(
             '$all',
             ExpectedVersion::ANY,
-            StreamMetadata::build()->setReadRoles(SystemRoles::ALL)->build(),
+            StreamMetadata::create()->setReadRoles(SystemRoles::ALL)->build(),
             DefaultData::adminCredentials()
         );
 

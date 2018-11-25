@@ -47,7 +47,7 @@ class when_having_max_count_set_for_stream extends TestCase
             yield $this->conn->setStreamMetadataAsync(
                 $this->stream,
                 ExpectedVersion::ANY,
-                StreamMetadata::build()->setMaxCount(3)->build(),
+                StreamMetadata::create()->setMaxCount(3)->build(),
                 DefaultData::adminCredentials()
             );
 
@@ -153,7 +153,7 @@ class when_having_max_count_set_for_stream extends TestCase
             yield $this->conn->setStreamMetadataAsync(
                 $this->stream,
                 ExpectedVersion::ANY,
-                StreamMetadata::build()->setMaxCount(4)->build(),
+                StreamMetadata::create()->setMaxCount(4)->build(),
                 DefaultData::adminCredentials()
             );
 
@@ -207,7 +207,7 @@ class when_having_max_count_set_for_stream extends TestCase
             yield $this->conn->setStreamMetadataAsync(
                 $this->stream,
                 ExpectedVersion::ANY,
-                StreamMetadata::build()->setMaxCount(2)->build(),
+                StreamMetadata::create()->setMaxCount(2)->build(),
                 DefaultData::adminCredentials()
             );
 
@@ -261,7 +261,7 @@ class when_having_max_count_set_for_stream extends TestCase
             yield $this->conn->setStreamMetadataAsync(
                 $this->stream,
                 ExpectedVersion::ANY,
-                StreamMetadata::build()->setMaxCount(4)->build(),
+                StreamMetadata::create()->setMaxCount(4)->build(),
                 DefaultData::adminCredentials()
             );
 
@@ -315,7 +315,7 @@ class when_having_max_count_set_for_stream extends TestCase
             yield $this->conn->setStreamMetadataAsync(
                 $this->stream,
                 ExpectedVersion::ANY,
-                StreamMetadata::build()->setMaxCount(2)->build(),
+                StreamMetadata::create()->setMaxCount(2)->build(),
                 DefaultData::adminCredentials()
             );
 

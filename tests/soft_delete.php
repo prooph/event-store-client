@@ -342,7 +342,7 @@ class soft_delete extends TestCase
             $result = yield $this->conn->setStreamMetadataAsync(
                 $stream,
                 ExpectedVersion::NO_STREAM,
-                StreamMetadata::build()
+                StreamMetadata::create()
                     ->setTruncateBefore(\PHP_INT_MAX)
                     ->setMaxCount(100)
                     ->setDeleteRoles('some-role')
@@ -599,7 +599,7 @@ class soft_delete extends TestCase
             $result = yield $this->conn->setStreamMetadataAsync(
                 $stream,
                 0,
-                StreamMetadata::build()
+                StreamMetadata::create()
                     ->setTruncateBefore(\PHP_INT_MAX)
                     ->setMaxCount(100)
                     ->setDeleteRoles('some-role')
@@ -662,7 +662,7 @@ class soft_delete extends TestCase
             $result = yield $this->conn->setStreamMetadataAsync(
                 $stream,
                 0,
-                StreamMetadata::build()
+                StreamMetadata::create()
                     ->setTruncateBefore(\PHP_INT_MAX)
                     ->setMaxCount(100)
                     ->setDeleteRoles('some-role')
