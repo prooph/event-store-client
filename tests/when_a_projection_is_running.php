@@ -47,7 +47,6 @@ class when_a_projection_is_running extends TestCase
             $this->projectionName,
             $this->query,
             false,
-            'JS',
             $this->credentials
         );
     }

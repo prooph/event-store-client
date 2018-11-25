@@ -42,7 +42,6 @@ class when_creating_one_time_projection extends TestCase
     {
         yield $this->projectionsManager->createOneTimeAsync(
             $this->query,
-            'JS',
             $this->credentials
         );
     }

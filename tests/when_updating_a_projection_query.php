@@ -44,7 +44,6 @@ class when_updating_a_projection_query extends TestCase
             $this->projectionName,
             $originalQuery,
             false,
-            'JS',
             $this->credentials
         );
     }
@@ -55,7 +54,6 @@ class when_updating_a_projection_query extends TestCase
             $this->projectionName,
             $this->newQuery,
             false,
-            'JS',
             $this->credentials
         );
     }

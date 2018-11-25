@@ -54,7 +54,6 @@ class when_creating_continuous_projection_with_track_emitted_streams extends Tes
             $this->projectionName,
             $this->query,
             true,
-            'JS',
             $this->credentials
         );
     }
