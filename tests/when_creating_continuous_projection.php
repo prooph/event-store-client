@@ -54,7 +54,6 @@ class when_creating_continuous_projection extends TestCase
             $this->projectionName,
             $this->query,
             false,
-            'JS',
             $this->credentials
         );
     }

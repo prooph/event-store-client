@@ -85,14 +85,14 @@ trait ProjectionSpecification
         );
     }
 
-    protected function createOneTimeProjection(string $type): Promise
+    protected function createOneTimeProjection(): Promise
     {
         $query = $this->createStandardQuery(Guid::generateAsHex());
 
-        return $this->projectionsManager->createOneTimeAsync($query, $type, $this->credentials);
+        return $this->projectionsManager->createOneTimeAsync($query, $this->credentials);
     }
 
-    protected function createContinuousProjection(string $projectionName, string $type): Promise
+    protected function createContinuousProjection(string $projectionName): Promise
     {
         $query = $this->createStandardQuery(Guid::generateAsHex());
 
@@ -100,7 +100,6 @@ trait ProjectionSpecification
             $projectionName,
             $query,
             false,
-            $type,
             $this->credentials
         );
     }

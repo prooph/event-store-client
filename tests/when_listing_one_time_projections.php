@@ -28,7 +28,7 @@ class when_listing_one_time_projections extends TestCase
 
     protected function given(): Generator
     {
-        yield $this->createOneTimeProjection('JS');
+        yield $this->createOneTimeProjection();
     }
 
     protected function when(): Generator
