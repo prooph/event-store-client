@@ -485,6 +485,25 @@ class ProjectionsClient
         );
     }
 
+    public function reset(
+        EndPoint $endPoint,
+        string $name,
+        ?UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+    ): Promise {
+        return $this->sendPost(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/projection/%s/command/reset',
+                $name
+            ),
+            '',
+            $userCredentials,
+            HttpStatusCode::OK
+        );
+    }
+
     public function delete(
         EndPoint $endPoint,
         string $name,

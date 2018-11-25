@@ -418,4 +418,21 @@ class ProjectionsManager
             $this->httpSchema
         );
     }
+
+    /**
+     * Asynchronously resets a projection
+     */
+    public function resetAsync(string $name, ?UserCredentials $userCredentials = null): Promise
+    {
+        if ('' === $name) {
+            throw new InvalidArgumentException('Name is required');
+        }
+
+        return $this->client->reset(
+            $this->httpEndPoint,
+            $name,
+            $userCredentials,
+            $this->httpSchema
+        );
+    }
 }
