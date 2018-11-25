@@ -49,7 +49,7 @@ class subscribe_to_all_should extends TestCase
             yield $connection->setStreamMetadataAsync(
                 '$all',
                 ExpectedVersion::ANY,
-                StreamMetadata::build()->setReadRoles(SystemRoles::ALL)->build(),
+                StreamMetadata::create()->setReadRoles(SystemRoles::ALL)->build(),
                 new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
             );
 

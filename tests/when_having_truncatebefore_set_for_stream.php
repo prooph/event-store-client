@@ -89,7 +89,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM,
-                StreamMetadata::build()->setTruncateBefore(2)
+                StreamMetadata::create()->setTruncateBefore(2)
             );
 
             $res = yield $this->readEvent($stream, 1);
@@ -116,7 +116,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM,
-                StreamMetadata::build()->setTruncateBefore(2)
+                StreamMetadata::create()->setTruncateBefore(2)
             );
 
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
@@ -141,7 +141,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM,
-                StreamMetadata::build()->setTruncateBefore(2)
+                StreamMetadata::create()->setTruncateBefore(2)
             );
 
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
@@ -166,7 +166,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM,
-                StreamMetadata::build()->setTruncateBefore(2)
+                StreamMetadata::create()->setTruncateBefore(2)
             );
 
             $res = yield $this->readEvent($stream, 1);
@@ -181,7 +181,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 0,
-                StreamMetadata::build()->setTruncateBefore(1)
+                StreamMetadata::create()->setTruncateBefore(1)
             );
 
             $res = yield $this->readEvent($stream, 0);
@@ -208,7 +208,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM,
-                StreamMetadata::build()->setTruncateBefore(2)
+                StreamMetadata::create()->setTruncateBefore(2)
             );
 
             $res = yield $this->readEvent($stream, 1);
@@ -223,7 +223,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 0,
-                StreamMetadata::build()->setTruncateBefore(3)
+                StreamMetadata::create()->setTruncateBefore(3)
             );
 
             $res = yield $this->readEvent($stream, 2);
@@ -250,7 +250,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM,
-                StreamMetadata::build()->setTruncateBefore(2)
+                StreamMetadata::create()->setTruncateBefore(2)
             );
 
             $res = yield $this->readEvent($stream, 1);
@@ -265,7 +265,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 0,
-                StreamMetadata::build()->setTruncateBefore(2)->setMaxCount(4)
+                StreamMetadata::create()->setTruncateBefore(2)->setMaxCount(4)
             );
 
             $res = yield $this->readEvent($stream, 1);
@@ -292,7 +292,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM,
-                StreamMetadata::build()->setTruncateBefore(2)
+                StreamMetadata::create()->setTruncateBefore(2)
             );
 
             $res = yield $this->readEvent($stream, 1);
@@ -307,7 +307,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 0,
-                StreamMetadata::build()->setTruncateBefore(2)->setMaxCount(2)
+                StreamMetadata::create()->setTruncateBefore(2)->setMaxCount(2)
             );
 
             $res = yield $this->readEvent($stream, 2);
@@ -334,7 +334,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM,
-                StreamMetadata::build()->setTruncateBefore(2)
+                StreamMetadata::create()->setTruncateBefore(2)
             );
 
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
@@ -347,7 +347,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 0,
-                StreamMetadata::build()->setTruncateBefore(1)
+                StreamMetadata::create()->setTruncateBefore(1)
             );
 
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
@@ -372,7 +372,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM,
-                StreamMetadata::build()->setTruncateBefore(2)
+                StreamMetadata::create()->setTruncateBefore(2)
             );
 
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
@@ -385,7 +385,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 0,
-                StreamMetadata::build()->setTruncateBefore(3)
+                StreamMetadata::create()->setTruncateBefore(3)
             );
 
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
@@ -410,7 +410,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM,
-                StreamMetadata::build()->setTruncateBefore(2)
+                StreamMetadata::create()->setTruncateBefore(2)
             );
 
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
@@ -423,7 +423,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 0,
-                StreamMetadata::build()->setTruncateBefore(2)->setMaxCount(4)
+                StreamMetadata::create()->setTruncateBefore(2)->setMaxCount(4)
             );
 
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
@@ -448,7 +448,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM,
-                StreamMetadata::build()->setTruncateBefore(2)
+                StreamMetadata::create()->setTruncateBefore(2)
             );
 
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
@@ -461,7 +461,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 0,
-                StreamMetadata::build()->setTruncateBefore(2)->setMaxCount(2)
+                StreamMetadata::create()->setTruncateBefore(2)->setMaxCount(2)
             );
 
             $res = yield $this->conn->readStreamEventsForwardAsync($stream, 0, 100, false, DefaultData::adminCredentials());
@@ -486,7 +486,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM,
-                StreamMetadata::build()->setTruncateBefore(2)
+                StreamMetadata::create()->setTruncateBefore(2)
             );
 
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
@@ -499,7 +499,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 0,
-                StreamMetadata::build()->setTruncateBefore(1)
+                StreamMetadata::create()->setTruncateBefore(1)
             );
 
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
@@ -524,7 +524,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM,
-                StreamMetadata::build()->setTruncateBefore(2)
+                StreamMetadata::create()->setTruncateBefore(2)
             );
 
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
@@ -537,7 +537,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 0,
-                StreamMetadata::build()->setTruncateBefore(3)
+                StreamMetadata::create()->setTruncateBefore(3)
             );
 
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
@@ -562,7 +562,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM,
-                StreamMetadata::build()->setTruncateBefore(2)
+                StreamMetadata::create()->setTruncateBefore(2)
             );
 
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
@@ -575,7 +575,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 0,
-                StreamMetadata::build()->setTruncateBefore(2)->setMaxCount(4)
+                StreamMetadata::create()->setTruncateBefore(2)->setMaxCount(4)
             );
 
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
@@ -600,7 +600,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 ExpectedVersion::EMPTY_STREAM,
-                StreamMetadata::build()->setTruncateBefore(2)
+                StreamMetadata::create()->setTruncateBefore(2)
             );
 
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());
@@ -613,7 +613,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
             yield $this->setStreamMetadata(
                 $stream,
                 0,
-                StreamMetadata::build()->setTruncateBefore(2)->setMaxCount(2)
+                StreamMetadata::create()->setTruncateBefore(2)->setMaxCount(2)
             );
 
             $res = yield $this->conn->readStreamEventsBackwardAsync($stream, -1, 100, false, DefaultData::adminCredentials());

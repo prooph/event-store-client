@@ -377,7 +377,7 @@ END;
     public function setting_structured_metadata_with_custom_properties_returns_them_untouched(): void
     {
         $this->execute(function () {
-            $metadata = StreamMetadata::build()
+            $metadata = StreamMetadata::create()
                 ->setMaxCount(17)
                 ->setMaxAge(123321)
                 ->setTruncateBefore(23)
@@ -439,7 +439,7 @@ END;
     public function setting_structured_metadata_with_multiple_roles_can_be_read_back(): void
     {
         $this->execute(function () {
-            $metadata = StreamMetadata::build()
+            $metadata = StreamMetadata::create()
                 ->setReadRoles('r1', 'r2', 'r3')
                 ->setWriteRoles('w1', 'w2')
                 ->setDeleteRoles('d1', 'd2', 'd3', 'd4')

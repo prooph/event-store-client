@@ -96,7 +96,7 @@ class StreamMetadata implements JsonSerializable
         $this->customMetadata = $customMetadata;
     }
 
-    public static function build(): StreamMetadataBuilder
+    public static function create(): StreamMetadataBuilder
     {
         return new StreamMetadataBuilder();
     }

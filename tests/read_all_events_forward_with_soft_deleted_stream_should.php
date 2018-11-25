@@ -40,7 +40,7 @@ class read_all_events_forward_with_soft_deleted_stream_should extends TestCase
         yield $this->conn->setStreamMetadataAsync(
             '$all',
             ExpectedVersion::ANY,
-            StreamMetadata::build()->build(),
+            StreamMetadata::create()->build(),
             DefaultData::adminCredentials()
         );
 
@@ -52,7 +52,7 @@ class read_all_events_forward_with_soft_deleted_stream_should extends TestCase
         yield $this->conn->setStreamMetadataAsync(
             '$all',
             ExpectedVersion::ANY,
-            StreamMetadata::build()->setReadRoles(SystemRoles::ALL)->build(),
+            StreamMetadata::create()->setReadRoles(SystemRoles::ALL)->build(),
             DefaultData::adminCredentials()
         );
 

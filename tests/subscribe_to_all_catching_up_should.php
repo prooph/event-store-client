@@ -63,7 +63,7 @@ class subscribe_to_all_catching_up_should extends TestCase
             yield $this->conn->setStreamMetadataAsync(
                 '$all',
                 ExpectedVersion::ANY,
-                StreamMetadata::build()->setReadRoles(SystemRoles::ALL)->build(),
+                StreamMetadata::create()->setReadRoles(SystemRoles::ALL)->build(),
                 new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
             );
 
@@ -72,7 +72,7 @@ class subscribe_to_all_catching_up_should extends TestCase
             yield $this->conn->setStreamMetadataAsync(
                 '$all',
                 ExpectedVersion::ANY,
-                StreamMetadata::build()->build(),
+                StreamMetadata::create()->build(),
                 new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
             );
 
