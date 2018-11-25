@@ -94,7 +94,6 @@ class ProjectionsManager
      */
     public function createOneTimeAsync(
         string $query,
-        string $type = 'JS',
         ?UserCredentials $userCredentials = null
     ): Promise {
         if ('' === $query) {
@@ -104,7 +103,6 @@ class ProjectionsManager
         return $this->client->createOneTime(
             $this->httpEndPoint,
             $query,
-            $type,
             $userCredentials,
             $this->httpSchema
         );
@@ -116,7 +114,6 @@ class ProjectionsManager
     public function createTransientAsync(
         string $name,
         string $query,
-        string $type = 'JS',
         ?UserCredentials $userCredentials = null
     ): Promise {
         if ('' === $name) {
@@ -131,7 +128,6 @@ class ProjectionsManager
             $this->httpEndPoint,
             $name,
             $query,
-            $type,
             $userCredentials,
             $this->httpSchema
         );
@@ -144,7 +140,6 @@ class ProjectionsManager
         string $name,
         string $query,
         bool $trackEmittedStreams = false,
-        string $type = 'JS',
         ?UserCredentials $userCredentials = null
     ): Promise {
         if ('' === $name) {
@@ -160,7 +155,6 @@ class ProjectionsManager
             $name,
             $query,
             $trackEmittedStreams,
-            $type,
             $userCredentials,
             $this->httpSchema
         );
@@ -376,7 +370,6 @@ class ProjectionsManager
         string $name,
         string $query,
         bool $emitEnabled = false,
-        string $type = 'JS',
         ?UserCredentials $userCredentials = null
     ): Promise {
         if ('' === $name) {
@@ -392,7 +385,6 @@ class ProjectionsManager
             $name,
             $query,
             $emitEnabled,
-            $type,
             $userCredentials,
             $this->httpSchema
         );

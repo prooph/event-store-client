@@ -101,7 +101,6 @@ class ProjectionsClient
     public function createOneTime(
         EndPoint $endPoint,
         string $query,
-        string $type = 'JS',
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
@@ -109,7 +108,7 @@ class ProjectionsClient
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
-                '/projections/onetime?type=%s',
+                '/projections/onetime?type=JS',
                 $type
             ),
             $query,
@@ -122,7 +121,6 @@ class ProjectionsClient
         EndPoint $endPoint,
         string $name,
         string $query,
-        string $type = 'JS',
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
@@ -130,7 +128,7 @@ class ProjectionsClient
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
-                '/projections/transient?name=%s&type=%s',
+                '/projections/transient?name=%s&type=JS',
                 $name,
                 $type
             ),
@@ -145,7 +143,6 @@ class ProjectionsClient
         string $name,
         string $query,
         bool $trackEmittedStreams = false,
-        string $type = 'JS',
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
@@ -153,7 +150,7 @@ class ProjectionsClient
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
-                '/projections/continuous?name=%s&type=%s&emit=1&trackemittedstreams=%d',
+                '/projections/continuous?name=%s&type=JS&emit=1&trackemittedstreams=%d',
                 $name,
                 $type,
                 (int) $trackEmittedStreams
@@ -467,7 +464,6 @@ class ProjectionsClient
         string $name,
         string $query,
         bool $emitEnabled = false,
-        string $type = 'JS',
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
@@ -475,7 +471,7 @@ class ProjectionsClient
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
-                '/projection/%s/query?emit=' . (int) $emitEnabled . '&type=%s',
+                '/projection/%s/query?emit=' . (int) $emitEnabled . '&type=JS',
                 $name,
                 $type
             ),
