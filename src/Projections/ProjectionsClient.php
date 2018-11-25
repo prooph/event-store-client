@@ -108,8 +108,7 @@ class ProjectionsClient
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
-                '/projections/onetime?type=JS',
-                $type
+                '/projections/onetime?type=JS'
             ),
             $query,
             $userCredentials,
@@ -129,8 +128,7 @@ class ProjectionsClient
                 $endPoint,
                 $httpSchema,
                 '/projections/transient?name=%s&type=JS',
-                $name,
-                $type
+                $name
             ),
             $query,
             $userCredentials,
@@ -152,7 +150,6 @@ class ProjectionsClient
                 $httpSchema,
                 '/projections/continuous?name=%s&type=JS&emit=1&trackemittedstreams=%d',
                 $name,
-                $type,
                 (int) $trackEmittedStreams
             ),
             $query,
@@ -472,8 +469,7 @@ class ProjectionsClient
                 $endPoint,
                 $httpSchema,
                 '/projection/%s/query?emit=' . (int) $emitEnabled . '&type=JS',
-                $name,
-                $type
+                $name
             ),
             $query,
             $userCredentials,
