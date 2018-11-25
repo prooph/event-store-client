@@ -26,7 +26,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 Loop::run(function () {
     $connection = EventStoreAsyncConnectionFactory::createFromEndPoint(
-        new EndPoint('eventstore', 1113)
+        new EndPoint('localhost', 1113)
     );
 
     $connection->onConnected(function (): void {
