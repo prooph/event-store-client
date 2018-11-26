@@ -1,0 +1,243 @@
+<?php
+
+/**
+ * This file is part of `prooph/event-store-client`.
+ * (c) 2018-2018 prooph software GmbH <contact@prooph.de>
+ * (c) 2018-2018 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace Prooph\EventStoreClient\PersistentSubscriptions;
+
+use Amp\Artax\Response;
+use Amp\Deferred;
+use Amp\Promise;
+use Prooph\EventStoreClient\EndPoint;
+use Prooph\EventStoreClient\Exception\JsonException;
+use Prooph\EventStoreClient\Exception\PersistentSubscriptionCommandFailedException;
+use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
+use Prooph\EventStoreClient\Transport\Http\HttpAsyncClient;
+use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
+use Prooph\EventStoreClient\UserCredentials;
+use Prooph\EventStoreClient\Util\Json;
+use Throwable;
+
+/** @internal */
+class PersistentSubscriptionsClient
+{
+    /** @var HttpAsyncClient */
+    private $client;
+    /** @var int */
+    private $operationTimeout;
+
+    public function __construct(int $operationTimeout)
+    {
+        $this->client = new HttpAsyncClient($operationTimeout);
+        $this->operationTimeout = $operationTimeout;
+    }
+
+    /**
+     * @param EndPoint $endPoint
+     * @param string $stream
+     * @param string $subscriptionName
+     * @param null|UserCredentials $userCredentials
+     * @param string $httpSchema
+     * @return Promise<PersistentSubscriptionDetails>
+     */
+    public function describe(
+        EndPoint $endPoint,
+        string $stream,
+        string $subscriptionName,
+        ?UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+    ): Promise {
+        $deferred = new Deferred();
+
+        $promise = $this->sendGet(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/subscriptions/%s/%s/info',
+                $stream,
+                $subscriptionName
+            ),
+            $userCredentials,
+            HttpStatusCode::OK
+        );
+
+        $promise->onResolve(function (?Throwable $e, ?string $body) use ($deferred): void {
+            if ($e) {
+                $deferred->fail($e);
+
+                return;
+            }
+
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
+
+                return;
+            }
+
+            $deferred->resolve(PersistentSubscriptionDetails::fromArray($data));
+        });
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @param EndPoint $endPoint
+     * @param null|string $stream
+     * @param null|UserCredentials $userCredentials
+     * @param string $httpSchema
+     * @return Promise<PersistentSubscriptionDetails[]>
+     */
+    public function list(
+        EndPoint $endPoint,
+        ?string $stream = null,
+        ?UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+    ): Promise {
+        $deferred = new Deferred();
+
+        $formatString = '/subscriptions';
+
+        if (null !== $stream) {
+            $formatString .= "/$stream";
+        }
+
+        $promise = $this->sendGet(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                $formatString
+            ),
+            $userCredentials,
+            HttpStatusCode::OK
+        );
+
+        $promise->onResolve(function (?Throwable $e, ?string $body) use ($deferred): void {
+            if ($e) {
+                $deferred->fail($e);
+
+                return;
+            }
+
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
+
+                return;
+            }
+
+            $details = [];
+
+            foreach ($data as $entry) {
+                $details[] = PersistentSubscriptionDetails::fromArray($entry);
+            }
+
+            $deferred->resolve($details);
+        });
+
+        return $deferred->promise();
+    }
+
+    public function replayParkedMessages(
+        EndPoint $endPoint,
+        string $stream,
+        string $subscriptionName,
+        ?UserCredentials $userCredentials = null,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+    ): Promise {
+        return $this->sendPost(
+            EndpointExtensions::formatStringToHttpUrl(
+                $endPoint,
+                $httpSchema,
+                '/subscriptions/%s/%s/replayParked',
+                $stream,
+                $subscriptionName
+            ),
+            '',
+            $userCredentials,
+            HttpStatusCode::OK
+        );
+    }
+
+    /**
+     * @param string $
+     * @param UserCredentials $
+     * @param int $
+     * @return Promise<string>
+     */
+    private function sendGet(string $url, ?UserCredentials $userCredentials, int $expectedCode): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->client->get(
+            $url,
+            $userCredentials,
+            function (Response $response) use ($deferred, $expectedCode, $url): void {
+                if ($response->getStatus() === $expectedCode) {
+                    $deferred->resolve($response->getBody());
+                } else {
+                    $deferred->fail(new PersistentSubscriptionCommandFailedException(
+                        $response->getStatus(),
+                        \sprintf(
+                            'Server returned %d (%s) for GET on %s',
+                            $response->getStatus(),
+                            $response->getReason(),
+                            $url
+                        )
+                    ));
+                }
+            },
+            function (Throwable $exception) use ($deferred): void {
+                $deferred->fail($exception);
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    private function sendPost(
+        string $url,
+        string $content,
+        ?UserCredentials $userCredentials,
+        int $expectedCode
+    ): Promise {
+        $deferred = new Deferred();
+
+        $this->client->post(
+            $url,
+            $content,
+            'application/json',
+            $userCredentials,
+            function (Response $response) use ($deferred, $expectedCode, $url): void {
+                if ($response->getStatus() === $expectedCode) {
+                    $deferred->resolve(null);
+                } else {
+                    $deferred->fail(new PersistentSubscriptionCommandFailedException(
+                        $response->getStatus(),
+                        \sprintf(
+                            'Server returned %d (%s) for POST on %s',
+                            $response->getStatus(),
+                            $response->getReason(),
+                            $url
+                        )
+                    ));
+                }
+            },
+            function (Throwable $exception) use ($deferred): void {
+                $deferred->fail($exception);
+            }
+        );
+
+        return $deferred->promise();
+    }
+}

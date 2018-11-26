@@ -15,7 +15,6 @@ namespace Prooph\EventStoreClient\UserManagement;
 
 use DateTimeImmutable;
 use Exception;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Util\DateTime;
 
 /** @internal */

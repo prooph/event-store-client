@@ -1,6 +1,7 @@
 <?php
+
 /**
- * This file is part of the prooph/event-store-client.
+ * This file is part of `prooph/event-store-client`.
  * (c) 2018-2018 prooph software GmbH <contact@prooph.de>
  * (c) 2018-2018 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
@@ -47,7 +48,7 @@ final class PersistentSubscriptionConfigDetails
     private function __construct()
     {
     }
-    
+
     public static function fromArray(array $data): self
     {
         $details = new self();
@@ -66,7 +67,7 @@ final class PersistentSubscriptionConfigDetails
         $details->maxSubscriberCount = $data['maxSubscriberCount'];
         $details->namedConsumerStrategy = $data['namedConsumerStrategy'];
         $details->preferRoundRobin = $data['preferRoundRobin'];
-        
+
         return $details;
     }
 

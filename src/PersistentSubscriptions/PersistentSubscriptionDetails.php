@@ -1,6 +1,7 @@
 <?php
+
 /**
- * This file is part of the prooph/event-store-client.
+ * This file is part of `prooph/event-store-client`.
  * (c) 2018-2018 prooph software GmbH <contact@prooph.de>
  * (c) 2018-2018 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
@@ -17,7 +18,7 @@ final class PersistentSubscriptionDetails
 {
     /**
      * @var PersistentSubscriptionConfigDetails
-     * 
+     *
      * Only populated when retrieved via PersistentSubscriptionsManager::describe() method.
      */
     private $config;
@@ -25,10 +26,10 @@ final class PersistentSubscriptionDetails
     /**
      * @var PersistentSubscriptionConfigDetails[]
      *
-     * Only populated when retrieved via PersistentSubscriptionsManager::describe() method. 
+     * Only populated when retrieved via PersistentSubscriptionsManager::describe() method.
      */
     private $connections = [];
-    
+
     /** @var string */
     private $eventStreamId;
     /** @var string */
@@ -70,9 +71,9 @@ final class PersistentSubscriptionDetails
             $details->config = PersistentSubscriptionConfigDetails::fromArray($data['config']);
         }
 
-        if (isset($details['connections'])) {
-            foreach ($details['connections'] as $connection) {
-                $details->connections[] = PersistentSubscriptionConfigDetails::fromArray($connection);
+        if (isset($data['connections'])) {
+            foreach ($data['connections'] as $connection) {
+                $details->connections[] = PersistentSubscriptionConnectionDetails::fromArray($connection);
             }
         }
 
@@ -81,12 +82,12 @@ final class PersistentSubscriptionDetails
         $details->status = $data['status'];
         $details->averageItemsPerSecond = $data['averageItemsPerSecond'];
         $details->totalItemsProcessed = $data['totalItemsProcessed'];
-        $details->countSinceLastMeasurement = $data['countSinceLastMeasurement'];
+        $details->countSinceLastMeasurement = $data['countSinceLastMeasurement'] ?? 0;
         $details->lastProcessedEventNumber = $data['lastProcessedEventNumber'];
         $details->lastKnownEventNumber = $data['lastKnownEventNumber'];
-        $details->readBufferCount = $data['readBufferCount'];
-        $details->liveBufferCount = $data['liveBufferCount'];
-        $details->retryBufferCount = $data['retryBufferCount'];
+        $details->readBufferCount = $data['readBufferCount'] ?? 0;
+        $details->liveBufferCount = $data['liveBufferCount'] ?? 0;
+        $details->retryBufferCount = $data['retryBufferCount'] ?? 0;
         $details->totalInFlightMessages = $data['totalInFlightMessages'];
         $details->parkedMessageUri = $data['parkedMessageUri'];
         $details->getMessagesUri = $data['getMessagesUri'];

@@ -24,7 +24,6 @@ use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\Transport\Http\HttpAsyncClient;
 use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
 use Prooph\EventStoreClient\UserCredentials;
-use Prooph\EventStoreClient\Util\DateTime;
 use Prooph\EventStoreClient\Util\Json;
 use Throwable;
 

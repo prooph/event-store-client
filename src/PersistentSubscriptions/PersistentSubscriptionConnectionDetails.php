@@ -1,6 +1,7 @@
 <?php
+
 /**
- * This file is part of the prooph/event-store-client.
+ * This file is part of `prooph/event-store-client`.
  * (c) 2018-2018 prooph software GmbH <contact@prooph.de>
  * (c) 2018-2018 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
@@ -19,21 +20,21 @@ final class PersistentSubscriptionConnectionDetails
     private $from;
     /** @var string */
     private $username;
-    /** @var float */    
+    /** @var float */
     private $averageItemsPerSecond;
     /** @var int */
-    private $totalItems;
+    private $totalItemsProcessed;
     /** @var int */
     private $countSinceLastMeasurement;
     /** @var int */
     private $availableSlots;
     /** @var int */
     private $inFlightMessages;
-    
+
     private function __construct()
     {
     }
-    
+
     public static function fromArray(array $data): self
     {
         $details = new self();
@@ -41,7 +42,7 @@ final class PersistentSubscriptionConnectionDetails
         $details->from = $data['from'];
         $details->username = $data['username'];
         $details->averageItemsPerSecond = $data['averageItemsPerSecond'];
-        $details->totalItems = $data['totalItems'];
+        $details->totalItemsProcessed = $data['totalItemsProcessed'];
         $details->countSinceLastMeasurement = $data['countSinceLastMeasurement'];
         $details->availableSlots = $data['availableSlots'];
         $details->inFlightMessages = $data['inFlightMessages'];
@@ -64,9 +65,9 @@ final class PersistentSubscriptionConnectionDetails
         return $this->averageItemsPerSecond;
     }
 
-    public function totalItems(): int
+    public function totalItemsProcessed(): int
     {
-        return $this->totalItems;
+        return $this->totalItemsProcessed;
     }
 
     public function countSinceLastMeasurement(): int
