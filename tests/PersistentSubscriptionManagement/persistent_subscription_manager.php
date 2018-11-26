@@ -33,6 +33,7 @@ use Prooph\EventStoreClient\Util\Guid;
 use ProophTest\EventStoreClient\CountdownEvent;
 use ProophTest\EventStoreClient\DefaultData;
 use ProophTest\EventStoreClient\SpecificationWithConnection;
+use Throwable;
 
 class persistent_subscription_manager extends TestCase
 {
@@ -100,7 +101,10 @@ class persistent_subscription_manager extends TestCase
         );
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function can_describe_persistent_subscription(): void
     {
         $this->execute(function () {
@@ -115,7 +119,10 @@ class persistent_subscription_manager extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function cannot_describe_persistent_subscription_with_empty_stream_name(): void
     {
         $this->execute(function () {
@@ -124,7 +131,10 @@ class persistent_subscription_manager extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function cannot_describe_persistent_subscription_with_empty_group_name(): void
     {
         $this->execute(function () {
@@ -133,7 +143,10 @@ class persistent_subscription_manager extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function can_list_all_persistent_subscriptions(): void
     {
         $this->execute(function () {
@@ -154,7 +167,34 @@ class persistent_subscription_manager extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function can_list_all_persistent_subscriptions_using_empty_string(): void
+    {
+        $this->execute(function () {
+            $list = yield $this->manager->list('');
+
+            $found = false;
+            foreach ($list as $details) {
+                \assert($details instanceof PersistentSubscriptionDetails);
+                if ($details->eventStreamId() === $this->stream
+                    && $details->groupName() === 'existing'
+                ) {
+                    $found = true;
+                    break;
+                }
+            }
+
+            $this->assertTrue($found);
+        });
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function can_list_persistent_subscriptions_for_stream(): void
     {
         $this->execute(function () {
@@ -176,7 +216,10 @@ class persistent_subscription_manager extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function can_replay_parked_messages(): void
     {
         $this->execute(function () {
@@ -256,6 +299,30 @@ class persistent_subscription_manager extends TestCase
             );
 
             $this->assertTrue(yield $event->wait(5000));
+        });
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function cannot_replay_parked_with_empty_stream_name(): void
+    {
+        $this->execute(function () {
+            $this->expectException(InvalidArgumentException::class);
+            yield $this->manager->replayParkedMessages('', 'existing');
+        });
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function cannot_replay_parked_with_empty_group_name(): void
+    {
+        $this->execute(function () {
+            $this->expectException(InvalidArgumentException::class);
+            yield $this->manager->replayParkedMessages($this->stream, '');
         });
     }
 }
