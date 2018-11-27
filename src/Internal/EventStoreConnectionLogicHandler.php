@@ -338,7 +338,7 @@ class EventStoreConnectionLogicHandler
 
             yield $this->connection->connectAsync();
 
-            if (! $this->connection->isClosed()) {
+            if (null !== $this->connection && ! $this->connection->isClosed()) {
                 $this->connection->startReceiving();
             }
         });
