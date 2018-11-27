@@ -15,8 +15,9 @@ namespace Prooph\EventStoreClient\UserManagement;
 
 use DateTimeImmutable;
 use Exception;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStoreClient\Util\DateTime;
 
+/** @internal */
 final class UserDetails
 {
     /** @var string */
@@ -32,32 +33,32 @@ final class UserDetails
     /** @var RelLink[] */
     private $links = [];
 
-    public function __construct(
-        string $loginName,
-        string $fullName,
-        array $groups,
-        ?DateTimeImmutable $dateLastUpdated,
-        bool $disabled,
-        array $links
-    ) {
-        foreach ($groups as $group) {
-            if (! \is_string($group)) {
-                throw new InvalidArgumentException('Expected an array of strings for group');
+    private function __construct()
+    {
+    }
+
+    public static function fromArray(array $data): self
+    {
+        $details = new self();
+
+        $details->loginName = $data['loginName'];
+        $details->fullName = $data['fullName'];
+        $details->groups = $data['groups'];
+        $details->disabled = $data['disabled'];
+
+        $details->dateLastUpdated = isset($data['dateLastUpdated'])
+            ? DateTime::create($data['dateLastUpdated'])
+            : null;
+
+        $links = [];
+        if (isset($data['links'])) {
+            foreach ($data['links'] as $link) {
+                $links[] = new RelLink($link['href'], $link['rel']);
             }
         }
+        $details->links = $links;
 
-        foreach ($links as $link) {
-            if (! $link instanceof RelLink) {
-                throw new InvalidArgumentException('Expected an array of RelLink for links');
-            }
-        }
-
-        $this->loginName = $loginName;
-        $this->fullName = $fullName;
-        $this->groups = $groups;
-        $this->dateLastUpdated = $dateLastUpdated;
-        $this->disabled = $disabled;
-        $this->links = $links;
+        return $details;
     }
 
     public function loginName(): string
@@ -104,15 +105,5 @@ final class UserDetails
         }
 
         throw new Exception('rel not found');
-    }
-
-    private function addGroup(string $group): void
-    {
-        $this->groups[] = $group;
-    }
-
-    private function addLink(RelLink $link): void
-    {
-        $this->links[] = $link;
     }
 }

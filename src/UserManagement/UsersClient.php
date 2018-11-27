@@ -24,7 +24,6 @@ use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\Transport\Http\HttpAsyncClient;
 use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
 use Prooph\EventStoreClient\UserCredentials;
-use Prooph\EventStoreClient\Util\DateTime;
 use Prooph\EventStoreClient\Util\Json;
 use Throwable;
 
@@ -130,20 +129,7 @@ class UsersClient
             $userDetails = [];
 
             foreach ($data['data'] as $entry) {
-                $links = [];
-
-                foreach ($entry['links'] as $link) {
-                    $links[] = new RelLink($link['href'], $link['rel']);
-                }
-
-                $userDetails[] = new UserDetails(
-                    $entry['loginName'],
-                    $entry['fullName'],
-                    $entry['groups'],
-                    null,
-                    $entry['disabled'],
-                    $links
-                );
+                $userDetails[] = UserDetails::fromArray($entry);
             }
 
             $deferred->resolve($userDetails);
@@ -185,14 +171,7 @@ class UsersClient
                 return;
             }
 
-            $deferred->resolve(new UserDetails(
-                $data['data']['loginName'],
-                $data['data']['fullName'],
-                $data['data']['groups'],
-                DateTime::create($data['data']['dateLastUpdated']),
-                $data['data']['disabled'],
-                []
-            ));
+            $deferred->resolve(UserDetails::fromArray($data['data']));
         });
 
         return $deferred->promise();
@@ -239,16 +218,7 @@ class UsersClient
                 $links[] = new RelLink($link['href'], $link['rel']);
             }
 
-            $deferred->resolve(new UserDetails(
-                $data['data']['loginName'],
-                $data['data']['fullName'],
-                $data['data']['groups'],
-                isset($data['data']['dateLastUpdated'])
-                    ? DateTime::create($data['data']['dateLastUpdated'])
-                    : null,
-                $data['data']['disabled'],
-                $links
-            ));
+            $deferred->resolve(UserDetails::fromArray($data['data']));
         });
 
         return $deferred->promise();

@@ -16,7 +16,6 @@ namespace Prooph\EventStoreClient\UserManagement;
 use JsonSerializable;
 use stdClass;
 
-/** @internal */
 final class UserCreationInformation implements JsonSerializable
 {
     /** @var string */
