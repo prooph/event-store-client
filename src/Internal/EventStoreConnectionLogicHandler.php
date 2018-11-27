@@ -313,32 +313,32 @@ class EventStoreConnectionLogicHandler
 
         $this->connectingPhase = ConnectingPhase::connectionEstablishing();
 
-        $this->connection = new TcpPackageConnection(
-            $this->settings->log(),
-            $endPoint,
-            Guid::generateAsHex(),
-            $this->settings->useSslConnection(),
-            $this->settings->targetHost(),
-            $this->settings->validateServer(),
-            $this->settings->clientConnectionTimeout(),
-            function (TcpPackageConnection $connection, TcpPackage $package): void {
-                $this->enqueueMessage(new HandleTcpPackageMessage($connection, $package));
-            },
-            function (TcpPackageConnection $connection, Throwable $exception): void {
-                $this->enqueueMessage(new TcpConnectionErrorMessage($connection, $exception));
-            },
-            function (TcpPackageConnection $connection): void {
-                $this->enqueueMessage(new TcpConnectionEstablishedMessage($connection));
-            },
-            function (TcpPackageConnection $connection, Throwable $exception): void {
-                $this->enqueueMessage(new TcpConnectionClosedMessage($connection, $exception));
-            }
-        );
+        Loop::defer(function () use ($endPoint): Generator {
+            $this->connection = new TcpPackageConnection(
+                $this->settings->log(),
+                $endPoint,
+                Guid::generateAsHex(),
+                $this->settings->useSslConnection(),
+                $this->settings->targetHost(),
+                $this->settings->validateServer(),
+                $this->settings->clientConnectionTimeout(),
+                function (TcpPackageConnection $connection, TcpPackage $package): void {
+                    $this->enqueueMessage(new HandleTcpPackageMessage($connection, $package));
+                },
+                function (TcpPackageConnection $connection, Throwable $exception): void {
+                    $this->enqueueMessage(new TcpConnectionErrorMessage($connection, $exception));
+                },
+                function (TcpPackageConnection $connection): void {
+                    $this->enqueueMessage(new TcpConnectionEstablishedMessage($connection));
+                },
+                function (TcpPackageConnection $connection, Throwable $exception): void {
+                    $this->enqueueMessage(new TcpConnectionClosedMessage($connection, $exception));
+                }
+            );
 
-        Loop::defer(function (): Generator {
             yield $this->connection->connectAsync();
 
-            if (null !== $this->connection && ! $this->connection->isClosed()) {
+            if (! $this->connection->isClosed()) {
                 $this->connection->startReceiving();
             }
         });
