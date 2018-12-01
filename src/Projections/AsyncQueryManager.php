@@ -24,11 +24,11 @@ use function Amp\call;
  * API for executing queries in the Event Store through PHP code.
  * Communicates with the Event Store over the RESTful API.
  */
-class QueryManager
+class AsyncQueryManager
 {
     /** @var int */
     private $queryTimeout;
-    /** @var ProjectionsManager */
+    /** @var AsyncProjectionsManager */
     private $projectionsManager;
 
     public function __construct(
@@ -37,7 +37,7 @@ class QueryManager
         int $queryTimeout
     ) {
         $this->queryTimeout = $queryTimeout;
-        $this->projectionsManager = new ProjectionsManager(
+        $this->projectionsManager = new AsyncProjectionsManager(
             $httpEndPoint,
             $projectionOperationTimeout
         );
@@ -52,7 +52,6 @@ class QueryManager
      *
      * @param string $name A name for the query
      * @param string $query The source code for the query
-     * @param string $type The language of the source code
      * @param int $initialPollingDelay Initial time to wait between polling for projection status
      * @param int $maximumPollingDelay Maximum time to wait between polling for projection status
      * @param UserCredentials|null $userCredentials Credentials for a user with permission to create a query
@@ -62,18 +61,16 @@ class QueryManager
     public function executeAsync(
         string $name,
         string $query,
-        string $type,
         int $initialPollingDelay,
         int $maximumPollingDelay,
         ?UserCredentials $userCredentials = null
     ): Promise {
         $promise = call(function () use (
-                $name, $query, $type, $initialPollingDelay, $maximumPollingDelay, $userCredentials
+                $name, $query, $initialPollingDelay, $maximumPollingDelay, $userCredentials
             ): Generator {
             yield $this->projectionsManager->createTransientAsync(
                     $name,
                     $query,
-                    $type,
                     $userCredentials
                 );
 

@@ -19,7 +19,7 @@ use Generator;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventStoreAsyncConnection;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Projections\ProjectionsManager;
+use Prooph\EventStoreClient\Projections\AsyncProjectionsManager;
 use Prooph\EventStoreClient\UserCredentials;
 use Prooph\EventStoreClient\Util\Guid;
 use ProophTest\EventStoreClient\Helper\TestConnection;
@@ -29,7 +29,7 @@ use function Amp\Promise\wait;
 
 trait ProjectionSpecification
 {
-    /** @var ProjectionsManager */
+    /** @var AsyncProjectionsManager */
     protected $projectionsManager;
     /** @var EventStoreAsyncConnection */
     protected $connection;
@@ -52,7 +52,7 @@ trait ProjectionSpecification
 
             yield $this->connection->connectAsync();
 
-            $this->projectionsManager = new ProjectionsManager(
+            $this->projectionsManager = new AsyncProjectionsManager(
                 TestConnection::httpEndPoint(),
                 5000
             );
