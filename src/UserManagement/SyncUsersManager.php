@@ -18,6 +18,7 @@ use Prooph\EventStoreClient\EndPoint;
 use Prooph\EventStoreClient\Exception\UserCommandFailedException;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\UserCredentials;
+use Throwable;
 
 class SyncUsersManager
 {
@@ -38,33 +39,52 @@ class SyncUsersManager
         );
     }
 
+    /**
+     * @throws Throwable
+     */
     public function enable(string $login, ?UserCredentials $userCredentials = null): void
     {
         Promise\wait($this->manager->enableAsync($login, $userCredentials));
     }
 
+    /**
+     * @throws Throwable
+     */
     public function disable(string $login, ?UserCredentials $userCredentials = null): void
     {
         Promise\wait($this->manager->disableAsync($login, $userCredentials));
     }
 
-    /** @throws UserCommandFailedException */
+    /**
+     * @throws UserCommandFailedException
+     * @throws Throwable
+     */
     public function deleteUser(string $login, ?UserCredentials $userCredentials = null): void
     {
         Promise\wait($this->manager->deleteUserAsync($login, $userCredentials));
     }
 
-    /** @return UserDetails[] */
-    public function listAll(UserCredentials $userCredentials = null): array
+    /**
+     * @return UserDetails[]
+     *
+     * @throws Throwable
+     */
+    public function listAll(?UserCredentials $userCredentials = null): array
     {
         return Promise\wait($this->manager->listAllAsync($userCredentials));
     }
 
-    public function getCurrentUser(UserCredentials $userCredentials): UserDetails
+    /**
+     * @throws Throwable
+     */
+    public function getCurrentUser(?UserCredentials $userCredentials): UserDetails
     {
         return Promise\wait($this->manager->getCurrentUserAsync($userCredentials));
     }
 
+    /**
+     * @throws Throwable
+     */
     public function getUser(string $login, ?UserCredentials $userCredentials = null): UserDetails
     {
         return Promise\wait($this->manager->getUserAsync($login, $userCredentials));
@@ -76,7 +96,10 @@ class SyncUsersManager
      * @param string[] $groups
      * @param string $password
      * @param UserCredentials|null $userCredentials
+     *
      * @return void
+     *
+     * @throws Throwable
      */
     public function createUser(
         string $login,
@@ -99,7 +122,10 @@ class SyncUsersManager
      * @param string $fullName
      * @param string[] $groups
      * @param UserCredentials|null $userCredentials
+     *
      * @return void
+     *
+     * @throws Throwable
      */
     public function updateUser(
         string $login,
@@ -115,6 +141,9 @@ class SyncUsersManager
         ));
     }
 
+    /**
+     * @throws Throwable
+     */
     public function changePassword(
         string $login,
         string $oldPassword,
@@ -129,6 +158,9 @@ class SyncUsersManager
         ));
     }
 
+    /**
+     * @throws Throwable
+     */
     public function resetPassword(
         string $login,
         string $newPassword,

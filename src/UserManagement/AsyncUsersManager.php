@@ -86,7 +86,7 @@ class AsyncUsersManager
     }
 
     /** @return Promise<UserDetails> */
-    public function getCurrentUserAsync(?UserCredentials $userCredentials): Promise
+    public function getCurrentUserAsync(?UserCredentials $userCredentials = null): Promise
     {
         $userCredentials = $userCredentials ?? $this->defaultCredentials;
 
