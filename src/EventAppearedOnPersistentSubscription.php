@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient;
 
 use Amp\Promise;
-use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
+use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 
 interface EventAppearedOnPersistentSubscription
 {
     public function __invoke(
-        AbstractEventStorePersistentSubscription $subscription,
+        EventStorePersistentSubscription $subscription,
         ResolvedEvent $resolvedEvent,
         ?int $retryCount = null
     ): Promise;

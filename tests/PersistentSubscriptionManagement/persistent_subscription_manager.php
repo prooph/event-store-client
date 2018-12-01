@@ -22,7 +22,6 @@ use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
@@ -78,7 +77,7 @@ class persistent_subscription_manager extends TestCase
             'existing',
             new class() implements EventAppearedOnPersistentSubscription {
                 public function __invoke(
-                    AbstractEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {
@@ -230,7 +229,7 @@ class persistent_subscription_manager extends TestCase
                 'existing',
                 new class() implements EventAppearedOnPersistentSubscription {
                     public function __invoke(
-                        AbstractEventStorePersistentSubscription $subscription,
+                        EventStorePersistentSubscription $subscription,
                         ResolvedEvent $resolvedEvent,
                         ?int $retryCount = null
                     ): Promise {
@@ -277,7 +276,7 @@ class persistent_subscription_manager extends TestCase
                     }
 
                     public function __invoke(
-                        AbstractEventStorePersistentSubscription $subscription,
+                        EventStorePersistentSubscription $subscription,
                         ResolvedEvent $resolvedEvent,
                         ?int $retryCount = null
                     ): Promise {

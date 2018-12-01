@@ -22,7 +22,7 @@ use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
+use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
@@ -79,7 +79,7 @@ class connect_to_persistent_subscription_with_retries extends TestCase
                 }
 
                 public function __invoke(
-                    AbstractEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {

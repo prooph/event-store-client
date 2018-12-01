@@ -19,7 +19,6 @@ use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\Exception\MaximumSubscribersReachedException;
-use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
@@ -65,7 +64,7 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends Te
             $this->group,
             new class() implements EventAppearedOnPersistentSubscription {
                 public function __invoke(
-                    AbstractEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {
@@ -89,7 +88,7 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends Te
                 $this->group,
                 new class() implements EventAppearedOnPersistentSubscription {
                     public function __invoke(
-                        AbstractEventStorePersistentSubscription $subscription,
+                        EventStorePersistentSubscription $subscription,
                         ResolvedEvent $resolvedEvent,
                         ?int $retryCount = null
                     ): Promise {

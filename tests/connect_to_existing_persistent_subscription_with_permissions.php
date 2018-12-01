@@ -18,7 +18,7 @@ use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
-use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
+use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Prooph\EventStoreClient\Util\Guid;
@@ -58,7 +58,7 @@ class connect_to_existing_persistent_subscription_with_permissions extends TestC
             'agroupname17',
             new class() implements EventAppearedOnPersistentSubscription {
                 public function __invoke(
-                    AbstractEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {

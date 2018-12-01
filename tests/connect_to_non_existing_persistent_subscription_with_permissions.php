@@ -19,7 +19,7 @@ use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
+use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Throwable;
 
@@ -38,7 +38,7 @@ class connect_to_non_existing_persistent_subscription_with_permissions extends T
                 'foo',
                 new class() implements EventAppearedOnPersistentSubscription {
                     public function __invoke(
-                        AbstractEventStorePersistentSubscription $subscription,
+                        EventStorePersistentSubscription $subscription,
                         ResolvedEvent $resolvedEvent,
                         ?int $retryCount = null
                     ): Promise {

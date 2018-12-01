@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
+use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionDropped;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
@@ -72,7 +72,7 @@ class update_existing_persistent_subscription_with_subscribers extends TestCase
             'existing',
             new class() implements EventAppearedOnPersistentSubscription {
                 public function __invoke(
-                    AbstractEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {
@@ -95,7 +95,7 @@ class update_existing_persistent_subscription_with_subscribers extends TestCase
                 }
 
                 public function __invoke(
-                    AbstractEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     SubscriptionDropReason $reason,
                     ?Throwable $exception = null
                 ): void {

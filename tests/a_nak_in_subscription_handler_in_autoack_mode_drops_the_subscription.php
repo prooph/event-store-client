@@ -24,7 +24,7 @@ use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
+use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionDropped;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
@@ -83,7 +83,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
             $this->group,
             new class() implements EventAppearedOnPersistentSubscription {
                 public function __invoke(
-                    AbstractEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {
@@ -99,7 +99,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
                 }
 
                 public function __invoke(
-                    AbstractEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     SubscriptionDropReason $reason,
                     ?Throwable $exception = null
                 ): void {

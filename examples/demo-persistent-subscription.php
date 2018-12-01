@@ -17,7 +17,7 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
-use Prooph\EventStoreClient\Internal\AbstractEventStorePersistentSubscription;
+use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\PersistentSubscriptionCreateResult;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Throwable;
@@ -65,7 +65,7 @@ Loop::run(function () {
         'test-persistent-subscription',
         new class() implements EventAppearedOnPersistentSubscription {
             public function __invoke(
-                AbstractEventStorePersistentSubscription $subscription,
+                EventStorePersistentSubscription $subscription,
                 ResolvedEvent $resolvedEvent,
                 ?int $retryCount = null
             ): Promise {
@@ -77,7 +77,7 @@ Loop::run(function () {
         },
         new class() implements PersistentSubscriptionDropped {
             public function __invoke(
-                AbstractEventStorePersistentSubscription $subscription,
+                EventStorePersistentSubscription $subscription,
                 SubscriptionDropReason $reason,
                 ?Throwable $exception = null
             ): void {
