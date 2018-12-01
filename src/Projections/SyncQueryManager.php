@@ -59,7 +59,7 @@ class SyncQueryManager
      *
      * @throws Throwable
      */
-    public function executeAsync(
+    public function execute(
         string $name,
         string $query,
         int $initialPollingDelay,
