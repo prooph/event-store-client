@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the prooph/event-store-client.
+ * This file is part of `prooph/event-store-client`.
  * (c) 2018-2018 prooph software GmbH <contact@prooph.de>
  * (c) 2018-2018 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
@@ -15,7 +15,6 @@ namespace Prooph\EventStoreClient\Projections;
 
 use Amp\Promise;
 use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\PersistentSubscriptions\AsyncPersistentSubscriptionsManager;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\UserCredentials;
