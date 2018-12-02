@@ -215,7 +215,7 @@ interface EventStoreAsyncConnection
     ): Promise;
 
     /**
-     * @return Promise<AbstractEventStorePersistentSubscription>
+     * @return Promise<EventStorePersistentSubscription>
      */
     public function connectToPersistentSubscriptionAsync(
         string $stream,
