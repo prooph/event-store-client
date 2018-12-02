@@ -1,7 +1,33 @@
 # Change Log
 
-## [v1.0.0-beta-6](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-6)
+## [v1.0.0-beta-7](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-7)
 
+[Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-6...v1.0.0-beta-7)
+
+**Implemented enhancements:**
+
+- Rename Method StreamMetadata::build =\> StreamMetadata::create [\#47](https://github.com/prooph/event-store-client/issues/47)
+- Remove type=JS for projections [\#46](https://github.com/prooph/event-store-client/issues/46)
+- Add Sync Projections- / Query- / User-Managers [\#45](https://github.com/prooph/event-store-client/issues/45)
+- Add ProjectionsManager::reset method [\#41](https://github.com/prooph/event-store-client/issues/41)
+- implement sync projections- and query manager [\#53](https://github.com/prooph/event-store-client/pull/53) ([prolic](https://github.com/prolic))
+- Implement PersistentSubscriptionsManager [\#51](https://github.com/prooph/event-store-client/pull/51) ([prolic](https://github.com/prolic))
+- Rename Method StreamMetadata::build =\> StreamMetadata::create [\#49](https://github.com/prooph/event-store-client/pull/49) ([prolic](https://github.com/prolic))
+- Remove type=JS for projections [\#48](https://github.com/prooph/event-store-client/pull/48) ([prolic](https://github.com/prolic))
+- Add ProjectionsManager::reset method [\#42](https://github.com/prooph/event-store-client/pull/42) ([prolic](https://github.com/prolic))
+- add all checkpoint const [\#40](https://github.com/prooph/event-store-client/pull/40) ([prolic](https://github.com/prolic))
+- Renamed Uuid to Guid [\#39](https://github.com/prooph/event-store-client/pull/39) ([pkruithof](https://github.com/pkruithof))
+
+**Fixed bugs:**
+
+- fix EventStoreConnectionLogicHandler [\#52](https://github.com/prooph/event-store-client/pull/52) ([prolic](https://github.com/prolic))
+
+**Closed issues:**
+
+- Reconnecting for subscriptions in a cluster fails [\#37](https://github.com/prooph/event-store-client/issues/37)
+- Output after the loop is closed [\#32](https://github.com/prooph/event-store-client/issues/32)
+
+## [v1.0.0-beta-6](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-6) (2018-11-19)
 [Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-5...v1.0.0-beta-6)
 
 **Implemented enhancements:**
