@@ -468,7 +468,7 @@ class ProjectionsClient
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
-                '/projection/%s/query?emit=' . (int) $emitEnabled . '&type=JS',
+                '/projection/%s/query?emit=' . (int) $emitEnabled,
                 $name
             ),
             $query,
