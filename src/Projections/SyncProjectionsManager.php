@@ -15,7 +15,6 @@ namespace Prooph\EventStoreClient\Projections;
 
 use Amp\Promise;
 use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\PersistentSubscriptions\AsyncPersistentSubscriptionsManager;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\UserCredentials;
 use Throwable;
@@ -30,7 +29,7 @@ class SyncProjectionsManager
         int $operationTimeout,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ) {
-        $this->manager = new AsyncPersistentSubscriptionsManager(
+        $this->manager = new AsyncProjectionsManager(
             $httpEndPoint,
             $operationTimeout,
             $httpSchema
