@@ -14,6 +14,9 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient;
 
 use Prooph\EventStoreClient\Internal\ListenerHandler;
+use Prooph\EventStoreClient\Internal\PersistentSubscriptionCreateResult;
+use Prooph\EventStoreClient\Internal\PersistentSubscriptionDeleteResult;
+use Prooph\EventStoreClient\Internal\PersistentSubscriptionUpdateResult;
 
 interface EventStoreSyncConnection
 {
@@ -121,6 +124,29 @@ interface EventStoreSyncConnection
     public function getRawStreamMetadata(string $stream, ?UserCredentials $userCredentials = null): RawStreamMetadataResult;
 
     public function setSystemSettings(SystemSettings $settings, ?UserCredentials $userCredentials = null): WriteResult;
+
+    /** @throws Throwable */
+    public function createPersistentSubscription(
+        string $stream,
+        string $groupName,
+        PersistentSubscriptionSettings $settings,
+        ?UserCredentials $userCredentials = null
+    ): PersistentSubscriptionCreateResult;
+
+    /** @throws Throwable */
+    public function updatePersistentSubscription(
+        string $stream,
+        string $groupName,
+        PersistentSubscriptionSettings $settings,
+        ?UserCredentials $userCredentials = null
+    ): PersistentSubscriptionUpdateResult;
+
+    /** @throws Throwable */
+    public function deletePersistentSubscription(
+        string $stream,
+        string $groupName,
+        ?UserCredentials $userCredentials = null
+    ): PersistentSubscriptionDeleteResult;
 
     public function startTransaction(
         string $stream,
