@@ -96,14 +96,14 @@ interface EventStoreSyncConnection
         int $count,
         bool $resolveLinkTos = true,
         ?UserCredentials $userCredentials = null
-    ): StreamEventsSlice;
+    ): AllEventsSlice;
 
     public function readAllEventsBackward(
         Position $position,
         int $count,
         bool $resolveLinkTos = true,
         ?UserCredentials $userCredentials = null
-    ): StreamEventsSlice;
+    ): AllEventsSlice;
 
     public function setStreamMetadata(
         string $stream,
