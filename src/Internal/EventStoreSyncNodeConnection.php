@@ -15,6 +15,7 @@ namespace Prooph\EventStoreClient\Internal;
 
 use Amp\Deferred;
 use Amp\Promise;
+use Prooph\EventStoreClient\AllEventsSlice;
 use Prooph\EventStoreClient\ClientOperations\CommitTransactionOperation;
 use Prooph\EventStoreClient\ClientOperations\StartTransactionOperation;
 use Prooph\EventStoreClient\ClientOperations\TransactionalWriteOperation;
@@ -188,7 +189,7 @@ final class EventStoreSyncNodeConnection implements
         int $count,
         bool $resolveLinkTos = true,
         ?UserCredentials $userCredentials = null
-    ): StreamEventsSlice {
+    ): AllEventsSlice {
         return Promise\wait($this->asyncConnection->readAllEventsForwardAsync(
             $position,
             $count,
@@ -203,7 +204,7 @@ final class EventStoreSyncNodeConnection implements
         int $count,
         bool $resolveLinkTos = true,
         ?UserCredentials $userCredentials = null
-    ): StreamEventsSlice {
+    ): AllEventsSlice {
         return Promise\wait($this->asyncConnection->readAllEventsBackwardAsync(
             $position,
             $count,
