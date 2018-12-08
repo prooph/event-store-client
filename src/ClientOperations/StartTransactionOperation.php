@@ -131,7 +131,7 @@ class StartTransactionOperation extends AbstractOperation
 
     public function name(): string
     {
-        return 'StartAsyncTransaction';
+        return 'StartTransaction';
     }
 
     public function __toString(): string

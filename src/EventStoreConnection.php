@@ -133,7 +133,7 @@ interface EventStoreConnection
     /** @return Promise<WriteResult> */
     public function setSystemSettingsAsync(SystemSettings $settings, ?UserCredentials $userCredentials = null): Promise;
 
-    /** @return Promise<EventStoreAsyncTransaction> */
+    /** @return Promise<EventStoreTransaction> */
     public function startTransactionAsync(
         string $stream,
         int $expectedVersion,

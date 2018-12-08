@@ -10,7 +10,7 @@ PHP 7.2 Event Store Client Implementation.
 
 Prooph Event Store Client supports async non-blocking communication via TCP to [EventStore](https://eventstore.org/).
 
-The `EventStoreAsyncConnection` or `EventStoreSyncConnection` maintains a full-duplex connection between the client and the Event Store server.
+The `EventStoreConnection` maintains a full-duplex connection between the client and the Event Store server.
 
 ### Extensions
 
