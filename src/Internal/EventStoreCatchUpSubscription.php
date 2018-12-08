@@ -25,7 +25,6 @@ use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
 use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\EventStoreSubscription;
-use Prooph\EventStoreClient\Internal\ResolvedEvent as InternalResolvedEvent;
 use Prooph\EventStoreClient\LiveProcessingStarted;
 use Prooph\EventStoreClient\ResolvedEvent;
 use Prooph\EventStoreClient\SubscriptionDropped;
@@ -287,7 +286,7 @@ abstract class EventStoreCatchUpSubscription
 
                     public function __invoke(
                         EventStoreSubscription $subscription,
-                        InternalResolvedEvent $resolvedEvent
+                        ResolvedEvent $resolvedEvent
                     ): Promise {
                         return ($this->callback)($subscription, $resolvedEvent);
                     }

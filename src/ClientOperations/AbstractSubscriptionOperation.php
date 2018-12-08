@@ -19,7 +19,6 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\Exception\AccessDeniedException;
 use Prooph\EventStoreClient\Exception\ConnectionClosedException;
@@ -34,7 +33,6 @@ use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled_NotHandledReason 
 use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped as SubscriptionDroppedMessage;
 use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped_SubscriptionDropReason as SubscriptionDropReasonMessage;
 use Prooph\EventStoreClient\Messages\ClientMessages\UnsubscribeFromStream;
-use Prooph\EventStoreClient\SubscriptionDropped;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
@@ -61,9 +59,9 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
     protected $resolveLinkTos;
     /** @var UserCredentials|null */
     protected $userCredentials;
-    /** @var EventAppearedOnSubscription */
+    /** @var callable */
     protected $eventAppeared;
-    /** @var SubscriptionDropped|null */
+    /** @var callable|null */
     private $subscriptionDropped;
     /** @var bool */
     private $verboseLogging;
@@ -86,8 +84,8 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
         string $streamId,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
-        EventAppearedOnSubscription $eventAppeared,
-        ?SubscriptionDropped $subscriptionDropped,
+        callable $eventAppeared,
+        ?callable $subscriptionDropped,
         bool $verboseLogging,
         callable $getConnection
     ) {

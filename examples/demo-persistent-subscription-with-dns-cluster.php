@@ -19,7 +19,6 @@ use Amp\Success;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\PersistentSubscriptionCreateResult;
-use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Throwable;
 
 require __DIR__ . '/../vendor/autoload.php';

@@ -23,9 +23,9 @@ use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
-use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
+use Prooph\EventStoreClient\ResolvedEvent;
 use Prooph\EventStoreClient\Util\Guid;
 use Throwable;
 
