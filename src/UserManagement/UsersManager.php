@@ -20,7 +20,7 @@ use Prooph\EventStoreClient\Exception\UserCommandFailedException;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\UserCredentials;
 
-class AsyncUsersManager
+class UsersManager
 {
     /** @var UsersClient */
     private $client;

@@ -35,7 +35,7 @@ class event_store_connection_should extends TestCase
      */
     public function not_throw_on_close_if_connect_was_not_called(): void
     {
-        $connection = TestConnection::createAsync();
+        $connection = TestConnection::create();
         $connection->close();
     }
 
@@ -45,7 +45,7 @@ class event_store_connection_should extends TestCase
      */
     public function not_throw_on_close_if_called_multiple_times(): void
     {
-        $connection = TestConnection::createAsync();
+        $connection = TestConnection::create();
         $connection->close();
         $connection->close();
     }
@@ -57,7 +57,7 @@ class event_store_connection_should extends TestCase
     public function throw_invalid_operation_on_every_api_call_if_connect_was_not_called(): void
     {
         wait(call(function () {
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
 
             $s = 'stream';
             $events = TestEvent::newAmount(1);

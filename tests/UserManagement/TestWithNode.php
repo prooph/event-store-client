@@ -13,23 +13,35 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
+use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\UserManagement\SyncUsersManager;
+use Prooph\EventStoreClient\UserManagement\UsersManager;
+use Throwable;
+use function Amp\call;
+use function Amp\Promise\wait;
 
 abstract class TestWithNode extends TestCase
 {
-    /** @var SyncUsersManager */
+    /** @var UsersManager */
     protected $manager;
 
     protected function setUp(): void
     {
-        $this->manager = new SyncUsersManager(
+        $this->manager = new UsersManager(
             new EndPoint(
                 (string) \getenv('ES_HOST'),
                 (int) \getenv('ES_HTTP_PORT')
             ),
             5000
         );
+    }
+
+    /** @throws Throwable */
+    protected function execute(callable $function): void
+    {
+        wait(call(function () use ($function): Generator {
+            yield from $function();
+        }));
     }
 }

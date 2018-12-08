@@ -36,7 +36,7 @@ class deleting_stream extends TestCase
         wait(call(function () {
             $stream = 'which_already_exists_should_success_when_passed_empty_stream_expected_version';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
 
             yield $connection->connectAsync();
 
@@ -56,7 +56,7 @@ class deleting_stream extends TestCase
         wait(call(function () {
             $stream = 'which_already_exists_should_success_when_passed_any_for_expected_version';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
 
             yield $connection->connectAsync();
 
@@ -75,7 +75,7 @@ class deleting_stream extends TestCase
         wait(call(function () {
             $stream = 'with_invalid_expected_version_should_fail';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
 
             yield $connection->connectAsync();
 
@@ -97,7 +97,7 @@ class deleting_stream extends TestCase
         wait(call(function () {
             $stream = 'delete_should_return_log_position_when_writing';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
 
             yield $connection->connectAsync();
 
@@ -122,7 +122,7 @@ class deleting_stream extends TestCase
         wait(call(function () {
             $stream = 'which_was_allready_deleted_should_fail';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
 
             yield $connection->connectAsync();
 

@@ -18,7 +18,7 @@ use Prooph\EventStoreClient\Internal\EventStoreAllCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\EventStoreStreamCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\ListenerHandler;
 
-interface EventStoreAsyncConnection
+interface EventStoreConnection
 {
     public function connectionName(): string;
 
@@ -143,7 +143,7 @@ interface EventStoreAsyncConnection
     public function continueTransaction(
         int $transactionId,
         ?UserCredentials $userCredentials = null
-    ): EventStoreAsyncTransaction;
+    ): EventStoreTransaction;
 
     /** @return Promise<PersistentSubscriptionCreateResult> */
     public function createPersistentSubscriptionAsync(

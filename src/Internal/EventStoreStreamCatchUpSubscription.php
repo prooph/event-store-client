@@ -19,7 +19,7 @@ use Generator;
 use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
 use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
+use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\Exception\OutOfRangeException;
 use Prooph\EventStoreClient\Exception\StreamDeletedException;
 use Prooph\EventStoreClient\LiveProcessingStarted;
@@ -43,7 +43,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
      * @internal
      */
     public function __construct(
-        EventStoreAsyncConnection $connection,
+        EventStoreConnection $connection,
         Logger $logger,
         string $streamId,
         ?int $fromEventNumberExclusive, // if null from the very beginning
@@ -75,7 +75,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
 
     /** @return Promise<void> */
     protected function readEventsTillAsync(
-        EventStoreAsyncConnection $connection,
+        EventStoreConnection $connection,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         ?int $lastCommitPosition,
@@ -86,7 +86,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
 
     /** @return Promise<void> */
     private function readEventsInternalAsync(
-        EventStoreAsyncConnection $connection,
+        EventStoreConnection $connection,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         ?int $lastEventNumber

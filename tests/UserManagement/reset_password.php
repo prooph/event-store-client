@@ -18,38 +18,54 @@ use Prooph\EventStoreClient\Exception\UserCommandFailedException;
 use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
 use Prooph\EventStoreClient\UserCredentials;
 use ProophTest\EventStoreClient\DefaultData;
+use Throwable;
 
 class reset_password extends TestWithUser
 {
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function empty_username_throws(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->execute(function () {
+            $this->expectException(InvalidArgumentException::class);
 
-        $this->manager->resetPassword('', 'foo', DefaultData::adminCredentials());
+            yield $this->manager->resetPasswordAsync('', 'foo', DefaultData::adminCredentials());
+        });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function empty_password_throws(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->execute(function () {
+            $this->expectException(InvalidArgumentException::class);
 
-        $this->manager->resetPassword($this->username, '', DefaultData::adminCredentials());
+            yield $this->manager->resetPasswordAsync($this->username, '', DefaultData::adminCredentials());
+        });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function can_reset_password(): void
     {
-        $this->manager->resetPassword($this->username, 'foo', DefaultData::adminCredentials());
+        $this->execute(function () {
+            yield $this->manager->resetPasswordAsync($this->username, 'foo', DefaultData::adminCredentials());
 
-        $this->expectException(UserCommandFailedException::class);
+            $this->expectException(UserCommandFailedException::class);
 
-        try {
-            $this->manager->changePassword($this->username, 'password', 'foobar', new UserCredentials($this->username, 'password'));
-        } catch (UserCommandFailedException $e) {
-            $this->assertSame(HttpStatusCode::UNAUTHORIZED, $e->httpStatusCode());
+            try {
+                yield $this->manager->changePasswordAsync($this->username, 'password', 'foobar', new UserCredentials($this->username, 'password'));
+            } catch (UserCommandFailedException $e) {
+                $this->assertSame(HttpStatusCode::UNAUTHORIZED, $e->httpStatusCode());
 
-            throw $e;
-        }
+                throw $e;
+            }
+        });
     }
 }

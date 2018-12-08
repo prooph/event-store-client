@@ -27,7 +27,7 @@ use Prooph\EventStoreClient\Common\SystemStreams;
 use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
 use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
+use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\EventStoreAllCatchUpSubscription;
@@ -47,7 +47,7 @@ class subscribe_to_all_catching_up_should extends TestCase
 {
     private const TIMEOUT = 10000;
 
-    /** @var EventStoreAsyncConnection */
+    /** @var EventStoreConnection */
     private $conn;
 
     /**
@@ -56,7 +56,7 @@ class subscribe_to_all_catching_up_should extends TestCase
     private function execute(callable $function): void
     {
         Promise\wait(call(function () use ($function): Generator {
-            $this->conn = TestConnection::createAsync();
+            $this->conn = TestConnection::create();
 
             yield $this->conn->connectAsync();
 
@@ -87,7 +87,7 @@ class subscribe_to_all_catching_up_should extends TestCase
     public function call_dropped_callback_after_stop_method_call(): void
     {
         $this->execute(function () {
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
 
             yield $store->connectAsync();
 
@@ -140,7 +140,7 @@ class subscribe_to_all_catching_up_should extends TestCase
         $this->execute(function () {
             $stream = 'all_call_dropped_callback_when_an_error_occurs_while_processing_an_event';
 
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
 
             yield $store->connectAsync();
 
@@ -200,7 +200,7 @@ class subscribe_to_all_catching_up_should extends TestCase
     public function be_able_to_subscribe_to_empty_db(): void
     {
         $this->execute(function () {
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
 
             yield $store->connectAsync();
 
@@ -283,7 +283,7 @@ class subscribe_to_all_catching_up_should extends TestCase
     public function read_all_existing_events_and_keep_listening_to_new_ones(): void
     {
         $this->execute(function () {
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
 
             yield $store->connectAsync();
 
@@ -388,7 +388,7 @@ class subscribe_to_all_catching_up_should extends TestCase
     public function filter_events_and_keep_listening_to_new_ones(): void
     {
         $this->execute(function () {
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
 
             yield $store->connectAsync();
 
@@ -498,7 +498,7 @@ class subscribe_to_all_catching_up_should extends TestCase
     public function filter_events_and_work_if_nothing_was_written_after_subscription(): void
     {
         $this->execute(function () {
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
 
             yield $store->connectAsync();
 

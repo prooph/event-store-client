@@ -16,8 +16,8 @@ namespace ProophTest\EventStoreClient;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
-use Prooph\EventStoreClient\EventStoreAsyncTransaction;
+use Prooph\EventStoreClient\EventStoreConnection;
+use Prooph\EventStoreClient\EventStoreTransaction;
 use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\SliceReadStatus;
@@ -32,7 +32,7 @@ use function Amp\Promise\wait;
 
 class when_committing_empty_transaction extends TestCase
 {
-    /** @var EventStoreAsyncConnection */
+    /** @var EventStoreConnection */
     private $connection;
     /** @var EventData */
     private $firstEvent;
@@ -42,7 +42,7 @@ class when_committing_empty_transaction extends TestCase
     protected function setUp(): void
     {
         $this->firstEvent = TestEvent::newTestEvent();
-        $this->connection = TestConnection::createAsync();
+        $this->connection = TestConnection::create();
         $this->stream = Guid::generateAsHex();
     }
 
@@ -63,7 +63,7 @@ class when_committing_empty_transaction extends TestCase
             $this->stream,
             2
         );
-        \assert($transaction instanceof EventStoreAsyncTransaction);
+        \assert($transaction instanceof EventStoreTransaction);
 
         $result = yield $transaction->commitAsync();
         \assert($result instanceof WriteResult);

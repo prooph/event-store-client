@@ -46,7 +46,7 @@ class subscribe_should extends TestCase
 
             $appeared = new Deferred();
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
 
             yield $connection->connectAsync();
 
@@ -78,7 +78,7 @@ class subscribe_should extends TestCase
         wait(call(function () {
             $stream = 'subscribe_should_allow_multiple_subscriptions_to_same_stream';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
 
             yield $connection->connectAsync();
 
@@ -126,7 +126,7 @@ class subscribe_should extends TestCase
         wait(call(function () {
             $stream = 'subscribe_should_call_dropped_callback_after_unsubscribe_method_call';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
 
             yield $connection->connectAsync();
 
@@ -169,7 +169,7 @@ class subscribe_should extends TestCase
         wait(call(function () {
             $stream = 'subscribe_should_catch_created_and_deleted_events_as_well';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
 
             yield $connection->connectAsync();
 

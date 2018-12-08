@@ -16,7 +16,7 @@ namespace ProophTest\EventStoreClient\Helper;
 use Amp\Parallel\Worker\Environment;
 use Amp\Parallel\Worker\Task;
 use Amp\Promise;
-use Prooph\EventStoreClient\EventStoreAsyncTransaction;
+use Prooph\EventStoreClient\EventStoreTransaction;
 use Prooph\EventStoreClient\ExpectedVersion;
 
 class ParallelTransactionTask implements Task
@@ -34,7 +34,7 @@ class ParallelTransactionTask implements Task
 
     public function run(Environment $environment)
     {
-        $store = TestConnection::createAsync();
+        $store = TestConnection::create();
 
         yield $store->connectAsync();
 
@@ -42,7 +42,7 @@ class ParallelTransactionTask implements Task
             $this->stream,
             ExpectedVersion::ANY
         );
-        \assert($transaction instanceof EventStoreAsyncTransaction);
+        \assert($transaction instanceof EventStoreTransaction);
 
         $writes = [];
 

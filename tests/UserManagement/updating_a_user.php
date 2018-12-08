@@ -15,48 +15,71 @@ namespace ProophTest\EventStoreClient\UserManagement;
 
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\UserCommandFailedException;
+use Prooph\EventStoreClient\UserManagement\UserDetails;
 use Prooph\EventStoreClient\Util\Guid;
 use ProophTest\EventStoreClient\DefaultData;
+use Throwable;
 
 class updating_a_user extends TestWithNode
 {
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function updating_a_user_with_empty_username_throws(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->execute(function () {
+            $this->expectException(InvalidArgumentException::class);
 
-        $this->manager->updateUser('', 'sascha', ['foo', 'bar'], DefaultData::adminCredentials());
+            yield $this->manager->updateUserAsync('', 'sascha', ['foo', 'bar'], DefaultData::adminCredentials());
+        });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function updating_a_user_with_empty_name_throws(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->execute(function () {
+            $this->expectException(InvalidArgumentException::class);
 
-        $this->manager->updateUser('sascha', '', ['foo', 'bar'], DefaultData::adminCredentials());
+            yield $this->manager->updateUserAsync('sascha', '', ['foo', 'bar'], DefaultData::adminCredentials());
+        });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function updating_non_existing_user_throws(): void
     {
-        $this->expectException(UserCommandFailedException::class);
+        $this->execute(function () {
+            $this->expectException(UserCommandFailedException::class);
 
-        $this->manager->updateUser(Guid::generateString(), 'bar', ['foo'], DefaultData::adminCredentials());
+            yield $this->manager->updateUserAsync(Guid::generateString(), 'bar', ['foo'], DefaultData::adminCredentials());
+        });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function updating_a_user_with_parameters_can_be_read(): void
     {
-        $name = Guid::generateString();
+        $this->execute(function () {
+            $name = Guid::generateString();
 
-        $this->manager->createUser($name, 'ourofull', ['foo', 'bar'], 'password', DefaultData::adminCredentials());
+            yield $this->manager->createUserAsync($name, 'ourofull', ['foo', 'bar'], 'password', DefaultData::adminCredentials());
 
-        $this->manager->updateUser($name, 'something', ['bar', 'baz'], DefaultData::adminCredentials());
+            yield $this->manager->updateUserAsync($name, 'something', ['bar', 'baz'], DefaultData::adminCredentials());
 
-        $user = $this->manager->getUser($name, DefaultData::adminCredentials());
+            $user = yield $this->manager->getUserAsync($name, DefaultData::adminCredentials());
+            \assert($user instanceof UserDetails);
 
-        $this->assertSame($name, $user->loginName());
-        $this->assertSame('something', $user->fullName());
-        $this->assertEquals(['bar', 'baz'], $user->groups());
+            $this->assertSame($name, $user->loginName());
+            $this->assertSame('something', $user->fullName());
+            $this->assertEquals(['bar', 'baz'], $user->groups());
+        });
     }
 }

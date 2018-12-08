@@ -37,7 +37,7 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0em1_idempotent';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
             yield $connection->connectAsync();
 
             $events = TestEvent::newAmount(6);
@@ -73,7 +73,7 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0any_idempotent';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
             yield $connection->connectAsync();
 
             $events = TestEvent::newAmount(6);
@@ -111,7 +111,7 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e5_non_idempotent';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
             yield $connection->connectAsync();
 
             $events = TestEvent::newAmount(6);
@@ -149,7 +149,7 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e6_wev';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
             yield $connection->connectAsync();
 
             $events = TestEvent::newAmount(6);
@@ -184,7 +184,7 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e4_wev';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
             yield $connection->connectAsync();
 
             $events = TestEvent::newAmount(6);
@@ -219,7 +219,7 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_0e0_non_idempotent';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
             yield $connection->connectAsync();
 
             $events = TestEvent::newAmount(1);
@@ -257,7 +257,7 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_0any_idempotent';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
             yield $connection->connectAsync();
 
             $events = TestEvent::newAmount(1);
@@ -295,7 +295,7 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_0em1_idempotent';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
             yield $connection->connectAsync();
 
             $events = TestEvent::newAmount(1);
@@ -333,7 +333,7 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_1e0_2e1_1any_1any_idempotent';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
             yield $connection->connectAsync();
 
             $events = TestEvent::newAmount(3);
@@ -371,7 +371,7 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
         wait(call(function () {
             $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_S_0em1_1em1_E_S_0em1_1em1_2em1_E_idempotancy_fail';
 
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
             yield $connection->connectAsync();
 
             $events = TestEvent::newAmount(2);

@@ -17,13 +17,13 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\ClusterSettings;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\EventStoreAsyncConnectionFactory as Factory;
+use Prooph\EventStoreClient\EventStoreConnectionFactory as Factory;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\GossipSeed;
 use Prooph\EventStoreClient\Uri;
 use Prooph\EventStoreClient\UserCredentials;
 
-final class connection_factory_async_can extends TestCase
+final class connection_factory_can extends TestCase
 {
     private const CONNECTION_NAME = 'test-conn';
     private const CLUSTER_DNS = 'escluster.net';

@@ -15,7 +15,7 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
+use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\Exception\StreamDeletedException;
 use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
 use Prooph\EventStoreClient\ExpectedVersion;
@@ -30,7 +30,7 @@ class when_working_with_raw_stream_metadata extends TestCase
 {
     /** @var string */
     private $stream;
-    /** @var EventStoreAsyncConnection */
+    /** @var EventStoreConnection */
     private $conn;
 
     /** @throws Throwable */
@@ -38,7 +38,7 @@ class when_working_with_raw_stream_metadata extends TestCase
     {
         wait(call(function () use ($function): Generator {
             $this->stream = __CLASS__ . '\\' . $this->getName();
-            $this->conn = TestConnection::createAsync();
+            $this->conn = TestConnection::create();
             yield $this->conn->connectAsync();
 
             yield from $function();

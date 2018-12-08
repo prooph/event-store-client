@@ -23,7 +23,7 @@ use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\ClientConnectionEventArgs;
 use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
 use Prooph\EventStoreClient\EventAppearedOnSubscription;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
+use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent as InternalResolvedEvent;
 use Prooph\EventStoreClient\LiveProcessingStarted;
@@ -52,7 +52,7 @@ abstract class EventStoreCatchUpSubscription
     /** @var Logger */
     protected $log;
 
-    /** @var EventStoreAsyncConnection */
+    /** @var EventStoreConnection */
     private $connection;
     /** @var bool */
     private $resolveLinkTos;
@@ -95,7 +95,7 @@ abstract class EventStoreCatchUpSubscription
     private $connectListener;
 
     public function __construct(
-        EventStoreAsyncConnection $connection,
+        EventStoreConnection $connection,
         Logger $logger,
         string $streamId,
         ?UserCredentials $userCredentials,
@@ -143,7 +143,7 @@ abstract class EventStoreCatchUpSubscription
     }
 
     abstract protected function readEventsTillAsync(
-        EventStoreAsyncConnection $connection,
+        EventStoreConnection $connection,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         ?int $lastCommitPosition,

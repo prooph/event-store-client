@@ -17,9 +17,9 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
+use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Projections\AsyncProjectionsManager;
+use Prooph\EventStoreClient\Projections\ProjectionsManager;
 use Prooph\EventStoreClient\UserCredentials;
 use Prooph\EventStoreClient\Util\Guid;
 use ProophTest\EventStoreClient\Helper\TestConnection;
@@ -29,9 +29,9 @@ use function Amp\Promise\wait;
 
 trait ProjectionSpecification
 {
-    /** @var AsyncProjectionsManager */
+    /** @var ProjectionsManager */
     protected $projectionsManager;
-    /** @var EventStoreAsyncConnection */
+    /** @var EventStoreConnection */
     protected $connection;
     /** @var UserCredentials */
     protected $credentials;
@@ -48,11 +48,11 @@ trait ProjectionSpecification
     {
         wait(call(function () use ($test) {
             $this->credentials = DefaultData::adminCredentials();
-            $this->connection = TestConnection::createAsync();
+            $this->connection = TestConnection::create();
 
             yield $this->connection->connectAsync();
 
-            $this->projectionsManager = new AsyncProjectionsManager(
+            $this->projectionsManager = new ProjectionsManager(
                 TestConnection::httpEndPoint(),
                 5000
             );

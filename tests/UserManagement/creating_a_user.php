@@ -15,99 +15,127 @@ namespace ProophTest\EventStoreClient\UserManagement;
 
 use Exception;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStoreClient\UserManagement\UserDetails;
 use Prooph\EventStoreClient\Util\Guid;
 use ProophTest\EventStoreClient\DefaultData;
+use Throwable;
 
 class creating_a_user extends TestWithNode
 {
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function creating_a_user_with_empty_username_throws(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->execute(function () {
+            $this->expectException(InvalidArgumentException::class);
 
-        $this->manager->createUser(
-            '',
-            'ouro',
-            ['foo', 'bar'],
-            'foofoofoo'
-        );
+            yield $this->manager->createUserAsync(
+                '',
+                'ouro',
+                ['foo', 'bar'],
+                'foofoofoo'
+            );
+        });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function creating_a_user_with_empty_name_throws(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->execute(function () {
+            $this->expectException(InvalidArgumentException::class);
 
-        $this->manager->createUser(
-            'ouro',
-            '',
-            ['foo', 'bar'],
-            'foofoofoo'
-        );
+            yield $this->manager->createUserAsync(
+                'ouro',
+                '',
+                ['foo', 'bar'],
+                'foofoofoo'
+            );
+        });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function creating_a_user_with_empty_password_throws(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->execute(function () {
+            $this->expectException(InvalidArgumentException::class);
 
-        $this->manager->createUser(
-            'ouro',
-            'ouro',
-            ['foo', 'bar'],
-            ''
-        );
+            yield $this->manager->createUserAsync(
+                'ouro',
+                'ouro',
+                ['foo', 'bar'],
+                ''
+            );
+        });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function fetching_user_with_empty_name_throws(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->execute(function () {
+            $this->expectException(InvalidArgumentException::class);
 
-        $this->manager->getUser('', DefaultData::adminCredentials());
+            yield $this->manager->getUserAsync('', DefaultData::adminCredentials());
+        });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws Throwable
+     */
     public function creating_a_user_with_parameters_can_be_read(): void
     {
-        $login = Guid::generateString();
+        $this->execute(function () {
+            $login = Guid::generateString();
 
-        $this->manager->createUser(
-            $login,
-            'ourofull',
-            ['foo', 'bar'],
-            'foofoofoo',
-            DefaultData::adminCredentials()
-        );
+            yield $this->manager->createUserAsync(
+                $login,
+                'ourofull',
+                ['foo', 'bar'],
+                'foofoofoo',
+                DefaultData::adminCredentials()
+            );
 
-        $user = $this->manager->getUser($login, DefaultData::adminCredentials());
+            $user = yield $this->manager->getUserAsync($login, DefaultData::adminCredentials());
+            \assert($user instanceof UserDetails);
 
-        $this->assertSame($login, $user->loginName());
-        $this->assertSame('ourofull', $user->fullName());
-        $this->assertEquals(['foo', 'bar'], $user->groups());
-        $this->assertCount(5, $user->links());
-        $this->assertNull($user->dateLastUpdated());
-        $this->assertFalse($user->disabled());
+            $this->assertSame($login, $user->loginName());
+            $this->assertSame('ourofull', $user->fullName());
+            $this->assertEquals(['foo', 'bar'], $user->groups());
+            $this->assertCount(5, $user->links());
+            $this->assertNull($user->dateLastUpdated());
+            $this->assertFalse($user->disabled());
 
-        $this->assertStringEndsWith('/users/' . $login . '/command/reset-password', $user->links()[0]->href());
-        $this->assertEquals('reset-password', $user->links()[0]->rel());
+            $this->assertStringEndsWith('/users/' . $login . '/command/reset-password', $user->links()[0]->href());
+            $this->assertEquals('reset-password', $user->links()[0]->rel());
 
-        $this->assertStringEndsWith('/users/' . $login . '/command/change-password', $user->links()[1]->href());
-        $this->assertEquals('change-password', $user->links()[1]->rel());
+            $this->assertStringEndsWith('/users/' . $login . '/command/change-password', $user->links()[1]->href());
+            $this->assertEquals('change-password', $user->links()[1]->rel());
 
-        $this->assertStringEndsWith('/users/' . $login, $user->links()[2]->href());
-        $this->assertEquals('edit', $user->links()[2]->rel());
+            $this->assertStringEndsWith('/users/' . $login, $user->links()[2]->href());
+            $this->assertEquals('edit', $user->links()[2]->rel());
 
-        $this->assertStringEndsWith('/users/' . $login, $user->links()[3]->href());
-        $this->assertEquals('delete', $user->links()[3]->rel());
+            $this->assertStringEndsWith('/users/' . $login, $user->links()[3]->href());
+            $this->assertEquals('delete', $user->links()[3]->rel());
 
-        $this->assertStringEndsWith('/users/' . $login . '/command/disable', $user->links()[4]->href());
-        $this->assertEquals('disable', $user->links()[4]->rel());
+            $this->assertStringEndsWith('/users/' . $login . '/command/disable', $user->links()[4]->href());
+            $this->assertEquals('disable', $user->links()[4]->rel());
 
-        $href = $user->getRelLink('disable');
-        $this->assertStringEndsWith('/users/' . $login . '/command/disable', $href);
+            $href = $user->getRelLink('disable');
+            $this->assertStringEndsWith('/users/' . $login . '/command/disable', $href);
 
-        $this->expectException(Exception::class);
-        $user->getRelLink('unknown');
+            $this->expectException(Exception::class);
+            $user->getRelLink('unknown');
+        });
     }
 }

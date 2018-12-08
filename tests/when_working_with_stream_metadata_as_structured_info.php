@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
+use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\Exception\RuntimeException;
 use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
 use Prooph\EventStoreClient\ExpectedVersion;
@@ -31,7 +31,7 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
 {
     /** @var string */
     private $stream;
-    /** @var EventStoreAsyncConnection */
+    /** @var EventStoreConnection */
     private $conn;
 
     /** @throws Throwable */
@@ -39,7 +39,7 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
     {
         wait(call(function () use ($function) {
             $this->stream = __CLASS__ . '\\' . $this->getName();
-            $this->conn = TestConnection::createAsync(DefaultData::adminCredentials());
+            $this->conn = TestConnection::create(DefaultData::adminCredentials());
             yield $this->conn->connectAsync();
 
             yield from $function();

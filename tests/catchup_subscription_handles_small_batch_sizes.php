@@ -22,7 +22,7 @@ use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventId;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
+use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
@@ -41,13 +41,13 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
     private $streamName = 'TestStream';
     /** @var CatchUpSubscriptionSettings */
     private $settings;
-    /** @var EventStoreAsyncConnection */
+    /** @var EventStoreConnection */
     private $connection;
 
     private function setUpTestCase(): Promise
     {
         return call(function () {
-            $this->connection = TestConnection::createAsync();
+            $this->connection = TestConnection::create();
             yield $this->connection->connectAsync();
 
             //Create 500 events

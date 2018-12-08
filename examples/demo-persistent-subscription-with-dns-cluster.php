@@ -31,7 +31,7 @@ require __DIR__ . '/../vendor/autoload.php';
  */
 
 Loop::run(function () {
-    $connection = EventStoreAsyncConnectionFactory::createFromConnectionString(
+    $connection = EventStoreConnectionFactory::createFromConnectionString(
         'Connect To=discover://127.0.0.1:2113',
         null,
         'dns-cluster-connection'

@@ -18,7 +18,7 @@ use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
+use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\SliceReadStatus;
 use Prooph\EventStoreClient\StreamEventsSlice;
@@ -32,7 +32,7 @@ class when_having_max_count_set_for_stream extends TestCase
 {
     /** @var string */
     private $stream = 'max-count-test-stream';
-    /** @var EventStoreAsyncConnection */
+    /** @var EventStoreConnection */
     private $conn;
     /** @var EventData[] */
     private $testEvents = [];
@@ -41,7 +41,7 @@ class when_having_max_count_set_for_stream extends TestCase
     private function execute(callable $function): void
     {
         Promise\wait(call(function () use ($function) {
-            $this->conn = TestConnection::createAsync();
+            $this->conn = TestConnection::create();
 
             yield $this->conn->connectAsync();
             yield $this->conn->setStreamMetadataAsync(

@@ -21,7 +21,7 @@ use Prooph\EventStoreClient\Exception\JsonException;
 use Prooph\EventStoreClient\Exception\UserCommandConflictException;
 use Prooph\EventStoreClient\Exception\UserCommandFailedException;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
-use Prooph\EventStoreClient\Transport\Http\HttpAsyncClient;
+use Prooph\EventStoreClient\Transport\Http\HttpClient;
 use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
 use Prooph\EventStoreClient\UserCredentials;
 use Prooph\EventStoreClient\Util\Json;
@@ -30,14 +30,14 @@ use Throwable;
 /** @internal */
 class UsersClient
 {
-    /** @var HttpAsyncClient */
+    /** @var HttpClient */
     private $client;
     /** @var int */
     private $operationTimeout;
 
     public function __construct(int $operationTimeout)
     {
-        $this->client = new HttpAsyncClient($operationTimeout);
+        $this->client = new HttpClient($operationTimeout);
         $this->operationTimeout = $operationTimeout;
     }
 

@@ -42,7 +42,7 @@ class subscribe_to_all_should extends TestCase
     private function execute(callable $function): void
     {
         Promise\wait(call(function () use ($function) {
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
 
             yield $connection->connectAsync();
 
@@ -76,7 +76,7 @@ class subscribe_to_all_should extends TestCase
         $this->execute(function () {
             $stream = 'subscribe_to_all_should_allow_multiple_subscriptions';
 
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
 
             yield $store->connectAsync();
 
@@ -122,7 +122,7 @@ class subscribe_to_all_should extends TestCase
         $this->execute(function () {
             $stream = 'subscribe_to_all_should_catch_created_and_deleted_events_as_well';
 
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
 
             yield $store->connectAsync();
 
