@@ -1,7 +1,32 @@
 # Change Log
 
-## [v1.0.0-beta-7](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-7)
+## [v1.0.0-beta-8](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-8)
 
+[Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-7...v1.0.0-beta-8)
+
+**Implemented enhancements:**
+
+- refactor event appeared callbacks [\#65](https://github.com/prooph/event-store-client/pull/65) ([prolic](https://github.com/prolic))
+- remove sync implementations [\#64](https://github.com/prooph/event-store-client/pull/64) ([prolic](https://github.com/prolic))
+
+**Fixed bugs:**
+
+- fix return type of readAllEventsForward in sync impl [\#63](https://github.com/prooph/event-store-client/pull/63) ([prolic](https://github.com/prolic))
+- Add missing methods to EventStoreSyncConnection interface [\#61](https://github.com/prooph/event-store-client/pull/61) ([enumag](https://github.com/enumag))
+- Remove type=JS from ProjectionsClient::updateQuery\(\) [\#59](https://github.com/prooph/event-store-client/pull/59) ([enumag](https://github.com/enumag))
+- Fix SyncProjectionsManager [\#54](https://github.com/prooph/event-store-client/pull/54) ([enumag](https://github.com/enumag))
+
+**Closed issues:**
+
+- Projection reset issues [\#58](https://github.com/prooph/event-store-client/issues/58)
+- Imposibility to edit native projections [\#56](https://github.com/prooph/event-store-client/issues/56)
+
+**Merged pull requests:**
+
+- Revert "Revert "Remove type=JS from ProjectionsClient::updateQuery\(\)"" [\#62](https://github.com/prooph/event-store-client/pull/62) ([prolic](https://github.com/prolic))
+- Revert "Remove type=JS from ProjectionsClient::updateQuery\(\)" [\#60](https://github.com/prooph/event-store-client/pull/60) ([prolic](https://github.com/prolic))
+
+## [v1.0.0-beta-7](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-7) (2018-12-02)
 [Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-6...v1.0.0-beta-7)
 
 **Implemented enhancements:**
