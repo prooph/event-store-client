@@ -29,7 +29,7 @@ use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\EventStoreStreamCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\ManualResetEventSlim;
-use Prooph\EventStoreClient\Internal\ResolvedEvent;
+use Prooph\EventStoreClient\ResolvedEvent;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;

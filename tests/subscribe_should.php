@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Internal\ResolvedEvent;
+use Prooph\EventStoreClient\ResolvedEvent;
 use Prooph\EventStoreClient\SubscriptionDropped;
 use Prooph\EventStoreClient\SubscriptionDropReason;
 use ProophTest\EventStoreClient\Helper\TestConnection;

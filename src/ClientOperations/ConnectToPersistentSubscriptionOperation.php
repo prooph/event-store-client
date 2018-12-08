@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventId;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\Exception\AccessDeniedException;
@@ -60,8 +59,8 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
         int $bufferSize,
         string $streamId,
         ?UserCredentials $userCredentials,
-        EventAppearedOnSubscription $eventAppeared,
-        ?SubscriptionDropped $subscriptionDropped,
+        callable $eventAppeared,
+        ?callable $subscriptionDropped,
         bool $verboseLogging,
         callable $getConnection
     ) {

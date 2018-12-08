@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
-use Prooph\EventStoreClient\Internal\ResolvedEvent;
+use Prooph\EventStoreClient\ResolvedEvent;
 use Throwable;
 
 class connect_to_non_existing_persistent_subscription_with_permissions extends TestCase

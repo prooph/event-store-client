@@ -21,7 +21,7 @@ use Prooph\EventStoreClient\Common\SystemRoles;
 use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Internal\ResolvedEvent;
+use Prooph\EventStoreClient\ResolvedEvent;
 use Prooph\EventStoreClient\StreamMetadata;
 use Prooph\EventStoreClient\SubscriptionDropped;
 use Prooph\EventStoreClient\SubscriptionDropReason;

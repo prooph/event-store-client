@@ -17,7 +17,6 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
-use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Throwable;
 
 require __DIR__ . '/../vendor/autoload.php';
