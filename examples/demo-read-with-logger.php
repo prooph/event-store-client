@@ -17,23 +17,14 @@ use Amp\Loop;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-/**
- * Start docker/local-3-node-cluster and run this script from host machine.
- * This is because the cluster advertises as 127.0.0.1, which does not resolve
- * to the event store in the PHP container, if you run it in Docker.
- */
-
 Loop::run(function () {
     $builder = new ConnectionSettingsBuilder();
-    $builder->setGossipSeedEndPoints([
-        new EndPoint('localhost', 2113),
-        new EndPoint('localhost', 2123),
-        new EndPoint('localhost', 2133),
-    ]);
+    $builder->enableVerboseLogging();
+    $builder->useConsoleLogger();
 
-    $connection = EventStoreAsyncConnectionFactory::createFromSettings(
-        $builder->build(),
-        'cluster-connection'
+    $connection = EventStoreConnectionFactory::createFromEndPoint(
+        new EndPoint('eventstore', 1113),
+        $builder->build()
     );
 
     $connection->onConnected(function (): void {
@@ -53,7 +44,7 @@ Loop::run(function () {
         true
     );
 
-    \var_dump($slice);
+    \var_dump(\get_class($slice));
 
     $slice = yield $connection->readStreamEventsBackwardAsync(
         'foo-bar',
@@ -62,15 +53,15 @@ Loop::run(function () {
         true
     );
 
-    \var_dump($slice);
+    \var_dump(\get_class($slice));
 
     $event = yield $connection->readEventAsync('foo-bar', 2, true);
 
-    \var_dump($event);
+    \var_dump(\get_class($event));
 
     $m = yield $connection->getStreamMetadataAsync('foo-bar');
 
-    \var_dump($m);
+    \var_dump(\get_class($m));
 
     $r = yield $connection->setStreamMetadataAsync('foo-bar', ExpectedVersion::ANY, new StreamMetadata(
         null, null, null, null, null, [
@@ -78,11 +69,11 @@ Loop::run(function () {
         ]
     ));
 
-    \var_dump($r);
+    \var_dump(\get_class($r));
 
     $m = yield $connection->getStreamMetadataAsync('foo-bar');
 
-    \var_dump($m);
+    \var_dump(\get_class($m));
 
     $wr = yield $connection->appendToStreamAsync('foo-bar', ExpectedVersion::ANY, [
         new EventData(EventId::generate(), 'test-type', false, 'jfkhksdfhsds', 'meta'),
@@ -91,21 +82,21 @@ Loop::run(function () {
         new EventData(EventId::generate(), 'test-type4', false, 'bbb', 'meta'),
     ]);
 
-    \var_dump($wr);
+    \var_dump(\get_class($wr));
 
     $ae = yield $connection->readAllEventsForwardAsync(Position::start(), 2, false, new UserCredentials(
         'admin',
         'changeit'
     ));
 
-    \var_dump($ae);
+    \var_dump(\get_class($ae));
 
     $aeb = yield $connection->readAllEventsBackwardAsync(Position::end(), 2, false, new UserCredentials(
         'admin',
         'changeit'
     ));
 
-    \var_dump($aeb);
+    \var_dump(\get_class($aeb));
 
     $connection->close();
 });

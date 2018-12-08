@@ -29,7 +29,7 @@ use Prooph\EventStoreClient\ClientOperations\ReadAllEventsForwardOperation;
 use Prooph\EventStoreClient\ClientOperations\ReadEventOperation;
 use Prooph\EventStoreClient\ClientOperations\ReadStreamEventsBackwardOperation;
 use Prooph\EventStoreClient\ClientOperations\ReadStreamEventsForwardOperation;
-use Prooph\EventStoreClient\ClientOperations\StartAsyncTransactionOperation;
+use Prooph\EventStoreClient\ClientOperations\StartTransactionOperation;
 use Prooph\EventStoreClient\ClientOperations\TransactionalWriteOperation;
 use Prooph\EventStoreClient\ClientOperations\UpdatePersistentSubscriptionOperation;
 use Prooph\EventStoreClient\ClusterSettings;
@@ -42,8 +42,8 @@ use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventData;
 use Prooph\EventStoreClient\EventReadResult;
 use Prooph\EventStoreClient\EventReadStatus;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
-use Prooph\EventStoreClient\EventStoreAsyncTransaction;
+use Prooph\EventStoreClient\EventStoreConnection;
+use Prooph\EventStoreClient\EventStoreTransaction;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
 use Prooph\EventStoreClient\Exception\MaxQueueSizeLimitReachedException;
@@ -68,9 +68,9 @@ use Prooph\EventStoreClient\Util\Guid;
 use Prooph\EventStoreClient\Util\Json;
 use Throwable;
 
-final class EventStoreAsyncNodeConnection implements
-    EventStoreAsyncConnection,
-    EventStoreAsyncTransactionConnection
+final class EventStoreNodeConnection implements
+    EventStoreConnection,
+    EventStoreTransactionConnection
 {
     /** @var string */
     private $connectionName;
@@ -794,7 +794,7 @@ final class EventStoreAsyncNodeConnection implements
 
         $deferred = new Deferred();
 
-        $this->enqueueOperation(new StartAsyncTransactionOperation(
+        $this->enqueueOperation(new StartTransactionOperation(
             $this->settings->log(),
             $deferred,
             $this->settings->requireMaster(),
@@ -810,16 +810,16 @@ final class EventStoreAsyncNodeConnection implements
     public function continueTransaction(
         int $transactionId,
         ?UserCredentials $userCredentials = null
-    ): EventStoreAsyncTransaction {
+    ): EventStoreTransaction {
         if ($transactionId < 0) {
             throw new InvalidArgumentException('Invalid transaction id');
         }
 
-        return new EventStoreAsyncTransaction($transactionId, $userCredentials, $this);
+        return new EventStoreTransaction($transactionId, $userCredentials, $this);
     }
 
     public function transactionalWriteAsync(
-        EventStoreAsyncTransaction $transaction,
+        EventStoreTransaction $transaction,
         array $events,
         ?UserCredentials $userCredentials
     ): Promise {
@@ -838,7 +838,7 @@ final class EventStoreAsyncNodeConnection implements
     }
 
     public function commitTransactionAsync(
-        EventStoreAsyncTransaction $transaction,
+        EventStoreTransaction $transaction,
         ?UserCredentials $userCredentials
     ): Promise {
         $deferred = new Deferred();

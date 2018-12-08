@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Prooph\EventStoreClient\EventStoreSyncTransaction;
+use Prooph\EventStoreClient\EventStoreTransaction;
 use Prooph\EventStoreClient\Exception\AccessDeniedException;
 use Prooph\EventStoreClient\Exception\InvalidTransactionException;
 use Prooph\EventStoreClient\Exception\StreamDeletedException;
 use Prooph\EventStoreClient\Exception\UnexpectedOperationResult;
 use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
-use Prooph\EventStoreClient\Internal\EventStoreSyncTransactionConnection;
+use Prooph\EventStoreClient\Internal\EventStoreTransactionConnection;
 use Prooph\EventStoreClient\Messages\ClientMessages\OperationResult;
 use Prooph\EventStoreClient\Messages\ClientMessages\TransactionStart;
 use Prooph\EventStoreClient\Messages\ClientMessages\TransactionStartCompleted;
@@ -40,8 +40,8 @@ class StartTransactionOperation extends AbstractOperation
     private $stream;
     /** @var int */
     private $expectedVersion;
-    /** @var EventStoreSyncTransactionConnection */
-    private $parentConnection;
+    /** @var EventStoreTransactionConnection */
+    protected $parentConnection;
 
     public function __construct(
         Logger $logger,
@@ -49,7 +49,7 @@ class StartTransactionOperation extends AbstractOperation
         bool $requireMaster,
         string $stream,
         int $expectedVersion,
-        EventStoreSyncTransactionConnection $parentConnection,
+        EventStoreTransactionConnection $parentConnection,
         ?UserCredentials $userCredentials
     ) {
         $this->requireMaster = $requireMaster;
@@ -73,6 +73,8 @@ class StartTransactionOperation extends AbstractOperation
         $message->setRequireMaster($this->requireMaster);
         $message->setEventStreamId($this->stream);
         $message->setExpectedVersion($this->expectedVersion);
+
+        return $message;
     }
 
     protected function inspectResponse(ProtobufMessage $response): InspectionResult
@@ -116,11 +118,11 @@ class StartTransactionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(ProtobufMessage $response): EventStoreSyncTransaction
+    protected function transformResponse(ProtobufMessage $response): EventStoreTransaction
     {
         \assert($response instanceof TransactionStartCompleted);
 
-        return new EventStoreSyncTransaction(
+        return new EventStoreTransaction(
             $response->getTransactionId(),
             $this->credentials,
             $this->parentConnection

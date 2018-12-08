@@ -27,7 +27,7 @@ use Prooph\EventStoreClient\ClientOperations\VolatileSubscriptionOperation;
 use Prooph\EventStoreClient\ClientReconnectingEventArgs;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
+use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\Exception\CannotEstablishConnectionException;
 use Prooph\EventStoreClient\Exception\EventStoreConnectionException;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
@@ -57,7 +57,7 @@ class EventStoreConnectionLogicHandler
 {
     private const CLIENT_VERSION = 1;
 
-    /** @var EventStoreAsyncConnection */
+    /** @var EventStoreConnection */
     private $esConnection;
     /** @var TcpPackageConnection|null */
     private $connection;
@@ -97,7 +97,7 @@ class EventStoreConnectionLogicHandler
     /** @var int */
     private $lastTimeoutsTimeStamp;
 
-    public function __construct(EventStoreAsyncConnection $connection, ConnectionSettings $settings)
+    public function __construct(EventStoreConnection $connection, ConnectionSettings $settings)
     {
         $this->esConnection = $connection;
         $this->settings = $settings;

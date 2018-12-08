@@ -24,11 +24,11 @@ use function Amp\call;
  * API for executing queries in the Event Store through PHP code.
  * Communicates with the Event Store over the RESTful API.
  */
-class AsyncQueryManager
+class QueryManager
 {
     /** @var int */
     private $queryTimeout;
-    /** @var AsyncProjectionsManager */
+    /** @var ProjectionsManager */
     private $projectionsManager;
 
     public function __construct(
@@ -37,7 +37,7 @@ class AsyncQueryManager
         int $queryTimeout
     ) {
         $this->queryTimeout = $queryTimeout;
-        $this->projectionsManager = new AsyncProjectionsManager(
+        $this->projectionsManager = new ProjectionsManager(
             $httpEndPoint,
             $projectionOperationTimeout
         );

@@ -17,18 +17,18 @@ use Throwable;
 
 class ClientErrorEventArgs implements EventArgs
 {
-    /** @var EventStoreAsyncConnection */
+    /** @var EventStoreConnection */
     private $connection;
     /** @var Throwable */
     private $exception;
 
-    public function __construct(EventStoreAsyncConnection $connection, Throwable $exception)
+    public function __construct(EventStoreConnection $connection, Throwable $exception)
     {
         $this->connection = $connection;
         $this->exception = $exception;
     }
 
-    public function connection(): EventStoreAsyncConnection
+    public function connection(): EventStoreConnection
     {
         return $this->connection;
     }

@@ -16,30 +16,18 @@ namespace ProophTest\EventStoreClient\Helper;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\ConnectionSettingsBuilder;
 use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
-use Prooph\EventStoreClient\EventStoreAsyncConnectionFactory;
-use Prooph\EventStoreClient\EventStoreSyncConnection;
-use Prooph\EventStoreClient\EventStoreSyncConnectionFactory;
+use Prooph\EventStoreClient\EventStoreConnection;
+use Prooph\EventStoreClient\EventStoreConnectionFactory;
 use Prooph\EventStoreClient\UserCredentials;
 
 /** @internal */
 class TestConnection
 {
-    public static function createAsync(?UserCredentials $userCredentials = null): EventStoreAsyncConnection
+    public static function create(?UserCredentials $userCredentials = null): EventStoreConnection
     {
         self::checkRequiredEnvironmentSettings();
 
-        return EventStoreAsyncConnectionFactory::createFromEndPoint(
-            self::endPoint(),
-            self::settings($userCredentials)
-        );
-    }
-
-    public static function createSync(?UserCredentials $userCredentials = null): EventStoreSyncConnection
-    {
-        self::checkRequiredEnvironmentSettings();
-
-        return EventStoreSyncConnectionFactory::createFromEndPoint(
+        return EventStoreConnectionFactory::createFromEndPoint(
             self::endPoint(),
             self::settings($userCredentials)
         );

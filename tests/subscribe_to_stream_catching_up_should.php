@@ -23,7 +23,7 @@ use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
 use Prooph\EventStoreClient\EventAppearedOnSubscription;
 use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
+use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
@@ -40,7 +40,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
 {
     private const TIMEOUT = 5000;
 
-    /** @var EventStoreAsyncConnection */
+    /** @var EventStoreConnection */
     private $conn;
 
     /**
@@ -49,7 +49,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
     private function execute(callable $function): void
     {
         Promise\wait(call(function () use ($function): Generator {
-            $this->conn = TestConnection::createAsync();
+            $this->conn = TestConnection::create();
 
             yield $this->conn->connectAsync();
 

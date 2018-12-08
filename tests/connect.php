@@ -21,8 +21,8 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\ClientClosedEventArgs;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
-use Prooph\EventStoreClient\EventStoreAsyncConnectionFactory;
+use Prooph\EventStoreClient\EventStoreConnection;
+use Prooph\EventStoreClient\EventStoreConnectionFactory;
 use Prooph\EventStoreClient\Exception\InvalidOperationException;
 use Prooph\EventStoreClient\ExpectedVersion;
 use ProophTest\EventStoreClient\Helper\TestEvent;
@@ -48,7 +48,7 @@ class connect extends TestCase
     public function should_not_throw_exception_when_server_is_down(): void
     {
         wait(call(function () {
-            $connection = EventStoreAsyncConnectionFactory::createFromEndPoint(
+            $connection = EventStoreConnectionFactory::createFromEndPoint(
                 $this->blackhole
             );
 
@@ -73,7 +73,7 @@ class connect extends TestCase
                 ->failOnNoServerResponse()
                 ->build();
 
-            $connection = EventStoreAsyncConnectionFactory::createFromEndPoint(
+            $connection = EventStoreConnectionFactory::createFromEndPoint(
                 $this->blackhole,
                 $settings
             );
@@ -111,13 +111,13 @@ class connect extends TestCase
                 ->failOnNoServerResponse()
                 ->build();
 
-            $connection = EventStoreAsyncConnectionFactory::createFromEndPoint(
+            $connection = EventStoreConnectionFactory::createFromEndPoint(
                 $this->blackhole,
                 $settings
             );
 
             $connection->onClosed(function (ClientClosedEventArgs $args) use ($closed) {
-                $this->assertInstanceOf(EventStoreAsyncConnection::class, $args->connection());
+                $this->assertInstanceOf(EventStoreConnection::class, $args->connection());
                 $this->assertEquals('Reconnection limit reached', $args->reason());
 
                 $closed->resolve(true);

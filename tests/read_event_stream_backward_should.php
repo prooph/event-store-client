@@ -39,7 +39,7 @@ class read_event_stream_backward_should extends TestCase
         wait(call(function () {
             $stream = 'read_event_stream_backward_should_throw_if_count_le_zero';
 
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
             yield $store->connectAsync();
 
             $this->expectException(InvalidArgumentException::class);
@@ -62,7 +62,7 @@ class read_event_stream_backward_should extends TestCase
         wait(call(function () {
             $stream = 'read_event_stream_backward_should_notify_using_status_code_if_stream_not_found';
 
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
             yield $store->connectAsync();
 
             $read = yield $store->readStreamEventsBackwardAsync(
@@ -86,7 +86,7 @@ class read_event_stream_backward_should extends TestCase
         wait(call(function () {
             $stream = 'read_event_stream_backward_should_notify_using_status_code_if_stream_was_deleted';
 
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
             yield $store->connectAsync();
             yield $store->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
 
@@ -111,7 +111,7 @@ class read_event_stream_backward_should extends TestCase
         wait(call(function () {
             $stream = 'read_event_stream_backward_should_return_single_event_when_called_on_empty_stream';
 
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
             yield $store->connectAsync();
 
             $read = yield $store->readStreamEventsBackwardAsync(
@@ -135,7 +135,7 @@ class read_event_stream_backward_should extends TestCase
         wait(call(function () {
             $stream = 'read_event_stream_backward_should_return_partial_slice_if_no_enough_events_in_stream';
 
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
             yield $store->connectAsync();
 
             $testEvents = TestEvent::newAmount(10);
@@ -166,7 +166,7 @@ class read_event_stream_backward_should extends TestCase
         wait(call(function () {
             $stream = 'read_event_stream_backward_should_return_events_reversed_compared_to_written';
 
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
             yield $store->connectAsync();
 
             $testEvents = TestEvent::newAmount(10);
@@ -204,7 +204,7 @@ class read_event_stream_backward_should extends TestCase
         wait(call(function () {
             $stream = 'read_event_stream_backward_should_be_able_to_read_single_event_from_arbitrary_position';
 
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
             yield $store->connectAsync();
 
             $testEvents = TestEvent::newAmount(10);
@@ -235,7 +235,7 @@ class read_event_stream_backward_should extends TestCase
         wait(call(function () {
             $stream = 'read_event_stream_backward_should_be_able_to_read_first_event';
 
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
             yield $store->connectAsync();
 
             $testEvents = TestEvent::newAmount(10);
@@ -266,7 +266,7 @@ class read_event_stream_backward_should extends TestCase
         wait(call(function () {
             $stream = 'read_event_stream_backward_should_be_able_to_read_last_event';
 
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
             yield $store->connectAsync();
 
             $testEvents = TestEvent::newAmount(10);
@@ -297,7 +297,7 @@ class read_event_stream_backward_should extends TestCase
         wait(call(function () {
             $stream = 'read_event_stream_backward_should_be_able_to_read_slice_from_arbitrary_position';
 
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
             yield $store->connectAsync();
 
             $testEvents = TestEvent::newAmount(10);
@@ -336,7 +336,7 @@ class read_event_stream_backward_should extends TestCase
     public function throw_when_got_int_max_value_as_maxcount(): void
     {
         wait(call(function () {
-            $store = TestConnection::createAsync();
+            $store = TestConnection::create();
             yield $store->connectAsync();
 
             $this->expectException(InvalidArgumentException::class);

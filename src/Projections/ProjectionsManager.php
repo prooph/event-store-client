@@ -19,7 +19,7 @@ use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\UserCredentials;
 
-class AsyncProjectionsManager
+class ProjectionsManager
 {
     /** @var ProjectionsClient */
     private $client;

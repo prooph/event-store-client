@@ -17,7 +17,7 @@ use Amp\Delayed;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
+use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\Exception\StreamDeletedException;
 use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
 use Prooph\EventStoreClient\ExpectedVersion;
@@ -36,12 +36,12 @@ use function Amp\Promise\wait;
 
 class soft_delete extends TestCase
 {
-    /** @var EventStoreAsyncConnection */
+    /** @var EventStoreConnection */
     private $conn;
 
     protected function setUpTestCase(): Generator
     {
-        $this->conn = TestConnection::createAsync(DefaultData::adminCredentials());
+        $this->conn = TestConnection::create(DefaultData::adminCredentials());
         yield $this->conn->connectAsync();
     }
 

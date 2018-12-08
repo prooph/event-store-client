@@ -31,7 +31,7 @@ class when_working_with_metadata extends TestCase
     public function when_getting_metadata_for_an_existing_stream_and_no_metadata_exists(): void
     {
         wait(call(function () {
-            $connection = TestConnection::createAsync();
+            $connection = TestConnection::create();
             yield $connection->connectAsync();
 
             $stream = 'when_getting_metadata_for_an_existing_stream_and_no_metadata_exists';

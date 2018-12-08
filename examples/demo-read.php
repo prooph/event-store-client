@@ -18,13 +18,8 @@ use Amp\Loop;
 require __DIR__ . '/../vendor/autoload.php';
 
 Loop::run(function () {
-    $builder = new ConnectionSettingsBuilder();
-    $builder->enableVerboseLogging();
-    $builder->useConsoleLogger();
-
-    $connection = EventStoreAsyncConnectionFactory::createFromEndPoint(
-        new EndPoint('eventstore', 1113),
-        $builder->build()
+    $connection = EventStoreConnectionFactory::createFromEndPoint(
+        new EndPoint('eventstore', 1113)
     );
 
     $connection->onConnected(function (): void {
@@ -44,7 +39,7 @@ Loop::run(function () {
         true
     );
 
-    \var_dump(\get_class($slice));
+    \var_dump($slice);
 
     $slice = yield $connection->readStreamEventsBackwardAsync(
         'foo-bar',
@@ -53,15 +48,15 @@ Loop::run(function () {
         true
     );
 
-    \var_dump(\get_class($slice));
+    \var_dump($slice);
 
     $event = yield $connection->readEventAsync('foo-bar', 2, true);
 
-    \var_dump(\get_class($event));
+    \var_dump($event);
 
     $m = yield $connection->getStreamMetadataAsync('foo-bar');
 
-    \var_dump(\get_class($m));
+    \var_dump($m);
 
     $r = yield $connection->setStreamMetadataAsync('foo-bar', ExpectedVersion::ANY, new StreamMetadata(
         null, null, null, null, null, [
@@ -69,11 +64,11 @@ Loop::run(function () {
         ]
     ));
 
-    \var_dump(\get_class($r));
+    \var_dump($r);
 
     $m = yield $connection->getStreamMetadataAsync('foo-bar');
 
-    \var_dump(\get_class($m));
+    \var_dump($m);
 
     $wr = yield $connection->appendToStreamAsync('foo-bar', ExpectedVersion::ANY, [
         new EventData(EventId::generate(), 'test-type', false, 'jfkhksdfhsds', 'meta'),
@@ -82,21 +77,21 @@ Loop::run(function () {
         new EventData(EventId::generate(), 'test-type4', false, 'bbb', 'meta'),
     ]);
 
-    \var_dump(\get_class($wr));
+    \var_dump($wr);
 
     $ae = yield $connection->readAllEventsForwardAsync(Position::start(), 2, false, new UserCredentials(
         'admin',
         'changeit'
     ));
 
-    \var_dump(\get_class($ae));
+    \var_dump($ae);
 
     $aeb = yield $connection->readAllEventsBackwardAsync(Position::end(), 2, false, new UserCredentials(
         'admin',
         'changeit'
     ));
 
-    \var_dump(\get_class($aeb));
+    \var_dump($aeb);
 
     $connection->close();
 });

@@ -27,8 +27,8 @@ use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\EventAppearedOnSubscription;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
-use Prooph\EventStoreClient\EventStoreAsyncTransaction;
+use Prooph\EventStoreClient\EventStoreConnection;
+use Prooph\EventStoreClient\EventStoreTransaction;
 use Prooph\EventStoreClient\Internal\EventHandler;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ListenerHandler;
@@ -42,7 +42,7 @@ use Prooph\EventStoreClient\SystemSettings;
 use Prooph\EventStoreClient\UserCredentials;
 
 /** @internal */
-class FakeEventStoreConnection implements EventStoreAsyncConnection
+class FakeEventStoreConnection implements EventStoreConnection
 {
     /** @var callable */
     private $readAllEventsForwardAsync;
@@ -218,7 +218,7 @@ class FakeEventStoreConnection implements EventStoreAsyncConnection
     public function continueTransaction(
         int $transactionId,
         ?UserCredentials $userCredentials = null
-    ): EventStoreAsyncTransaction {
+    ): EventStoreTransaction {
         throw new \RuntimeException('Not implemented');
     }
 

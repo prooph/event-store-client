@@ -15,7 +15,7 @@ namespace ProophTest\EventStoreClient\Helper;
 
 use Amp\Promise;
 use Amp\Success;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
+use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\WriteResult;
 use function Amp\call;
@@ -23,14 +23,14 @@ use function Amp\call;
 /** @internal */
 class StreamWriter
 {
-    /** @var EventStoreAsyncConnection */
+    /** @var EventStoreConnection */
     private $connection;
     /** @var string */
     private $stream;
     /** @var int */
     private $version;
 
-    public function __construct(EventStoreAsyncConnection $connection, string $stream, int $version)
+    public function __construct(EventStoreConnection $connection, string $stream, int $version)
     {
         $this->connection = $connection;
         $this->stream = $stream;

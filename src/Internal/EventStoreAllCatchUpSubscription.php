@@ -19,7 +19,7 @@ use Prooph\EventStoreClient\AllEventsSlice;
 use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
 use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
-use Prooph\EventStoreClient\EventStoreAsyncConnection;
+use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\LiveProcessingStarted;
 use Prooph\EventStoreClient\Position;
 use Prooph\EventStoreClient\ResolvedEvent;
@@ -40,7 +40,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription
      * @internal
      */
     public function __construct(
-        EventStoreAsyncConnection $connection,
+        EventStoreConnection $connection,
         Logger $logger,
         ?Position $fromPositionExclusive, // if null from the very beginning
         ?UserCredentials $userCredentials,
@@ -70,7 +70,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription
     }
 
     protected function readEventsTillAsync(
-        EventStoreAsyncConnection $connection,
+        EventStoreConnection $connection,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         ?int $lastCommitPosition,
@@ -80,7 +80,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription
     }
 
     private function readEventsInternalAsync(
-        EventStoreAsyncConnection $connection,
+        EventStoreConnection $connection,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         ?int $lastCommitPosition

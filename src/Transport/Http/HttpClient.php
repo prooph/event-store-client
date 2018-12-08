@@ -21,7 +21,7 @@ use Prooph\EventStoreClient\UserCredentials;
 use Throwable;
 
 /** @internal  */
-class HttpAsyncClient
+class HttpClient
 {
     /** @var Client */
     private $client;

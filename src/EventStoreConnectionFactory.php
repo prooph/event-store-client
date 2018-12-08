@@ -13,20 +13,20 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-use Prooph\EventStoreClient\EventStoreSyncConnection as SyncConnection;
+use Prooph\EventStoreClient\EventStoreConnection as AsyncConnection;
 use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Internal\ClusterDnsEndPointDiscoverer;
-use Prooph\EventStoreClient\Internal\EventStoreSyncNodeConnection;
+use Prooph\EventStoreClient\Internal\EventStoreNodeConnection;
 use Prooph\EventStoreClient\Internal\SingleEndpointDiscoverer;
 use Prooph\EventStoreClient\Internal\StaticEndPointDiscoverer;
 
-class EventStoreSyncConnectionFactory
+class EventStoreConnectionFactory
 {
     public static function createFromConnectionString(
         string $connectionString,
         ?ConnectionSettings $settings = null,
         ?string $connectionName = null
-    ): SyncConnection {
+    ): AsyncConnection {
         $settings = ConnectionString::getConnectionSettings(
             $connectionString,
             $settings ?? ConnectionSettings::default()
@@ -53,7 +53,7 @@ class EventStoreSyncConnectionFactory
         ?Uri $uri,
         ?ConnectionSettings $connectionSettings = null,
         ?string $connectionName = null
-    ): SyncConnection {
+    ): AsyncConnection {
         $connectionSettings = $connectionSettings ?? ConnectionSettings::default();
 
         if (null !== $uri) {
@@ -83,7 +83,7 @@ class EventStoreSyncConnectionFactory
                     $clusterSettings->preferRandomNode()
                 );
 
-                return new EventStoreSyncNodeConnection(
+                return new EventStoreNodeConnection(
                     $connectionSettings,
                     $clusterSettings,
                     $endPointDiscoverer,
@@ -92,7 +92,7 @@ class EventStoreSyncConnectionFactory
             }
 
             if ('tcp' === $scheme) {
-                return new EventStoreSyncNodeConnection(
+                return new EventStoreNodeConnection(
                     $connectionSettings,
                     null,
                     new SingleEndpointDiscoverer(
@@ -127,7 +127,34 @@ class EventStoreSyncConnectionFactory
                 $clusterSettings->preferRandomNode()
             );
 
-            return new EventStoreSyncNodeConnection(
+            return new EventStoreNodeConnection(
+                $connectionSettings,
+                $clusterSettings,
+                $endPointDiscoverer,
+                $connectionName
+            );
+        }
+
+        if ('' !== $connectionSettings->clusterDns()) {
+            $clusterSettings = ClusterSettings::fromClusterDns(
+                $connectionSettings->clusterDns(),
+                $connectionSettings->maxDiscoverAttempts(),
+                $connectionSettings->externalGossipPort(),
+                $connectionSettings->gossipTimeout(),
+                $connectionSettings->preferRandomNode()
+            );
+
+            $endPointDiscoverer = new ClusterDnsEndPointDiscoverer(
+                $connectionSettings->log(),
+                $clusterSettings->clusterDns(),
+                $clusterSettings->maxDiscoverAttempts(),
+                $clusterSettings->externalGossipPort(),
+                $clusterSettings->gossipSeeds(),
+                $clusterSettings->gossipTimeout(),
+                $clusterSettings->preferRandomNode()
+            );
+
+            return new EventStoreNodeConnection(
                 $connectionSettings,
                 $clusterSettings,
                 $endPointDiscoverer,
@@ -142,10 +169,10 @@ class EventStoreSyncConnectionFactory
         EndPoint $endPoint,
         ?ConnectionSettings $settings = null,
         ?string $connectionName = null
-    ): SyncConnection {
+    ): AsyncConnection {
         $settings = $settings ?? ConnectionSettings::default();
 
-        return new EventStoreSyncNodeConnection(
+        return new EventStoreNodeConnection(
             $settings,
             null,
             new StaticEndPointDiscoverer(
@@ -159,7 +186,7 @@ class EventStoreSyncConnectionFactory
     public static function createFromSettings(
         ConnectionSettings $settings,
         ?string $connectionName = null
-    ): SyncConnection {
+    ): AsyncConnection {
         return self::createFromUri(null, $settings, $connectionName);
     }
 
@@ -167,7 +194,7 @@ class EventStoreSyncConnectionFactory
         ConnectionSettings $connectionSettings,
         ClusterSettings $clusterSettings,
         string $connectionName = ''
-    ): SyncConnection {
+    ): AsyncConnection {
         $endPointDiscoverer = new ClusterDnsEndPointDiscoverer(
             $connectionSettings->log(),
             $clusterSettings->clusterDns(),
@@ -178,7 +205,7 @@ class EventStoreSyncConnectionFactory
             $clusterSettings->preferRandomNode()
         );
 
-        return new EventStoreSyncNodeConnection(
+        return new EventStoreNodeConnection(
             $connectionSettings,
             $clusterSettings,
             $endPointDiscoverer,

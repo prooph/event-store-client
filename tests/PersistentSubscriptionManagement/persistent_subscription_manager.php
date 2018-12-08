@@ -25,8 +25,8 @@ use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\Internal\ResolvedEvent;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
-use Prooph\EventStoreClient\PersistentSubscriptions\AsyncPersistentSubscriptionsManager;
 use Prooph\EventStoreClient\PersistentSubscriptions\PersistentSubscriptionDetails;
+use Prooph\EventStoreClient\PersistentSubscriptions\PersistentSubscriptionsManager;
 use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Prooph\EventStoreClient\Util\Guid;
 use ProophTest\EventStoreClient\CountdownEvent;
@@ -38,7 +38,7 @@ class persistent_subscription_manager extends TestCase
 {
     use SpecificationWithConnection;
 
-    /** @var AsyncPersistentSubscriptionsManager */
+    /** @var PersistentSubscriptionsManager */
     private $manager;
     /** @var string */
     private $stream;
@@ -49,7 +49,7 @@ class persistent_subscription_manager extends TestCase
 
     protected function setUp(): void
     {
-        $this->manager = new AsyncPersistentSubscriptionsManager(
+        $this->manager = new PersistentSubscriptionsManager(
             new EndPoint(
                 (string) \getenv('ES_HOST'),
                 (int) \getenv('ES_HTTP_PORT')
