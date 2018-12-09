@@ -8,6 +8,7 @@
       "email": "saschaprolic@googlemail.com"
     }
   ],
+  "description": "Event Store Client for async TCP connections",
   "keywords": [
     "EventStore",
     "EventSourcing",

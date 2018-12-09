@@ -212,12 +212,6 @@ class UsersClient
                 return;
             }
 
-            $links = [];
-
-            foreach ($data['data']['links'] as $link) {
-                $links[] = new RelLink($link['href'], $link['rel']);
-            }
-
             $deferred->resolve(UserDetails::fromArray($data['data']));
         });
 

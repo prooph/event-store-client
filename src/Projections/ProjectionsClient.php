@@ -189,13 +189,13 @@ class ProjectionsClient
                 return;
             }
 
+            $projectionDetails = [];
+
             if (null === $data['projections']) {
-                $deferred->resolve(null);
+                $deferred->resolve($projectionDetails);
 
                 return;
             }
-
-            $projectionDetails = [];
 
             foreach ($data['projections'] as $entry) {
                 $projectionDetails[] = $this->buildProjectionDetails($entry);
@@ -238,13 +238,13 @@ class ProjectionsClient
                 return;
             }
 
+            $projectionDetails = [];
+
             if (null === $data['projections']) {
-                $deferred->resolve(null);
+                $deferred->resolve($projectionDetails);
 
                 return;
             }
-
-            $projectionDetails = [];
 
             foreach ($data['projections'] as $entry) {
                 $projectionDetails[] = $this->buildProjectionDetails($entry);
@@ -287,13 +287,13 @@ class ProjectionsClient
                 return;
             }
 
+            $projectionDetails = [];
+
             if (null === $data['projections']) {
-                $deferred->resolve(null);
+                $deferred->resolve($projectionDetails);
 
                 return;
             }
-
-            $projectionDetails = [];
 
             foreach ($data['projections'] as $entry) {
                 $projectionDetails[] = $this->buildProjectionDetails($entry);

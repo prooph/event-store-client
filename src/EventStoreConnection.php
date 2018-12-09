@@ -153,7 +153,7 @@ interface EventStoreConnection
         ?UserCredentials $userCredentials = null
     ): Promise;
 
-    /** @return Promise<UpdatePersistentSubscription> */
+    /** @return Promise<PersistentSubscriptionUpdateResult> */
     public function updatePersistentSubscriptionAsync(
         string $stream,
         string $groupName,
@@ -161,7 +161,7 @@ interface EventStoreConnection
         ?UserCredentials $userCredentials = null
     ): Promise;
 
-    /** @return Promise<DeletePersistentSubscription> */
+    /** @return Promise<PersistentSubscriptionDeleteResult> */
     public function deletePersistentSubscriptionAsync(
         string $stream,
         string $groupName,
