@@ -16,6 +16,7 @@ namespace Prooph\EventStoreClient\Internal;
 use Prooph\EventStoreClient\Position;
 use Prooph\EventStoreClient\RecordedEvent;
 
+/** @internal */
 interface ResolvedEvent
 {
     public function originalEvent(): ?RecordedEvent;
