@@ -35,7 +35,6 @@ use SplQueue;
 use Throwable;
 use function Amp\call;
 
-/** @internal  */
 abstract class EventStoreCatchUpSubscription
 {
     /** @var ResolvedEvent */
@@ -93,6 +92,7 @@ abstract class EventStoreCatchUpSubscription
     /** @var ListenerHandler */
     private $connectListener;
 
+    /** @internal */
     public function __construct(
         EventStoreConnection $connection,
         Logger $logger,
