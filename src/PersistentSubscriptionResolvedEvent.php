@@ -15,6 +15,7 @@ namespace Prooph\EventStoreClient;
 
 use Prooph\EventStoreClient\Internal\ResolvedEvent as InternalResolvedEvent;
 
+/** @internal */
 class PersistentSubscriptionResolvedEvent implements InternalResolvedEvent
 {
     /** @var int|null */
@@ -22,7 +23,6 @@ class PersistentSubscriptionResolvedEvent implements InternalResolvedEvent
     /** @var ResolvedEvent */
     private $event;
 
-    /** @internal */
     public function __construct(ResolvedEvent $event, ?int $retryCount)
     {
         $this->event = $event;
