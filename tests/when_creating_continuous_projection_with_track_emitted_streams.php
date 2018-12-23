@@ -15,9 +15,9 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EventReadResult;
+use Prooph\EventStore\EventReadResult;
+use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\Projections\ProjectionDetails;
-use Prooph\EventStoreClient\Util\Guid;
 use Throwable;
 
 class when_creating_continuous_projection_with_track_emitted_streams extends TestCase

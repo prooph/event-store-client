@@ -15,7 +15,7 @@ namespace ProophTest\EventStoreClient\Helper;
 
 use Amp\Promise;
 use Generator;
-use Prooph\EventStoreClient\EventData;
+use Prooph\EventStore\EventData;
 use Prooph\EventStoreClient\EventStoreTransaction;
 use function Amp\call;
 

@@ -15,9 +15,9 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Exception\InvalidOperationException;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Util\Guid;
+use Prooph\EventStore\Exception\InvalidOperationException;
+use Prooph\EventStore\PersistentSubscriptionSettings;
+use Prooph\EventStore\Util\Guid;
 use Throwable;
 
 class create_duplicate_persistent_subscription_group extends TestCase

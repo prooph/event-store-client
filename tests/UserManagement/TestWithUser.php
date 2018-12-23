@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient\UserManagement;
 
 use Generator;
-use Prooph\EventStoreClient\Util\Guid;
+use Prooph\EventStore\Util\Guid;
 use ProophTest\EventStoreClient\DefaultData;
 use Throwable;
 use function Amp\call;

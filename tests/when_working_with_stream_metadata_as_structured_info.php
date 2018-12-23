@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EventStoreConnection;
-use Prooph\EventStoreClient\Exception\RuntimeException;
-use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
-use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\RawStreamMetadataResult;
-use Prooph\EventStoreClient\StreamMetadata;
-use Prooph\EventStoreClient\StreamMetadataResult;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\Exception\RuntimeException;
+use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\RawStreamMetadataResult;
+use Prooph\EventStore\StreamMetadata;
+use Prooph\EventStore\StreamMetadataResult;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
@@ -31,7 +31,7 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
 {
     /** @var string */
     private $stream;
-    /** @var EventStoreConnection */
+    /** @var AsyncEventStoreConnection */
     private $conn;
 
     /** @throws Throwable */

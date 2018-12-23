@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Internal\Message;
 
 use Amp\Deferred;
-use Prooph\EventStoreClient\UserCredentials;
+use Prooph\EventStore\UserCredentials;
 
 /** @internal  */
 class StartPersistentSubscriptionMessage implements Message

@@ -15,6 +15,15 @@ namespace ProophTest\EventStoreClient;
 
 use Amp\Promise;
 use Amp\Success;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\ListenerHandler;
+use Prooph\EventStore\PersistentSubscriptionSettings;
+use Prooph\EventStore\Position;
+use Prooph\EventStore\StreamMetadata;
+use Prooph\EventStore\SubscriptionDropped;
+use Prooph\EventStore\SystemSettings;
+use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
 use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\ClientAuthenticationFailedEventArgs;
@@ -26,23 +35,14 @@ use Prooph\EventStoreClient\ClusterSettings;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
-use Prooph\EventStoreClient\EventAppearedOnSubscription;
-use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\EventStoreTransaction;
 use Prooph\EventStoreClient\Internal\EventHandler;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
-use Prooph\EventStoreClient\Internal\ListenerHandler;
 use Prooph\EventStoreClient\LiveProcessingStarted;
 use Prooph\EventStoreClient\PersistentSubscriptionDropped;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Position;
-use Prooph\EventStoreClient\StreamMetadata;
-use Prooph\EventStoreClient\SubscriptionDropped;
-use Prooph\EventStoreClient\SystemSettings;
-use Prooph\EventStoreClient\UserCredentials;
 
 /** @internal */
-class FakeEventStoreConnection implements EventStoreConnection
+class FakeEventStoreConnection implements AsyncEventStoreConnection
 {
     /** @var callable */
     private $readAllEventsForwardAsync;

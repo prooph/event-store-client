@@ -19,8 +19,10 @@ use Amp\Log\ConsoleFormatter;
 use Amp\Log\StreamHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Logger as MonoLog;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Internal\Consts;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\Internal\Consts;
+use Prooph\EventStore\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
 use Psr\Log\NullLogger;
 

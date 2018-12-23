@@ -16,7 +16,7 @@ namespace ProophTest\EventStoreClient;
 use Amp\Deferred;
 use Amp\Promise;
 use InvalidArgumentException;
-use Prooph\EventStoreClient\Exception\RuntimeException;
+use Prooph\EventStore\Exception\RuntimeException;
 
 /** @internal */
 class CountdownEvent

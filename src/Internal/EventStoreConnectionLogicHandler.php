@@ -17,6 +17,15 @@ use Amp\Deferred;
 use Amp\Loop;
 use Exception;
 use Generator;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Exception\CannotEstablishConnectionException;
+use Prooph\EventStore\Exception\EventStoreConnectionException;
+use Prooph\EventStore\Exception\InvalidOperationException;
+use Prooph\EventStore\Exception\ObjectDisposedException;
+use Prooph\EventStore\Internal\Consts;
+use Prooph\EventStore\ListenerHandler;
+use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\ClientAuthenticationFailedEventArgs;
 use Prooph\EventStoreClient\ClientClosedEventArgs;
 use Prooph\EventStoreClient\ClientConnectionEventArgs;
@@ -26,12 +35,6 @@ use Prooph\EventStoreClient\ClientOperations\ConnectToPersistentSubscriptionOper
 use Prooph\EventStoreClient\ClientOperations\VolatileSubscriptionOperation;
 use Prooph\EventStoreClient\ClientReconnectingEventArgs;
 use Prooph\EventStoreClient\ConnectionSettings;
-use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\EventStoreConnection;
-use Prooph\EventStoreClient\Exception\CannotEstablishConnectionException;
-use Prooph\EventStoreClient\Exception\EventStoreConnectionException;
-use Prooph\EventStoreClient\Exception\InvalidOperationException;
-use Prooph\EventStoreClient\Exception\ObjectDisposedException;
 use Prooph\EventStoreClient\Internal\Message\CloseConnectionMessage;
 use Prooph\EventStoreClient\Internal\Message\EstablishTcpConnectionMessage;
 use Prooph\EventStoreClient\Internal\Message\HandleTcpPackageMessage;
@@ -49,7 +52,6 @@ use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\SystemData\TcpFlags;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
-use Prooph\EventStoreClient\Util\Guid;
 use Throwable;
 
 /** @internal */
@@ -57,7 +59,7 @@ class EventStoreConnectionLogicHandler
 {
     private const CLIENT_VERSION = 1;
 
-    /** @var EventStoreConnection */
+    /** @var AsyncEventStoreConnection */
     private $esConnection;
     /** @var TcpPackageConnection|null */
     private $connection;
@@ -97,7 +99,7 @@ class EventStoreConnectionLogicHandler
     /** @var int */
     private $lastTimeoutsTimeStamp;
 
-    public function __construct(EventStoreConnection $connection, ConnectionSettings $settings)
+    public function __construct(AsyncEventStoreConnection $connection, ConnectionSettings $settings)
     {
         $this->esConnection = $connection;
         $this->settings = $settings;

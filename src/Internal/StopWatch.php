@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Prooph\EventStoreClient\Util\DateTime;
+use Prooph\EventStore\Util\DateTime;
 
 /** @internal */
 class StopWatch

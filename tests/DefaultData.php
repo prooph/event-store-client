@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Prooph\EventStoreClient\UserCredentials;
+use Prooph\EventStore\UserCredentials;
 
 class DefaultData
 {

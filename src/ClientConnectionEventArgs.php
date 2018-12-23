@@ -13,20 +13,23 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\EndPoint;
+
 class ClientConnectionEventArgs implements EventArgs
 {
-    /** @var EventStoreConnection */
+    /** @var AsyncEventStoreConnection */
     private $connection;
     /** @var EndPoint */
     private $remoteEndPoint;
 
-    public function __construct(EventStoreConnection $connection, EndPoint $remoteEndPoint)
+    public function __construct(AsyncEventStoreConnection $connection, EndPoint $remoteEndPoint)
     {
         $this->connection = $connection;
         $this->remoteEndPoint = $remoteEndPoint;
     }
 
-    public function connection(): EventStoreConnection
+    public function connection(): AsyncEventStoreConnection
     {
         return $this->connection;
     }

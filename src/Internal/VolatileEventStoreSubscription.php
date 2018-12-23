@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStoreClient\ClientOperations\VolatileSubscriptionOperation;
-use Prooph\EventStoreClient\EventStoreSubscription;
 
 /** @internal */
 class VolatileEventStoreSubscription extends EventStoreSubscription

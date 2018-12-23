@@ -18,15 +18,15 @@ use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventId;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventId;
-use Prooph\EventStoreClient\EventStoreConnection;
-use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
 use Prooph\EventStoreClient\LiveProcessingStarted;
-use Prooph\EventStoreClient\ResolvedEvent;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use Throwable;
 use function Amp\call;
@@ -41,7 +41,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
     private $streamName = 'TestStream';
     /** @var CatchUpSubscriptionSettings */
     private $settings;
-    /** @var EventStoreConnection */
+    /** @var AsyncEventStoreConnection */
     private $connection;
 
     private function setUpTestCase(): Promise

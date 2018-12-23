@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
-use Prooph\EventStoreClient\SubscriptionDropReason;
+use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;

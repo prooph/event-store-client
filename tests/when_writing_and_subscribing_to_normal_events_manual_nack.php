@@ -18,14 +18,14 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\PersistentSubscriptionSettings;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\ResolvedEvent;
-use Prooph\EventStoreClient\Util\Guid;
 use Throwable;
 
 class when_writing_and_subscribing_to_normal_events_manual_nack extends TestCase

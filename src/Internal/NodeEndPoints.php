@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Exception\InvalidArgumentException;
 
 /** @internal */
 class NodeEndPoints

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Prooph\EventStoreClient\EventId;
-use Prooph\EventStoreClient\EventStoreSubscription;
+use Prooph\EventStore\EventId;
+use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
 
 /** @internal */

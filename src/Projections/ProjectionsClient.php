@@ -16,15 +16,15 @@ namespace Prooph\EventStoreClient\Projections;
 use Amp\Artax\Response;
 use Amp\Deferred;
 use Amp\Promise;
-use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\Exception\JsonException;
-use Prooph\EventStoreClient\Exception\ProjectionCommandConflictException;
-use Prooph\EventStoreClient\Exception\ProjectionCommandFailedException;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Exception\JsonException;
+use Prooph\EventStore\Exception\ProjectionCommandConflictException;
+use Prooph\EventStore\Exception\ProjectionCommandFailedException;
+use Prooph\EventStore\UserCredentials;
+use Prooph\EventStore\Util\Json;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\Transport\Http\HttpClient;
 use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
-use Prooph\EventStoreClient\UserCredentials;
-use Prooph\EventStoreClient\Util\Json;
 use Throwable;
 
 /** @internal */

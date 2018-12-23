@@ -15,16 +15,16 @@ namespace Prooph\EventStoreClient\Internal;
 
 use Amp\Delayed;
 use Amp\Promise;
-use Prooph\EventStoreClient\AllEventsSlice;
+use Prooph\EventStore\AllEventsSlice;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\Position;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\SubscriptionDropReason;
+use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
 use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
-use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\LiveProcessingStarted;
-use Prooph\EventStoreClient\Position;
-use Prooph\EventStoreClient\ResolvedEvent;
-use Prooph\EventStoreClient\SubscriptionDropReason;
-use Prooph\EventStoreClient\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
 use Throwable;
 use function Amp\call;
@@ -40,7 +40,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription
      * @internal
      */
     public function __construct(
-        EventStoreConnection $connection,
+        AsyncEventStoreConnection $connection,
         Logger $logger,
         ?Position $fromPositionExclusive, // if null from the very beginning
         ?UserCredentials $userCredentials,
@@ -70,7 +70,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription
     }
 
     protected function readEventsTillAsync(
-        EventStoreConnection $connection,
+        AsyncEventStoreConnection $connection,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         ?int $lastCommitPosition,
@@ -80,7 +80,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription
     }
 
     private function readEventsInternalAsync(
-        EventStoreConnection $connection,
+        AsyncEventStoreConnection $connection,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         ?int $lastCommitPosition

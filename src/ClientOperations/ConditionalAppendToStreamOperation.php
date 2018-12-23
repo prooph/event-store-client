@@ -14,21 +14,21 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\Exception\InvalidTransactionException;
+use Prooph\EventStore\Exception\UnexpectedOperationResult;
+use Prooph\EventStore\Position;
+use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\ConditionalWriteResult;
 use Prooph\EventStoreClient\ConditionalWriteStatus;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\Exception\AccessDeniedException;
-use Prooph\EventStoreClient\Exception\InvalidTransactionException;
-use Prooph\EventStoreClient\Exception\UnexpectedOperationResult;
 use Prooph\EventStoreClient\Internal\NewEventConverter;
 use Prooph\EventStoreClient\Messages\ClientMessages\OperationResult;
 use Prooph\EventStoreClient\Messages\ClientMessages\WriteEvents;
 use Prooph\EventStoreClient\Messages\ClientMessages\WriteEventsCompleted;
-use Prooph\EventStoreClient\Position;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use Prooph\EventStoreClient\UserCredentials;
 use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 

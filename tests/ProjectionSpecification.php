@@ -16,12 +16,12 @@ namespace ProophTest\EventStoreClient;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventStoreConnection;
-use Prooph\EventStoreClient\ExpectedVersion;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\UserCredentials;
+use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\Projections\ProjectionsManager;
-use Prooph\EventStoreClient\UserCredentials;
-use Prooph\EventStoreClient\Util\Guid;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use Throwable;
 use function Amp\call;
@@ -31,7 +31,7 @@ trait ProjectionSpecification
 {
     /** @var ProjectionsManager */
     protected $projectionsManager;
-    /** @var EventStoreConnection */
+    /** @var AsyncEventStoreConnection */
     protected $connection;
     /** @var UserCredentials */
     protected $credentials;

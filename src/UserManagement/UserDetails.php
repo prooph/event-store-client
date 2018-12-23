@@ -15,7 +15,7 @@ namespace Prooph\EventStoreClient\UserManagement;
 
 use DateTimeImmutable;
 use Exception;
-use Prooph\EventStoreClient\Util\DateTime;
+use Prooph\EventStore\Util\DateTime;
 
 /** @internal */
 final class UserDetails

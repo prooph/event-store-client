@@ -17,11 +17,11 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStore\PersistentSubscriptionSettings;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\ResolvedEvent;
-use Prooph\EventStoreClient\Util\Guid;
 use Throwable;
 
 class connect_to_existing_persistent_subscription_with_permissions extends TestCase

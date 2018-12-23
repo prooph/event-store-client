@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Projections;
 
 use Amp\Promise;
-use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
-use Prooph\EventStoreClient\UserCredentials;
 
 class ProjectionsManager
 {

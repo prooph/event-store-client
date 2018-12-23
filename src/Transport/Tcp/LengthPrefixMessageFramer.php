@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Transport\Tcp;
 
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Exception\PackageFramingException;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\Exception\PackageFramingException;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 
 /** @internal */

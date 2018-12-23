@@ -15,8 +15,8 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Util\Guid;
+use Prooph\EventStore\PersistentSubscriptionSettings;
+use Prooph\EventStore\Util\Guid;
 use Throwable;
 
 class deleting_existing_persistent_subscription_group_with_permissions extends TestCase

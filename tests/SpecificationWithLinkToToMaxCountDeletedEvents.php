@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Generator;
-use Prooph\EventStoreClient\Common\SystemEventTypes;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventId;
-use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\StreamMetadata;
-use Prooph\EventStoreClient\Util\Guid;
+use Prooph\EventStore\Common\SystemEventTypes;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventId;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\StreamMetadata;
+use Prooph\EventStore\Util\Guid;
 
 trait SpecificationWithLinkToToMaxCountDeletedEvents
 {

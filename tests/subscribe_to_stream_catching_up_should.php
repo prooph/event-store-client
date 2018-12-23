@@ -18,19 +18,19 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventStoreSubscription;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
 use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
-use Prooph\EventStoreClient\EventAppearedOnSubscription;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventStoreConnection;
-use Prooph\EventStoreClient\EventStoreSubscription;
-use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\EventStoreStreamCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\ManualResetEventSlim;
-use Prooph\EventStoreClient\ResolvedEvent;
-use Prooph\EventStoreClient\SubscriptionDropReason;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
@@ -40,7 +40,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
 {
     private const TIMEOUT = 5000;
 
-    /** @var EventStoreConnection */
+    /** @var AsyncEventStoreConnection */
     private $conn;
 
     /**

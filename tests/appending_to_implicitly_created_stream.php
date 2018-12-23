@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
-use Prooph\EventStoreClient\ExpectedVersion;
+use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\ExpectedVersion;
 use ProophTest\EventStoreClient\Helper\EventsStream;
 use ProophTest\EventStoreClient\Helper\StreamWriter;
 use ProophTest\EventStoreClient\Helper\TailWriter;

@@ -14,20 +14,20 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Prooph\EventStoreClient\Exception\AccessDeniedException;
-use Prooph\EventStoreClient\Exception\InvalidTransactionException;
-use Prooph\EventStoreClient\Exception\StreamDeletedException;
-use Prooph\EventStoreClient\Exception\UnexpectedOperationResult;
-use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\Exception\InvalidTransactionException;
+use Prooph\EventStore\Exception\StreamDeletedException;
+use Prooph\EventStore\Exception\UnexpectedOperationResult;
+use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\Position;
+use Prooph\EventStore\UserCredentials;
+use Prooph\EventStore\WriteResult;
 use Prooph\EventStoreClient\Messages\ClientMessages\OperationResult;
 use Prooph\EventStoreClient\Messages\ClientMessages\TransactionCommit;
 use Prooph\EventStoreClient\Messages\ClientMessages\TransactionCommitCompleted;
-use Prooph\EventStoreClient\Position;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use Prooph\EventStoreClient\UserCredentials;
-use Prooph\EventStoreClient\WriteResult;
 use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 

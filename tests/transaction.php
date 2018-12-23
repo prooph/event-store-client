@@ -16,14 +16,14 @@ namespace ProophTest\EventStoreClient;
 use Amp\Parallel\Worker\DefaultPool;
 use Amp\Promise;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventStoreConnection;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\Exception\StreamDeletedException;
+use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\StreamEventsSlice;
+use Prooph\EventStore\WriteResult;
 use Prooph\EventStoreClient\EventStoreTransaction;
-use Prooph\EventStoreClient\Exception\StreamDeletedException;
-use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
-use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\StreamEventsSlice;
-use Prooph\EventStoreClient\WriteResult;
 use ProophTest\EventStoreClient\Helper\ParallelTransactionTask;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
@@ -32,7 +32,7 @@ use function Amp\call;
 
 class transaction extends TestCase
 {
-    /** @var EventStoreConnection */
+    /** @var AsyncEventStoreConnection */
     private $conn;
 
     /**

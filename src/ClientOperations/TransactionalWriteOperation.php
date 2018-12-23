@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\Exception\AccessDeniedException;
-use Prooph\EventStoreClient\Exception\UnexpectedOperationResult;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\Exception\UnexpectedOperationResult;
+use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Internal\NewEventConverter;
 use Prooph\EventStoreClient\Messages\ClientMessages\OperationResult;
 use Prooph\EventStoreClient\Messages\ClientMessages\TransactionWrite;
@@ -24,7 +25,6 @@ use Prooph\EventStoreClient\Messages\ClientMessages\TransactionWriteCompleted;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use Prooph\EventStoreClient\UserCredentials;
 use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 

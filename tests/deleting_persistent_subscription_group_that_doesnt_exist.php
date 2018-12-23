@@ -16,8 +16,8 @@ namespace ProophTest\EventStoreClient;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Exception\InvalidOperationException;
-use Prooph\EventStoreClient\Util\Guid;
+use Prooph\EventStore\Exception\InvalidOperationException;
+use Prooph\EventStore\Util\Guid;
 use Throwable;
 
 class deleting_persistent_subscription_group_that_doesnt_exist extends TestCase

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\Helper;
 
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\RecordedEvent;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\RecordedEvent;
 
 class EventDataComparer
 {

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Transport\Http;
 
-use Prooph\EventStoreClient\EndPoint;
+use Prooph\EventStore\EndPoint;
 
 /** @internal */
 class EndpointExtensions

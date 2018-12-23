@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use Prooph\EventStoreClient\EndPoint;
+use Prooph\EventStore\EndPoint;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\UserManagement\UserDetails;
 use Prooph\EventStoreClient\UserManagement\UsersManager;

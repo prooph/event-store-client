@@ -16,8 +16,8 @@ namespace Prooph\EventStoreClient\Projections;
 use Amp\Delayed;
 use Amp\Promise;
 use Generator;
-use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\UserCredentials;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\UserCredentials;
 use function Amp\call;
 
 /**

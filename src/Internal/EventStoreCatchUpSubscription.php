@@ -18,18 +18,19 @@ use Amp\Promise;
 use Amp\Success;
 use Closure;
 use Generator;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventStoreSubscription;
+use Prooph\EventStore\ListenerHandler;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\SubscriptionDropped;
+use Prooph\EventStore\SubscriptionDropReason;
+use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
 use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\ClientConnectionEventArgs;
 use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
-use Prooph\EventStoreClient\EventAppearedOnSubscription;
-use Prooph\EventStoreClient\EventStoreConnection;
-use Prooph\EventStoreClient\EventStoreSubscription;
 use Prooph\EventStoreClient\LiveProcessingStarted;
-use Prooph\EventStoreClient\ResolvedEvent;
-use Prooph\EventStoreClient\SubscriptionDropped;
-use Prooph\EventStoreClient\SubscriptionDropReason;
-use Prooph\EventStoreClient\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
 use SplQueue;
 use Throwable;
@@ -50,7 +51,7 @@ abstract class EventStoreCatchUpSubscription
     /** @var Logger */
     protected $log;
 
-    /** @var EventStoreConnection */
+    /** @var AsyncEventStoreConnection */
     private $connection;
     /** @var bool */
     private $resolveLinkTos;
@@ -94,7 +95,7 @@ abstract class EventStoreCatchUpSubscription
 
     /** @internal */
     public function __construct(
-        EventStoreConnection $connection,
+        AsyncEventStoreConnection $connection,
         Logger $logger,
         string $streamId,
         ?UserCredentials $userCredentials,
@@ -142,7 +143,7 @@ abstract class EventStoreCatchUpSubscription
     }
 
     abstract protected function readEventsTillAsync(
-        EventStoreConnection $connection,
+        AsyncEventStoreConnection $connection,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         ?int $lastCommitPosition,

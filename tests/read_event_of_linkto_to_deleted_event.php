@@ -16,8 +16,8 @@ namespace ProophTest\EventStoreClient;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EventReadResult;
-use Prooph\EventStoreClient\EventReadStatus;
+use Prooph\EventStore\EventReadResult;
+use Prooph\EventStore\EventReadStatus;
 use Throwable;
 
 class read_event_of_linkto_to_deleted_event extends TestCase

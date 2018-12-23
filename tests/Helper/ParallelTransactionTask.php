@@ -16,8 +16,8 @@ namespace ProophTest\EventStoreClient\Helper;
 use Amp\Parallel\Worker\Environment;
 use Amp\Parallel\Worker\Task;
 use Amp\Promise;
+use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStoreClient\EventStoreTransaction;
-use Prooph\EventStoreClient\ExpectedVersion;
 
 class ParallelTransactionTask implements Task
 {

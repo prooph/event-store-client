@@ -15,7 +15,7 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Util\Guid;
+use Prooph\EventStore\Util\Guid;
 use Throwable;
 
 class when_creating_transient_projection extends TestCase

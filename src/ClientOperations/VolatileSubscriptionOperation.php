@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
-use Prooph\EventStoreClient\EventStoreSubscription;
+use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStoreClient\Internal\EventMessageConverter;
 use Prooph\EventStoreClient\Internal\VolatileEventStoreSubscription;
 use Prooph\EventStoreClient\Messages\ClientMessages\StreamEventAppeared;

@@ -14,12 +14,16 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Prooph\EventStoreClient\EventId;
-use Prooph\EventStoreClient\EventStoreSubscription;
-use Prooph\EventStoreClient\Exception\AccessDeniedException;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Exception\MaximumSubscribersReachedException;
-use Prooph\EventStoreClient\Exception\PersistentSubscriptionDeletedException;
+use Prooph\EventStore\EventId;
+use Prooph\EventStore\EventStoreSubscription;
+use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\Exception\MaximumSubscribersReachedException;
+use Prooph\EventStore\Exception\PersistentSubscriptionDeletedException;
+use Prooph\EventStore\PersistentSubscriptionResolvedEvent;
+use Prooph\EventStore\SubscriptionDropped;
+use Prooph\EventStore\SubscriptionDropReason;
+use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Internal\ConnectToPersistentSubscriptions;
 use Prooph\EventStoreClient\Internal\EventMessageConverter;
 use Prooph\EventStoreClient\Internal\PersistentEventStoreSubscription;
@@ -31,15 +35,11 @@ use Prooph\EventStoreClient\Messages\ClientMessages\PersistentSubscriptionStream
 use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped as SubscriptionDroppedMessage;
 use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped_SubscriptionDropReason as SubscriptionDropReasonMessage;
 use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
-use Prooph\EventStoreClient\PersistentSubscriptionResolvedEvent;
-use Prooph\EventStoreClient\SubscriptionDropped;
-use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\SystemData\TcpFlags;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
-use Prooph\EventStoreClient\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */

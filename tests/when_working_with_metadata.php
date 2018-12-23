@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\RawStreamMetadataResult;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\RawStreamMetadataResult;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;

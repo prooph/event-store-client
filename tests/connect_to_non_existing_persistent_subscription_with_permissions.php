@@ -17,10 +17,10 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
-use Prooph\EventStoreClient\ResolvedEvent;
 use Throwable;
 
 class connect_to_non_existing_persistent_subscription_with_permissions extends TestCase

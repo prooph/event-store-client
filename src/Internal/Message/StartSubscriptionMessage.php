@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Internal\Message;
 
 use Amp\Deferred;
-use Prooph\EventStoreClient\EventAppearedOnSubscription;
-use Prooph\EventStoreClient\SubscriptionDropped;
-use Prooph\EventStoreClient\UserCredentials;
+use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\SubscriptionDropped;
+use Prooph\EventStore\UserCredentials;
 
 /** @internal  */
 class StartSubscriptionMessage implements Message

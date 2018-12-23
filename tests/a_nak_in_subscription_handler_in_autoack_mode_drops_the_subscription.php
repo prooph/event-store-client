@@ -20,16 +20,16 @@ use Closure;
 use Exception;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventId;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\PersistentSubscriptionSettings;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\SubscriptionDropReason;
+use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventId;
-use Prooph\EventStoreClient\ExpectedVersion;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Prooph\EventStoreClient\PersistentSubscriptionDropped;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\ResolvedEvent;
-use Prooph\EventStoreClient\SubscriptionDropReason;
-use Prooph\EventStoreClient\Util\Guid;
 use Throwable;
 
 class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription extends TestCase

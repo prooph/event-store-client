@@ -16,18 +16,18 @@ namespace Prooph\EventStoreClient\Internal;
 use Amp\Delayed;
 use Amp\Promise;
 use Generator;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\Exception\OutOfRangeException;
+use Prooph\EventStore\Exception\StreamDeletedException;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\SliceReadStatus;
+use Prooph\EventStore\StreamEventsSlice;
+use Prooph\EventStore\SubscriptionDropReason;
+use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
 use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
-use Prooph\EventStoreClient\EventStoreConnection;
-use Prooph\EventStoreClient\Exception\OutOfRangeException;
-use Prooph\EventStoreClient\Exception\StreamDeletedException;
 use Prooph\EventStoreClient\LiveProcessingStarted;
-use Prooph\EventStoreClient\ResolvedEvent;
-use Prooph\EventStoreClient\SliceReadStatus;
-use Prooph\EventStoreClient\StreamEventsSlice;
-use Prooph\EventStoreClient\SubscriptionDropReason;
-use Prooph\EventStoreClient\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
 use Throwable;
 use function Amp\call;
@@ -43,7 +43,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
      * @internal
      */
     public function __construct(
-        EventStoreConnection $connection,
+        AsyncEventStoreConnection $connection,
         Logger $logger,
         string $streamId,
         ?int $fromEventNumberExclusive, // if null from the very beginning
@@ -75,7 +75,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
 
     /** @return Promise<void> */
     protected function readEventsTillAsync(
-        EventStoreConnection $connection,
+        AsyncEventStoreConnection $connection,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         ?int $lastCommitPosition,
@@ -86,7 +86,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
 
     /** @return Promise<void> */
     private function readEventsInternalAsync(
-        EventStoreConnection $connection,
+        AsyncEventStoreConnection $connection,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         ?int $lastEventNumber

@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\DeleteResult;
-use Prooph\EventStoreClient\Exception\StreamDeletedException;
-use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
-use Prooph\EventStoreClient\ExpectedVersion;
+use Prooph\EventStore\DeleteResult;
+use Prooph\EventStore\Exception\StreamDeletedException;
+use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\ExpectedVersion;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;

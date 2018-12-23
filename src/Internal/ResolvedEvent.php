@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Prooph\EventStoreClient\Position;
-use Prooph\EventStoreClient\RecordedEvent;
+use Prooph\EventStore\Position;
+use Prooph\EventStore\RecordedEvent;
 
 /** @internal */
 interface ResolvedEvent

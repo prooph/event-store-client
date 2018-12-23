@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\UserManagement;
 
 use Amp\Promise;
-use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Exception\UserCommandFailedException;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\Exception\UserCommandFailedException;
+use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
-use Prooph\EventStoreClient\UserCredentials;
 
 class UsersManager
 {

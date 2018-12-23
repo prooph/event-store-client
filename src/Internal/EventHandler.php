@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use Prooph\EventStore\ListenerHandler;
 use Prooph\EventStoreClient\ClientAuthenticationFailedEventArgs;
 use Prooph\EventStoreClient\ClientClosedEventArgs;
 use Prooph\EventStoreClient\ClientConnectionEventArgs;

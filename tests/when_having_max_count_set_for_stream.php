@@ -17,12 +17,12 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventStoreConnection;
-use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\SliceReadStatus;
-use Prooph\EventStoreClient\StreamEventsSlice;
-use Prooph\EventStoreClient\StreamMetadata;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\SliceReadStatus;
+use Prooph\EventStore\StreamEventsSlice;
+use Prooph\EventStore\StreamMetadata;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
@@ -32,7 +32,7 @@ class when_having_max_count_set_for_stream extends TestCase
 {
     /** @var string */
     private $stream = 'max-count-test-stream';
-    /** @var EventStoreConnection */
+    /** @var AsyncEventStoreConnection */
     private $conn;
     /** @var EventData[] */
     private $testEvents = [];

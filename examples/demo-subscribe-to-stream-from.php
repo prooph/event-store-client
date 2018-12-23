@@ -16,6 +16,8 @@ namespace Prooph\EventStoreClient;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
 use Throwable;
 

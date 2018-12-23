@@ -15,13 +15,13 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventId;
-use Prooph\EventStoreClient\EventReadResult;
-use Prooph\EventStoreClient\EventReadStatus;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Exception\OutOfRangeException;
-use Prooph\EventStoreClient\Util\Guid;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventId;
+use Prooph\EventStore\EventReadResult;
+use Prooph\EventStore\EventReadStatus;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\Exception\OutOfRangeException;
+use Prooph\EventStore\Util\Guid;
 use Throwable;
 
 class read_event_should extends TestCase

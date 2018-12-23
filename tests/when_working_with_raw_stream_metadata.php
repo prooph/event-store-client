@@ -15,11 +15,11 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EventStoreConnection;
-use Prooph\EventStoreClient\Exception\StreamDeletedException;
-use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
-use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\RawStreamMetadataResult;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\Exception\StreamDeletedException;
+use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\RawStreamMetadataResult;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
@@ -30,7 +30,7 @@ class when_working_with_raw_stream_metadata extends TestCase
 {
     /** @var string */
     private $stream;
-    /** @var EventStoreConnection */
+    /** @var AsyncEventStoreConnection */
     private $conn;
 
     /** @throws Throwable */

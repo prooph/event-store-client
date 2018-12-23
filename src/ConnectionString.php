@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\UserCredentials;
 use ReflectionObject;
 
 class ConnectionString

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient;
 
 use Amp\Promise;
+use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 
 interface EventAppearedOnPersistentSubscription

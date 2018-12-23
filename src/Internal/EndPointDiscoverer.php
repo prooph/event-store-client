@@ -17,7 +17,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Internal;
 
 use Amp\Promise;
-use Prooph\EventStoreClient\EndPoint;
+use Prooph\EventStore\EndPoint;
 
 /** @internal */
 interface EndPointDiscoverer
