@@ -22,10 +22,16 @@ use Amp\Success;
 use Exception;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStore\AsyncCatchUpSubscriptionDropped;
+use Prooph\EventStore\AsyncEventStoreCatchUpSubscription;
+use Prooph\EventStore\CatchUpSubscriptionSettings;
+use Prooph\EventStore\ClientConnectionEventArgs;
 use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
 use Prooph\EventStore\EventAppearedOnSubscription;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\EventStoreSubscription;
+use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
 use Prooph\EventStore\ReadDirection;
 use Prooph\EventStore\RecordedEvent;
 use Prooph\EventStore\ResolvedEvent;
@@ -34,15 +40,9 @@ use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\Util\DateTime;
-use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
-use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
-use Prooph\EventStoreClient\ClientConnectionEventArgs;
 use Prooph\EventStoreClient\ClientOperations\VolatileSubscriptionOperation;
-use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
-use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\EventStoreStreamCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\VolatileEventStoreSubscription;
-use Prooph\EventStoreClient\LiveProcessingStarted;
 use Psr\Log\NullLogger;
 use Throwable;
 use function Amp\call;
@@ -106,7 +106,7 @@ class catch_up_subscription_handles_errors extends TestCase
             self::$streamId,
             null,
             null,
-            new class($props1) implements EventAppearedOnCatchupSubscription {
+            new class($props1) implements EventAppearedOnAsyncCatchupSubscription {
                 private $props;
 
                 public function __construct(array &$props)
@@ -115,7 +115,7 @@ class catch_up_subscription_handles_errors extends TestCase
                 }
 
                 public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
+                    AsyncEventStoreCatchUpSubscription $subscription,
                     ResolvedEvent $resolvedEvent
                 ): Promise {
                     $this->props['raisedEvents'][] = $resolvedEvent;
@@ -124,7 +124,7 @@ class catch_up_subscription_handles_errors extends TestCase
                     return new Success();
                 }
             },
-            new class($props2) implements LiveProcessingStarted {
+            new class($props2) implements LiveProcessingStartedOnAsyncCatchUpSubscription {
                 private $props;
 
                 public function __construct(array &$props)
@@ -132,12 +132,12 @@ class catch_up_subscription_handles_errors extends TestCase
                     $this->props = &$props;
                 }
 
-                public function __invoke(EventStoreCatchUpSubscription $subscription): void
+                public function __invoke(AsyncEventStoreCatchUpSubscription $subscription): void
                 {
                     $this->props['liveProcessingStarted'] = true;
                 }
             },
-            new class($props3) implements CatchUpSubscriptionDropped {
+            new class($props3) implements AsyncCatchUpSubscriptionDropped {
                 private $props;
 
                 public function __construct(array &$props)
@@ -146,7 +146,7 @@ class catch_up_subscription_handles_errors extends TestCase
                 }
 
                 public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
+                    AsyncEventStoreCatchUpSubscription $subscription,
                     SubscriptionDropReason $reason,
                     ?Throwable $exception = null
                 ): void {
@@ -472,7 +472,7 @@ class catch_up_subscription_handles_errors extends TestCase
                 }
             );
 
-            $event1 = new \Prooph\EventStoreClient\ResolvedEvent(
+            $event1 = new ResolvedEvent(
                 new RecordedEvent(
                     self::$streamId,
                     1,
@@ -586,7 +586,7 @@ class catch_up_subscription_handles_errors extends TestCase
         $events = [];
 
         for ($i = 0; $i < $count; $i++) {
-            $events[] = new \Prooph\EventStoreClient\ResolvedEvent(
+            $events[] = new ResolvedEvent(
                 new RecordedEvent(
                     self::$streamId,
                     $i,

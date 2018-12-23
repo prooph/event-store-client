@@ -16,7 +16,7 @@ namespace ProophTest\EventStoreClient;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Projections\ProjectionDetails;
+use Prooph\EventStore\Projections\ProjectionDetails;
 use Throwable;
 
 class when_listing_all_projections extends TestCase

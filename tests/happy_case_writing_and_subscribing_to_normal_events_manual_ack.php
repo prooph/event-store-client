@@ -19,13 +19,13 @@ use Amp\Success;
 use Amp\TimeoutException;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStore\AsyncEventStorePersistentSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
-use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
-use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Throwable;
 use function Amp\Promise\timeout;
 
@@ -79,7 +79,7 @@ class happy_case_writing_and_subscribing_to_normal_events_manual_ack extends Tes
             yield $this->conn->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
-                new class($this->eventsReceived, $this->eventReceivedCount, self::EVENT_WRITE_COUNT) implements EventAppearedOnPersistentSubscription {
+                new class($this->eventsReceived, $this->eventReceivedCount, self::EVENT_WRITE_COUNT) implements EventAppearedOnAsyncPersistentSubscription {
                     private $eventsReceived;
                     private $eventReceivedCount;
                     private $eventWriteCount;
@@ -92,7 +92,7 @@ class happy_case_writing_and_subscribing_to_normal_events_manual_ack extends Tes
                     }
 
                     public function __invoke(
-                        EventStorePersistentSubscription $subscription,
+                        AsyncEventStorePersistentSubscription $subscription,
                         ResolvedEvent $resolvedEvent,
                         ?int $retryCount = null
                     ): Promise {

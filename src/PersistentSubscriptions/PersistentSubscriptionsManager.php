@@ -16,10 +16,11 @@ namespace Prooph\EventStoreClient\PersistentSubscriptions;
 use Amp\Promise;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\PersistentSubscriptions\AsyncPersistentSubscriptionsManager;
+use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
-use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 
-class PersistentSubscriptionsManager
+class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsManager
 {
     /** @var PersistentSubscriptionsClient */
     private $client;

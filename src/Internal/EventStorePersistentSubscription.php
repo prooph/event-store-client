@@ -19,32 +19,32 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
+use Prooph\EventStore\AsyncEventStorePersistentSubscription;
+use Prooph\EventStore\AsyncPersistentSubscriptionDropped;
+use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\Exception\RuntimeException;
+use Prooph\EventStore\Internal\PersistentEventStoreSubscription;
+use Prooph\EventStore\Internal\ResolvedEvent as InternalResolvedEvent;
+use Prooph\EventStore\PersistentSubscriptionNakEventAction;
 use Prooph\EventStore\PersistentSubscriptionResolvedEvent;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\ConnectionSettings;
-use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
 use Prooph\EventStoreClient\Internal\Message\StartPersistentSubscriptionMessage;
-use Prooph\EventStoreClient\Internal\ResolvedEvent as InternalResolvedEvent;
-use Prooph\EventStoreClient\PersistentSubscriptionDropped;
-use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
 use Psr\Log\LoggerInterface as Logger;
 use SplQueue;
 use Throwable;
 use function Amp\call;
 
-class EventStorePersistentSubscription
+class EventStorePersistentSubscription implements AsyncEventStorePersistentSubscription
 {
     /** @var EventStoreConnectionLogicHandler */
     private $handler;
 
     /** @var ResolvedEvent */
     private static $dropSubscriptionEvent;
-
-    public const DEFAULT_BUFFER_SIZE = 10;
 
     /** @var string */
     private $subscriptionId;
@@ -85,8 +85,8 @@ class EventStorePersistentSubscription
     public function __construct(
         string $subscriptionId,
         string $streamId,
-        EventAppearedOnPersistentSubscription $eventAppeared,
-        ?PersistentSubscriptionDropped $subscriptionDropped,
+        EventAppearedOnAsyncPersistentSubscription $eventAppeared,
+        ?AsyncPersistentSubscriptionDropped $subscriptionDropped,
         ?UserCredentials $userCredentials,
         Logger $logger,
         bool $verboseLogging,

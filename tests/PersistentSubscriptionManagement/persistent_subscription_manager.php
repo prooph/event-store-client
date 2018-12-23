@@ -17,17 +17,17 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStore\AsyncEventStorePersistentSubscription;
 use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\PersistentSubscriptionNakEventAction;
+use Prooph\EventStore\PersistentSubscriptions\PersistentSubscriptionDetails;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
-use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
-use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
-use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
-use Prooph\EventStoreClient\PersistentSubscriptions\PersistentSubscriptionDetails;
 use Prooph\EventStoreClient\PersistentSubscriptions\PersistentSubscriptionsManager;
 use ProophTest\EventStoreClient\CountdownEvent;
 use ProophTest\EventStoreClient\DefaultData;
@@ -44,7 +44,7 @@ class persistent_subscription_manager extends TestCase
     private $stream;
     /** @var PersistentSubscriptionSettings */
     private $settings;
-    /** @var EventStorePersistentSubscription */
+    /** @var AsyncEventStorePersistentSubscription */
     private $sub;
 
     protected function setUp(): void
@@ -75,9 +75,9 @@ class persistent_subscription_manager extends TestCase
         $this->sub = yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             'existing',
-            new class() implements EventAppearedOnPersistentSubscription {
+            new class() implements EventAppearedOnAsyncPersistentSubscription {
                 public function __invoke(
-                    EventStorePersistentSubscription $subscription,
+                    AsyncEventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {
@@ -227,9 +227,9 @@ class persistent_subscription_manager extends TestCase
             $this->sub = yield $this->conn->connectToPersistentSubscriptionAsync(
                 $this->stream,
                 'existing',
-                new class() implements EventAppearedOnPersistentSubscription {
+                new class() implements EventAppearedOnAsyncPersistentSubscription {
                     public function __invoke(
-                        EventStorePersistentSubscription $subscription,
+                        AsyncEventStorePersistentSubscription $subscription,
                         ResolvedEvent $resolvedEvent,
                         ?int $retryCount = null
                     ): Promise {
@@ -266,7 +266,7 @@ class persistent_subscription_manager extends TestCase
             yield $this->conn->connectToPersistentSubscriptionAsync(
                 $this->stream,
                 'existing',
-                new class($event) implements EventAppearedOnPersistentSubscription {
+                new class($event) implements EventAppearedOnAsyncPersistentSubscription {
                     /** @var CountdownEvent */
                     private $event;
 
@@ -276,7 +276,7 @@ class persistent_subscription_manager extends TestCase
                     }
 
                     public function __invoke(
-                        EventStorePersistentSubscription $subscription,
+                        AsyncEventStorePersistentSubscription $subscription,
                         ResolvedEvent $resolvedEvent,
                         ?int $retryCount = null
                     ): Promise {

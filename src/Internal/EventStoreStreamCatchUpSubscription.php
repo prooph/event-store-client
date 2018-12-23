@@ -16,18 +16,18 @@ namespace Prooph\EventStoreClient\Internal;
 use Amp\Delayed;
 use Amp\Promise;
 use Generator;
+use Prooph\EventStore\AsyncCatchUpSubscriptionDropped;
 use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\CatchUpSubscriptionSettings;
+use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
 use Prooph\EventStore\Exception\OutOfRangeException;
 use Prooph\EventStore\Exception\StreamDeletedException;
+use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SliceReadStatus;
 use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
-use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
-use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
-use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
-use Prooph\EventStoreClient\LiveProcessingStarted;
 use Psr\Log\LoggerInterface as Logger;
 use Throwable;
 use function Amp\call;
@@ -48,9 +48,9 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
         string $streamId,
         ?int $fromEventNumberExclusive, // if null from the very beginning
         ?UserCredentials $userCredentials,
-        EventAppearedOnCatchupSubscription $eventAppeared,
-        ?LiveProcessingStarted $liveProcessingStarted,
-        ?CatchUpSubscriptionDropped $subscriptionDropped,
+        EventAppearedOnAsyncCatchupSubscription $eventAppeared,
+        ?LiveProcessingStartedOnAsyncCatchUpSubscription $liveProcessingStarted,
+        ?AsyncCatchUpSubscriptionDropped $subscriptionDropped,
         CatchUpSubscriptionSettings $settings
     ) {
         parent::__construct(

@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
+use Prooph\EventStore\AsyncEventStoreTransaction;
 use Prooph\EventStore\Exception\AccessDeniedException;
 use Prooph\EventStore\Exception\InvalidTransactionException;
 use Prooph\EventStore\Exception\StreamDeletedException;
 use Prooph\EventStore\Exception\UnexpectedOperationResult;
 use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\Internal\AsyncEventStoreTransactionConnection;
 use Prooph\EventStore\UserCredentials;
-use Prooph\EventStoreClient\EventStoreTransaction;
-use Prooph\EventStoreClient\Internal\EventStoreTransactionConnection;
 use Prooph\EventStoreClient\Messages\ClientMessages\OperationResult;
 use Prooph\EventStoreClient\Messages\ClientMessages\TransactionStart;
 use Prooph\EventStoreClient\Messages\ClientMessages\TransactionStartCompleted;
@@ -40,7 +40,7 @@ class StartTransactionOperation extends AbstractOperation
     private $stream;
     /** @var int */
     private $expectedVersion;
-    /** @var EventStoreTransactionConnection */
+    /** @var AsyncEventStoreTransactionConnection */
     protected $parentConnection;
 
     public function __construct(
@@ -49,7 +49,7 @@ class StartTransactionOperation extends AbstractOperation
         bool $requireMaster,
         string $stream,
         int $expectedVersion,
-        EventStoreTransactionConnection $parentConnection,
+        AsyncEventStoreTransactionConnection $parentConnection,
         ?UserCredentials $userCredentials
     ) {
         $this->requireMaster = $requireMaster;
@@ -118,11 +118,11 @@ class StartTransactionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(ProtobufMessage $response): EventStoreTransaction
+    protected function transformResponse(ProtobufMessage $response): AsyncEventStoreTransaction
     {
         \assert($response instanceof TransactionStartCompleted);
 
-        return new EventStoreTransaction(
+        return new AsyncEventStoreTransaction(
             $response->getTransactionId(),
             $this->credentials,
             $this->parentConnection

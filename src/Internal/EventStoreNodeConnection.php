@@ -15,9 +15,16 @@ namespace Prooph\EventStoreClient\Internal;
 
 use Amp\Deferred;
 use Amp\Promise;
+use Prooph\EventStore\AsyncCatchUpSubscriptionDropped;
 use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\AsyncEventStoreTransaction;
+use Prooph\EventStore\AsyncPersistentSubscriptionDropped;
+use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\Common\SystemEventTypes;
 use Prooph\EventStore\Common\SystemStreams;
+use Prooph\EventStore\ConnectionSettings;
+use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
 use Prooph\EventStore\EventAppearedOnSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventReadResult;
@@ -31,6 +38,7 @@ use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\Internal\AsyncEventStoreTransactionConnection;
 use Prooph\EventStore\Internal\Consts;
 use Prooph\EventStore\ListenerHandler;
+use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Position;
 use Prooph\EventStore\RawStreamMetadataResult;
@@ -41,8 +49,6 @@ use Prooph\EventStore\SystemSettings;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStore\Util\Guid;
 use Prooph\EventStore\Util\Json;
-use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
-use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
 use Prooph\EventStoreClient\ClientOperations\AppendToStreamOperation;
 use Prooph\EventStoreClient\ClientOperations\ClientOperation;
 use Prooph\EventStoreClient\ClientOperations\CommitTransactionOperation;
@@ -59,16 +65,10 @@ use Prooph\EventStoreClient\ClientOperations\StartTransactionOperation;
 use Prooph\EventStoreClient\ClientOperations\TransactionalWriteOperation;
 use Prooph\EventStoreClient\ClientOperations\UpdatePersistentSubscriptionOperation;
 use Prooph\EventStoreClient\ClusterSettings;
-use Prooph\EventStoreClient\ConnectionSettings;
-use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
-use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
-use Prooph\EventStoreClient\EventStoreTransaction;
 use Prooph\EventStoreClient\Internal\Message\CloseConnectionMessage;
 use Prooph\EventStoreClient\Internal\Message\StartConnectionMessage;
 use Prooph\EventStoreClient\Internal\Message\StartOperationMessage;
 use Prooph\EventStoreClient\Internal\Message\StartSubscriptionMessage;
-use Prooph\EventStoreClient\LiveProcessingStarted;
-use Prooph\EventStoreClient\PersistentSubscriptionDropped;
 use Throwable;
 
 final class EventStoreNodeConnection implements
@@ -670,9 +670,9 @@ final class EventStoreNodeConnection implements
         string $stream,
         ?int $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
-        EventAppearedOnCatchupSubscription $eventAppeared,
-        ?LiveProcessingStarted $liveProcessingStarted = null,
-        ?CatchUpSubscriptionDropped $subscriptionDropped = null,
+        EventAppearedOnAsyncCatchupSubscription $eventAppeared,
+        ?LiveProcessingStartedOnAsyncCatchUpSubscription $liveProcessingStarted = null,
+        ?AsyncCatchUpSubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
@@ -726,9 +726,9 @@ final class EventStoreNodeConnection implements
     public function subscribeToAllFromAsync(
         ?Position $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
-        EventAppearedOnCatchupSubscription $eventAppeared,
-        ?LiveProcessingStarted $liveProcessingStarted = null,
-        ?CatchUpSubscriptionDropped $subscriptionDropped = null,
+        EventAppearedOnAsyncCatchupSubscription $eventAppeared,
+        ?LiveProcessingStartedOnAsyncCatchUpSubscription $liveProcessingStarted = null,
+        ?AsyncCatchUpSubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
         if (null === $settings) {
@@ -755,8 +755,8 @@ final class EventStoreNodeConnection implements
     public function connectToPersistentSubscriptionAsync(
         string $stream,
         string $groupName,
-        EventAppearedOnPersistentSubscription $eventAppeared,
-        ?PersistentSubscriptionDropped $subscriptionDropped = null,
+        EventAppearedOnAsyncPersistentSubscription $eventAppeared,
+        ?AsyncPersistentSubscriptionDropped $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         ?UserCredentials $userCredentials = null
@@ -813,16 +813,16 @@ final class EventStoreNodeConnection implements
     public function continueTransaction(
         int $transactionId,
         ?UserCredentials $userCredentials = null
-    ): EventStoreTransaction {
+    ): AsyncEventStoreTransaction {
         if ($transactionId < 0) {
             throw new InvalidArgumentException('Invalid transaction id');
         }
 
-        return new EventStoreTransaction($transactionId, $userCredentials, $this);
+        return new AsyncEventStoreTransaction($transactionId, $userCredentials, $this);
     }
 
     public function transactionalWriteAsync(
-        EventStoreTransaction $transaction,
+        AsyncEventStoreTransaction $transaction,
         array $events,
         ?UserCredentials $userCredentials
     ): Promise {
@@ -841,7 +841,7 @@ final class EventStoreNodeConnection implements
     }
 
     public function commitTransactionAsync(
-        EventStoreTransaction $transaction,
+        AsyncEventStoreTransaction $transaction,
         ?UserCredentials $userCredentials
     ): Promise {
         $deferred = new Deferred();

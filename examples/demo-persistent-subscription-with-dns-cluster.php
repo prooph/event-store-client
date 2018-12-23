@@ -16,12 +16,15 @@ namespace Prooph\EventStoreClient;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
+use Prooph\EventStore\AsyncEventStorePersistentSubscription;
+use Prooph\EventStore\AsyncPersistentSubscriptionDropped;
+use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
 use Prooph\EventStore\Exception\InvalidOperationException;
+use Prooph\EventStore\Internal\PersistentSubscriptionCreateResult;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
-use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
-use Prooph\EventStoreClient\Internal\PersistentSubscriptionCreateResult;
 use Throwable;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -73,9 +76,9 @@ Loop::run(function () {
     yield $connection->connectToPersistentSubscriptionAsync(
         'foo-bar',
         'test-persistent-subscription',
-        new class() implements EventAppearedOnPersistentSubscription {
+        new class() implements EventAppearedOnAsyncPersistentSubscription {
             public function __invoke(
-                EventStorePersistentSubscription $subscription,
+                AsyncEventStorePersistentSubscription $subscription,
                 ResolvedEvent $resolvedEvent,
                 ?int $retryCount = null
             ): Promise {
@@ -85,9 +88,9 @@ Loop::run(function () {
                 return new Success();
             }
         },
-        new class() implements PersistentSubscriptionDropped {
+        new class() implements AsyncPersistentSubscriptionDropped {
             public function __invoke(
-                EventStorePersistentSubscription $subscription,
+                AsyncEventStorePersistentSubscription $subscription,
                 SubscriptionDropReason $reason,
                 ?Throwable $exception = null
             ): void {

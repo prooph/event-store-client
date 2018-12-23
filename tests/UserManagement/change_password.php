@@ -15,8 +15,8 @@ namespace ProophTest\EventStoreClient\UserManagement;
 
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\UserCommandFailedException;
+use Prooph\EventStore\Transport\Http\HttpStatusCode;
 use Prooph\EventStore\UserCredentials;
-use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
 use ProophTest\EventStoreClient\DefaultData;
 use Throwable;
 

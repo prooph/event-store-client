@@ -16,13 +16,14 @@ namespace Prooph\EventStoreClient;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
+use Prooph\EventStore\AsyncEventStoreCatchUpSubscription;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventAppearedOnSubscription;
 use Prooph\EventStore\EventStoreSubscription;
+use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SubscriptionDropReason;
-use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
 use Throwable;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -62,8 +63,8 @@ Loop::run(function () {
                 return new Success();
             }
         },
-        new class() implements LiveProcessingStarted {
-            public function __invoke(EventStoreCatchUpSubscription $subscription): void
+        new class() implements LiveProcessingStartedOnAsyncCatchUpSubscription {
+            public function __invoke(AsyncEventStoreCatchUpSubscription $subscription): void
             {
                 echo 'liveProcessingStarted on ' . $subscription->streamId() . PHP_EOL;
             }

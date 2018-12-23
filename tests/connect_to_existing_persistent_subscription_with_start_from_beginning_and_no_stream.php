@@ -18,14 +18,14 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStore\AsyncEventStorePersistentSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
-use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
-use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
 use Throwable;
 use function Amp\call;
 
@@ -70,7 +70,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
         yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
-            new class($this->set, $this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
+            new class($this->set, $this->resetEvent, $this->firstEvent) implements EventAppearedOnAsyncPersistentSubscription {
                 private $set;
                 private $deferred;
                 private $firstEvent;
@@ -83,7 +83,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
                 }
 
                 public function __invoke(
-                    EventStorePersistentSubscription $subscription,
+                    AsyncEventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {

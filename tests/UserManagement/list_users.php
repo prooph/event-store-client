@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient\UserManagement;
 
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
-use Prooph\EventStoreClient\UserManagement\UserDetails;
+use Prooph\EventStore\Transport\Http\EndpointExtensions;
+use Prooph\EventStore\UserManagement\UserDetails;
 use Prooph\EventStoreClient\UserManagement\UsersManager;
 use ProophTest\EventStoreClient\DefaultData;
 use Throwable;

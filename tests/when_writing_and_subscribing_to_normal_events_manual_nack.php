@@ -18,14 +18,14 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStore\AsyncEventStorePersistentSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\PersistentSubscriptionNakEventAction;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
-use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
-use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
-use Prooph\EventStoreClient\PersistentSubscriptionNakEventAction;
 use Throwable;
 
 class when_writing_and_subscribing_to_normal_events_manual_nack extends TestCase
@@ -79,7 +79,7 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends TestCase
             yield $this->conn->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
-                new class($this->eventReceivedCount, $this->eventsReceived) implements EventAppearedOnPersistentSubscription {
+                new class($this->eventReceivedCount, $this->eventsReceived) implements EventAppearedOnAsyncPersistentSubscription {
                     /** @var int */
                     private $eventReceivedCount;
                     /** @var Deferred */
@@ -92,7 +92,7 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends TestCase
                     }
 
                     public function __invoke(
-                        EventStorePersistentSubscription $subscription,
+                        AsyncEventStorePersistentSubscription $subscription,
                         ResolvedEvent $resolvedEvent,
                         ?int $retryCount = null
                     ): Promise {

@@ -16,6 +16,7 @@ namespace ProophTest\EventStoreClient;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\AsyncEventStoreTransaction;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\Exception\WrongExpectedVersionException;
 use Prooph\EventStore\ExpectedVersion;
@@ -23,7 +24,6 @@ use Prooph\EventStore\SliceReadStatus;
 use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\Util\Guid;
 use Prooph\EventStore\WriteResult;
-use Prooph\EventStoreClient\EventStoreTransaction;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
@@ -63,7 +63,7 @@ class when_committing_empty_transaction extends TestCase
             $this->stream,
             2
         );
-        \assert($transaction instanceof EventStoreTransaction);
+        \assert($transaction instanceof AsyncEventStoreTransaction);
 
         $result = yield $transaction->commitAsync();
         \assert($result instanceof WriteResult);

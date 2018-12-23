@@ -20,11 +20,16 @@ use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\JsonException;
 use Prooph\EventStore\Exception\UserCommandConflictException;
 use Prooph\EventStore\Exception\UserCommandFailedException;
+use Prooph\EventStore\Transport\Http\EndpointExtensions;
+use Prooph\EventStore\Transport\Http\HttpStatusCode;
 use Prooph\EventStore\UserCredentials;
+use Prooph\EventStore\UserManagement\ChangePasswordDetails;
+use Prooph\EventStore\UserManagement\ResetPasswordDetails;
+use Prooph\EventStore\UserManagement\UserCreationInformation;
+use Prooph\EventStore\UserManagement\UserDetails;
+use Prooph\EventStore\UserManagement\UserUpdateInformation;
 use Prooph\EventStore\Util\Json;
-use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\Transport\Http\HttpClient;
-use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
 use Throwable;
 
 /** @internal */

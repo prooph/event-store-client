@@ -20,6 +20,9 @@ use Closure;
 use Exception;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStore\AsyncEventStorePersistentSubscription;
+use Prooph\EventStore\AsyncPersistentSubscriptionDropped;
+use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\ExpectedVersion;
@@ -27,9 +30,6 @@ use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\Util\Guid;
-use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
-use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
-use Prooph\EventStoreClient\PersistentSubscriptionDropped;
 use Throwable;
 
 class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription extends TestCase
@@ -81,16 +81,16 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
         yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
-            new class() implements EventAppearedOnPersistentSubscription {
+            new class() implements EventAppearedOnAsyncPersistentSubscription {
                 public function __invoke(
-                    EventStorePersistentSubscription $subscription,
+                    AsyncEventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {
                     throw new \Exception('test');
                 }
             },
-            new class(Closure::fromCallable($dropBehaviour)) implements PersistentSubscriptionDropped {
+            new class(Closure::fromCallable($dropBehaviour)) implements AsyncPersistentSubscriptionDropped {
                 private $callback;
 
                 public function __construct(callable $callback)
@@ -99,7 +99,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
                 }
 
                 public function __invoke(
-                    EventStorePersistentSubscription $subscription,
+                    AsyncEventStorePersistentSubscription $subscription,
                     SubscriptionDropReason $reason,
                     ?Throwable $exception = null
                 ): void {

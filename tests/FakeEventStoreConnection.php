@@ -15,31 +15,31 @@ namespace ProophTest\EventStoreClient;
 
 use Amp\Promise;
 use Amp\Success;
+use Prooph\EventStore\AsyncCatchUpSubscriptionDropped;
 use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\AsyncEventStorePersistentSubscription;
+use Prooph\EventStore\AsyncEventStoreTransaction;
+use Prooph\EventStore\AsyncPersistentSubscriptionDropped;
+use Prooph\EventStore\CatchUpSubscriptionSettings;
+use Prooph\EventStore\ClientAuthenticationFailedEventArgs;
+use Prooph\EventStore\ClientClosedEventArgs;
+use Prooph\EventStore\ClientConnectionEventArgs;
+use Prooph\EventStore\ClientErrorEventArgs;
+use Prooph\EventStore\ClientReconnectingEventArgs;
+use Prooph\EventStore\ConnectionSettings;
+use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
 use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\Internal\EventHandler;
 use Prooph\EventStore\ListenerHandler;
+use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Position;
 use Prooph\EventStore\StreamMetadata;
 use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SystemSettings;
 use Prooph\EventStore\UserCredentials;
-use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
-use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
-use Prooph\EventStoreClient\ClientAuthenticationFailedEventArgs;
-use Prooph\EventStoreClient\ClientClosedEventArgs;
-use Prooph\EventStoreClient\ClientConnectionEventArgs;
-use Prooph\EventStoreClient\ClientErrorEventArgs;
-use Prooph\EventStoreClient\ClientReconnectingEventArgs;
 use Prooph\EventStoreClient\ClusterSettings;
-use Prooph\EventStoreClient\ConnectionSettings;
-use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
-use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
-use Prooph\EventStoreClient\EventStoreTransaction;
-use Prooph\EventStoreClient\Internal\EventHandler;
-use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
-use Prooph\EventStoreClient\LiveProcessingStarted;
-use Prooph\EventStoreClient\PersistentSubscriptionDropped;
 
 /** @internal */
 class FakeEventStoreConnection implements AsyncEventStoreConnection
@@ -218,7 +218,7 @@ class FakeEventStoreConnection implements AsyncEventStoreConnection
     public function continueTransaction(
         int $transactionId,
         ?UserCredentials $userCredentials = null
-    ): EventStoreTransaction {
+    ): AsyncEventStoreTransaction {
         throw new \RuntimeException('Not implemented');
     }
 
@@ -267,9 +267,9 @@ class FakeEventStoreConnection implements AsyncEventStoreConnection
         string $stream,
         ?int $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
-        EventAppearedOnCatchupSubscription $eventAppeared,
-        ?LiveProcessingStarted $liveProcessingStarted = null,
-        ?CatchUpSubscriptionDropped $subscriptionDropped = null,
+        EventAppearedOnAsyncCatchupSubscription $eventAppeared,
+        ?LiveProcessingStartedOnAsyncCatchUpSubscription $liveProcessingStarted = null,
+        ?AsyncCatchUpSubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
         throw new \RuntimeException('Not implemented');
@@ -292,9 +292,9 @@ class FakeEventStoreConnection implements AsyncEventStoreConnection
     public function subscribeToAllFromAsync(
         ?Position $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
-        EventAppearedOnCatchupSubscription $eventAppeared,
-        ?LiveProcessingStarted $liveProcessingStarted = null,
-        ?CatchUpSubscriptionDropped $subscriptionDropped = null,
+        EventAppearedOnAsyncCatchupSubscription $eventAppeared,
+        ?LiveProcessingStartedOnAsyncCatchUpSubscription $liveProcessingStarted = null,
+        ?AsyncCatchUpSubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
         throw new \RuntimeException('Not implemented');
@@ -303,20 +303,20 @@ class FakeEventStoreConnection implements AsyncEventStoreConnection
     public function connectToPersistentSubscription(
         string $stream,
         string $groupName,
-        EventAppearedOnPersistentSubscription $eventAppeared,
-        ?PersistentSubscriptionDropped $subscriptionDropped = null,
+        EventAppearedOnAsyncPersistentSubscription $eventAppeared,
+        ?AsyncPersistentSubscriptionDropped $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         ?UserCredentials $userCredentials = null
-    ): EventStorePersistentSubscription {
+    ): AsyncEventStorePersistentSubscription {
         throw new \RuntimeException('Not implemented');
     }
 
     public function connectToPersistentSubscriptionAsync(
         string $stream,
         string $groupName,
-        EventAppearedOnPersistentSubscription $eventAppeared,
-        ?PersistentSubscriptionDropped $subscriptionDropped = null,
+        EventAppearedOnAsyncPersistentSubscription $eventAppeared,
+        ?AsyncPersistentSubscriptionDropped $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         ?UserCredentials $userCredentials = null

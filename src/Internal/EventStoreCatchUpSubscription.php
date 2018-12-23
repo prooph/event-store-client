@@ -18,25 +18,26 @@ use Amp\Promise;
 use Amp\Success;
 use Closure;
 use Generator;
+use Prooph\EventStore\AsyncCatchUpSubscriptionDropped;
+use Prooph\EventStore\AsyncEventStoreCatchUpSubscription;
 use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\CatchUpSubscriptionSettings;
+use Prooph\EventStore\ClientConnectionEventArgs;
+use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
 use Prooph\EventStore\EventAppearedOnSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ListenerHandler;
+use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
-use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
-use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
-use Prooph\EventStoreClient\ClientConnectionEventArgs;
-use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
-use Prooph\EventStoreClient\LiveProcessingStarted;
 use Psr\Log\LoggerInterface as Logger;
 use SplQueue;
 use Throwable;
 use function Amp\call;
 
-abstract class EventStoreCatchUpSubscription
+abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSubscription
 {
     /** @var ResolvedEvent */
     private static $dropSubscriptionEvent;
@@ -63,11 +64,11 @@ abstract class EventStoreCatchUpSubscription
     /** @var int */
     protected $maxPushQueueSize;
 
-    /** @var EventAppearedOnCatchupSubscription */
+    /** @var EventAppearedOnAsyncCatchupSubscription */
     protected $eventAppeared;
-    /** @var LiveProcessingStarted|null */
+    /** @var LiveProcessingStartedOnAsyncCatchUpSubscription|null */
     private $liveProcessingStarted;
-    /** @var CatchUpSubscriptionDropped|null */
+    /** @var AsyncCatchUpSubscriptionDropped|null */
     private $subscriptionDropped;
 
     /** @var bool */
@@ -99,9 +100,9 @@ abstract class EventStoreCatchUpSubscription
         Logger $logger,
         string $streamId,
         ?UserCredentials $userCredentials,
-        EventAppearedOnCatchupSubscription $eventAppeared,
-        ?LiveProcessingStarted $liveProcessingStarted,
-        ?CatchUpSubscriptionDropped $subscriptionDropped,
+        EventAppearedOnAsyncCatchupSubscription $eventAppeared,
+        ?LiveProcessingStartedOnAsyncCatchUpSubscription $liveProcessingStarted,
+        ?AsyncCatchUpSubscriptionDropped $subscriptionDropped,
         CatchUpSubscriptionSettings $settings
     ) {
         if (null === self::$dropSubscriptionEvent) {

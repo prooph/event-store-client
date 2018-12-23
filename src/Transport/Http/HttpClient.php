@@ -17,6 +17,7 @@ use Amp\Artax\Client;
 use Amp\Artax\DefaultClient;
 use Amp\Artax\Request;
 use Amp\Artax\Response;
+use Prooph\EventStore\Transport\Http\HttpMethod;
 use Prooph\EventStore\UserCredentials;
 use Throwable;
 

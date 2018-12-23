@@ -16,10 +16,11 @@ namespace Prooph\EventStoreClient\Projections;
 use Amp\Promise;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\Projections\AsyncProjectionsManager;
+use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
-use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 
-class ProjectionsManager
+class ProjectionsManager implements AsyncProjectionsManager
 {
     /** @var ProjectionsClient */
     private $client;

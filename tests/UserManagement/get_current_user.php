@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use Prooph\EventStoreClient\UserManagement\UserDetails;
+use Prooph\EventStore\UserManagement\UserDetails;
 use ProophTest\EventStoreClient\DefaultData;
 use Throwable;
 

@@ -17,10 +17,15 @@ use Amp\Promise;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\UserCommandFailedException;
+use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
-use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
+use Prooph\EventStore\UserManagement\AsyncUsersManager;
+use Prooph\EventStore\UserManagement\ChangePasswordDetails;
+use Prooph\EventStore\UserManagement\ResetPasswordDetails;
+use Prooph\EventStore\UserManagement\UserCreationInformation;
+use Prooph\EventStore\UserManagement\UserUpdateInformation;
 
-class UsersManager
+class UsersManager implements AsyncUsersManager
 {
     /** @var UsersClient */
     private $client;

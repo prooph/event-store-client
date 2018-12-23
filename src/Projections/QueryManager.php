@@ -17,6 +17,7 @@ use Amp\Delayed;
 use Amp\Promise;
 use Generator;
 use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Projections\AsyncQueryManager;
 use Prooph\EventStore\UserCredentials;
 use function Amp\call;
 
@@ -24,7 +25,7 @@ use function Amp\call;
  * API for executing queries in the Event Store through PHP code.
  * Communicates with the Event Store over the RESTful API.
  */
-class QueryManager
+class QueryManager implements AsyncQueryManager
 {
     /** @var int */
     private $queryTimeout;

@@ -31,6 +31,7 @@
     "ramsey/uuid": "^3.8"
   },
   "require-dev": {
+    "amphp/log": "^1.0",
     "phpspec/prophecy": "^1.7",
     "phpunit/phpunit": "^7.5",
     "doctrine/instantiator": "^1.1",
