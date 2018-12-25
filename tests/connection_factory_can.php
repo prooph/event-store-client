@@ -109,8 +109,7 @@ final class connection_factory_can extends TestCase
     /** @test */
     public function create_from_uri_with_gossip_seeds(): void
     {
-        $connectionSettings = ConnectionSettings
-            ::create()
+        $connectionSettings = ConnectionSettings::create()
             ->setGossipSeeds($this->getGossipSeeds())
             ->setMaxDiscoverAttempts(self::MAX_DISCOVER_ATTEMPTS)
             ->setGossipTimeout(self::CONNECT_TIMEOUT)
@@ -153,8 +152,7 @@ final class connection_factory_can extends TestCase
             self::CONNECTION_NAME
         );
 
-        $connectionSettings = ConnectionSettings
-            ::create()
+        $connectionSettings = ConnectionSettings::create()
             ->setHeartbeatTimeout(500)
             ->setDefaultUserCredentials(
                 new UserCredentials('admin', 'changeit')
@@ -174,8 +172,7 @@ final class connection_factory_can extends TestCase
             self::CONNECTION_NAME
         );
 
-        $connectionSettings = ConnectionSettings
-            ::create()
+        $connectionSettings = ConnectionSettings::create()
             ->setHeartbeatTimeout(500)
             ->setGossipSeeds([
                 new GossipSeed(new EndPoint('192.168.0.2', 1111)),
@@ -257,11 +254,8 @@ final class connection_factory_can extends TestCase
     /** @test */
     public function create_from_settings_with_gossip_seeds(): void
     {
-        $connectionSettings = ConnectionSettings
-            ::create()
-            ->setGossipSeeds(
-                $this->getGossipSeeds()
-            )
+        $connectionSettings = ConnectionSettings::create()
+            ->setGossipSeeds($this->getGossipSeeds())
             ->build();
 
         $conn = Factory::createFromSettings(
