@@ -15,6 +15,7 @@ namespace Prooph\EventStoreClient;
 
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\GossipSeed;
 use Prooph\EventStore\UserCredentials;
 use ReflectionObject;
 

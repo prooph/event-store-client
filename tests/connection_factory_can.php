@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStore\ClusterSettings;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\GossipSeed;
 use Prooph\EventStore\UserCredentials;
-use Prooph\EventStoreClient\ClusterSettings;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\EventStoreConnectionFactory as Factory;
-use Prooph\EventStoreClient\GossipSeed;
 use Prooph\EventStoreClient\Uri;
 
 final class connection_factory_can extends TestCase

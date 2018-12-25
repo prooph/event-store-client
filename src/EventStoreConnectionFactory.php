@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient;
 
 use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\ClusterSettings;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Internal\ClusterDnsEndPointDiscoverer;

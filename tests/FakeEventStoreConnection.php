@@ -26,6 +26,7 @@ use Prooph\EventStore\ClientClosedEventArgs;
 use Prooph\EventStore\ClientConnectionEventArgs;
 use Prooph\EventStore\ClientErrorEventArgs;
 use Prooph\EventStore\ClientReconnectingEventArgs;
+use Prooph\EventStore\ClusterSettings;
 use Prooph\EventStore\ConnectionSettings;
 use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
 use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
@@ -39,7 +40,6 @@ use Prooph\EventStore\StreamMetadata;
 use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SystemSettings;
 use Prooph\EventStore\UserCredentials;
-use Prooph\EventStoreClient\ClusterSettings;
 
 /** @internal */
 class FakeEventStoreConnection implements AsyncEventStoreConnection
