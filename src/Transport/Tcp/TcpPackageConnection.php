@@ -196,30 +196,29 @@ class TcpPackageConnection
 
     public function startReceiving(): void
     {
-        Loop::defer(function (): Generator {
-            while (true) {
-                $data = yield $this->connection->read();
+        Loop::unreference(Loop::repeat(0, function (string $watcherId): Generator {
+            Loop::disable($watcherId);
+            $data = yield $this->connection->read();
 
-                if (null === $data) {
-                    // stream got closed
-                    return;
-                }
-
-                try {
-                    $this->framer->unFrameData($data);
-                } catch (PackageFramingException $exception) {
-                    $this->log->error(\sprintf(
-                        'TcpPackageConnection: [%s, %s]. Invalid TCP frame received',
-                        $this->remoteEndPoint,
-                        $this->connectionId
-                    ));
-
-                    $this->close();
-
-                    return;
-                }
+            if (null === $data) {
+                // stream got closed
+                return;
             }
-        });
+
+            try {
+                $this->framer->unFrameData($data);
+            } catch (PackageFramingException $exception) {
+                $this->log->error(\sprintf(
+                    'TcpPackageConnection: [%s, %s]. Invalid TCP frame received',
+                    $this->remoteEndPoint,
+                    $this->connectionId
+                ));
+
+                $this->close();
+            }
+
+            Loop::enable($watcherId);
+        }));
     }
 
     public function close(): void

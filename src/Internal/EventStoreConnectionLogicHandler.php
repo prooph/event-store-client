@@ -196,9 +196,9 @@ class EventStoreConnectionLogicHandler
 
         switch ($this->state->value()) {
             case ConnectionState::INIT:
-                $this->timerTickWatcherId = Loop::repeat(Consts::TIMER_PERIOD, function (): void {
+                Loop::unreference(Loop::repeat(Consts::TIMER_PERIOD, function (): void {
                     $this->timerTick();
-                });
+                }));
                 $this->endPointDiscoverer = $endPointDiscoverer;
                 $this->state = ConnectionState::connecting();
                 $this->connectingPhase = ConnectingPhase::reconnecting();
@@ -276,9 +276,9 @@ class EventStoreConnectionLogicHandler
 
         $this->state = ConnectionState::closed();
 
-        if ($this->timerTickWatcherId) {
-            Loop::cancel($this->timerTickWatcherId);
-        }
+        //if ($this->timerTickWatcherId) {
+//            Loop::cancel($this->timerTickWatcherId);
+//        }
 
         $this->operations->cleanUp();
         $this->subscriptions->cleanUp();
