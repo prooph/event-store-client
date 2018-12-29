@@ -17,6 +17,7 @@ use Amp\Promise;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Projections\AsyncProjectionsManager;
+use Prooph\EventStore\Projections\ProjectionDetails;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
 
@@ -28,15 +29,19 @@ class ProjectionsManager implements AsyncProjectionsManager
     private $httpEndPoint;
     /** @var string */
     private $httpSchema;
+    /** @var UserCredentials|null */
+    private $defaultUserCredentials;
 
     public function __construct(
         EndPoint $httpEndPoint,
         int $operationTimeout,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA,
+        ?UserCredentials $defaultUserCredentials = null
     ) {
         $this->client = new ProjectionsClient($operationTimeout);
         $this->httpEndPoint = $httpEndPoint;
         $this->httpSchema = $httpSchema;
+        $this->defaultUserCredentials = $defaultUserCredentials;
     }
 
     /**
@@ -51,7 +56,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         return $this->client->enable(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -68,7 +73,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         return $this->client->disable(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -85,7 +90,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         return $this->client->abort(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -104,7 +109,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         return $this->client->createOneTime(
             $this->httpEndPoint,
             $query,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -129,7 +134,7 @@ class ProjectionsManager implements AsyncProjectionsManager
             $this->httpEndPoint,
             $name,
             $query,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -156,7 +161,7 @@ class ProjectionsManager implements AsyncProjectionsManager
             $name,
             $query,
             $trackEmittedStreams,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -170,7 +175,7 @@ class ProjectionsManager implements AsyncProjectionsManager
     {
         return $this->client->listAll(
             $this->httpEndPoint,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -184,7 +189,7 @@ class ProjectionsManager implements AsyncProjectionsManager
     {
         return $this->client->listOneTime(
             $this->httpEndPoint,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -198,7 +203,7 @@ class ProjectionsManager implements AsyncProjectionsManager
     {
         return $this->client->listContinuous(
             $this->httpEndPoint,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -219,7 +224,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         return $this->client->getStatus(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -240,7 +245,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         return $this->client->getState(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -269,7 +274,7 @@ class ProjectionsManager implements AsyncProjectionsManager
             $this->httpEndPoint,
             $name,
             $partition,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -290,7 +295,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         return $this->client->getResult(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -319,7 +324,7 @@ class ProjectionsManager implements AsyncProjectionsManager
             $this->httpEndPoint,
             $name,
             $partition,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -340,7 +345,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         return $this->client->getStatistics(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -359,7 +364,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         return $this->client->getQuery(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -386,7 +391,7 @@ class ProjectionsManager implements AsyncProjectionsManager
             $name,
             $query,
             $emitEnabled,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -407,7 +412,7 @@ class ProjectionsManager implements AsyncProjectionsManager
             $this->httpEndPoint,
             $name,
             $deleteEmittedStreams,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -424,7 +429,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         return $this->client->reset(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }

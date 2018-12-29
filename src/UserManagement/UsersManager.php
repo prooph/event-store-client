@@ -22,6 +22,7 @@ use Prooph\EventStore\UserManagement\AsyncUsersManager;
 use Prooph\EventStore\UserManagement\ChangePasswordDetails;
 use Prooph\EventStore\UserManagement\ResetPasswordDetails;
 use Prooph\EventStore\UserManagement\UserCreationInformation;
+use Prooph\EventStore\UserManagement\UserDetails;
 use Prooph\EventStore\UserManagement\UserUpdateInformation;
 use Prooph\EventStoreClient\Exception\UserCommandFailedException;
 
@@ -54,9 +55,12 @@ class UsersManager implements AsyncUsersManager
             throw new InvalidArgumentException('Login cannot be empty');
         }
 
-        $userCredentials = $userCredentials ?? $this->defaultCredentials;
-
-        return $this->client->enable($this->endPoint, $login, $userCredentials, $this->schema);
+        return $this->client->enable(
+            $this->endPoint,
+            $login,
+            $userCredentials ?? $this->defaultCredentials,
+            $this->schema
+        );
     }
 
     public function disableAsync(string $login, ?UserCredentials $userCredentials = null): Promise
@@ -65,9 +69,12 @@ class UsersManager implements AsyncUsersManager
             throw new InvalidArgumentException('Login cannot be empty');
         }
 
-        $userCredentials = $userCredentials ?? $this->defaultCredentials;
-
-        return $this->client->disable($this->endPoint, $login, $userCredentials, $this->schema);
+        return $this->client->disable(
+            $this->endPoint,
+            $login,
+            $userCredentials ?? $this->defaultCredentials,
+            $this->schema
+        );
     }
 
     /** @throws UserCommandFailedException */
@@ -77,25 +84,32 @@ class UsersManager implements AsyncUsersManager
             throw new InvalidArgumentException('Login cannot be empty');
         }
 
-        $userCredentials = $userCredentials ?? $this->defaultCredentials;
-
-        return $this->client->delete($this->endPoint, $login, $userCredentials, $this->schema);
+        return $this->client->delete(
+            $this->endPoint,
+            $login,
+            $userCredentials ?? $this->defaultCredentials,
+            $this->schema
+        );
     }
 
     /** @return Promise<UserDetails[]> */
     public function listAllAsync(?UserCredentials $userCredentials = null): Promise
     {
-        $userCredentials = $userCredentials ?? $this->defaultCredentials;
-
-        return $this->client->listAll($this->endPoint, $userCredentials, $this->schema);
+        return $this->client->listAll(
+            $this->endPoint,
+            $userCredentials ?? $this->defaultCredentials,
+            $this->schema
+        );
     }
 
     /** @return Promise<UserDetails> */
     public function getCurrentUserAsync(?UserCredentials $userCredentials = null): Promise
     {
-        $userCredentials = $userCredentials ?? $this->defaultCredentials;
-
-        return $this->client->getCurrentUser($this->endPoint, $userCredentials, $this->schema);
+        return $this->client->getCurrentUser(
+            $this->endPoint,
+            $userCredentials ?? $this->defaultCredentials,
+            $this->schema
+        );
     }
 
     /** @return Promise<UserDetails> */
@@ -105,9 +119,12 @@ class UsersManager implements AsyncUsersManager
             throw new InvalidArgumentException('Login cannot be empty');
         }
 
-        $userCredentials = $userCredentials ?? $this->defaultCredentials;
-
-        return $this->client->getUser($this->endPoint, $login, $userCredentials, $this->schema);
+        return $this->client->getUser(
+            $this->endPoint,
+            $login,
+            $userCredentials ?? $this->defaultCredentials,
+            $this->schema
+        );
     }
 
     /**
@@ -143,8 +160,6 @@ class UsersManager implements AsyncUsersManager
             }
         }
 
-        $userCredentials = $userCredentials ?? $this->defaultCredentials;
-
         return $this->client->createUser(
             $this->endPoint,
             new UserCreationInformation(
@@ -153,7 +168,7 @@ class UsersManager implements AsyncUsersManager
                 $groups,
                 $password
             ),
-            $userCredentials,
+            $userCredentials ?? $this->defaultCredentials,
             $this->schema
         );
     }
@@ -185,13 +200,11 @@ class UsersManager implements AsyncUsersManager
             }
         }
 
-        $userCredentials = $userCredentials ?? $this->defaultCredentials;
-
         return $this->client->updateUser(
             $this->endPoint,
             $login,
             new UserUpdateInformation($fullName, $groups),
-            $userCredentials,
+            $userCredentials ?? $this->defaultCredentials,
             $this->schema
         );
     }
@@ -214,13 +227,11 @@ class UsersManager implements AsyncUsersManager
             throw new InvalidArgumentException('New password cannot be empty');
         }
 
-        $userCredentials = $userCredentials ?? $this->defaultCredentials;
-
         return $this->client->changePassword(
             $this->endPoint,
             $login,
             new ChangePasswordDetails($oldPassword, $newPassword),
-            $userCredentials,
+            $userCredentials ?? $this->defaultCredentials,
             $this->schema
         );
     }
@@ -238,13 +249,11 @@ class UsersManager implements AsyncUsersManager
             throw new InvalidArgumentException('New password cannot be empty');
         }
 
-        $userCredentials = $userCredentials ?? $this->defaultCredentials;
-
         return $this->client->resetPassword(
             $this->endPoint,
             $login,
             new ResetPasswordDetails($newPassword),
-            $userCredentials,
+            $userCredentials ?? $this->defaultCredentials,
             $this->schema
         );
     }

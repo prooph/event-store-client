@@ -28,15 +28,19 @@ class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsMana
     private $httpEndPoint;
     /** @var string */
     private $httpSchema;
+    /** @var UserCredentials|null */
+    private $defaultUserCredentials;
 
     public function __construct(
         EndPoint $httpEndPoint,
         int $operationTimeout,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA,
+        ?UserCredentials $defaultUserCredentials = null
     ) {
         $this->client = new PersistentSubscriptionsClient($operationTimeout);
         $this->httpEndPoint = $httpEndPoint;
         $this->httpSchema = $httpSchema;
+        $this->defaultUserCredentials = $defaultUserCredentials;
     }
 
     /**
@@ -62,7 +66,7 @@ class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsMana
             $this->httpEndPoint,
             $stream,
             $subscriptionName,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -84,7 +88,7 @@ class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsMana
             $this->httpEndPoint,
             $stream,
             $subscriptionName,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -103,7 +107,7 @@ class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsMana
         return $this->client->list(
             $this->httpEndPoint,
             $stream,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }

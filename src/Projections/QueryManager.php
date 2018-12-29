@@ -18,6 +18,7 @@ use Amp\Promise;
 use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Projections\AsyncQueryManager;
+use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
 use function Amp\call;
 
@@ -31,17 +32,23 @@ class QueryManager implements AsyncQueryManager
     private $queryTimeout;
     /** @var ProjectionsManager */
     private $projectionsManager;
+    /** @var UserCredentials|null */
+    private $defaultUserCredentials;
 
     public function __construct(
         EndPoint $httpEndPoint,
         int $projectionOperationTimeout,
-        int $queryTimeout
+        int $queryTimeout,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA,
+        ?UserCredentials $defaultUserCredentials = null
     ) {
         $this->queryTimeout = $queryTimeout;
         $this->projectionsManager = new ProjectionsManager(
             $httpEndPoint,
-            $projectionOperationTimeout
+            $projectionOperationTimeout,
+            $httpSchema
         );
+        $this->defaultUserCredentials = $defaultUserCredentials;
     }
 
     /**
@@ -66,9 +73,11 @@ class QueryManager implements AsyncQueryManager
         int $maximumPollingDelay,
         ?UserCredentials $userCredentials = null
     ): Promise {
-        $promise = call(function () use (
-                $name, $query, $initialPollingDelay, $maximumPollingDelay, $userCredentials
-            ): Generator {
+        $userCredentials = $userCredentials ?? $this->defaultUserCredentials;
+
+        $promise = call(function () use ($name, $query, $initialPollingDelay,
+            $maximumPollingDelay, $userCredentials
+        ): Generator {
             yield $this->projectionsManager->createTransientAsync(
                     $name,
                     $query,
@@ -86,8 +95,7 @@ class QueryManager implements AsyncQueryManager
                     $name,
                     $userCredentials
                 );
-        }
-        );
+        });
 
         return Promise\timeout($promise, $this->queryTimeout);
     }
