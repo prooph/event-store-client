@@ -507,7 +507,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
 
             if ($this->verbose) {
                 $this->log->debug(\sprintf(
-                    'Catch-up Subscription %s to %s: droppen subscription, reason: %s %s',
+                    'Catch-up Subscription %s to %s: dropped subscription, reason: %s %s',
                     $this->subscriptionName,
                     $this->isSubscribedToAll ? '<all>' : $this->streamId,
                     $reason->name(),

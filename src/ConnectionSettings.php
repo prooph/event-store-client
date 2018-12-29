@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface as Log;
 /**
  * All times are milliseconds
  */
-class ConnectionSettings implements \Prooph\EventStore\ConnectionSettings
+final class ConnectionSettings
 {
     /** @var Log */
     private $log;
