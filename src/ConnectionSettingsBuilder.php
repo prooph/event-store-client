@@ -22,7 +22,6 @@ use Monolog\Logger as MonoLog;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\RuntimeException;
-use Prooph\EventStore\GossipSeed;
 use Prooph\EventStore\Internal\Consts;
 use Prooph\EventStore\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
