@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\PersistentSubscriptionManagement;
 
+use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
@@ -258,6 +259,8 @@ class persistent_subscription_manager extends TestCase
             );
 
             $this->sub->stop();
+
+            yield new Delayed(1000); // wait for subscription to drop
 
             yield $this->manager->replayParkedMessages($this->stream, 'existing', DefaultData::adminCredentials());
 
