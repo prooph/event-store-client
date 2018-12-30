@@ -57,7 +57,7 @@ class UsersClient
                 $endPoint,
                 $httpSchema,
                 '/users/%s/command/enable',
-                $login
+                \urlencode($login)
             ),
             '',
             $userCredentials,
@@ -76,7 +76,7 @@ class UsersClient
                 $endPoint,
                 $httpSchema,
                 '/users/%s/command/disable',
-                $login
+                \urlencode($login)
             ),
             '',
             $userCredentials,
@@ -95,7 +95,7 @@ class UsersClient
                 $endPoint,
                 $httpSchema,
                 '/users/%s',
-                $login
+                \urlencode($login)
             ),
             $userCredentials,
             HttpStatusCode::OK
@@ -196,7 +196,7 @@ class UsersClient
                 $endPoint,
                 $httpSchema,
                 '/users/%s',
-                $login
+                \urlencode($login)
             ),
             $userCredentials,
             HttpStatusCode::OK
@@ -253,7 +253,7 @@ class UsersClient
                 $endPoint,
                 $httpSchema,
                 '/users/%s',
-                $login
+                \urlencode($login)
             ),
             Json::encode($updatedUser),
             $userCredentials,
@@ -273,7 +273,7 @@ class UsersClient
                 $endPoint,
                 $httpSchema,
                 '/users/%s/command/change-password',
-                $login
+                \urlencode($login)
             ),
             Json::encode($changePasswordDetails),
             $userCredentials,
@@ -293,7 +293,7 @@ class UsersClient
                 $endPoint,
                 $httpSchema,
                 '/users/%s/command/reset-password',
-                $login
+                \urlencode($login)
             ),
             Json::encode($resetPasswordDetails),
             $userCredentials,
