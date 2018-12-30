@@ -27,7 +27,7 @@
     "amphp/byte-stream": "^1.5.0",
     "amphp/file": "^0.3.3",
     "amphp/socket": "^0.10.11",
-    "prooph/event-store": "dev-initial_v8",
+    "prooph/event-store": "dev-master",
     "ramsey/uuid": "^3.8"
   },
   "require-dev": {
