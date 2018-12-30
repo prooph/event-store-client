@@ -100,6 +100,7 @@ class ProjectionsManager implements AsyncProjectionsManager
      */
     public function createOneTimeAsync(
         string $query,
+        string $type = 'JS',
         ?UserCredentials $userCredentials = null
     ): Promise {
         if ('' === $query) {
@@ -109,6 +110,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         return $this->client->createOneTime(
             $this->httpEndPoint,
             $query,
+            $type,
             $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
@@ -120,6 +122,7 @@ class ProjectionsManager implements AsyncProjectionsManager
     public function createTransientAsync(
         string $name,
         string $query,
+        string $type = 'JS',
         ?UserCredentials $userCredentials = null
     ): Promise {
         if ('' === $name) {
@@ -134,6 +137,7 @@ class ProjectionsManager implements AsyncProjectionsManager
             $this->httpEndPoint,
             $name,
             $query,
+            $type,
             $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
@@ -146,6 +150,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         string $name,
         string $query,
         bool $trackEmittedStreams = false,
+        string $type = 'JS',
         ?UserCredentials $userCredentials = null
     ): Promise {
         if ('' === $name) {
@@ -161,6 +166,7 @@ class ProjectionsManager implements AsyncProjectionsManager
             $name,
             $query,
             $trackEmittedStreams,
+            $type,
             $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
