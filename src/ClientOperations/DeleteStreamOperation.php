@@ -94,8 +94,10 @@ class DeleteStreamOperation extends AbstractOperation
             case OperationResult::ForwardTimeout:
                 return new InspectionResult(InspectionDecision::retry(), 'ForwardTimeout');
             case OperationResult::WrongExpectedVersion:
-                $exception = WrongExpectedVersionException::withExpectedVersion($this->stream, $this->expectedVersion);
-                $this->fail($exception);
+                $this->fail(WrongExpectedVersionException::with(
+                    $this->stream,
+                    $this->expectedVersion
+                ));
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'WrongExpectedVersion');
             case OperationResult::StreamDeleted:

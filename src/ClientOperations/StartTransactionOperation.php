@@ -93,12 +93,10 @@ class StartTransactionOperation extends AbstractOperation
             case OperationResult::ForwardTimeout:
                 return new InspectionResult(InspectionDecision::retry(), 'ForwardTimeout');
             case OperationResult::WrongExpectedVersion:
-                $exception = new WrongExpectedVersionException(\sprintf(
-                    'Start transaction failed due to WrongExpectedVersion. Stream: \'%s\', Expected version: \'%s\'',
+                $this->fail(WrongExpectedVersionException::with(
                     $this->stream,
                     $this->expectedVersion
                 ));
-                $this->fail($exception);
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'WrongExpectedVersion');
             case OperationResult::StreamDeleted:

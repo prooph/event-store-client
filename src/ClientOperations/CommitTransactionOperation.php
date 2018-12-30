@@ -84,11 +84,10 @@ class CommitTransactionOperation extends AbstractOperation
             case OperationResult::CommitTimeout:
                 return new InspectionResult(InspectionDecision::retry(), 'CommitTimeout');
             case OperationResult::WrongExpectedVersion:
-                $exception = new WrongExpectedVersionException(\sprintf(
+                $this->fail(new WrongExpectedVersionException(\sprintf(
                     'Commit transaction failed due to WrongExpectedVersion. Transaction id: \'%s\'',
                     $this->transactionId
-                ));
-                $this->fail($exception);
+                )));
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'WrongExpectedVersion');
             case OperationResult::StreamDeleted:

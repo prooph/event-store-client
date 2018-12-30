@@ -105,8 +105,11 @@ class AppendToStreamOperation extends AbstractOperation
             case OperationResult::CommitTimeout:
                 return new InspectionResult(InspectionDecision::retry(), 'CommitTimeout');
             case OperationResult::WrongExpectedVersion:
-                $exception = WrongExpectedVersionException::withExpectedVersion($this->stream, $this->expectedVersion);
-                $this->fail($exception);
+                $this->fail(WrongExpectedVersionException::with(
+                    $this->stream,
+                    $this->expectedVersion,
+                    $response->getCurrentVersion()
+                ));
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'WrongExpectedVersion');
             case OperationResult::StreamDeleted:
