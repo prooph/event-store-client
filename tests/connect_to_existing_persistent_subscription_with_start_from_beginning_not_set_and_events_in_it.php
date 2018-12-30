@@ -19,13 +19,13 @@ use Amp\Success;
 use Amp\TimeoutException;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\ResolvedEvent;
-use Prooph\EventStoreClient\Util\Guid;
+use Prooph\EventStore\AsyncEventStorePersistentSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\PersistentSubscriptionSettings;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\Util\Guid;
 use Throwable;
 use function Amp\call;
 
@@ -68,7 +68,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
         yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
-            new class($deferred) implements EventAppearedOnPersistentSubscription {
+            new class($deferred) implements EventAppearedOnAsyncPersistentSubscription {
                 private $deferred;
 
                 public function __construct($deferred)
@@ -77,7 +77,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
                 }
 
                 public function __invoke(
-                    EventStorePersistentSubscription $subscription,
+                    AsyncEventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Exception;
 
+use Prooph\EventStore\Exception\RuntimeException;
+
 class PackageFramingException extends RuntimeException
 {
 }

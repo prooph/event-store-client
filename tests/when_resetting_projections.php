@@ -16,7 +16,7 @@ namespace ProophTest\EventStoreClient;
 use Amp\Delayed;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Util\Guid;
+use Prooph\EventStore\Util\Guid;
 use Throwable;
 
 class when_resetting_projections extends TestCase

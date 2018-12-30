@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Exception;
 
-class UserCommandFailedException extends EventStoreConnectionException
+use Prooph\EventStore\Exception\UserCommandFailedException as BaseException;
+
+class UserCommandFailedException extends BaseException
 {
     /** @var int */
     private $httpStatusCode;

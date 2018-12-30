@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Prooph\EventStoreClient\SubscriptionDropReason;
+use Prooph\EventStore\SubscriptionDropReason;
 use Throwable;
 
 /** @internal */

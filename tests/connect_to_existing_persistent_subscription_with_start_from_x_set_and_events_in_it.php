@@ -18,14 +18,14 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EventAppearedOnPersistentSubscription;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventId;
-use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Internal\EventStorePersistentSubscription;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\ResolvedEvent;
-use Prooph\EventStoreClient\Util\Guid;
+use Prooph\EventStore\AsyncEventStorePersistentSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventId;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\PersistentSubscriptionSettings;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\Util\Guid;
 use Throwable;
 use function Amp\call;
 
@@ -70,7 +70,7 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
         yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
-            new class($this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
+            new class($this->resetEvent, $this->firstEvent) implements EventAppearedOnAsyncPersistentSubscription {
                 private $deferred;
                 private $firstEvent;
                 private $set = false;
@@ -82,7 +82,7 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
                 }
 
                 public function __invoke(
-                    EventStorePersistentSubscription $subscription,
+                    AsyncEventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {

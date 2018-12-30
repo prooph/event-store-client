@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\PersistentSubscriptions;
 
 use Amp\Promise;
-use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
-use Prooph\EventStoreClient\UserCredentials;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\PersistentSubscriptions\AsyncPersistentSubscriptionsManager;
+use Prooph\EventStore\Transport\Http\EndpointExtensions;
+use Prooph\EventStore\UserCredentials;
 
-class PersistentSubscriptionsManager
+class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsManager
 {
     /** @var PersistentSubscriptionsClient */
     private $client;
@@ -27,15 +28,19 @@ class PersistentSubscriptionsManager
     private $httpEndPoint;
     /** @var string */
     private $httpSchema;
+    /** @var UserCredentials|null */
+    private $defaultUserCredentials;
 
     public function __construct(
         EndPoint $httpEndPoint,
         int $operationTimeout,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA,
+        ?UserCredentials $defaultUserCredentials = null
     ) {
         $this->client = new PersistentSubscriptionsClient($operationTimeout);
         $this->httpEndPoint = $httpEndPoint;
         $this->httpSchema = $httpSchema;
+        $this->defaultUserCredentials = $defaultUserCredentials;
     }
 
     /**
@@ -61,7 +66,7 @@ class PersistentSubscriptionsManager
             $this->httpEndPoint,
             $stream,
             $subscriptionName,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -83,7 +88,7 @@ class PersistentSubscriptionsManager
             $this->httpEndPoint,
             $stream,
             $subscriptionName,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -102,7 +107,7 @@ class PersistentSubscriptionsManager
         return $this->client->list(
             $this->httpEndPoint,
             $stream,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }

@@ -15,17 +15,17 @@ namespace ProophTest\EventStoreClient\Helper;
 
 use Amp\Promise;
 use Generator;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventStoreTransaction;
+use Prooph\EventStore\AsyncEventStoreTransaction;
+use Prooph\EventStore\EventData;
 use function Amp\call;
 
 /** @internal */
 class OngoingTransaction
 {
-    /** @var EventStoreTransaction */
+    /** @var AsyncEventStoreTransaction */
     private $transaction;
 
-    public function __construct(EventStoreTransaction $transaction)
+    public function __construct(AsyncEventStoreTransaction $transaction)
     {
         $this->transaction = $transaction;
     }

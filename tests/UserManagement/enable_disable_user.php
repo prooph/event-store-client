@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Exception\UserCommandFailedException;
-use Prooph\EventStoreClient\UserCredentials;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\Exception\UserCommandFailedException;
+use Prooph\EventStore\UserCredentials;
 use ProophTest\EventStoreClient\DefaultData;
 use Throwable;
 

@@ -18,19 +18,19 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\CatchUpSubscriptionDropped;
-use Prooph\EventStoreClient\CatchUpSubscriptionSettings;
-use Prooph\EventStoreClient\EventAppearedOnCatchupSubscription;
-use Prooph\EventStoreClient\EventAppearedOnSubscription;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventStoreConnection;
-use Prooph\EventStoreClient\EventStoreSubscription;
-use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
+use Prooph\EventStore\AsyncCatchUpSubscriptionDropped;
+use Prooph\EventStore\AsyncEventStoreCatchUpSubscription;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\CatchUpSubscriptionSettings;
+use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
+use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventStoreSubscription;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStoreClient\Internal\EventStoreStreamCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\ManualResetEventSlim;
-use Prooph\EventStoreClient\ResolvedEvent;
-use Prooph\EventStoreClient\SubscriptionDropReason;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
@@ -40,7 +40,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
 {
     private const TIMEOUT = 5000;
 
-    /** @var EventStoreConnection */
+    /** @var AsyncEventStoreConnection */
     private $conn;
 
     /**
@@ -220,9 +220,9 @@ class subscribe_to_stream_catching_up_should extends TestCase
                 $stream,
                 null,
                 CatchUpSubscriptionSettings::default(),
-                new class() implements EventAppearedOnCatchupSubscription {
+                new class() implements EventAppearedOnAsyncCatchupSubscription {
                     public function __invoke(
-                        EventStoreCatchUpSubscription $subscription,
+                        AsyncEventStoreCatchUpSubscription $subscription,
                         ResolvedEvent $resolvedEvent
                     ): Promise {
                         return new Success();
@@ -260,9 +260,9 @@ class subscribe_to_stream_catching_up_should extends TestCase
                 $stream,
                 null,
                 CatchUpSubscriptionSettings::default(),
-                new class() implements EventAppearedOnCatchupSubscription {
+                new class() implements EventAppearedOnAsyncCatchupSubscription {
                     public function __invoke(
-                        EventStoreCatchUpSubscription $subscription,
+                        AsyncEventStoreCatchUpSubscription $subscription,
                         ResolvedEvent $resolvedEvent
                     ): Promise {
                         throw new \Exception('Error');
@@ -451,9 +451,9 @@ class subscribe_to_stream_catching_up_should extends TestCase
         });
     }
 
-    private function appearedWithCountdown(CountdownEvent $appeared): EventAppearedOnCatchupSubscription
+    private function appearedWithCountdown(CountdownEvent $appeared): EventAppearedOnAsyncCatchupSubscription
     {
-        return new class($appeared) implements EventAppearedOnCatchupSubscription {
+        return new class($appeared) implements EventAppearedOnAsyncCatchupSubscription {
             /** @var CountdownEvent */
             private $appeared;
 
@@ -463,7 +463,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
             }
 
             public function __invoke(
-                EventStoreCatchUpSubscription $subscription,
+                AsyncEventStoreCatchUpSubscription $subscription,
                 ResolvedEvent $resolvedEvent
             ): Promise {
                 $this->appeared->signal();
@@ -473,9 +473,9 @@ class subscribe_to_stream_catching_up_should extends TestCase
         };
     }
 
-    private function appearedWithCountdownAndEventsAdd(array &$events, CountdownEvent $appeared): EventAppearedOnCatchupSubscription
+    private function appearedWithCountdownAndEventsAdd(array &$events, CountdownEvent $appeared): EventAppearedOnAsyncCatchupSubscription
     {
-        return new class($events, $appeared) implements EventAppearedOnCatchupSubscription {
+        return new class($events, $appeared) implements EventAppearedOnAsyncCatchupSubscription {
             /** @var array */
             private $events;
             /** @var CountdownEvent */
@@ -488,7 +488,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
             }
 
             public function __invoke(
-                EventStoreCatchUpSubscription $subscription,
+                AsyncEventStoreCatchUpSubscription $subscription,
                 ResolvedEvent $resolvedEvent
             ): Promise {
                 $this->events[] = $resolvedEvent;
@@ -499,9 +499,9 @@ class subscribe_to_stream_catching_up_should extends TestCase
         };
     }
 
-    private function appearedWithResetEvent(ManualResetEventSlim $appeared): EventAppearedOnCatchupSubscription
+    private function appearedWithResetEvent(ManualResetEventSlim $appeared): EventAppearedOnAsyncCatchupSubscription
     {
-        return new class($appeared) implements EventAppearedOnCatchupSubscription {
+        return new class($appeared) implements EventAppearedOnAsyncCatchupSubscription {
             /** @var ManualResetEventSlim */
             private $appeared;
 
@@ -511,7 +511,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
             }
 
             public function __invoke(
-                EventStoreCatchUpSubscription $subscription,
+                AsyncEventStoreCatchUpSubscription $subscription,
                 ResolvedEvent $resolvedEvent
             ): Promise {
                 $this->appeared->set();
@@ -521,9 +521,9 @@ class subscribe_to_stream_catching_up_should extends TestCase
         };
     }
 
-    private function droppedWithCountdown(CountdownEvent $dropped): CatchUpSubscriptionDropped
+    private function droppedWithCountdown(CountdownEvent $dropped): AsyncCatchUpSubscriptionDropped
     {
-        return new class($dropped) implements CatchUpSubscriptionDropped {
+        return new class($dropped) implements AsyncCatchUpSubscriptionDropped {
             /** @var CountdownEvent */
             private $dropped;
 
@@ -533,7 +533,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
             }
 
             public function __invoke(
-                EventStoreCatchUpSubscription $subscription,
+                AsyncEventStoreCatchUpSubscription $subscription,
                 SubscriptionDropReason $reason,
                 ?Throwable $exception = null
             ): void {
@@ -542,9 +542,9 @@ class subscribe_to_stream_catching_up_should extends TestCase
         };
     }
 
-    private function droppedWithResetEvent(ManualResetEventSlim $dropped): CatchUpSubscriptionDropped
+    private function droppedWithResetEvent(ManualResetEventSlim $dropped): AsyncCatchUpSubscriptionDropped
     {
-        return new class($dropped) implements CatchUpSubscriptionDropped {
+        return new class($dropped) implements AsyncCatchUpSubscriptionDropped {
             /** @var ManualResetEventSlim */
             private $dropped;
 
@@ -554,7 +554,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
             }
 
             public function __invoke(
-                EventStoreCatchUpSubscription $subscription,
+                AsyncEventStoreCatchUpSubscription $subscription,
                 SubscriptionDropReason $reason,
                 ?Throwable $exception = null
             ): void {

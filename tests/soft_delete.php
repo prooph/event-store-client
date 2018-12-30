@@ -16,18 +16,18 @@ namespace ProophTest\EventStoreClient;
 use Amp\Delayed;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventStoreConnection;
-use Prooph\EventStoreClient\Exception\StreamDeletedException;
-use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
-use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\RawStreamMetadataResult;
-use Prooph\EventStoreClient\ResolvedEvent;
-use Prooph\EventStoreClient\SliceReadStatus;
-use Prooph\EventStoreClient\StreamEventsSlice;
-use Prooph\EventStoreClient\StreamMetadata;
-use Prooph\EventStoreClient\StreamMetadataResult;
-use Prooph\EventStoreClient\WriteResult;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\Exception\StreamDeletedException;
+use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\RawStreamMetadataResult;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\SliceReadStatus;
+use Prooph\EventStore\StreamEventsSlice;
+use Prooph\EventStore\StreamMetadata;
+use Prooph\EventStore\StreamMetadataResult;
+use Prooph\EventStore\WriteResult;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
@@ -36,7 +36,7 @@ use function Amp\Promise\wait;
 
 class soft_delete extends TestCase
 {
-    /** @var EventStoreConnection */
+    /** @var AsyncEventStoreConnection */
     private $conn;
 
     protected function setUpTestCase(): Generator

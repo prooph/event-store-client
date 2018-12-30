@@ -14,6 +14,12 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient;
 
 use Amp\Loop;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventId;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\Position;
+use Prooph\EventStore\StreamMetadata;
+use Prooph\EventStore\UserCredentials;
 
 require __DIR__ . '/../vendor/autoload.php';
 

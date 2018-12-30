@@ -15,11 +15,11 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\Exception\AccessDeniedException;
-use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Util\Guid;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\PersistentSubscriptionSettings;
+use Prooph\EventStore\Util\Guid;
 use Throwable;
 
 class update_existing_persistent_subscription_without_permissions extends TestCase

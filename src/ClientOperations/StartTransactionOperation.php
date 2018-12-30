@@ -14,20 +14,20 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Prooph\EventStoreClient\EventStoreTransaction;
-use Prooph\EventStoreClient\Exception\AccessDeniedException;
-use Prooph\EventStoreClient\Exception\InvalidTransactionException;
-use Prooph\EventStoreClient\Exception\StreamDeletedException;
-use Prooph\EventStoreClient\Exception\UnexpectedOperationResult;
-use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
-use Prooph\EventStoreClient\Internal\EventStoreTransactionConnection;
+use Prooph\EventStore\AsyncEventStoreTransaction;
+use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\Exception\InvalidTransactionException;
+use Prooph\EventStore\Exception\StreamDeletedException;
+use Prooph\EventStore\Exception\UnexpectedOperationResult;
+use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\Internal\AsyncEventStoreTransactionConnection;
+use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Messages\ClientMessages\OperationResult;
 use Prooph\EventStoreClient\Messages\ClientMessages\TransactionStart;
 use Prooph\EventStoreClient\Messages\ClientMessages\TransactionStartCompleted;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use Prooph\EventStoreClient\UserCredentials;
 use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
@@ -40,7 +40,7 @@ class StartTransactionOperation extends AbstractOperation
     private $stream;
     /** @var int */
     private $expectedVersion;
-    /** @var EventStoreTransactionConnection */
+    /** @var AsyncEventStoreTransactionConnection */
     protected $parentConnection;
 
     public function __construct(
@@ -49,7 +49,7 @@ class StartTransactionOperation extends AbstractOperation
         bool $requireMaster,
         string $stream,
         int $expectedVersion,
-        EventStoreTransactionConnection $parentConnection,
+        AsyncEventStoreTransactionConnection $parentConnection,
         ?UserCredentials $userCredentials
     ) {
         $this->requireMaster = $requireMaster;
@@ -93,12 +93,10 @@ class StartTransactionOperation extends AbstractOperation
             case OperationResult::ForwardTimeout:
                 return new InspectionResult(InspectionDecision::retry(), 'ForwardTimeout');
             case OperationResult::WrongExpectedVersion:
-                $exception = new WrongExpectedVersionException(\sprintf(
-                    'Start transaction failed due to WrongExpectedVersion. Stream: \'%s\', Expected version: \'%s\'',
+                $this->fail(WrongExpectedVersionException::with(
                     $this->stream,
                     $this->expectedVersion
                 ));
-                $this->fail($exception);
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'WrongExpectedVersion');
             case OperationResult::StreamDeleted:
@@ -118,11 +116,11 @@ class StartTransactionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(ProtobufMessage $response): EventStoreTransaction
+    protected function transformResponse(ProtobufMessage $response): AsyncEventStoreTransaction
     {
         \assert($response instanceof TransactionStartCompleted);
 
-        return new EventStoreTransaction(
+        return new AsyncEventStoreTransaction(
             $response->getTransactionId(),
             $this->credentials,
             $this->parentConnection

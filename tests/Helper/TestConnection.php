@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\Helper;
 
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\ConnectionSettingsBuilder;
-use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\EventStoreConnectionFactory;
-use Prooph\EventStoreClient\UserCredentials;
 
 /** @internal */
 class TestConnection
 {
-    public static function create(?UserCredentials $userCredentials = null): EventStoreConnection
+    public static function create(?UserCredentials $userCredentials = null): AsyncEventStoreConnection
     {
         self::checkRequiredEnvironmentSettings();
 

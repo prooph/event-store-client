@@ -14,21 +14,21 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Prooph\EventStoreClient\Exception\AccessDeniedException;
-use Prooph\EventStoreClient\Exception\ServerError;
+use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\Exception\ServerError;
+use Prooph\EventStore\ReadDirection;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\SliceReadStatus;
+use Prooph\EventStore\StreamEventsSlice;
+use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Internal\EventMessageConverter;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEvents;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEventsCompleted;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEventsCompleted_ReadStreamResult as ReadStreamResult;
 use Prooph\EventStoreClient\Messages\ClientMessages\ResolvedIndexedEvent;
-use Prooph\EventStoreClient\ReadDirection;
-use Prooph\EventStoreClient\ResolvedEvent;
-use Prooph\EventStoreClient\SliceReadStatus;
-use Prooph\EventStoreClient\StreamEventsSlice;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use Prooph\EventStoreClient\UserCredentials;
 use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 

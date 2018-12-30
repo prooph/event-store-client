@@ -18,13 +18,13 @@ use Amp\Delayed;
 use Amp\Promise;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\ClientClosedEventArgs;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\ClientClosedEventArgs;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Exception\InvalidOperationException;
+use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStoreClient\ConnectionSettings;
-use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\EventStoreConnection;
 use Prooph\EventStoreClient\EventStoreConnectionFactory;
-use Prooph\EventStoreClient\Exception\InvalidOperationException;
-use Prooph\EventStoreClient\ExpectedVersion;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 use function Amp\call;
@@ -117,7 +117,7 @@ class connect extends TestCase
             );
 
             $connection->onClosed(function (ClientClosedEventArgs $args) use ($closed) {
-                $this->assertInstanceOf(EventStoreConnection::class, $args->connection());
+                $this->assertInstanceOf(AsyncEventStoreConnection::class, $args->connection());
                 $this->assertEquals('Reconnection limit reached', $args->reason());
 
                 $closed->resolve(true);

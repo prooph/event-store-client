@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\SystemData;
 
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStore\Exception\InvalidArgumentException;
 
 /** @internal */
 class TcpPackage

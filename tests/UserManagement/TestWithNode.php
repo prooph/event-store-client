@@ -15,7 +15,7 @@ namespace ProophTest\EventStoreClient\UserManagement;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EndPoint;
+use Prooph\EventStore\EndPoint;
 use Prooph\EventStoreClient\UserManagement\UsersManager;
 use Throwable;
 use function Amp\call;

@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-use Prooph\EventStoreClient\EventStoreConnection as AsyncConnection;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Internal\ClusterDnsEndPointDiscoverer;
 use Prooph\EventStoreClient\Internal\EventStoreNodeConnection;
 use Prooph\EventStoreClient\Internal\SingleEndpointDiscoverer;
@@ -26,7 +27,7 @@ class EventStoreConnectionFactory
         string $connectionString,
         ?ConnectionSettings $settings = null,
         ?string $connectionName = null
-    ): AsyncConnection {
+    ): AsyncEventStoreConnection {
         $settings = ConnectionString::getConnectionSettings(
             $connectionString,
             $settings ?? ConnectionSettings::default()
@@ -53,7 +54,7 @@ class EventStoreConnectionFactory
         ?Uri $uri,
         ?ConnectionSettings $connectionSettings = null,
         ?string $connectionName = null
-    ): AsyncConnection {
+    ): AsyncEventStoreConnection {
         $connectionSettings = $connectionSettings ?? ConnectionSettings::default();
 
         if (null !== $uri) {
@@ -169,7 +170,7 @@ class EventStoreConnectionFactory
         EndPoint $endPoint,
         ?ConnectionSettings $settings = null,
         ?string $connectionName = null
-    ): AsyncConnection {
+    ): AsyncEventStoreConnection {
         $settings = $settings ?? ConnectionSettings::default();
 
         return new EventStoreNodeConnection(
@@ -186,7 +187,7 @@ class EventStoreConnectionFactory
     public static function createFromSettings(
         ConnectionSettings $settings,
         ?string $connectionName = null
-    ): AsyncConnection {
+    ): AsyncEventStoreConnection {
         return self::createFromUri(null, $settings, $connectionName);
     }
 
@@ -194,7 +195,7 @@ class EventStoreConnectionFactory
         ConnectionSettings $connectionSettings,
         ClusterSettings $clusterSettings,
         string $connectionName = ''
-    ): AsyncConnection {
+    ): AsyncEventStoreConnection {
         $endPointDiscoverer = new ClusterDnsEndPointDiscoverer(
             $connectionSettings->log(),
             $clusterSettings->clusterDns(),

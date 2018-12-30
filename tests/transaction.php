@@ -16,14 +16,14 @@ namespace ProophTest\EventStoreClient;
 use Amp\Parallel\Worker\DefaultPool;
 use Amp\Promise;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventStoreConnection;
-use Prooph\EventStoreClient\EventStoreTransaction;
-use Prooph\EventStoreClient\Exception\StreamDeletedException;
-use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
-use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\StreamEventsSlice;
-use Prooph\EventStoreClient\WriteResult;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\AsyncEventStoreTransaction;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\Exception\StreamDeletedException;
+use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\StreamEventsSlice;
+use Prooph\EventStore\WriteResult;
 use ProophTest\EventStoreClient\Helper\ParallelTransactionTask;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
@@ -32,7 +32,7 @@ use function Amp\call;
 
 class transaction extends TestCase
 {
-    /** @var EventStoreConnection */
+    /** @var AsyncEventStoreConnection */
     private $conn;
 
     /**
@@ -64,7 +64,7 @@ class transaction extends TestCase
                 $stream,
                 ExpectedVersion::NO_STREAM
             );
-            \assert($transaction instanceof EventStoreTransaction);
+            \assert($transaction instanceof AsyncEventStoreTransaction);
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
@@ -88,7 +88,7 @@ class transaction extends TestCase
                 $stream,
                 ExpectedVersion::ANY
             );
-            \assert($transaction instanceof EventStoreTransaction);
+            \assert($transaction instanceof AsyncEventStoreTransaction);
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
@@ -112,7 +112,7 @@ class transaction extends TestCase
                 $stream,
                 1
             );
-            \assert($transaction instanceof EventStoreTransaction);
+            \assert($transaction instanceof AsyncEventStoreTransaction);
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
@@ -135,7 +135,7 @@ class transaction extends TestCase
                 $stream,
                 ExpectedVersion::NO_STREAM
             );
-            \assert($transaction instanceof EventStoreTransaction);
+            \assert($transaction instanceof AsyncEventStoreTransaction);
 
             $result = yield $transaction->commitAsync();
             \assert($result instanceof WriteResult);
@@ -167,7 +167,7 @@ class transaction extends TestCase
                 $stream,
                 ExpectedVersion::NO_STREAM
             );
-            \assert($transaction instanceof EventStoreTransaction);
+            \assert($transaction instanceof AsyncEventStoreTransaction);
 
             yield $transaction->writeAsync();
 
@@ -201,7 +201,7 @@ class transaction extends TestCase
                 $stream,
                 100500
             );
-            \assert($transaction instanceof EventStoreTransaction);
+            \assert($transaction instanceof AsyncEventStoreTransaction);
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
@@ -278,7 +278,7 @@ class transaction extends TestCase
                 $stream,
                 ExpectedVersion::EMPTY_STREAM
             );
-            \assert($transaction instanceof EventStoreTransaction);
+            \assert($transaction instanceof AsyncEventStoreTransaction);
 
             yield $this->conn->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
 
@@ -303,7 +303,7 @@ class transaction extends TestCase
                 $stream,
                 0
             );
-            \assert($transaction instanceof EventStoreTransaction);
+            \assert($transaction instanceof AsyncEventStoreTransaction);
 
             yield $this->conn->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
 
@@ -329,7 +329,7 @@ class transaction extends TestCase
                 $stream,
                 ExpectedVersion::EMPTY_STREAM
             );
-            \assert($transaction instanceof EventStoreTransaction);
+            \assert($transaction instanceof AsyncEventStoreTransaction);
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
@@ -356,7 +356,7 @@ class transaction extends TestCase
                 $stream,
                 ExpectedVersion::ANY
             );
-            \assert($transaction1 instanceof EventStoreTransaction);
+            \assert($transaction1 instanceof AsyncEventStoreTransaction);
             yield $transaction1->writeAsync([$event]);
             $result1 = yield $transaction1->commitAsync();
             \assert($result1 instanceof WriteResult);
@@ -366,7 +366,7 @@ class transaction extends TestCase
                 $stream,
                 ExpectedVersion::ANY
             );
-            \assert($transaction2 instanceof EventStoreTransaction);
+            \assert($transaction2 instanceof AsyncEventStoreTransaction);
             yield $transaction2->writeAsync([$event]);
             $result2 = yield $transaction2->commitAsync();
             \assert($result2 instanceof WriteResult);

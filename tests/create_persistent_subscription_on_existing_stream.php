@@ -15,10 +15,10 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Util\Guid;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\PersistentSubscriptionSettings;
+use Prooph\EventStore\Util\Guid;
 use Throwable;
 
 class create_persistent_subscription_on_existing_stream extends TestCase

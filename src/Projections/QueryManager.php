@@ -16,31 +16,39 @@ namespace Prooph\EventStoreClient\Projections;
 use Amp\Delayed;
 use Amp\Promise;
 use Generator;
-use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\UserCredentials;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Projections\AsyncQueryManager;
+use Prooph\EventStore\Transport\Http\EndpointExtensions;
+use Prooph\EventStore\UserCredentials;
 use function Amp\call;
 
 /**
  * API for executing queries in the Event Store through PHP code.
  * Communicates with the Event Store over the RESTful API.
  */
-class QueryManager
+class QueryManager implements AsyncQueryManager
 {
     /** @var int */
     private $queryTimeout;
     /** @var ProjectionsManager */
     private $projectionsManager;
+    /** @var UserCredentials|null */
+    private $defaultUserCredentials;
 
     public function __construct(
         EndPoint $httpEndPoint,
         int $projectionOperationTimeout,
-        int $queryTimeout
+        int $queryTimeout,
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA,
+        ?UserCredentials $defaultUserCredentials = null
     ) {
         $this->queryTimeout = $queryTimeout;
         $this->projectionsManager = new ProjectionsManager(
             $httpEndPoint,
-            $projectionOperationTimeout
+            $projectionOperationTimeout,
+            $httpSchema
         );
+        $this->defaultUserCredentials = $defaultUserCredentials;
     }
 
     /**
@@ -65,9 +73,11 @@ class QueryManager
         int $maximumPollingDelay,
         ?UserCredentials $userCredentials = null
     ): Promise {
-        $promise = call(function () use (
-                $name, $query, $initialPollingDelay, $maximumPollingDelay, $userCredentials
-            ): Generator {
+        $userCredentials = $userCredentials ?? $this->defaultUserCredentials;
+
+        $promise = call(function () use ($name, $query, $initialPollingDelay,
+            $maximumPollingDelay, $userCredentials
+        ): Generator {
             yield $this->projectionsManager->createTransientAsync(
                     $name,
                     $query,
@@ -85,8 +95,7 @@ class QueryManager
                     $name,
                     $userCredentials
                 );
-        }
-        );
+        });
 
         return Promise\timeout($promise, $this->queryTimeout);
     }

@@ -15,19 +15,19 @@ namespace ProophTest\EventStoreClient\Helper;
 
 use Amp\Promise;
 use Amp\Success;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\EventStoreConnection;
+use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\EventData;
 use function Amp\call;
 
 /** @internal */
 class TailWriter
 {
-    /** @var EventStoreConnection */
+    /** @var AsyncEventStoreConnection */
     private $connection;
     /** @var string */
     private $stream;
 
-    public function __construct(EventStoreConnection $connection, string $stream)
+    public function __construct(AsyncEventStoreConnection $connection, string $stream)
     {
         $this->connection = $connection;
         $this->stream = $stream;

@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-use Prooph\EventStoreClient\Exception\OutOfRangeException;
-use Prooph\EventStoreClient\Internal\Consts;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Exception\OutOfRangeException;
+use Prooph\EventStore\Internal\Consts;
 
 class GossipSeedClusterSettingsBuilder
 {

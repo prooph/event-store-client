@@ -16,14 +16,15 @@ namespace Prooph\EventStoreClient\PersistentSubscriptions;
 use Amp\Artax\Response;
 use Amp\Deferred;
 use Amp\Promise;
-use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\Exception\JsonException;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Exception\JsonException;
+use Prooph\EventStore\PersistentSubscriptions\PersistentSubscriptionDetails;
+use Prooph\EventStore\Transport\Http\EndpointExtensions;
+use Prooph\EventStore\Transport\Http\HttpStatusCode;
+use Prooph\EventStore\UserCredentials;
+use Prooph\EventStore\Util\Json;
 use Prooph\EventStoreClient\Exception\PersistentSubscriptionCommandFailedException;
-use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
 use Prooph\EventStoreClient\Transport\Http\HttpClient;
-use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
-use Prooph\EventStoreClient\UserCredentials;
-use Prooph\EventStoreClient\Util\Json;
 use Throwable;
 
 /** @internal */

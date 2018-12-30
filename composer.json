@@ -22,19 +22,21 @@
     "php": "^7.2",
     "ext-json": "*",
     "ext-protobuf": "*",
-    "amphp/amp": "^2.0.7",
+    "amphp/amp": "^2.1.1",
     "amphp/artax": "^3.0.14",
-    "amphp/byte-stream": "^1.5.0",
+    "amphp/byte-stream": "^1.5.1",
     "amphp/file": "^0.3.3",
     "amphp/socket": "^0.10.11",
+    "prooph/event-store": "dev-master",
     "ramsey/uuid": "^3.8"
   },
   "require-dev": {
+    "amphp/log": "^1.0",
     "phpspec/prophecy": "^1.7",
-    "phpunit/phpunit": "^7.4",
+    "phpunit/phpunit": "^7.5",
     "doctrine/instantiator": "^1.1",
     "sebastian/object-enumerator": "^3.0.3",
-    "satooshi/php-coveralls": "^2.0"
+    "php-coveralls/php-coveralls": "^2.1"
   },
   "autoload": {
     "psr-4": {

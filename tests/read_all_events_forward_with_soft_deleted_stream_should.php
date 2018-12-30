@@ -15,14 +15,14 @@ namespace ProophTest\EventStoreClient;
 
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Common\SystemEventTypes;
-use Prooph\EventStoreClient\Common\SystemRoles;
-use Prooph\EventStoreClient\EventData;
-use Prooph\EventStoreClient\ExpectedVersion;
-use Prooph\EventStoreClient\SliceReadStatus;
-use Prooph\EventStoreClient\StreamEventsSlice;
-use Prooph\EventStoreClient\StreamMetadata;
-use Prooph\EventStoreClient\Util\Json;
+use Prooph\EventStore\Common\SystemEventTypes;
+use Prooph\EventStore\Common\SystemRoles;
+use Prooph\EventStore\EventData;
+use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\SliceReadStatus;
+use Prooph\EventStore\StreamEventsSlice;
+use Prooph\EventStore\StreamMetadata;
+use Prooph\EventStore\Util\Json;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 

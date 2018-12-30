@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Exception\OutOfRangeException;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\Exception\OutOfRangeException;
 
 /**
  * All times are milliseconds
  */
-class ClusterSettings
+final class ClusterSettings
 {
     /** @var string */
     private $clusterDns = '';

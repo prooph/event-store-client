@@ -16,9 +16,9 @@ namespace ProophTest\EventStoreClient;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Exception\AccessDeniedException;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
-use Prooph\EventStoreClient\Util\Guid;
+use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\PersistentSubscriptionSettings;
+use Prooph\EventStore\Util\Guid;
 use Throwable;
 
 class create_persistent_subscription_group_without_permissions extends TestCase

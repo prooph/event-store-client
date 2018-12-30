@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient\SystemData;
 
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\SystemData\TcpFlags;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
-use Prooph\EventStoreClient\Util\Guid;
 
 class clientapi_tcp_package extends TestCase
 {

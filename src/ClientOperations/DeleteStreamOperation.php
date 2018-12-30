@@ -14,20 +14,20 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Prooph\EventStoreClient\DeleteResult;
-use Prooph\EventStoreClient\Exception\AccessDeniedException;
-use Prooph\EventStoreClient\Exception\InvalidTransactionException;
-use Prooph\EventStoreClient\Exception\StreamDeletedException;
-use Prooph\EventStoreClient\Exception\UnexpectedOperationResult;
-use Prooph\EventStoreClient\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\DeleteResult;
+use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\Exception\InvalidTransactionException;
+use Prooph\EventStore\Exception\StreamDeletedException;
+use Prooph\EventStore\Exception\UnexpectedOperationResult;
+use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\Position;
+use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Messages\ClientMessages\DeleteStream;
 use Prooph\EventStoreClient\Messages\ClientMessages\DeleteStreamCompleted;
 use Prooph\EventStoreClient\Messages\ClientMessages\OperationResult;
-use Prooph\EventStoreClient\Position;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use Prooph\EventStoreClient\UserCredentials;
 use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
@@ -94,8 +94,10 @@ class DeleteStreamOperation extends AbstractOperation
             case OperationResult::ForwardTimeout:
                 return new InspectionResult(InspectionDecision::retry(), 'ForwardTimeout');
             case OperationResult::WrongExpectedVersion:
-                $exception = WrongExpectedVersionException::withExpectedVersion($this->stream, $this->expectedVersion);
-                $this->fail($exception);
+                $this->fail(WrongExpectedVersionException::with(
+                    $this->stream,
+                    $this->expectedVersion
+                ));
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'WrongExpectedVersion');
             case OperationResult::StreamDeleted:

@@ -15,13 +15,13 @@ namespace Prooph\EventStoreClient\Internal;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use Prooph\EventStoreClient\EventId;
+use Prooph\EventStore\EventId;
+use Prooph\EventStore\Position;
+use Prooph\EventStore\RecordedEvent;
+use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStoreClient\Messages\ClientMessages\EventRecord as EventRecordMessage;
 use Prooph\EventStoreClient\Messages\ClientMessages\ResolvedEvent as ResolvedEventMessage;
 use Prooph\EventStoreClient\Messages\ClientMessages\ResolvedIndexedEvent as ResolvedIndexedEventMessage;
-use Prooph\EventStoreClient\Position;
-use Prooph\EventStoreClient\RecordedEvent;
-use Prooph\EventStoreClient\ResolvedEvent;
 
 /** @internal */
 class EventMessageConverter

@@ -15,7 +15,7 @@ namespace Prooph\EventStoreClient\Internal;
 
 use Amp\Promise;
 use Amp\Success;
-use Prooph\EventStoreClient\EndPoint;
+use Prooph\EventStore\EndPoint;
 
 /** @internal */
 final class StaticEndPointDiscoverer implements EndPointDiscoverer

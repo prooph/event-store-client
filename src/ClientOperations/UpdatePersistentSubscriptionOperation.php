@@ -14,20 +14,20 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Prooph\EventStoreClient\Common\SystemConsumerStrategies;
-use Prooph\EventStoreClient\Exception\AccessDeniedException;
-use Prooph\EventStoreClient\Exception\InvalidOperationException;
-use Prooph\EventStoreClient\Exception\UnexpectedOperationResult;
-use Prooph\EventStoreClient\Internal\PersistentSubscriptionUpdateResult;
-use Prooph\EventStoreClient\Internal\PersistentSubscriptionUpdateStatus;
+use Prooph\EventStore\Common\SystemConsumerStrategies;
+use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\Exception\InvalidOperationException;
+use Prooph\EventStore\Exception\UnexpectedOperationResult;
+use Prooph\EventStore\Internal\PersistentSubscriptionUpdateResult;
+use Prooph\EventStore\Internal\PersistentSubscriptionUpdateStatus;
+use Prooph\EventStore\PersistentSubscriptionSettings;
+use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Messages\ClientMessages\UpdatePersistentSubscription;
 use Prooph\EventStoreClient\Messages\ClientMessages\UpdatePersistentSubscriptionCompleted;
 use Prooph\EventStoreClient\Messages\ClientMessages\UpdatePersistentSubscriptionCompleted_UpdatePersistentSubscriptionResult as UpdatePersistentSubscriptionResult;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use Prooph\EventStoreClient\UserCredentials;
 use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 

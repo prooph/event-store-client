@@ -14,12 +14,14 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Projections;
 
 use Amp\Promise;
-use Prooph\EventStoreClient\EndPoint;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Transport\Http\EndpointExtensions;
-use Prooph\EventStoreClient\UserCredentials;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\Projections\AsyncProjectionsManager;
+use Prooph\EventStore\Projections\ProjectionDetails;
+use Prooph\EventStore\Transport\Http\EndpointExtensions;
+use Prooph\EventStore\UserCredentials;
 
-class ProjectionsManager
+class ProjectionsManager implements AsyncProjectionsManager
 {
     /** @var ProjectionsClient */
     private $client;
@@ -27,15 +29,19 @@ class ProjectionsManager
     private $httpEndPoint;
     /** @var string */
     private $httpSchema;
+    /** @var UserCredentials|null */
+    private $defaultUserCredentials;
 
     public function __construct(
         EndPoint $httpEndPoint,
         int $operationTimeout,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        string $httpSchema = EndpointExtensions::HTTP_SCHEMA,
+        ?UserCredentials $defaultUserCredentials = null
     ) {
         $this->client = new ProjectionsClient($operationTimeout);
         $this->httpEndPoint = $httpEndPoint;
         $this->httpSchema = $httpSchema;
+        $this->defaultUserCredentials = $defaultUserCredentials;
     }
 
     /**
@@ -50,7 +56,7 @@ class ProjectionsManager
         return $this->client->enable(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -67,7 +73,7 @@ class ProjectionsManager
         return $this->client->disable(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -84,7 +90,7 @@ class ProjectionsManager
         return $this->client->abort(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -103,7 +109,7 @@ class ProjectionsManager
         return $this->client->createOneTime(
             $this->httpEndPoint,
             $query,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -128,7 +134,7 @@ class ProjectionsManager
             $this->httpEndPoint,
             $name,
             $query,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -155,7 +161,7 @@ class ProjectionsManager
             $name,
             $query,
             $trackEmittedStreams,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -169,7 +175,7 @@ class ProjectionsManager
     {
         return $this->client->listAll(
             $this->httpEndPoint,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -183,7 +189,7 @@ class ProjectionsManager
     {
         return $this->client->listOneTime(
             $this->httpEndPoint,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -197,7 +203,7 @@ class ProjectionsManager
     {
         return $this->client->listContinuous(
             $this->httpEndPoint,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -218,7 +224,7 @@ class ProjectionsManager
         return $this->client->getStatus(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -239,7 +245,7 @@ class ProjectionsManager
         return $this->client->getState(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -268,7 +274,7 @@ class ProjectionsManager
             $this->httpEndPoint,
             $name,
             $partition,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -289,7 +295,7 @@ class ProjectionsManager
         return $this->client->getResult(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -318,7 +324,7 @@ class ProjectionsManager
             $this->httpEndPoint,
             $name,
             $partition,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -339,7 +345,7 @@ class ProjectionsManager
         return $this->client->getStatistics(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -358,7 +364,7 @@ class ProjectionsManager
         return $this->client->getQuery(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -385,7 +391,7 @@ class ProjectionsManager
             $name,
             $query,
             $emitEnabled,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -406,7 +412,7 @@ class ProjectionsManager
             $this->httpEndPoint,
             $name,
             $deleteEmittedStreams,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }
@@ -423,7 +429,7 @@ class ProjectionsManager
         return $this->client->reset(
             $this->httpEndPoint,
             $name,
-            $userCredentials,
+            $userCredentials ?? $this->defaultUserCredentials,
             $this->httpSchema
         );
     }

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Exception;
 
-class ClusterException extends EventStoreConnectionException
+use Prooph\EventStore\Exception\RuntimeException;
+
+class ClusterException extends RuntimeException
 {
 }

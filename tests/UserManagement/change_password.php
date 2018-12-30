@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Exception\UserCommandFailedException;
-use Prooph\EventStoreClient\Transport\Http\HttpStatusCode;
-use Prooph\EventStoreClient\UserCredentials;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\Exception\UserCommandFailedException;
+use Prooph\EventStore\Transport\Http\HttpStatusCode;
+use Prooph\EventStore\UserCredentials;
 use ProophTest\EventStoreClient\DefaultData;
 use Throwable;
 
@@ -68,12 +68,22 @@ class change_password extends TestWithUser
     public function can_change_password(): void
     {
         $this->execute(function () {
-            yield $this->manager->changePasswordAsync($this->username, 'password', 'fubar', new UserCredentials($this->username, 'password'));
+            yield $this->manager->changePasswordAsync(
+                $this->username,
+                'password',
+                'fubar',
+                new UserCredentials($this->username, 'password')
+            );
 
             $this->expectException(UserCommandFailedException::class);
 
             try {
-                yield $this->manager->changePasswordAsync($this->username, 'password', 'foobar', new UserCredentials($this->username, 'password'));
+                yield $this->manager->changePasswordAsync(
+                    $this->username,
+                    'password',
+                    'foobar',
+                    new UserCredentials($this->username, 'password')
+                );
             } catch (UserCommandFailedException $e) {
                 $this->assertSame(HttpStatusCode::UNAUTHORIZED, $e->httpStatusCode());
 

@@ -16,7 +16,7 @@ namespace ProophTest\EventStoreClient;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\StreamEventsSlice;
+use Prooph\EventStore\StreamEventsSlice;
 use Throwable;
 
 class read_all_events_forward_with_linkto_passed_max_count extends TestCase

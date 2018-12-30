@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Prooph\EventStoreClient\Exception\RuntimeException;
+use Prooph\EventStore\Exception\RuntimeException;
 use Prooph\EventStoreClient\Internal\Message\Message;
 
 /** @internal */

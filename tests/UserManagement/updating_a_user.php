@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Exception\UserCommandFailedException;
-use Prooph\EventStoreClient\UserManagement\UserDetails;
-use Prooph\EventStoreClient\Util\Guid;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\Exception\UserCommandFailedException;
+use Prooph\EventStore\UserManagement\UserDetails;
+use Prooph\EventStore\Util\Guid;
 use ProophTest\EventStoreClient\DefaultData;
 use Throwable;
 

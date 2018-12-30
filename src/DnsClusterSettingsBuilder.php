@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Exception\OutOfRangeException;
-use Prooph\EventStoreClient\Internal\Consts;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\Exception\OutOfRangeException;
+use Prooph\EventStore\Internal\Consts;
 
 class DnsClusterSettingsBuilder
 {

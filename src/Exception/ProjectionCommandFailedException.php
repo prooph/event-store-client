@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Exception;
 
-class ProjectionCommandFailedException extends EventStoreConnectionException
+use Prooph\EventStore\Exception\ProjectionCommandFailedException as BaseException;
+
+class ProjectionCommandFailedException extends BaseException
 {
     /** @var int */
     private $httpStatusCode;

@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use Prooph\EventStore\Exception\ConnectionClosedException;
+use Prooph\EventStore\Exception\OperationTimedOutException;
+use Prooph\EventStore\Exception\RetriesLimitReachedException;
+use Prooph\EventStore\SubscriptionDropReason;
+use Prooph\EventStore\Util\DateTime;
+use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\ConnectionSettings;
-use Prooph\EventStoreClient\Exception\ConnectionClosedException;
-use Prooph\EventStoreClient\Exception\OperationTimedOutException;
-use Prooph\EventStoreClient\Exception\RetriesLimitReachedException;
-use Prooph\EventStoreClient\SubscriptionDropReason;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
-use Prooph\EventStoreClient\Util\DateTime;
-use Prooph\EventStoreClient\Util\Guid;
 use SplQueue;
 
 /** @internal  */

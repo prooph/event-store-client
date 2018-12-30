@@ -16,8 +16,8 @@ namespace ProophTest\EventStoreClient;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\PersistentSubscriptionSettings;
 use Throwable;
 
 class create_persistent_subscription_with_too_big_checkpoint_after extends TestCase

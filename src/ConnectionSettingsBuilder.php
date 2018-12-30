@@ -19,8 +19,11 @@ use Amp\Log\ConsoleFormatter;
 use Amp\Log\StreamHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Logger as MonoLog;
-use Prooph\EventStoreClient\Exception\InvalidArgumentException;
-use Prooph\EventStoreClient\Internal\Consts;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\Exception\RuntimeException;
+use Prooph\EventStore\Internal\Consts;
+use Prooph\EventStore\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
 use Psr\Log\NullLogger;
 
@@ -86,6 +89,13 @@ class ConnectionSettingsBuilder
 
     public function useConsoleLogger(): self
     {
+        if (! \class_exists(StreamHandler::class)) {
+            throw new RuntimeException(\sprintf(
+                '%s not found, install amphp/log ^1.0 via composer to use console logger',
+                StreamHandler::class
+            ));
+        }
+
         $logHandler = new StreamHandler(new ResourceOutputStream(\STDOUT));
         $logHandler->setFormatter(new ConsoleFormatter("[%datetime%] %channel%.%level_name%: %message%\r\n"));
 
@@ -97,6 +107,13 @@ class ConnectionSettingsBuilder
 
     public function useFileLogger(Handle $handle): self
     {
+        if (! \class_exists(StreamHandler::class)) {
+            throw new RuntimeException(\sprintf(
+                '%s not found, install amphp/log ^1.0 via composer to use file logger',
+                StreamHandler::class
+            ));
+        }
+
         $logHandler = new StreamHandler($handle);
         $logHandler->setFormatter(new LineFormatter());
 

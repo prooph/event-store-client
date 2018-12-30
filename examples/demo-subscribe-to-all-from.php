@@ -16,7 +16,15 @@ namespace Prooph\EventStoreClient;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
-use Prooph\EventStoreClient\Internal\EventStoreCatchUpSubscription;
+use Prooph\EventStore\AsyncCatchUpSubscriptionDropped;
+use Prooph\EventStore\AsyncEventStoreCatchUpSubscription;
+use Prooph\EventStore\CatchUpSubscriptionSettings;
+use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
+use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\SubscriptionDropReason;
+use Prooph\EventStore\UserCredentials;
 use Throwable;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -39,9 +47,9 @@ Loop::run(function () {
     yield $connection->subscribeToAllFromAsync(
         null,
         CatchUpSubscriptionSettings::default(),
-        new class() implements EventAppearedOnCatchupSubscription {
+        new class() implements EventAppearedOnAsyncCatchupSubscription {
             public function __invoke(
-                EventStoreCatchUpSubscription $subscription,
+                AsyncEventStoreCatchUpSubscription $subscription,
                 ResolvedEvent $resolvedEvent): Promise
             {
                 echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
@@ -50,15 +58,15 @@ Loop::run(function () {
                 return new Success();
             }
         },
-        new class() implements LiveProcessingStarted {
-            public function __invoke(EventStoreCatchUpSubscription $subscription): void
+        new class() implements LiveProcessingStartedOnAsyncCatchUpSubscription {
+            public function __invoke(AsyncEventStoreCatchUpSubscription $subscription): void
             {
                 echo 'liveProcessingStarted on <all>' . PHP_EOL;
             }
         },
-        new class() implements CatchUpSubscriptionDropped {
+        new class() implements AsyncCatchUpSubscriptionDropped {
             public function __invoke(
-                EventStoreCatchUpSubscription $subscription,
+                AsyncEventStoreCatchUpSubscription $subscription,
                 SubscriptionDropReason $reason,
                 ?Throwable $exception = null
             ): void {

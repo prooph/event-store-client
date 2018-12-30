@@ -16,8 +16,8 @@ namespace ProophTest\EventStoreClient;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStoreClient\Exception\AccessDeniedException;
-use Prooph\EventStoreClient\PersistentSubscriptionSettings;
+use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\PersistentSubscriptionSettings;
 use Throwable;
 
 class create_persistent_subscription_on_all_stream extends TestCase
