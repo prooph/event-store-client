@@ -44,6 +44,7 @@ class when_disabling_projections extends TestCase
             $this->projectionName,
             $this->query,
             false,
+            'JS',
             $this->credentials
         );
     }

@@ -89,7 +89,7 @@ trait ProjectionSpecification
     {
         $query = $this->createStandardQuery(Guid::generateAsHex());
 
-        return $this->projectionsManager->createOneTimeAsync($query, $this->credentials);
+        return $this->projectionsManager->createOneTimeAsync($query, 'JS', $this->credentials);
     }
 
     protected function createContinuousProjection(string $projectionName): Promise
@@ -100,6 +100,7 @@ trait ProjectionSpecification
             $projectionName,
             $query,
             false,
+            'JS',
             $this->credentials
         );
     }

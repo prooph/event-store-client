@@ -46,6 +46,7 @@ class when_creating_transient_projection extends TestCase
         yield $this->projectionsManager->createTransientAsync(
             $this->projectionName,
             $this->query,
+            'JS',
             $this->credentials
         );
     }
