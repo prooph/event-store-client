@@ -17,7 +17,7 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropped;
@@ -45,7 +45,7 @@ Loop::run(function () {
 
     $subscription = yield $connection->subscribeToAllAsync(
         true,
-        new class() implements EventAppearedOnSubscription {
+        new class() implements EventAppearedOnAsyncSubscription {
             public function __invoke(
                 EventStoreSubscription $subscription,
                 ResolvedEvent $resolvedEvent): Promise

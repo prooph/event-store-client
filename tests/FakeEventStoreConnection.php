@@ -28,7 +28,7 @@ use Prooph\EventStore\ClientErrorEventArgs;
 use Prooph\EventStore\ClientReconnectingEventArgs;
 use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
 use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
-use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\Internal\EventHandler;
 use Prooph\EventStore\ListenerHandler;
 use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
@@ -251,7 +251,7 @@ class FakeEventStoreConnection implements AsyncEventStoreConnection
     public function subscribeToStreamAsync(
         string $stream,
         bool $resolveLinkTos,
-        EventAppearedOnSubscription $eventAppeared,
+        EventAppearedOnAsyncSubscription $eventAppeared,
         ?SubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
@@ -277,7 +277,7 @@ class FakeEventStoreConnection implements AsyncEventStoreConnection
 
     public function subscribeToAllAsync(
         bool $resolveLinkTos,
-        EventAppearedOnSubscription $eventAppeared,
+        EventAppearedOnAsyncSubscription $eventAppeared,
         ?SubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {

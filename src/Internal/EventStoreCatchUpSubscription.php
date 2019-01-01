@@ -24,7 +24,7 @@ use Prooph\EventStore\AsyncEventStoreConnection;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\ClientConnectionEventArgs;
 use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
-use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ListenerHandler;
 use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
@@ -278,7 +278,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
                     ));
                 }
 
-                $eventAppeared = new class(Closure::fromCallable([$this, 'enqueuePushedEvent'])) implements EventAppearedOnSubscription {
+                $eventAppeared = new class(Closure::fromCallable([$this, 'enqueuePushedEvent'])) implements EventAppearedOnAsyncSubscription {
                     private $callback;
 
                     public function __construct(callable $callback)

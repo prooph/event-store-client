@@ -28,7 +28,7 @@ use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\ClientConnectionEventArgs;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
-use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
@@ -536,7 +536,7 @@ class catch_up_subscription_handles_errors extends TestCase
                 self::$streamId,
                 false,
                 null,
-                new class($raise) implements EventAppearedOnSubscription {
+                new class($raise) implements EventAppearedOnAsyncSubscription {
                     private $raise;
 
                     public function __construct($raise)

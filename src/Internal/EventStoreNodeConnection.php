@@ -24,7 +24,7 @@ use Prooph\EventStore\Common\SystemEventTypes;
 use Prooph\EventStore\Common\SystemStreams;
 use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
 use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
-use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventReadResult;
 use Prooph\EventStore\EventReadStatus;
@@ -641,7 +641,7 @@ final class EventStoreNodeConnection implements
     public function subscribeToStreamAsync(
         string $stream,
         bool $resolveLinkTos,
-        EventAppearedOnSubscription $eventAppeared,
+        EventAppearedOnAsyncSubscription $eventAppeared,
         ?SubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
@@ -703,7 +703,7 @@ final class EventStoreNodeConnection implements
     /** {@inheritdoc} */
     public function subscribeToAllAsync(
         bool $resolveLinkTos,
-        EventAppearedOnSubscription $eventAppeared,
+        EventAppearedOnAsyncSubscription $eventAppeared,
         ?SubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {

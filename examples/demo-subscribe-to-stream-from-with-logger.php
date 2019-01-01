@@ -18,7 +18,7 @@ use Amp\Promise;
 use Amp\Success;
 use Prooph\EventStore\AsyncEventStoreCatchUpSubscription;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
 use Prooph\EventStore\ResolvedEvent;
@@ -52,7 +52,7 @@ Loop::run(function () {
         'foo-bar',
         null,
         CatchUpSubscriptionSettings::default(),
-        new class() implements EventAppearedOnSubscription {
+        new class() implements EventAppearedOnAsyncSubscription {
             public function __invoke(
                 EventStoreSubscription $subscription,
                 ResolvedEvent $resolvedEvent): Promise
