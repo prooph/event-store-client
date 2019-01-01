@@ -24,6 +24,7 @@ use Prooph\EventStore\AsyncPersistentSubscriptionDropped;
 use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\Exception\RuntimeException;
+use Prooph\EventStore\Internal\DropData;
 use Prooph\EventStore\Internal\PersistentEventStoreSubscription;
 use Prooph\EventStore\Internal\ResolvedEvent as InternalResolvedEvent;
 use Prooph\EventStore\PersistentSubscriptionNakEventAction;

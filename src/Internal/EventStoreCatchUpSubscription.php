@@ -26,6 +26,7 @@ use Prooph\EventStore\ClientConnectionEventArgs;
 use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
 use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventStoreSubscription;
+use Prooph\EventStore\Internal\DropData;
 use Prooph\EventStore\ListenerHandler;
 use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
 use Prooph\EventStore\ResolvedEvent;
