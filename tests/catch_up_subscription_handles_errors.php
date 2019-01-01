@@ -2,8 +2,8 @@
 
 /**
  * This file is part of `prooph/event-store-client`.
- * (c) 2018-2018 prooph software GmbH <contact@prooph.de>
- * (c) 2018-2018 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ * (c) 2018-2019 prooph software GmbH <contact@prooph.de>
+ * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -28,7 +28,7 @@ use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\ClientConnectionEventArgs;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
-use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
@@ -536,7 +536,7 @@ class catch_up_subscription_handles_errors extends TestCase
                 self::$streamId,
                 false,
                 null,
-                new class($raise) implements EventAppearedOnSubscription {
+                new class($raise) implements EventAppearedOnAsyncSubscription {
                     private $raise;
 
                     public function __construct($raise)

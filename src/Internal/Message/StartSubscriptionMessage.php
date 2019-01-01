@@ -2,8 +2,8 @@
 
 /**
  * This file is part of `prooph/event-store-client`.
- * (c) 2018-2018 prooph software GmbH <contact@prooph.de>
- * (c) 2018-2018 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ * (c) 2018-2019 prooph software GmbH <contact@prooph.de>
+ * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Internal\Message;
 
 use Amp\Deferred;
-use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\UserCredentials;
 
@@ -29,7 +29,7 @@ class StartSubscriptionMessage implements Message
     private $resolveTo;
     /** @var UserCredentials|null */
     private $userCredentials;
-    /** @var EventAppearedOnSubscription */
+    /** @var EventAppearedOnAsyncSubscription */
     private $eventAppeared;
     /** @var SubscriptionDropped|null */
     private $subscriptionDropped;
@@ -43,7 +43,7 @@ class StartSubscriptionMessage implements Message
         string $streamId,
         bool $resolveTo,
         ?UserCredentials $userCredentials,
-        EventAppearedOnSubscription $eventAppeared,
+        EventAppearedOnAsyncSubscription $eventAppeared,
         ?SubscriptionDropped $subscriptionDropped,
         int $maxRetries,
         int $timeout
@@ -78,7 +78,7 @@ class StartSubscriptionMessage implements Message
         return $this->userCredentials;
     }
 
-    public function eventAppeared(): EventAppearedOnSubscription
+    public function eventAppeared(): EventAppearedOnAsyncSubscription
     {
         return $this->eventAppeared;
     }

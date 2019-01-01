@@ -2,8 +2,8 @@
 
 /**
  * This file is part of `prooph/event-store-client`.
- * (c) 2018-2018 prooph software GmbH <contact@prooph.de>
- * (c) 2018-2018 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ * (c) 2018-2019 prooph software GmbH <contact@prooph.de>
+ * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,7 +17,7 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropped;
@@ -45,7 +45,7 @@ Loop::run(function () {
 
     $subscription = yield $connection->subscribeToAllAsync(
         true,
-        new class() implements EventAppearedOnSubscription {
+        new class() implements EventAppearedOnAsyncSubscription {
             public function __invoke(
                 EventStoreSubscription $subscription,
                 ResolvedEvent $resolvedEvent): Promise

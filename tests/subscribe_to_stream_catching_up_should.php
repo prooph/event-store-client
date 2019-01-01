@@ -2,8 +2,8 @@
 
 /**
  * This file is part of `prooph/event-store-client`.
- * (c) 2018-2018 prooph software GmbH <contact@prooph.de>
- * (c) 2018-2018 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ * (c) 2018-2019 prooph software GmbH <contact@prooph.de>
+ * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -23,7 +23,7 @@ use Prooph\EventStore\AsyncEventStoreCatchUpSubscription;
 use Prooph\EventStore\AsyncEventStoreConnection;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
-use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ExpectedVersion;
@@ -86,7 +86,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
             yield $this->conn->subscribeToStreamAsync(
                 $stream,
                 false,
-                new class() implements EventAppearedOnSubscription {
+                new class() implements EventAppearedOnAsyncSubscription {
                     public function __invoke(
                         EventStoreSubscription $subscription,
                         ResolvedEvent $resolvedEvent

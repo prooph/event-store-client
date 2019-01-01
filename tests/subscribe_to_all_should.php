@@ -2,8 +2,8 @@
 
 /**
  * This file is part of `prooph/event-store-client`.
- * (c) 2018-2018 prooph software GmbH <contact@prooph.de>
- * (c) 2018-2018 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ * (c) 2018-2019 prooph software GmbH <contact@prooph.de>
+ * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,7 +18,7 @@ use Amp\Success;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Common\SystemRoles;
-use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\ResolvedEvent;
@@ -149,9 +149,9 @@ class subscribe_to_all_should extends TestCase
         });
     }
 
-    private function appearedWithCountdown(CountdownEvent $appeared): EventAppearedOnSubscription
+    private function appearedWithCountdown(CountdownEvent $appeared): EventAppearedOnAsyncSubscription
     {
-        return new class($appeared) implements EventAppearedOnSubscription {
+        return new class($appeared) implements EventAppearedOnAsyncSubscription {
             /** @var CountdownEvent */
             private $appeared;
 

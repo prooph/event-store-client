@@ -2,8 +2,8 @@
 
 /**
  * This file is part of `prooph/event-store-client`.
- * (c) 2018-2018 prooph software GmbH <contact@prooph.de>
- * (c) 2018-2018 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ * (c) 2018-2019 prooph software GmbH <contact@prooph.de>
+ * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,7 +18,7 @@ use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\ResolvedEvent;
@@ -135,7 +135,7 @@ class subscribe_should extends TestCase
             $subscription = yield $connection->subscribeToStreamAsync(
                 $stream,
                 false,
-                new class() implements EventAppearedOnSubscription {
+                new class() implements EventAppearedOnAsyncSubscription {
                     public function __invoke(
                         EventStoreSubscription $subscription,
                         ResolvedEvent $resolvedEvent
@@ -194,9 +194,9 @@ class subscribe_should extends TestCase
         }));
     }
 
-    private function eventAppearedResolver(Deferred $deferred): EventAppearedOnSubscription
+    private function eventAppearedResolver(Deferred $deferred): EventAppearedOnAsyncSubscription
     {
-        return new class($deferred) implements EventAppearedOnSubscription {
+        return new class($deferred) implements EventAppearedOnAsyncSubscription {
             private $deferred;
 
             public function __construct(Deferred $deferred)

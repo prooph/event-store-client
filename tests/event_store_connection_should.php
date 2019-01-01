@@ -2,8 +2,8 @@
 
 /**
  * This file is part of `prooph/event-store-client`.
- * (c) 2018-2018 prooph software GmbH <contact@prooph.de>
- * (c) 2018-2018 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ * (c) 2018-2019 prooph software GmbH <contact@prooph.de>
+ * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,7 @@ namespace ProophTest\EventStoreClient;
 use Amp\Promise;
 use Amp\Success;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\EventAppearedOnSubscription;
+use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\Position;
@@ -115,7 +115,7 @@ class event_store_connection_should extends TestCase
                 yield $connection->subscribeToStreamAsync(
                     $s,
                     false,
-                    new class() implements EventAppearedOnSubscription {
+                    new class() implements EventAppearedOnAsyncSubscription {
                         public function __invoke(
                             EventStoreSubscription $subscription,
                             ResolvedEvent $resolvedEvent
@@ -133,7 +133,7 @@ class event_store_connection_should extends TestCase
             try {
                 yield $connection->subscribeToAllAsync(
                     false,
-                    new class() implements EventAppearedOnSubscription {
+                    new class() implements EventAppearedOnAsyncSubscription {
                         public function __invoke(
                             EventStoreSubscription $subscription,
                             ResolvedEvent $resolvedEvent
