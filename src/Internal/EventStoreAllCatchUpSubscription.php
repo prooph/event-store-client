@@ -17,6 +17,7 @@ use Amp\Delayed;
 use Amp\Promise;
 use Prooph\EventStore\AllEventsSlice;
 use Prooph\EventStore\AsyncCatchUpSubscriptionDropped;
+use Prooph\EventStore\AsyncEventStoreAllCatchUpSubscription;
 use Prooph\EventStore\AsyncEventStoreConnection;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
@@ -29,7 +30,9 @@ use Psr\Log\LoggerInterface as Logger;
 use Throwable;
 use function Amp\call;
 
-class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription
+class EventStoreAllCatchUpSubscription
+    extends EventStoreCatchUpSubscription
+    implements AsyncEventStoreAllCatchUpSubscription
 {
     /** @var Position */
     private $nextReadPosition;

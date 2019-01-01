@@ -18,6 +18,7 @@ use Amp\Promise;
 use Generator;
 use Prooph\EventStore\AsyncCatchUpSubscriptionDropped;
 use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\AsyncEventStoreStreamCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
 use Prooph\EventStore\Exception\OutOfRangeException;
@@ -32,7 +33,9 @@ use Psr\Log\LoggerInterface as Logger;
 use Throwable;
 use function Amp\call;
 
-class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription
+class EventStoreStreamCatchUpSubscription
+    extends EventStoreCatchUpSubscription
+    implements AsyncEventStoreStreamCatchUpSubscription
 {
     /** @var int */
     private $nextReadEventNumber;
