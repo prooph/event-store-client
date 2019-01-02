@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use function Amp\call;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
@@ -36,7 +37,6 @@ use Prooph\EventStore\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
 use SplQueue;
 use Throwable;
-use function Amp\call;
 
 abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSubscription
 {

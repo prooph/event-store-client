@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
+use function Amp\call;
 use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
@@ -44,7 +45,6 @@ use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
 use Psr\Log\LoggerInterface as Logger;
 use SplQueue;
 use Throwable;
-use function Amp\call;
 
 /** @internal  */
 abstract class AbstractSubscriptionOperation implements SubscriptionOperation

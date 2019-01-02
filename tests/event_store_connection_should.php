@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
 use Amp\Promise;
+use function Amp\Promise\wait;
 use Amp\Success;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\EventAppearedOnAsyncSubscription;
@@ -24,8 +26,6 @@ use Prooph\EventStore\ResolvedEvent;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
-use function Amp\call;
-use function Amp\Promise\wait;
 
 class event_store_connection_should extends TestCase
 {

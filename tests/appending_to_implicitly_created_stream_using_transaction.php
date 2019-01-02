@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
+use function Amp\Promise\wait;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
@@ -23,8 +25,6 @@ use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use ProophTest\EventStoreClient\Helper\TransactionalWriter;
 use Throwable;
-use function Amp\call;
-use function Amp\Promise\wait;
 
 class appending_to_implicitly_created_stream_using_transaction extends TestCase
 {

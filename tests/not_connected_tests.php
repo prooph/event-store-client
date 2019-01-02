@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
 use Amp\Deferred;
+use function Amp\Promise\timeout;
+use function Amp\Promise\wait;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStoreClient\ConnectionSettingsBuilder;
 use Prooph\EventStoreClient\EventStoreConnectionFactory;
-use function Amp\call;
-use function Amp\Promise\timeout;
-use function Amp\Promise\wait;
 
 class not_connected_tests extends TestCase
 {

@@ -17,6 +17,7 @@ use Amp\Artax\Client;
 use Amp\Artax\DefaultClient;
 use Amp\Artax\Request;
 use Amp\Artax\Response;
+use function Amp\call;
 use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
@@ -31,7 +32,6 @@ use Prooph\EventStoreClient\Messages\ClusterMessages\MemberInfoDto;
 use Prooph\EventStoreClient\Messages\ClusterMessages\VNodeState;
 use Psr\Log\LoggerInterface as Logger;
 use Throwable;
-use function Amp\call;
 
 /** @internal */
 final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer

@@ -13,8 +13,11 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
 use Amp\Deferred;
 use Amp\Promise;
+use function Amp\Promise\timeout;
+use function Amp\Promise\wait;
 use Amp\Success;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
@@ -29,9 +32,6 @@ use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
 use Prooph\EventStore\ResolvedEvent;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use Throwable;
-use function Amp\call;
-use function Amp\Promise\timeout;
-use function Amp\Promise\wait;
 
 class catchup_subscription_handles_small_batch_sizes extends TestCase
 {

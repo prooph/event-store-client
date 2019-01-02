@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
 use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
@@ -41,7 +42,6 @@ use Prooph\EventStoreClient\Internal\ManualResetEventSlim;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
-use function Amp\call;
 
 class subscribe_to_all_catching_up_should extends TestCase
 {

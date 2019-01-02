@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
+use function Amp\Promise\wait;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\AsyncEventStoreConnection;
@@ -27,8 +29,6 @@ use Prooph\EventStore\WriteResult;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
-use function Amp\call;
-use function Amp\Promise\wait;
 
 class when_committing_empty_transaction extends TestCase
 {

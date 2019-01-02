@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
+use function Amp\Promise\wait;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\AsyncEventStoreConnection;
 use Prooph\EventStore\Exception\RuntimeException;
@@ -24,8 +26,6 @@ use Prooph\EventStore\StreamMetadataResult;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
-use function Amp\call;
-use function Amp\Promise\wait;
 
 class when_working_with_stream_metadata_as_structured_info extends TestCase
 {

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Projections;
 
+use function Amp\call;
 use Amp\Delayed;
 use Amp\Promise;
 use Generator;
@@ -20,7 +21,6 @@ use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Projections\AsyncQueryManager;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
-use function Amp\call;
 
 /**
  * API for executing queries in the Event Store through PHP code.

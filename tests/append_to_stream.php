@@ -16,6 +16,8 @@ namespace ProophTest\EventStoreClient;
 use Amp\Artax\DefaultClient;
 use Amp\Artax\Request;
 use Amp\Artax\Response;
+use function Amp\call;
+use function Amp\Promise\wait;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\ConditionalWriteResult;
 use Prooph\EventStore\ConditionalWriteStatus;
@@ -31,8 +33,6 @@ use Prooph\EventStore\WriteResult;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
-use function Amp\call;
-use function Amp\Promise\wait;
 
 class append_to_stream extends TestCase
 {

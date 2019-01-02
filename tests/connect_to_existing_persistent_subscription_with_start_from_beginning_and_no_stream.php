@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
 use Amp\Deferred;
 use Amp\Promise;
 use Amp\Success;
@@ -27,7 +28,6 @@ use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
 use Throwable;
-use function Amp\call;
 
 class connect_to_existing_persistent_subscription_with_start_from_beginning_and_no_stream extends TestCase
 {

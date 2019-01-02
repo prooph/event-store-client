@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
+use function Amp\call;
+use function Amp\Promise\wait;
 use Generator;
 use Prooph\EventStore\Util\Guid;
 use ProophTest\EventStoreClient\DefaultData;
 use Throwable;
-use function Amp\call;
-use function Amp\Promise\wait;
 
 abstract class TestWithUser extends TestWithNode
 {

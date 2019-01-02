@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
 use Amp\Promise;
+use function Amp\Promise\timeout;
 use Amp\Success;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
@@ -29,8 +31,6 @@ use Prooph\EventStore\UserCredentials;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
-use function Amp\call;
-use function Amp\Promise\timeout;
 
 class subscribe_to_all_should extends TestCase
 {

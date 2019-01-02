@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
@@ -26,7 +27,6 @@ use Prooph\EventStore\StreamMetadata;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
-use function Amp\call;
 
 class when_having_max_count_set_for_stream extends TestCase
 {

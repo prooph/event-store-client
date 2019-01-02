@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
 use Amp\Deferred;
 use Amp\Delayed;
 use Amp\Failure;
@@ -45,7 +46,6 @@ use Prooph\EventStoreClient\Internal\EventStoreStreamCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\VolatileEventStoreSubscription;
 use Psr\Log\NullLogger;
 use Throwable;
-use function Amp\call;
 
 class catch_up_subscription_handles_errors extends TestCase
 {

@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
+use function Amp\Promise\wait;
 use Amp\Success;
 use Generator;
 use Prooph\EventStore\AsyncEventStoreConnection;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use Throwable;
-use function Amp\call;
-use function Amp\Promise\wait;
 
 trait SpecificationWithConnection
 {

@@ -13,11 +13,13 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Transport\Tcp;
 
+use function Amp\call;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Socket\ClientConnectContext;
 use Amp\Socket\ClientSocket;
 use Amp\Socket\ClientTlsContext;
+use function Amp\Socket\connect;
 use Amp\Socket\ConnectException;
 use Generator;
 use Prooph\EventStore\EndPoint;
@@ -26,8 +28,6 @@ use Prooph\EventStore\Exception\PackageFramingException;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Psr\Log\LoggerInterface as Logger;
 use Throwable;
-use function Amp\call;
-use function Amp\Socket\connect;
 
 /** @internal */
 class TcpPackageConnection

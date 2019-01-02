@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\Helper;
 
+use function Amp\call;
 use Amp\Promise;
 use Amp\Success;
 use Prooph\EventStore\AsyncEventStoreConnection;
 use Prooph\EventStore\StreamEventsSlice;
-use function Amp\call;
 
 /** @internal */
 class EventsStream

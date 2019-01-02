@@ -15,6 +15,7 @@ namespace ProophTest\EventStoreClient;
 
 use Amp\Deferred;
 use Amp\Promise;
+use function Amp\Promise\timeout;
 use Amp\Success;
 use Amp\TimeoutException;
 use Generator;
@@ -27,7 +28,6 @@ use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
 use Throwable;
-use function Amp\Promise\timeout;
 
 class happy_case_writing_and_subscribing_to_normal_events_manual_ack extends TestCase
 {

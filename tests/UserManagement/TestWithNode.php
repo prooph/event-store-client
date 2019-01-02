@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
+use function Amp\call;
+use function Amp\Promise\wait;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStoreClient\UserManagement\UsersManager;
 use Throwable;
-use function Amp\call;
-use function Amp\Promise\wait;
 
 abstract class TestWithNode extends TestCase
 {

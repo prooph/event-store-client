@@ -13,8 +13,11 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
 use Amp\Deferred;
 use Amp\Promise;
+use function Amp\Promise\timeout;
+use function Amp\Promise\wait;
 use Amp\Success;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
@@ -27,9 +30,6 @@ use Prooph\EventStore\SubscriptionDropReason;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
-use function Amp\call;
-use function Amp\Promise\timeout;
-use function Amp\Promise\wait;
 
 class subscribe_should extends TestCase
 {

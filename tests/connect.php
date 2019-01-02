@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
 use Amp\Deferred;
 use Amp\Delayed;
 use Amp\Promise;
+use function Amp\Promise\wait;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\AsyncEventStoreConnection;
@@ -27,8 +29,6 @@ use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\EventStoreConnectionFactory;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
-use function Amp\call;
-use function Amp\Promise\wait;
 
 class connect extends TestCase
 {

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use function Amp\call;
 use Amp\Delayed;
 use Amp\Promise;
 use Generator;
@@ -31,11 +32,8 @@ use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
 use Throwable;
-use function Amp\call;
 
-class EventStoreStreamCatchUpSubscription
-    extends EventStoreCatchUpSubscription
-    implements AsyncEventStoreStreamCatchUpSubscription
+class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription implements AsyncEventStoreStreamCatchUpSubscription
 {
     /** @var int */
     private $nextReadEventNumber;

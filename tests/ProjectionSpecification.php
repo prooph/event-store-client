@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
 use Amp\Promise;
+use function Amp\Promise\wait;
 use Amp\Success;
 use Generator;
 use Prooph\EventStore\AsyncEventStoreConnection;
@@ -24,8 +26,6 @@ use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\Projections\ProjectionsManager;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use Throwable;
-use function Amp\call;
-use function Amp\Promise\wait;
 
 trait ProjectionSpecification
 {
