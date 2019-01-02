@@ -75,8 +75,8 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
     /** @var DropData */
     private $dropData;
 
-    /** @var int */
-    private $isDropped;
+    /** @var bool */
+    private $isDropped = false;
     /** @var int */
     private $bufferSize;
     /** @var ManualResetEventSlim */
@@ -409,6 +409,8 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
     private function dropSubscription(SubscriptionDropReason $reason, ?Throwable $error): void
     {
         if (! $this->isDropped) {
+            $this->isDropped = true;
+
             if ($this->verbose) {
                 $this->log->debug(\sprintf(
                     'Persistent Subscription to %s: dropping subscription, reason: %s %s',
