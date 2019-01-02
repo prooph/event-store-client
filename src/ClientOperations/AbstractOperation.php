@@ -16,9 +16,9 @@ namespace Prooph\EventStoreClient\ClientOperations;
 use Amp\Deferred;
 use Amp\Promise;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\Exception\NotAuthenticatedException;
+use Prooph\EventStore\Exception\NotAuthenticated;
 use Prooph\EventStore\Exception\ServerError;
-use Prooph\EventStore\Exception\UnexpectedCommandException;
+use Prooph\EventStore\Exception\UnexpectedCommand;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled;
 use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled_MasterInfo as MasterInfo;
@@ -138,7 +138,7 @@ abstract class AbstractOperation implements ClientOperation
 
     private function inspectNotAuthenticated(TcpPackage $package): InspectionResult
     {
-        $this->fail(new NotAuthenticatedException());
+        $this->fail(new NotAuthenticated());
 
         return new InspectionResult(InspectionDecision::endOperation(), 'Not authenticated');
     }
@@ -200,7 +200,7 @@ abstract class AbstractOperation implements ClientOperation
         $this->log->error('TcpPackage Data Dump:');
         $this->log->error($package->data());
 
-        $exception = UnexpectedCommandException::with($expectedCommand->name(), $package->command()->name());
+        $exception = UnexpectedCommand::with($expectedCommand->name(), $package->command()->name());
         $this->fail($exception);
 
         return new InspectionResult(InspectionDecision::endOperation(), $exception->getMessage());

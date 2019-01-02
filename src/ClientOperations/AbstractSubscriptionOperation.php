@@ -20,12 +20,12 @@ use Amp\Success;
 use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventStoreSubscription;
-use Prooph\EventStore\Exception\AccessDeniedException;
-use Prooph\EventStore\Exception\ConnectionClosedException;
-use Prooph\EventStore\Exception\NotAuthenticatedException;
+use Prooph\EventStore\Exception\AccessDenied;
+use Prooph\EventStore\Exception\ConnectionClosed;
+use Prooph\EventStore\Exception\NotAuthenticated;
 use Prooph\EventStore\Exception\RuntimeException;
 use Prooph\EventStore\Exception\ServerError;
-use Prooph\EventStore\Exception\UnexpectedCommandException;
+use Prooph\EventStore\Exception\UnexpectedCommand;
 use Prooph\EventStore\Internal\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
@@ -155,7 +155,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
                             $this->dropSubscription(SubscriptionDropReason::userInitiated(), null);
                             break;
                         case SubscriptionDropReasonMessage::AccessDenied:
-                            $this->dropSubscription(SubscriptionDropReason::accessDenied(), new AccessDeniedException(\sprintf(
+                            $this->dropSubscription(SubscriptionDropReason::accessDenied(), new AccessDenied(\sprintf(
                                 'Subscription to \'%s\' failed due to access denied',
                                 $this->streamId
                             )));
@@ -173,7 +173,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
                                         $message->getReason()
                                 ));
                             }
-                            $this->dropSubscription(SubscriptionDropReason::unknown(), new UnexpectedCommandException(
+                            $this->dropSubscription(SubscriptionDropReason::unknown(), new UnexpectedCommand(
                                 'Unsubscribe reason: ' . $message->getReason()
                             ));
                             break;
@@ -181,7 +181,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 
                     return new InspectionResult(InspectionDecision::endOperation(), 'SubscriptionDropped: ' . $message->getReason());
                 case TcpCommand::NOT_AUTHENTICATED_EXCEPTION:
-                    $this->dropSubscription(SubscriptionDropReason::notAuthenticated(), new NotAuthenticatedException());
+                    $this->dropSubscription(SubscriptionDropReason::notAuthenticated(), new NotAuthenticated());
 
                     return new InspectionResult(InspectionDecision::endOperation(), 'NotAuthenticated');
                 case TcpCommand::BAD_REQUEST:
@@ -230,7 +230,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
                 default:
                     $this->dropSubscription(
                         SubscriptionDropReason::serverError(),
-                        UnexpectedCommandException::withName($package->command()->name())
+                        UnexpectedCommand::withName($package->command()->name())
                     );
 
                     return new InspectionResult(InspectionDecision::endOperation(), $package->command()->name());
@@ -247,7 +247,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
     {
         $this->dropSubscription(
             SubscriptionDropReason::connectionClosed(),
-            new ConnectionClosedException('Connection was closed')
+            new ConnectionClosed('Connection was closed')
         );
     }
 

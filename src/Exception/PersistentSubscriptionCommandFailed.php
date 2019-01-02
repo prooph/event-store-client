@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Exception;
 
-use Prooph\EventStore\Exception\UserCommandFailedException as BaseException;
+use Prooph\EventStore\Exception\PersistentSubscriptionCommandFailed as BaseException;
 
-class UserCommandFailedException extends BaseException
+class PersistentSubscriptionCommandFailed extends BaseException
 {
     /** @var int */
     private $httpStatusCode;

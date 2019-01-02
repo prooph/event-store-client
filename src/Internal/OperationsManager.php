@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Internal;
 
 use Amp\Promise;
-use Prooph\EventStore\Exception\ConnectionClosedException;
-use Prooph\EventStore\Exception\OperationTimedOutException;
-use Prooph\EventStore\Exception\RetriesLimitReachedException;
+use Prooph\EventStore\Exception\ConnectionClosed;
+use Prooph\EventStore\Exception\OperationTimedOut;
+use Prooph\EventStore\Exception\RetriesLimitReached;
 use Prooph\EventStore\Util\DateTime;
 use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\ConnectionSettings;
@@ -69,7 +69,7 @@ class OperationsManager
 
     public function cleanUp(): void
     {
-        $closedConnectionException = ConnectionClosedException::withName($this->connectionName);
+        $closedConnectionException = ConnectionClosed::withName($this->connectionName);
 
         foreach ($this->activeOperations as $operationItem) {
             try {
@@ -120,7 +120,7 @@ class OperationsManager
                 $this->settings->log()->error($err);
 
                 if ($this->settings->failOnNoServerResponse()) {
-                    $operation->operation()->fail(new OperationTimedOutException($err));
+                    $operation->operation()->fail(new OperationTimedOut($err));
                     $removeOperations[] = $operation;
                 } else {
                     $retryOperations[] = $operation;
@@ -162,7 +162,7 @@ class OperationsManager
         $this->logDebug('ScheduleOperationRetry for %s', $operation);
         if ($operation->maxRetries() >= 0 && $operation->retryCount() >= $operation->maxRetries()) {
             $operation->operation()->fail(
-                RetriesLimitReachedException::with($operation->retryCount())
+                RetriesLimitReached::with($operation->retryCount())
             );
 
             return;

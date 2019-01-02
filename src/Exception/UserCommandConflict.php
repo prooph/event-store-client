@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Exception;
 
-use Prooph\EventStore\Exception\UserCommandConflictException as BaseException;
+use Prooph\EventStore\Exception\UserCommandConflict as BaseException;
 
-class UserCommandConflictException extends BaseException
+class UserCommandConflict extends BaseException
 {
     /** @var int */
     private $httpStatusCode;

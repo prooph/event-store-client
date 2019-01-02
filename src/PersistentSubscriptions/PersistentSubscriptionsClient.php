@@ -23,7 +23,7 @@ use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\Transport\Http\HttpStatusCode;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStore\Util\Json;
-use Prooph\EventStoreClient\Exception\PersistentSubscriptionCommandFailedException;
+use Prooph\EventStoreClient\Exception\PersistentSubscriptionCommandFailed;
 use Prooph\EventStoreClient\Transport\Http\HttpClient;
 use Throwable;
 
@@ -187,7 +187,7 @@ class PersistentSubscriptionsClient
                 if ($response->getStatus() === $expectedCode) {
                     $deferred->resolve($response->getBody());
                 } else {
-                    $deferred->fail(new PersistentSubscriptionCommandFailedException(
+                    $deferred->fail(new PersistentSubscriptionCommandFailed(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for GET on %s',
@@ -223,7 +223,7 @@ class PersistentSubscriptionsClient
                 if ($response->getStatus() === $expectedCode) {
                     $deferred->resolve(null);
                 } else {
-                    $deferred->fail(new PersistentSubscriptionCommandFailedException(
+                    $deferred->fail(new PersistentSubscriptionCommandFailed(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for POST on %s',

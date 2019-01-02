@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient\UserManagement;
 
 use Prooph\EventStore\Exception\InvalidArgumentException;
-use Prooph\EventStore\Exception\UserCommandFailedException;
+use Prooph\EventStore\Exception\UserCommandFailed;
 use Prooph\EventStore\Transport\Http\HttpStatusCode;
 use Prooph\EventStore\UserManagement\UserDetails;
 use Prooph\EventStore\Util\Guid;
@@ -30,11 +30,11 @@ class deleting_a_user extends TestWithNode
     public function deleting_non_existing_user_throws(): void
     {
         $this->execute(function () {
-            $this->expectException(UserCommandFailedException::class);
+            $this->expectException(UserCommandFailed::class);
 
             try {
                 yield $this->manager->deleteUserAsync(Guid::generateString(), DefaultData::adminCredentials());
-            } catch (UserCommandFailedException $e) {
+            } catch (UserCommandFailed $e) {
                 $this->assertSame(HttpStatusCode::NOT_FOUND, $e->httpStatusCode());
 
                 throw $e;
@@ -93,7 +93,7 @@ class deleting_a_user extends TestWithNode
 
             yield $this->manager->deleteUserAsync($name, DefaultData::adminCredentials());
 
-            $this->expectException(UserCommandFailedException::class);
+            $this->expectException(UserCommandFailed::class);
 
             yield $this->manager->getUserAsync($name, DefaultData::adminCredentials());
         });

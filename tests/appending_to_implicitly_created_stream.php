@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
 use ProophTest\EventStoreClient\Helper\EventsStream;
 use ProophTest\EventStoreClient\Helper\StreamWriter;
@@ -105,7 +105,7 @@ class appending_to_implicitly_created_stream extends TestCase
             $first6 = yield $writer->append($events);
             \assert($first6 instanceof TailWriter);
             try {
-                $this->expectException(WrongExpectedVersionException::class);
+                $this->expectException(WrongExpectedVersion::class);
                 yield $first6->then($events[0], 6);
             } finally {
                 $connection->close();
@@ -133,7 +133,7 @@ class appending_to_implicitly_created_stream extends TestCase
             $first6 = yield $writer->append($events);
             \assert($first6 instanceof TailWriter);
             try {
-                $this->expectException(WrongExpectedVersionException::class);
+                $this->expectException(WrongExpectedVersion::class);
                 yield $first6->then($events[0], 4);
             } finally {
                 $connection->close();
@@ -386,7 +386,7 @@ class appending_to_implicitly_created_stream extends TestCase
 
             $events[] = TestEvent::newTestEvent();
 
-            $this->expectException(WrongExpectedVersionException::class);
+            $this->expectException(WrongExpectedVersion::class);
 
             try {
                 yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);

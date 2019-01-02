@@ -15,8 +15,8 @@ namespace ProophTest\EventStoreClient;
 
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\DeleteResult;
-use Prooph\EventStore\Exception\StreamDeletedException;
-use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\Exception\StreamDeleted;
+use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
@@ -80,7 +80,7 @@ class deleting_stream extends TestCase
             yield $connection->connectAsync();
 
             try {
-                $this->expectException(WrongExpectedVersionException::class);
+                $this->expectException(WrongExpectedVersion::class);
                 yield $connection->deleteStreamAsync($stream, 1, true);
             } finally {
                 $connection->close();
@@ -129,7 +129,7 @@ class deleting_stream extends TestCase
             yield $connection->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
 
             try {
-                $this->expectException(StreamDeletedException::class);
+                $this->expectException(StreamDeleted::class);
                 yield $connection->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
             } finally {
                 $connection->close();

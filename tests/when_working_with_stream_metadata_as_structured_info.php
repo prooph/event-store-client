@@ -16,7 +16,7 @@ namespace ProophTest\EventStoreClient;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\AsyncEventStoreConnection;
 use Prooph\EventStore\Exception\RuntimeException;
-use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\RawStreamMetadataResult;
 use Prooph\EventStore\StreamMetadata;
@@ -129,7 +129,7 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
     public function trying_to_set_metadata_with_wrong_expected_version_fails(): void
     {
         $this->execute(function () {
-            $this->expectException(WrongExpectedVersionException::class);
+            $this->expectException(WrongExpectedVersion::class);
 
             yield $this->conn->setStreamMetadataAsync(
                 $this->stream,

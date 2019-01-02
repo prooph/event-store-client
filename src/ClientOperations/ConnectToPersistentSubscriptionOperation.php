@@ -16,10 +16,10 @@ namespace Prooph\EventStoreClient\ClientOperations;
 use Amp\Deferred;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\EventStoreSubscription;
-use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\InvalidArgumentException;
-use Prooph\EventStore\Exception\MaximumSubscribersReachedException;
-use Prooph\EventStore\Exception\PersistentSubscriptionDeletedException;
+use Prooph\EventStore\Exception\MaximumSubscribersReached;
+use Prooph\EventStore\Exception\PersistentSubscriptionDeleted;
 use Prooph\EventStore\Internal\ConnectToPersistentSubscriptions;
 use Prooph\EventStore\Internal\PersistentEventStoreSubscription;
 use Prooph\EventStore\PersistentSubscriptionNakEventAction;
@@ -132,7 +132,7 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
             $message->parseFromString($package->data());
 
             if ($message->getReason() === SubscriptionDropReasonMessage::AccessDenied) {
-                $this->dropSubscription(SubscriptionDropReason::accessDenied(), new AccessDeniedException('You do not have access to the stream'));
+                $this->dropSubscription(SubscriptionDropReason::accessDenied(), new AccessDenied('You do not have access to the stream'));
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'SubscriptionDropped');
             }
@@ -144,13 +144,13 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
             }
 
             if ($message->getReason() === SubscriptionDropReasonMessage::PersistentSubscriptionDeleted) {
-                $this->dropSubscription(SubscriptionDropReason::persistentSubscriptionDeleted(), new PersistentSubscriptionDeletedException());
+                $this->dropSubscription(SubscriptionDropReason::persistentSubscriptionDeleted(), new PersistentSubscriptionDeleted());
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'SubscriptionDropped');
             }
 
             if ($message->getReason() === SubscriptionDropReasonMessage::SubscriberMaxCountReached) {
-                $this->dropSubscription(SubscriptionDropReason::maxSubscribersReached(), new MaximumSubscribersReachedException());
+                $this->dropSubscription(SubscriptionDropReason::maxSubscribersReached(), new MaximumSubscribersReached());
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'SubscriptionDropped');
             }

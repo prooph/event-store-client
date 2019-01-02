@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\AsyncEventStoreConnection;
 use Prooph\EventStore\AsyncEventStoreTransaction;
 use Prooph\EventStore\EventData;
-use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\SliceReadStatus;
 use Prooph\EventStore\StreamEventsSlice;
@@ -190,7 +190,7 @@ class when_committing_empty_transaction extends TestCase
         wait(call(function () {
             yield from $this->bootstrap();
 
-            $this->expectException(WrongExpectedVersionException::class);
+            $this->expectException(WrongExpectedVersion::class);
 
             yield $this->connection->appendToStreamAsync(
                 $this->stream,

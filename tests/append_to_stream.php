@@ -20,8 +20,8 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\ConditionalWriteResult;
 use Prooph\EventStore\ConditionalWriteStatus;
 use Prooph\EventStore\Exception\InvalidArgumentException;
-use Prooph\EventStore\Exception\StreamDeletedException;
-use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\Exception\StreamDeleted;
+use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\ReadDirection;
 use Prooph\EventStore\StreamEventsSlice;
@@ -275,7 +275,7 @@ class append_to_stream extends TestCase
             yield $connection->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
 
             try {
-                $this->expectException(StreamDeletedException::class);
+                $this->expectException(StreamDeleted::class);
                 yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
             } finally {
                 $connection->close();
@@ -325,7 +325,7 @@ class append_to_stream extends TestCase
             }
 
             try {
-                $this->expectException(StreamDeletedException::class);
+                $this->expectException(StreamDeleted::class);
                 yield $connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
             } finally {
                 $connection->close();
@@ -348,7 +348,7 @@ class append_to_stream extends TestCase
 
             yield $connection->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
 
-            $this->expectException(StreamDeletedException::class);
+            $this->expectException(StreamDeleted::class);
             try {
                 yield $connection->appendToStreamAsync($stream, 5, [TestEvent::newTestEvent()]);
             } finally {
@@ -415,7 +415,7 @@ class append_to_stream extends TestCase
             yield $connection->connectAsync();
 
             try {
-                $this->expectException(WrongExpectedVersionException::class);
+                $this->expectException(WrongExpectedVersion::class);
                 yield $connection->appendToStreamAsync($stream, 1, [TestEvent::newTestEvent()]);
             } finally {
                 $connection->close();
@@ -510,7 +510,7 @@ class append_to_stream extends TestCase
             yield $connection->connectAsync();
 
             try {
-                $this->expectException(WrongExpectedVersionException::class);
+                $this->expectException(WrongExpectedVersion::class);
                 yield $connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
             } finally {
                 $connection->close();
@@ -534,7 +534,7 @@ class append_to_stream extends TestCase
             yield $connection->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
 
             try {
-                $this->expectException(StreamDeletedException::class);
+                $this->expectException(StreamDeleted::class);
                 yield $connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
             } finally {
                 $connection->close();
@@ -558,7 +558,7 @@ class append_to_stream extends TestCase
             yield $connection->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, false);
 
             try {
-                $this->expectException(StreamDeletedException::class);
+                $this->expectException(StreamDeleted::class);
                 yield $connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
             } finally {
                 $connection->close();

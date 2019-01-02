@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\WriteResult;
 use ProophTest\EventStoreClient\Helper\EventsStream;
@@ -169,7 +169,7 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
             $ongoingTransaction = yield $ongoingTransaction->writeAsync([\current($events)]);
             \assert($ongoingTransaction instanceof OngoingTransaction);
 
-            $this->expectException(WrongExpectedVersionException::class);
+            $this->expectException(WrongExpectedVersion::class);
 
             yield $ongoingTransaction->commitAsync();
         }));
@@ -204,7 +204,7 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
             $ongoingTransaction = yield $ongoingTransaction->writeAsync([\current($events)]);
             \assert($ongoingTransaction instanceof OngoingTransaction);
 
-            $this->expectException(WrongExpectedVersionException::class);
+            $this->expectException(WrongExpectedVersion::class);
 
             yield $ongoingTransaction->commitAsync();
         }));
@@ -393,7 +393,7 @@ class appending_to_implicitly_created_stream_using_transaction extends TestCase
             $ongoingTransaction = yield $ongoingTransaction->writeAsync($events);
             \assert($ongoingTransaction instanceof OngoingTransaction);
 
-            $this->expectException(WrongExpectedVersionException::class);
+            $this->expectException(WrongExpectedVersion::class);
 
             yield $ongoingTransaction->commitAsync();
         }));

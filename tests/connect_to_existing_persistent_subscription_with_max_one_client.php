@@ -19,7 +19,7 @@ use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\AsyncEventStorePersistentSubscription;
 use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
-use Prooph\EventStore\Exception\MaximumSubscribersReachedException;
+use Prooph\EventStore\Exception\MaximumSubscribersReached;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
@@ -127,7 +127,7 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends Te
     public function the_second_subscription_throws_maximum_subscribers_reached_exception(): void
     {
         $this->execute(function (): Generator {
-            $this->assertInstanceOf(MaximumSubscribersReachedException::class, $this->exception);
+            $this->assertInstanceOf(MaximumSubscribersReached::class, $this->exception);
             yield new Success();
         });
     }

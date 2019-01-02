@@ -16,7 +16,7 @@ namespace ProophTest\EventStoreClient;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\EventData;
-use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
@@ -60,7 +60,7 @@ class update_existing_persistent_subscription_without_permissions extends TestCa
     public function the_completion_fails_with_access_denied(): void
     {
         $this->execute(function () {
-            $this->expectException(AccessDeniedException::class);
+            $this->expectException(AccessDenied::class);
 
             yield $this->conn->updatePersistentSubscriptionAsync(
                 $this->stream,

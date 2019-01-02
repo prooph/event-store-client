@@ -15,11 +15,11 @@ namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
 use Prooph\EventStore\DeleteResult;
-use Prooph\EventStore\Exception\AccessDeniedException;
-use Prooph\EventStore\Exception\InvalidTransactionException;
-use Prooph\EventStore\Exception\StreamDeletedException;
+use Prooph\EventStore\Exception\AccessDenied;
+use Prooph\EventStore\Exception\InvalidTransaction;
+use Prooph\EventStore\Exception\StreamDeleted;
 use Prooph\EventStore\Exception\UnexpectedOperationResult;
-use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\Position;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Messages\ClientMessages\DeleteStream;
@@ -94,24 +94,24 @@ class DeleteStreamOperation extends AbstractOperation
             case OperationResult::ForwardTimeout:
                 return new InspectionResult(InspectionDecision::retry(), 'ForwardTimeout');
             case OperationResult::WrongExpectedVersion:
-                $this->fail(WrongExpectedVersionException::with(
+                $this->fail(WrongExpectedVersion::with(
                     $this->stream,
                     $this->expectedVersion
                 ));
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'WrongExpectedVersion');
             case OperationResult::StreamDeleted:
-                $exception = StreamDeletedException::with($this->stream);
+                $exception = StreamDeleted::with($this->stream);
                 $this->fail($exception);
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'StreamDeleted');
             case OperationResult::InvalidTransaction:
-                $exception = new InvalidTransactionException();
+                $exception = new InvalidTransaction();
                 $this->fail($exception);
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'InvalidTransaction');
             case OperationResult::AccessDenied:
-                $exception = AccessDeniedException::toStream($this->stream);
+                $exception = AccessDenied::toStream($this->stream);
                 $this->fail($exception);
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');

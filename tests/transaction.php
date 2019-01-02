@@ -19,8 +19,8 @@ use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\AsyncEventStoreConnection;
 use Prooph\EventStore\AsyncEventStoreTransaction;
 use Prooph\EventStore\EventData;
-use Prooph\EventStore\Exception\StreamDeletedException;
-use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\Exception\StreamDeleted;
+use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\WriteResult;
@@ -116,7 +116,7 @@ class transaction extends TestCase
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
-            $this->expectException(WrongExpectedVersionException::class);
+            $this->expectException(WrongExpectedVersion::class);
 
             yield $transaction->commitAsync();
         });
@@ -205,7 +205,7 @@ class transaction extends TestCase
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
-            $this->expectException(WrongExpectedVersionException::class);
+            $this->expectException(WrongExpectedVersion::class);
 
             yield $transaction->commitAsync();
         });
@@ -284,7 +284,7 @@ class transaction extends TestCase
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
-            $this->expectException(WrongExpectedVersionException::class);
+            $this->expectException(WrongExpectedVersion::class);
 
             yield $transaction->commitAsync();
         });
@@ -335,7 +335,7 @@ class transaction extends TestCase
 
             yield $this->conn->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
 
-            $this->expectException(StreamDeletedException::class);
+            $this->expectException(StreamDeleted::class);
 
             yield $transaction->commitAsync();
         });

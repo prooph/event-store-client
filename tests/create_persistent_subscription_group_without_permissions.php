@@ -16,7 +16,7 @@ namespace ProophTest\EventStoreClient;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
 use Throwable;
@@ -60,7 +60,7 @@ class create_persistent_subscription_group_without_permissions extends TestCase
 
                 $this->fail('Should have thrown');
             } catch (Throwable $e) {
-                $this->assertInstanceOf(AccessDeniedException::class, $e);
+                $this->assertInstanceOf(AccessDenied::class, $e);
             }
         });
     }

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient\UserManagement;
 
 use Prooph\EventStore\Exception\InvalidArgumentException;
-use Prooph\EventStore\Exception\UserCommandFailedException;
+use Prooph\EventStore\Exception\UserCommandFailed;
 use Prooph\EventStore\UserManagement\UserDetails;
 use Prooph\EventStore\Util\Guid;
 use ProophTest\EventStoreClient\DefaultData;
@@ -55,7 +55,7 @@ class updating_a_user extends TestWithNode
     public function updating_non_existing_user_throws(): void
     {
         $this->execute(function () {
-            $this->expectException(UserCommandFailedException::class);
+            $this->expectException(UserCommandFailed::class);
 
             yield $this->manager->updateUserAsync(Guid::generateString(), 'bar', ['foo'], DefaultData::adminCredentials());
         });

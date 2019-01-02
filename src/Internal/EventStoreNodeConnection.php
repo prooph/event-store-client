@@ -30,7 +30,7 @@ use Prooph\EventStore\EventReadResult;
 use Prooph\EventStore\EventReadStatus;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\InvalidOperationException;
-use Prooph\EventStore\Exception\MaxQueueSizeLimitReachedException;
+use Prooph\EventStore\Exception\MaxQueueSizeLimitReached;
 use Prooph\EventStore\Exception\OutOfRangeException;
 use Prooph\EventStore\Exception\UnexpectedValueException;
 use Prooph\EventStore\ExpectedVersion;
@@ -895,7 +895,7 @@ final class EventStoreNodeConnection implements
     private function enqueueOperation(ClientOperation $operation): void
     {
         if ($this->handler->totalOperationCount() >= $this->settings->maxQueueSize()) {
-            throw MaxQueueSizeLimitReachedException::with($this->connectionName, $this->settings->maxQueueSize());
+            throw MaxQueueSizeLimitReached::with($this->connectionName, $this->settings->maxQueueSize());
         }
 
         $this->handler->enqueueMessage(new StartOperationMessage(

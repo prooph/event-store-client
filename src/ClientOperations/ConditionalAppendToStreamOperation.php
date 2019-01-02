@@ -17,8 +17,8 @@ use Amp\Deferred;
 use Prooph\EventStore\ConditionalWriteResult;
 use Prooph\EventStore\ConditionalWriteStatus;
 use Prooph\EventStore\EventData;
-use Prooph\EventStore\Exception\AccessDeniedException;
-use Prooph\EventStore\Exception\InvalidTransactionException;
+use Prooph\EventStore\Exception\AccessDenied;
+use Prooph\EventStore\Exception\InvalidTransaction;
 use Prooph\EventStore\Exception\UnexpectedOperationResult;
 use Prooph\EventStore\Position;
 use Prooph\EventStore\UserCredentials;
@@ -106,12 +106,12 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'StreamDeleted');
             case OperationResult::InvalidTransaction:
-                $exception = new InvalidTransactionException();
+                $exception = new InvalidTransaction();
                 $this->fail($exception);
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'InvalidTransaction');
             case OperationResult::AccessDenied:
-                $exception = AccessDeniedException::toStream($this->stream);
+                $exception = AccessDenied::toStream($this->stream);
                 $this->fail($exception);
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');

@@ -15,7 +15,7 @@ namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
 use Prooph\EventStore\Common\SystemConsumerStrategies;
-use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\Exception\UnexpectedOperationResult;
 use Prooph\EventStore\Internal\PersistentSubscriptionUpdateResult;
@@ -105,7 +105,7 @@ class UpdatePersistentSubscriptionOperation extends AbstractOperation
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'Fail');
             case UpdatePersistentSubscriptionResult::AccessDenied:
-                $this->fail(AccessDeniedException::toStream($this->stream));
+                $this->fail(AccessDenied::toStream($this->stream));
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');
             case UpdatePersistentSubscriptionResult::DoesNotExist:

@@ -18,8 +18,8 @@ use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\AsyncEventStoreConnection;
 use Prooph\EventStore\EventData;
-use Prooph\EventStore\Exception\StreamDeletedException;
-use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\Exception\StreamDeleted;
+use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\RawStreamMetadataResult;
 use Prooph\EventStore\ResolvedEvent;
@@ -438,7 +438,7 @@ class soft_delete extends TestCase
 
             $this->assertTrue($meta->isStreamDeleted());
 
-            $this->expectException(StreamDeletedException::class);
+            $this->expectException(StreamDeleted::class);
 
             yield $this->conn->appendToStreamAsync(
                 $stream,
@@ -486,7 +486,7 @@ class soft_delete extends TestCase
 
                 $this->fail('Should have thrown');
             } catch (Throwable $e) {
-                $this->assertInstanceOf(WrongExpectedVersionException::class, $e);
+                $this->assertInstanceOf(WrongExpectedVersion::class, $e);
             }
 
             $result = yield $this->conn->readStreamEventsForwardAsync(

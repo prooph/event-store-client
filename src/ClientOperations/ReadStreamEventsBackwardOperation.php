@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\ServerError;
 use Prooph\EventStore\ReadDirection;
 use Prooph\EventStore\ResolvedEvent;
@@ -106,7 +106,7 @@ class ReadStreamEventsBackwardOperation extends AbstractOperation
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'Error');
             case ReadStreamResult::AccessDenied:
-                $this->fail(AccessDeniedException::toStream($this->stream));
+                $this->fail(AccessDenied::toStream($this->stream));
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');
             default:

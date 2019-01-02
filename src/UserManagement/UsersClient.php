@@ -27,8 +27,8 @@ use Prooph\EventStore\UserManagement\UserCreationInformation;
 use Prooph\EventStore\UserManagement\UserDetails;
 use Prooph\EventStore\UserManagement\UserUpdateInformation;
 use Prooph\EventStore\Util\Json;
-use Prooph\EventStoreClient\Exception\UserCommandConflictException;
-use Prooph\EventStoreClient\Exception\UserCommandFailedException;
+use Prooph\EventStoreClient\Exception\UserCommandConflict;
+use Prooph\EventStoreClient\Exception\UserCommandFailed;
 use Prooph\EventStoreClient\Transport\Http\HttpClient;
 use Throwable;
 
@@ -315,7 +315,7 @@ class UsersClient
                 if ($response->getStatus() === $expectedCode) {
                     $deferred->resolve($response->getBody());
                 } else {
-                    $deferred->fail(new UserCommandFailedException(
+                    $deferred->fail(new UserCommandFailed(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for GET on %s',
@@ -348,7 +348,7 @@ class UsersClient
                 if ($response->getStatus() === $expectedCode) {
                     $deferred->resolve($response->getBody());
                 } else {
-                    $deferred->fail(new UserCommandFailedException(
+                    $deferred->fail(new UserCommandFailed(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for DELETE on %s',
@@ -384,7 +384,7 @@ class UsersClient
                 if ($response->getStatus() === $expectedCode) {
                     $deferred->resolve(null);
                 } else {
-                    $deferred->fail(new UserCommandFailedException(
+                    $deferred->fail(new UserCommandFailed(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for PUT on %s',
@@ -420,9 +420,9 @@ class UsersClient
                 if ($response->getStatus() === $expectedCode) {
                     $deferred->resolve(null);
                 } elseif ($response->getStatus() === HttpStatusCode::CONFLICT) {
-                    $deferred->fail(new UserCommandConflictException($response->getStatus(), $response->getReason()));
+                    $deferred->fail(new UserCommandConflict($response->getStatus(), $response->getReason()));
                 } else {
-                    $deferred->fail(new UserCommandFailedException(
+                    $deferred->fail(new UserCommandFailed(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for POST on %s',

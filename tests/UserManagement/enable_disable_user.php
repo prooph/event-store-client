@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient\UserManagement;
 
 use Prooph\EventStore\Exception\InvalidArgumentException;
-use Prooph\EventStore\Exception\UserCommandFailedException;
+use Prooph\EventStore\Exception\UserCommandFailed;
 use Prooph\EventStore\UserCredentials;
 use ProophTest\EventStoreClient\DefaultData;
 use Throwable;
@@ -60,11 +60,11 @@ class enable_disable_user extends TestWithUser
 
             try {
                 yield $this->manager->disableAsync('foo', DefaultData::adminCredentials());
-            } catch (UserCommandFailedException $e) {
+            } catch (UserCommandFailed $e) {
                 $thrown = true;
             }
 
-            $this->assertTrue($thrown, UserCommandFailedException::class . ' was expected');
+            $this->assertTrue($thrown, UserCommandFailed::class . ' was expected');
 
             yield $this->manager->enableAsync($this->username, DefaultData::adminCredentials());
 

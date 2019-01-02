@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Prooph\EventStore\Exception\ConnectionClosedException;
-use Prooph\EventStore\Exception\OperationTimedOutException;
-use Prooph\EventStore\Exception\RetriesLimitReachedException;
+use Prooph\EventStore\Exception\ConnectionClosed;
+use Prooph\EventStore\Exception\OperationTimedOut;
+use Prooph\EventStore\Exception\RetriesLimitReached;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\Util\DateTime;
 use Prooph\EventStore\Util\Guid;
@@ -51,7 +51,7 @@ class SubscriptionsManager
 
     public function cleanUp(): void
     {
-        $connectionClosedException = ConnectionClosedException::withName($this->connectionName);
+        $connectionClosedException = ConnectionClosed::withName($this->connectionName);
 
         foreach ($this->activeSubscriptions as $subscriptionItem) {
             $subscriptionItem->operation()->dropSubscription(
@@ -125,7 +125,7 @@ class SubscriptionsManager
                 if ($this->settings->failOnNoServerResponse()) {
                     $subscription->operation()->dropSubscription(
                         SubscriptionDropReason::subscribingError(),
-                        new OperationTimedOutException($err)
+                        new OperationTimedOut($err)
                     );
                     $removeSubscriptions->enqueue($subscription);
                 } else {
@@ -177,7 +177,7 @@ class SubscriptionsManager
             $this->logDebug('RETRIES LIMIT REACHED when trying to retry %s', $subscription);
             $subscription->operation()->dropSubscription(
                 SubscriptionDropReason::subscribingError(),
-                RetriesLimitReachedException::with($subscription->retryCount())
+                RetriesLimitReached::with($subscription->retryCount())
             );
 
             return;

@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Prooph\EventStore\Exception\AccessDeniedException;
-use Prooph\EventStore\Exception\InvalidTransactionException;
-use Prooph\EventStore\Exception\StreamDeletedException;
+use Prooph\EventStore\Exception\AccessDenied;
+use Prooph\EventStore\Exception\InvalidTransaction;
+use Prooph\EventStore\Exception\StreamDeleted;
 use Prooph\EventStore\Exception\UnexpectedOperationResult;
-use Prooph\EventStore\Exception\WrongExpectedVersionException;
+use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\Position;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStore\WriteResult;
@@ -84,22 +84,22 @@ class CommitTransactionOperation extends AbstractOperation
             case OperationResult::CommitTimeout:
                 return new InspectionResult(InspectionDecision::retry(), 'CommitTimeout');
             case OperationResult::WrongExpectedVersion:
-                $this->fail(new WrongExpectedVersionException(\sprintf(
+                $this->fail(new WrongExpectedVersion(\sprintf(
                     'Commit transaction failed due to WrongExpectedVersion. Transaction id: \'%s\'',
                     $this->transactionId
                 )));
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'WrongExpectedVersion');
             case OperationResult::StreamDeleted:
-                $this->fail(new StreamDeletedException());
+                $this->fail(new StreamDeleted());
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'StreamDeleted');
             case OperationResult::InvalidTransaction:
-                $this->fail(new InvalidTransactionException());
+                $this->fail(new InvalidTransaction());
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'InvalidTransaction');
             case OperationResult::AccessDenied:
-                $exception = new AccessDeniedException('Write access denied');
+                $exception = new AccessDenied('Write access denied');
                 $this->fail($exception);
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');

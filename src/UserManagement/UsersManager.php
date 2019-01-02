@@ -24,7 +24,7 @@ use Prooph\EventStore\UserManagement\ResetPasswordDetails;
 use Prooph\EventStore\UserManagement\UserCreationInformation;
 use Prooph\EventStore\UserManagement\UserDetails;
 use Prooph\EventStore\UserManagement\UserUpdateInformation;
-use Prooph\EventStoreClient\Exception\UserCommandFailedException;
+use Prooph\EventStoreClient\Exception\UserCommandFailed;
 
 class UsersManager implements AsyncUsersManager
 {
@@ -77,7 +77,7 @@ class UsersManager implements AsyncUsersManager
         );
     }
 
-    /** @throws UserCommandFailedException */
+    /** @throws UserCommandFailed */
     public function deleteUserAsync(string $login, ?UserCredentials $userCredentials = null): Promise
     {
         if (empty($login)) {

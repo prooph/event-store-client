@@ -16,7 +16,7 @@ namespace ProophTest\EventStoreClient;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Util\Guid;
 use Throwable;
 
@@ -44,7 +44,7 @@ class deleting_persistent_subscription_group_without_permissions extends TestCas
     public function the_delete_fails_with_access_denied(): void
     {
         $this->execute(function () {
-            $this->expectException(AccessDeniedException::class);
+            $this->expectException(AccessDenied::class);
 
             yield $this->conn->deletePersistentSubscriptionAsync(
                 $this->stream,

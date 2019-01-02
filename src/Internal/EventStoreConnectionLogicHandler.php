@@ -24,10 +24,10 @@ use Prooph\EventStore\ClientConnectionEventArgs;
 use Prooph\EventStore\ClientErrorEventArgs;
 use Prooph\EventStore\ClientReconnectingEventArgs;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\Exception\CannotEstablishConnectionException;
+use Prooph\EventStore\Exception\CannotEstablishConnection;
 use Prooph\EventStore\Exception\EventStoreConnectionException;
 use Prooph\EventStore\Exception\InvalidOperationException;
-use Prooph\EventStore\Exception\ObjectDisposedException;
+use Prooph\EventStore\Exception\ObjectDisposed;
 use Prooph\EventStore\Internal\Consts;
 use Prooph\EventStore\Internal\EventHandler;
 use Prooph\EventStore\ListenerHandler;
@@ -212,7 +212,7 @@ class EventStoreConnectionLogicHandler
                 )));
                 break;
             case ConnectionState::CLOSED:
-                $deferred->fail(new ObjectDisposedException($this->esConnection->connectionName()));
+                $deferred->fail(new ObjectDisposed($this->esConnection->connectionName()));
                 break;
         }
     }
@@ -245,7 +245,7 @@ class EventStoreConnectionLogicHandler
                 ));
 
                 if ($deferred) {
-                    $deferred->fail(new CannotEstablishConnectionException('Cannot resolve target end point'));
+                    $deferred->fail(new CannotEstablishConnection('Cannot resolve target end point'));
                 }
 
                 return;
@@ -634,7 +634,7 @@ class EventStoreConnectionLogicHandler
                 $this->operations->scheduleOperation(new OperationItem($operation, $maxRetries, $timeout), $this->connection);
                 break;
             case ConnectionState::CLOSED:
-                $operation->fail(new ObjectDisposedException($this->esConnection->connectionName()));
+                $operation->fail(new ObjectDisposed($this->esConnection->connectionName()));
                 break;
         }
     }
@@ -683,7 +683,7 @@ class EventStoreConnectionLogicHandler
 
                 break;
             case ConnectionState::CLOSED:
-                $message->deferred()->fail(new ObjectDisposedException($this->esConnection->connectionName()));
+                $message->deferred()->fail(new ObjectDisposed($this->esConnection->connectionName()));
                 break;
         }
     }
@@ -733,7 +733,7 @@ class EventStoreConnectionLogicHandler
 
                 break;
             case ConnectionState::CLOSED:
-                $message->deferred()->fail(new ObjectDisposedException($this->esConnection->connectionName()));
+                $message->deferred()->fail(new ObjectDisposed($this->esConnection->connectionName()));
                 break;
         }
     }

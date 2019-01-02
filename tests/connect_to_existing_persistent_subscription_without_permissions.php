@@ -19,7 +19,7 @@ use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\AsyncEventStorePersistentSubscription;
 use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
-use Prooph\EventStore\Exception\AccessDeniedException;
+use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
@@ -73,7 +73,7 @@ class connect_to_existing_persistent_subscription_without_permissions extends Te
      */
     public function the_subscription_fails_to_connect_with_access_denied_exception(): void
     {
-        $this->expectException(AccessDeniedException::class);
+        $this->expectException(AccessDenied::class);
 
         $this->execute(function (): Generator {
             yield new Success();
