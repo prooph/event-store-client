@@ -61,7 +61,7 @@ after_script:
   - wget --http-user="admin" --http-password="changeit" --post-data='' http://localhost:2113/admin/shutdown
 
 after_success:
-  - if [[ $TEST_COVERAGE == 'true' ]]; then php vendor/bin/coveralls -v; fi
+  - if [[ $TEST_COVERAGE == 'true' ]]; then php vendor/bin/php-coveralls -v; fi
 
 notifications:
   webhooks:
