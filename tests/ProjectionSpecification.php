@@ -18,7 +18,7 @@ use Amp\Promise;
 use function Amp\Promise\wait;
 use Amp\Success;
 use Generator;
-use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\UserCredentials;
@@ -31,7 +31,7 @@ trait ProjectionSpecification
 {
     /** @var ProjectionsManager */
     protected $projectionsManager;
-    /** @var AsyncEventStoreConnection */
+    /** @var EventStoreConnection */
     protected $connection;
     /** @var UserCredentials */
     protected $credentials;

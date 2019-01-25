@@ -16,10 +16,10 @@ namespace Prooph\EventStoreClient;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
-use Prooph\EventStore\AsyncEventStorePersistentSubscription;
-use Prooph\EventStore\AsyncPersistentSubscriptionDropped;
+use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
+use Prooph\EventStore\Async\EventStorePersistentSubscription;
+use Prooph\EventStore\Async\PersistentSubscriptionDropped;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\Internal\PersistentSubscriptionCreateResult;
 use Prooph\EventStore\PersistentSubscriptionSettings;
@@ -69,9 +69,9 @@ Loop::run(function () {
     yield $connection->connectToPersistentSubscriptionAsync(
         'foo-bar',
         'test-persistent-subscription',
-        new class() implements EventAppearedOnAsyncPersistentSubscription {
+        new class() implements EventAppearedOnPersistentSubscription {
             public function __invoke(
-                AsyncEventStorePersistentSubscription $subscription,
+                EventStorePersistentSubscription $subscription,
                 ResolvedEvent $resolvedEvent,
                 ?int $retryCount = null
             ): Promise {
@@ -81,9 +81,9 @@ Loop::run(function () {
                 return new Success();
             }
         },
-        new class() implements AsyncPersistentSubscriptionDropped {
+        new class() implements PersistentSubscriptionDropped {
             public function __invoke(
-                AsyncEventStorePersistentSubscription $subscription,
+                EventStorePersistentSubscription $subscription,
                 SubscriptionDropReason $reason,
                 ?Throwable $exception = null
             ): void {

@@ -16,12 +16,12 @@ namespace Prooph\EventStoreClient;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
-use Prooph\EventStore\AsyncCatchUpSubscriptionDropped;
-use Prooph\EventStore\AsyncEventStoreCatchUpSubscription;
+use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
+use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
+use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
+use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
-use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropReason;
 use Throwable;
@@ -47,9 +47,9 @@ Loop::run(function () {
         'foo-bar',
         null,
         CatchUpSubscriptionSettings::default(),
-        new class() implements EventAppearedOnAsyncCatchupSubscription {
+        new class() implements EventAppearedOnCatchupSubscription {
             public function __invoke(
-                AsyncEventStoreCatchUpSubscription $subscription,
+                EventStoreCatchUpSubscription $subscription,
                 ResolvedEvent $resolvedEvent
             ): Promise {
                 echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
@@ -58,15 +58,15 @@ Loop::run(function () {
                 return new Success();
             }
         },
-        new class() implements LiveProcessingStartedOnAsyncCatchUpSubscription {
-            public function __invoke(AsyncEventStoreCatchUpSubscription $subscription): void
+        new class() implements LiveProcessingStartedOnCatchUpSubscription {
+            public function __invoke(EventStoreCatchUpSubscription $subscription): void
             {
                 echo 'liveProcessingStarted on ' . $subscription->streamId() . PHP_EOL;
             }
         },
-        new class() implements AsyncCatchUpSubscriptionDropped {
+        new class() implements CatchUpSubscriptionDropped {
             public function __invoke(
-                AsyncEventStoreCatchUpSubscription $subscription,
+                EventStoreCatchUpSubscription $subscription,
                 SubscriptionDropReason $reason,
                 ?Throwable $exception = null
             ): void {

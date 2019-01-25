@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Projections;
 
 use Amp\Promise;
+use Prooph\EventStore\Async\Projections\ProjectionsManager as AsyncProjectionsManager;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
-use Prooph\EventStore\Projections\AsyncProjectionsManager;
 use Prooph\EventStore\Projections\ProjectionDetails;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;

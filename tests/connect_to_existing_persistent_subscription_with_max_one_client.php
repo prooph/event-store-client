@@ -17,8 +17,8 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\AsyncEventStorePersistentSubscription;
-use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
+use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
+use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\Exception\MaximumSubscribersReached;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
@@ -37,7 +37,7 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends Te
     private $exception;
     /** @var string */
     private $group = 'startinbeginning1';
-    /** @var AsyncEventStorePersistentSubscription|null */
+    /** @var EventStorePersistentSubscription|null */
     private $firstSubscription;
 
     protected function setUp(): void
@@ -62,9 +62,9 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends Te
         $this->firstSubscription = yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
-            new class() implements EventAppearedOnAsyncPersistentSubscription {
+            new class() implements EventAppearedOnPersistentSubscription {
                 public function __invoke(
-                    AsyncEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {
@@ -86,9 +86,9 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends Te
             yield $this->conn->connectToPersistentSubscriptionAsync(
                 $this->stream,
                 $this->group,
-                new class() implements EventAppearedOnAsyncPersistentSubscription {
+                new class() implements EventAppearedOnPersistentSubscription {
                     public function __invoke(
-                        AsyncEventStorePersistentSubscription $subscription,
+                        EventStorePersistentSubscription $subscription,
                         ResolvedEvent $resolvedEvent,
                         ?int $retryCount = null
                     ): Promise {

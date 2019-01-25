@@ -17,7 +17,7 @@ use function Amp\call;
 use function Amp\Promise\wait;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Exception\StreamDeleted;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
@@ -30,7 +30,7 @@ class when_working_with_raw_stream_metadata extends TestCase
 {
     /** @var string */
     private $stream;
-    /** @var AsyncEventStoreConnection */
+    /** @var EventStoreConnection */
     private $conn;
 
     /** @throws Throwable */

@@ -20,9 +20,9 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use Prooph\EventStore\AsyncEventStorePersistentSubscription;
-use Prooph\EventStore\AsyncPersistentSubscriptionDropped;
-use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
+use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
+use Prooph\EventStore\Async\EventStorePersistentSubscription as AsyncEventStorePersistentSubscription;
+use Prooph\EventStore\Async\PersistentSubscriptionDropped;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\Exception\RuntimeException;
 use Prooph\EventStore\Internal\DropData;
@@ -86,8 +86,8 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
     public function __construct(
         string $subscriptionId,
         string $streamId,
-        EventAppearedOnAsyncPersistentSubscription $eventAppeared,
-        ?AsyncPersistentSubscriptionDropped $subscriptionDropped,
+        EventAppearedOnPersistentSubscription $eventAppeared,
+        ?PersistentSubscriptionDropped $subscriptionDropped,
         ?UserCredentials $userCredentials,
         Logger $logger,
         bool $verboseLogging,

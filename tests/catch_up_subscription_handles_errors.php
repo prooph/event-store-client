@@ -23,16 +23,16 @@ use Amp\Success;
 use Exception;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\AsyncCatchUpSubscriptionDropped;
-use Prooph\EventStore\AsyncEventStoreCatchUpSubscription;
+use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
+use Prooph\EventStore\Async\ClientConnectionEventArgs;
+use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
+use Prooph\EventStore\Async\EventAppearedOnSubscription;
+use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
+use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
-use Prooph\EventStore\ClientConnectionEventArgs;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
-use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\EventStoreSubscription;
-use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
 use Prooph\EventStore\ReadDirection;
 use Prooph\EventStore\RecordedEvent;
 use Prooph\EventStore\ResolvedEvent;
@@ -106,7 +106,7 @@ class catch_up_subscription_handles_errors extends TestCase
             self::$streamId,
             null,
             null,
-            new class($props1) implements EventAppearedOnAsyncCatchupSubscription {
+            new class($props1) implements EventAppearedOnCatchupSubscription {
                 private $props;
 
                 public function __construct(array &$props)
@@ -115,7 +115,7 @@ class catch_up_subscription_handles_errors extends TestCase
                 }
 
                 public function __invoke(
-                    AsyncEventStoreCatchUpSubscription $subscription,
+                    EventStoreCatchUpSubscription $subscription,
                     ResolvedEvent $resolvedEvent
                 ): Promise {
                     $this->props['raisedEvents'][] = $resolvedEvent;
@@ -124,7 +124,7 @@ class catch_up_subscription_handles_errors extends TestCase
                     return new Success();
                 }
             },
-            new class($props2) implements LiveProcessingStartedOnAsyncCatchUpSubscription {
+            new class($props2) implements LiveProcessingStartedOnCatchUpSubscription {
                 private $props;
 
                 public function __construct(array &$props)
@@ -132,12 +132,12 @@ class catch_up_subscription_handles_errors extends TestCase
                     $this->props = &$props;
                 }
 
-                public function __invoke(AsyncEventStoreCatchUpSubscription $subscription): void
+                public function __invoke(EventStoreCatchUpSubscription $subscription): void
                 {
                     $this->props['liveProcessingStarted'] = true;
                 }
             },
-            new class($props3) implements AsyncCatchUpSubscriptionDropped {
+            new class($props3) implements CatchUpSubscriptionDropped {
                 private $props;
 
                 public function __construct(array &$props)
@@ -146,7 +146,7 @@ class catch_up_subscription_handles_errors extends TestCase
                 }
 
                 public function __invoke(
-                    AsyncEventStoreCatchUpSubscription $subscription,
+                    EventStoreCatchUpSubscription $subscription,
                     SubscriptionDropReason $reason,
                     ?Throwable $exception = null
                 ): void {
@@ -536,7 +536,7 @@ class catch_up_subscription_handles_errors extends TestCase
                 self::$streamId,
                 false,
                 null,
-                new class($raise) implements EventAppearedOnAsyncSubscription {
+                new class($raise) implements EventAppearedOnSubscription {
                     private $raise;
 
                     public function __construct($raise)

@@ -27,7 +27,8 @@
     "amphp/byte-stream": "^1.5.1",
     "amphp/file": "^0.3.3",
     "amphp/socket": "^0.10.11",
-    "prooph/event-store": "dev-master",
+    "prooph/event-store": "dev-async",
+    "prooph/php-cs-fixer-config": "^0.3",
     "ramsey/uuid": "^3.8"
   },
   "require-dev": {

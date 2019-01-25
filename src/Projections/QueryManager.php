@@ -17,8 +17,8 @@ use function Amp\call;
 use Amp\Delayed;
 use Amp\Promise;
 use Generator;
+use Prooph\EventStore\Async\Projections\QueryManager as AsyncQueryManager;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\Projections\AsyncQueryManager;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
 

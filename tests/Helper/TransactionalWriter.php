@@ -16,17 +16,17 @@ namespace ProophTest\EventStoreClient\Helper;
 use function Amp\call;
 use Amp\Promise;
 use Generator;
-use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\Async\EventStoreConnection;
 
 /** @internal */
 class TransactionalWriter
 {
-    /** @var AsyncEventStoreConnection */
+    /** @var EventStoreConnection */
     private $connection;
     /** @var string */
     private $stream;
 
-    public function __construct(AsyncEventStoreConnection $connection, string $stream)
+    public function __construct(EventStoreConnection $connection, string $stream)
     {
         $this->connection = $connection;
         $this->stream = $stream;

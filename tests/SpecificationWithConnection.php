@@ -17,13 +17,13 @@ use function Amp\call;
 use function Amp\Promise\wait;
 use Amp\Success;
 use Generator;
-use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\Async\EventStoreConnection;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use Throwable;
 
 trait SpecificationWithConnection
 {
-    /** @var AsyncEventStoreConnection */
+    /** @var EventStoreConnection */
     protected $conn;
 
     protected function given(): Generator

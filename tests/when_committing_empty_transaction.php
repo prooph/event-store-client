@@ -17,8 +17,8 @@ use function Amp\call;
 use function Amp\Promise\wait;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\AsyncEventStoreConnection;
-use Prooph\EventStore\AsyncEventStoreTransaction;
+use Prooph\EventStore\Async\EventStoreConnection;
+use Prooph\EventStore\Async\EventStoreTransaction;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
@@ -32,7 +32,7 @@ use Throwable;
 
 class when_committing_empty_transaction extends TestCase
 {
-    /** @var AsyncEventStoreConnection */
+    /** @var EventStoreConnection */
     private $connection;
     /** @var EventData */
     private $firstEvent;
@@ -63,7 +63,7 @@ class when_committing_empty_transaction extends TestCase
             $this->stream,
             2
         );
-        \assert($transaction instanceof AsyncEventStoreTransaction);
+        \assert($transaction instanceof EventStoreTransaction);
 
         $result = yield $transaction->commitAsync();
         \assert($result instanceof WriteResult);

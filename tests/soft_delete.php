@@ -18,7 +18,7 @@ use Amp\Delayed;
 use function Amp\Promise\wait;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\Exception\StreamDeleted;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
@@ -36,7 +36,7 @@ use Throwable;
 
 class soft_delete extends TestCase
 {
-    /** @var AsyncEventStoreConnection */
+    /** @var EventStoreConnection */
     private $conn;
 
     protected function setUpTestCase(): Generator

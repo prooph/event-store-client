@@ -19,8 +19,8 @@ use function Amp\Promise\timeout;
 use Amp\Success;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Common\SystemRoles;
-use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\ResolvedEvent;
@@ -149,9 +149,9 @@ class subscribe_to_all_should extends TestCase
         });
     }
 
-    private function appearedWithCountdown(CountdownEvent $appeared): EventAppearedOnAsyncSubscription
+    private function appearedWithCountdown(CountdownEvent $appeared): EventAppearedOnSubscription
     {
-        return new class($appeared) implements EventAppearedOnAsyncSubscription {
+        return new class($appeared) implements EventAppearedOnSubscription {
             /** @var CountdownEvent */
             private $appeared;
 

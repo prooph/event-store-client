@@ -18,9 +18,9 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\AsyncEventStorePersistentSubscription;
-use Prooph\EventStore\AsyncPersistentSubscriptionDropped;
-use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
+use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
+use Prooph\EventStore\Async\EventStorePersistentSubscription;
+use Prooph\EventStore\Async\PersistentSubscriptionDropped;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropReason;
@@ -60,16 +60,16 @@ class deleting_existing_persistent_subscription_with_subscriber extends TestCase
         yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             'groupname123',
-            new class() implements EventAppearedOnAsyncPersistentSubscription {
+            new class() implements EventAppearedOnPersistentSubscription {
                 public function __invoke(
-                    AsyncEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {
                     return new Success();
                 }
             },
-            new class($this->called) implements AsyncPersistentSubscriptionDropped {
+            new class($this->called) implements PersistentSubscriptionDropped {
                 private $called;
 
                 public function __construct(&$called)
@@ -78,7 +78,7 @@ class deleting_existing_persistent_subscription_with_subscriber extends TestCase
                 }
 
                 public function __invoke(
-                    AsyncEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     SubscriptionDropReason $reason,
                     ?Throwable $exception = null
                 ): void {

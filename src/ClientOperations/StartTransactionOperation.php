@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
-use Prooph\EventStore\AsyncEventStoreTransaction;
+use Prooph\EventStore\Async\EventStoreTransaction;
+use Prooph\EventStore\Async\Internal\EventStoreTransactionConnection;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\InvalidTransaction;
 use Prooph\EventStore\Exception\StreamDeleted;
 use Prooph\EventStore\Exception\UnexpectedOperationResult;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
-use Prooph\EventStore\Internal\AsyncEventStoreTransactionConnection;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Messages\ClientMessages\OperationResult;
 use Prooph\EventStoreClient\Messages\ClientMessages\TransactionStart;
@@ -40,7 +40,7 @@ class StartTransactionOperation extends AbstractOperation
     private $stream;
     /** @var int */
     private $expectedVersion;
-    /** @var AsyncEventStoreTransactionConnection */
+    /** @var EventStoreTransactionConnection */
     protected $parentConnection;
 
     public function __construct(
@@ -49,7 +49,7 @@ class StartTransactionOperation extends AbstractOperation
         bool $requireMaster,
         string $stream,
         int $expectedVersion,
-        AsyncEventStoreTransactionConnection $parentConnection,
+        EventStoreTransactionConnection $parentConnection,
         ?UserCredentials $userCredentials
     ) {
         $this->requireMaster = $requireMaster;
@@ -116,11 +116,11 @@ class StartTransactionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(ProtobufMessage $response): AsyncEventStoreTransaction
+    protected function transformResponse(ProtobufMessage $response): EventStoreTransaction
     {
         \assert($response instanceof TransactionStartCompleted);
 
-        return new AsyncEventStoreTransaction(
+        return new EventStoreTransaction(
             $response->getTransactionId(),
             $this->credentials,
             $this->parentConnection
