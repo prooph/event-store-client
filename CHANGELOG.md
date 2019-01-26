@@ -1,7 +1,37 @@
 # Change Log
 
-## [v1.0.0-beta-8](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-8)
+## [v1.0.0-beta-9](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-9)
 
+[Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-8...v1.0.0-beta-9)
+
+**Implemented enhancements:**
+
+- HTTP API UserCredentials [\#55](https://github.com/prooph/event-store-client/issues/55)
+- refactor to use new async interfaces [\#81](https://github.com/prooph/event-store-client/pull/81) ([prolic](https://github.com/prolic))
+- rename almost all exceptions [\#80](https://github.com/prooph/event-store-client/pull/80) ([prolic](https://github.com/prolic))
+- update to v8 interfaces [\#79](https://github.com/prooph/event-store-client/pull/79) ([prolic](https://github.com/prolic))
+- update projections managers [\#78](https://github.com/prooph/event-store-client/pull/78) ([prolic](https://github.com/prolic))
+- use prooph/event-store v8 as core [\#74](https://github.com/prooph/event-store-client/pull/74) ([prolic](https://github.com/prolic))
+- cleanup deps [\#73](https://github.com/prooph/event-store-client/pull/73) ([prolic](https://github.com/prolic))
+- remove unused dependencies from composer.json [\#71](https://github.com/prooph/event-store-client/pull/71) ([SunMar](https://github.com/SunMar))
+- Test php 7.3 on travis [\#66](https://github.com/prooph/event-store-client/pull/66) ([prolic](https://github.com/prolic))
+
+**Fixed bugs:**
+
+- Unit test problem [\#67](https://github.com/prooph/event-store-client/issues/67)
+- fixed unit test problem [\#77](https://github.com/prooph/event-store-client/pull/77) ([prolic](https://github.com/prolic))
+
+**Closed issues:**
+
+- Optional logging dependencies [\#72](https://github.com/prooph/event-store-client/issues/72)
+- EventAppearedOnCatchupSubscription uses internal class and non-interface [\#69](https://github.com/prooph/event-store-client/issues/69)
+- php-fpm "oops, unknown child exited with 1" [\#68](https://github.com/prooph/event-store-client/issues/68)
+
+**Merged pull requests:**
+
+- move @internal to prevent code checker warnings [\#70](https://github.com/prooph/event-store-client/pull/70) ([SunMar](https://github.com/SunMar))
+
+## [v1.0.0-beta-8](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-8) (2018-12-08)
 [Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-7...v1.0.0-beta-8)
 
 **Implemented enhancements:**
