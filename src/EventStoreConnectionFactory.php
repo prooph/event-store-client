@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Internal\ClusterDnsEndPointDiscoverer;
@@ -27,7 +27,7 @@ class EventStoreConnectionFactory
         string $connectionString,
         ?ConnectionSettings $settings = null,
         ?string $connectionName = null
-    ): AsyncEventStoreConnection {
+    ): EventStoreConnection {
         $settings = ConnectionString::getConnectionSettings(
             $connectionString,
             $settings ?? ConnectionSettings::default()
@@ -54,7 +54,7 @@ class EventStoreConnectionFactory
         ?Uri $uri,
         ?ConnectionSettings $connectionSettings = null,
         ?string $connectionName = null
-    ): AsyncEventStoreConnection {
+    ): EventStoreConnection {
         $connectionSettings = $connectionSettings ?? ConnectionSettings::default();
 
         if (null !== $uri) {
@@ -170,7 +170,7 @@ class EventStoreConnectionFactory
         EndPoint $endPoint,
         ?ConnectionSettings $settings = null,
         ?string $connectionName = null
-    ): AsyncEventStoreConnection {
+    ): EventStoreConnection {
         $settings = $settings ?? ConnectionSettings::default();
 
         return new EventStoreNodeConnection(
@@ -187,7 +187,7 @@ class EventStoreConnectionFactory
     public static function createFromSettings(
         ConnectionSettings $settings,
         ?string $connectionName = null
-    ): AsyncEventStoreConnection {
+    ): EventStoreConnection {
         return self::createFromUri(null, $settings, $connectionName);
     }
 
@@ -195,7 +195,7 @@ class EventStoreConnectionFactory
         ConnectionSettings $connectionSettings,
         ClusterSettings $clusterSettings,
         string $connectionName = ''
-    ): AsyncEventStoreConnection {
+    ): EventStoreConnection {
         $endPointDiscoverer = new ClusterDnsEndPointDiscoverer(
             $connectionSettings->log(),
             $clusterSettings->clusterDns(),

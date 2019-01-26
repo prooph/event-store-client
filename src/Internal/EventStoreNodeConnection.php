@@ -15,16 +15,18 @@ namespace Prooph\EventStoreClient\Internal;
 
 use Amp\Deferred;
 use Amp\Promise;
-use Prooph\EventStore\AsyncCatchUpSubscriptionDropped;
-use Prooph\EventStore\AsyncEventStoreConnection;
-use Prooph\EventStore\AsyncEventStoreTransaction;
-use Prooph\EventStore\AsyncPersistentSubscriptionDropped;
+use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
+use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
+use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
+use Prooph\EventStore\Async\EventAppearedOnSubscription;
+use Prooph\EventStore\Async\EventStoreConnection;
+use Prooph\EventStore\Async\EventStoreTransaction;
+use Prooph\EventStore\Async\Internal\EventStoreTransactionConnection;
+use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
+use Prooph\EventStore\Async\PersistentSubscriptionDropped;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\Common\SystemEventTypes;
 use Prooph\EventStore\Common\SystemStreams;
-use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
-use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
-use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventReadResult;
 use Prooph\EventStore\EventReadStatus;
@@ -34,10 +36,8 @@ use Prooph\EventStore\Exception\MaxQueueSizeLimitReached;
 use Prooph\EventStore\Exception\OutOfRangeException;
 use Prooph\EventStore\Exception\UnexpectedValueException;
 use Prooph\EventStore\ExpectedVersion;
-use Prooph\EventStore\Internal\AsyncEventStoreTransactionConnection;
 use Prooph\EventStore\Internal\Consts;
 use Prooph\EventStore\ListenerHandler;
-use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Position;
 use Prooph\EventStore\RawStreamMetadataResult;
@@ -72,8 +72,8 @@ use Prooph\EventStoreClient\Internal\Message\StartSubscriptionMessage;
 use Throwable;
 
 final class EventStoreNodeConnection implements
-    AsyncEventStoreConnection,
-    AsyncEventStoreTransactionConnection
+    EventStoreConnection,
+    EventStoreTransactionConnection
 {
     /** @var string */
     private $connectionName;
@@ -641,7 +641,7 @@ final class EventStoreNodeConnection implements
     public function subscribeToStreamAsync(
         string $stream,
         bool $resolveLinkTos,
-        EventAppearedOnAsyncSubscription $eventAppeared,
+        EventAppearedOnSubscription $eventAppeared,
         ?SubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
@@ -670,9 +670,9 @@ final class EventStoreNodeConnection implements
         string $stream,
         ?int $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
-        EventAppearedOnAsyncCatchupSubscription $eventAppeared,
-        ?LiveProcessingStartedOnAsyncCatchUpSubscription $liveProcessingStarted = null,
-        ?AsyncCatchUpSubscriptionDropped $subscriptionDropped = null,
+        EventAppearedOnCatchupSubscription $eventAppeared,
+        ?LiveProcessingStartedOnCatchUpSubscription $liveProcessingStarted = null,
+        ?CatchUpSubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
@@ -703,7 +703,7 @@ final class EventStoreNodeConnection implements
     /** {@inheritdoc} */
     public function subscribeToAllAsync(
         bool $resolveLinkTos,
-        EventAppearedOnAsyncSubscription $eventAppeared,
+        EventAppearedOnSubscription $eventAppeared,
         ?SubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
@@ -726,9 +726,9 @@ final class EventStoreNodeConnection implements
     public function subscribeToAllFromAsync(
         ?Position $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
-        EventAppearedOnAsyncCatchupSubscription $eventAppeared,
-        ?LiveProcessingStartedOnAsyncCatchUpSubscription $liveProcessingStarted = null,
-        ?AsyncCatchUpSubscriptionDropped $subscriptionDropped = null,
+        EventAppearedOnCatchupSubscription $eventAppeared,
+        ?LiveProcessingStartedOnCatchUpSubscription $liveProcessingStarted = null,
+        ?CatchUpSubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
         if (null === $settings) {
@@ -755,8 +755,8 @@ final class EventStoreNodeConnection implements
     public function connectToPersistentSubscriptionAsync(
         string $stream,
         string $groupName,
-        EventAppearedOnAsyncPersistentSubscription $eventAppeared,
-        ?AsyncPersistentSubscriptionDropped $subscriptionDropped = null,
+        EventAppearedOnPersistentSubscription $eventAppeared,
+        ?PersistentSubscriptionDropped $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         ?UserCredentials $userCredentials = null
@@ -813,16 +813,16 @@ final class EventStoreNodeConnection implements
     public function continueTransaction(
         int $transactionId,
         ?UserCredentials $userCredentials = null
-    ): AsyncEventStoreTransaction {
+    ): EventStoreTransaction {
         if ($transactionId < 0) {
             throw new InvalidArgumentException('Invalid transaction id');
         }
 
-        return new AsyncEventStoreTransaction($transactionId, $userCredentials, $this);
+        return new EventStoreTransaction($transactionId, $userCredentials, $this);
     }
 
     public function transactionalWriteAsync(
-        AsyncEventStoreTransaction $transaction,
+        EventStoreTransaction $transaction,
         array $events,
         ?UserCredentials $userCredentials
     ): Promise {
@@ -841,7 +841,7 @@ final class EventStoreNodeConnection implements
     }
 
     public function commitTransactionAsync(
-        AsyncEventStoreTransaction $transaction,
+        EventStoreTransaction $transaction,
         ?UserCredentials $userCredentials
     ): Promise {
         $deferred = new Deferred();

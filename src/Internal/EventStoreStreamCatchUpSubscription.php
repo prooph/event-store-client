@@ -17,14 +17,14 @@ use function Amp\call;
 use Amp\Delayed;
 use Amp\Promise;
 use Generator;
-use Prooph\EventStore\AsyncCatchUpSubscriptionDropped;
-use Prooph\EventStore\AsyncEventStoreConnection;
-use Prooph\EventStore\AsyncEventStoreStreamCatchUpSubscription;
+use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
+use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
+use Prooph\EventStore\Async\EventStoreConnection;
+use Prooph\EventStore\Async\EventStoreStreamCatchUpSubscription as AsyncEventStoreStreamCatchUpSubscription;
+use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
-use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
 use Prooph\EventStore\Exception\OutOfRangeException;
 use Prooph\EventStore\Exception\StreamDeleted;
-use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SliceReadStatus;
 use Prooph\EventStore\StreamEventsSlice;
@@ -44,14 +44,14 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription 
      * @internal
      */
     public function __construct(
-        AsyncEventStoreConnection $connection,
+        EventStoreConnection $connection,
         Logger $logger,
         string $streamId,
         ?int $fromEventNumberExclusive, // if null from the very beginning
         ?UserCredentials $userCredentials,
-        EventAppearedOnAsyncCatchupSubscription $eventAppeared,
-        ?LiveProcessingStartedOnAsyncCatchUpSubscription $liveProcessingStarted,
-        ?AsyncCatchUpSubscriptionDropped $subscriptionDropped,
+        EventAppearedOnCatchupSubscription $eventAppeared,
+        ?LiveProcessingStartedOnCatchUpSubscription $liveProcessingStarted,
+        ?CatchUpSubscriptionDropped $subscriptionDropped,
         CatchUpSubscriptionSettings $settings
     ) {
         parent::__construct(
@@ -76,7 +76,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription 
 
     /** @return Promise<void> */
     protected function readEventsTillAsync(
-        AsyncEventStoreConnection $connection,
+        EventStoreConnection $connection,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         ?int $lastCommitPosition,
@@ -87,7 +87,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription 
 
     /** @return Promise<void> */
     private function readEventsInternalAsync(
-        AsyncEventStoreConnection $connection,
+        EventStoreConnection $connection,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         ?int $lastEventNumber

@@ -20,9 +20,9 @@ use Closure;
 use Exception;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\AsyncEventStorePersistentSubscription;
-use Prooph\EventStore\AsyncPersistentSubscriptionDropped;
-use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
+use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
+use Prooph\EventStore\Async\EventStorePersistentSubscription;
+use Prooph\EventStore\Async\PersistentSubscriptionDropped;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\ExpectedVersion;
@@ -81,16 +81,16 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
         yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
-            new class() implements EventAppearedOnAsyncPersistentSubscription {
+            new class() implements EventAppearedOnPersistentSubscription {
                 public function __invoke(
-                    AsyncEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {
                     throw new \Exception('test');
                 }
             },
-            new class(Closure::fromCallable($dropBehaviour)) implements AsyncPersistentSubscriptionDropped {
+            new class(Closure::fromCallable($dropBehaviour)) implements PersistentSubscriptionDropped {
                 private $callback;
 
                 public function __construct(callable $callback)
@@ -99,7 +99,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
                 }
 
                 public function __invoke(
-                    AsyncEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     SubscriptionDropReason $reason,
                     ?Throwable $exception = null
                 ): void {

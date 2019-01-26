@@ -18,7 +18,7 @@ use Amp\Promise;
 use function Amp\Promise\wait;
 use Amp\Success;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\EventAppearedOnAsyncSubscription;
+use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\Position;
@@ -115,7 +115,7 @@ class event_store_connection_should extends TestCase
                 yield $connection->subscribeToStreamAsync(
                     $s,
                     false,
-                    new class() implements EventAppearedOnAsyncSubscription {
+                    new class() implements EventAppearedOnSubscription {
                         public function __invoke(
                             EventStoreSubscription $subscription,
                             ResolvedEvent $resolvedEvent
@@ -133,7 +133,7 @@ class event_store_connection_should extends TestCase
             try {
                 yield $connection->subscribeToAllAsync(
                     false,
-                    new class() implements EventAppearedOnAsyncSubscription {
+                    new class() implements EventAppearedOnSubscription {
                         public function __invoke(
                             EventStoreSubscription $subscription,
                             ResolvedEvent $resolvedEvent

@@ -18,8 +18,8 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\AsyncEventStorePersistentSubscription;
-use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
+use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
+use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\ExpectedVersion;
@@ -68,7 +68,7 @@ class connect_to_persistent_subscription_with_retries extends TestCase
         yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             'agroupname55',
-            new class($this->retryCount, $this->resetEvent) implements EventAppearedOnAsyncPersistentSubscription {
+            new class($this->retryCount, $this->resetEvent) implements EventAppearedOnPersistentSubscription {
                 private $retryCount;
                 private $resetEvent;
 
@@ -79,7 +79,7 @@ class connect_to_persistent_subscription_with_retries extends TestCase
                 }
 
                 public function __invoke(
-                    AsyncEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {

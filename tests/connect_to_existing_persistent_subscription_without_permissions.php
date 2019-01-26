@@ -17,8 +17,8 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\AsyncEventStorePersistentSubscription;
-use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
+use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
+use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
@@ -55,9 +55,9 @@ class connect_to_existing_persistent_subscription_without_permissions extends Te
         yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             'agroupname55',
-            new class() implements EventAppearedOnAsyncPersistentSubscription {
+            new class() implements EventAppearedOnPersistentSubscription {
                 public function __invoke(
-                    AsyncEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {

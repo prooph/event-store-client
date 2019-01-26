@@ -17,19 +17,19 @@ use Amp\Deferred;
 use Amp\Loop;
 use Exception;
 use Generator;
-use Prooph\EventStore\AsyncEventStoreConnection;
-use Prooph\EventStore\ClientAuthenticationFailedEventArgs;
-use Prooph\EventStore\ClientClosedEventArgs;
-use Prooph\EventStore\ClientConnectionEventArgs;
-use Prooph\EventStore\ClientErrorEventArgs;
-use Prooph\EventStore\ClientReconnectingEventArgs;
+use Prooph\EventStore\Async\ClientAuthenticationFailedEventArgs;
+use Prooph\EventStore\Async\ClientClosedEventArgs;
+use Prooph\EventStore\Async\ClientConnectionEventArgs;
+use Prooph\EventStore\Async\ClientErrorEventArgs;
+use Prooph\EventStore\Async\ClientReconnectingEventArgs;
+use Prooph\EventStore\Async\EventStoreConnection;
+use Prooph\EventStore\Async\Internal\EventHandler;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\CannotEstablishConnection;
 use Prooph\EventStore\Exception\EventStoreConnectionException;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\Exception\ObjectDisposed;
 use Prooph\EventStore\Internal\Consts;
-use Prooph\EventStore\Internal\EventHandler;
 use Prooph\EventStore\ListenerHandler;
 use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\ClientOperations\ClientOperation;
@@ -60,7 +60,7 @@ class EventStoreConnectionLogicHandler
 {
     private const CLIENT_VERSION = 1;
 
-    /** @var AsyncEventStoreConnection */
+    /** @var EventStoreConnection */
     private $esConnection;
     /** @var TcpPackageConnection|null */
     private $connection;
@@ -100,7 +100,7 @@ class EventStoreConnectionLogicHandler
     /** @var int */
     private $lastTimeoutsTimeStamp;
 
-    public function __construct(AsyncEventStoreConnection $connection, ConnectionSettings $settings)
+    public function __construct(EventStoreConnection $connection, ConnectionSettings $settings)
     {
         $this->esConnection = $connection;
         $this->settings = $settings;

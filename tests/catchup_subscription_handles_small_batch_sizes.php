@@ -21,14 +21,14 @@ use function Amp\Promise\wait;
 use Amp\Success;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\AsyncEventStoreCatchUpSubscription;
-use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
+use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
+use Prooph\EventStore\Async\EventStoreConnection;
+use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
-use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\ExpectedVersion;
-use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
 use Prooph\EventStore\ResolvedEvent;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use Throwable;
@@ -41,7 +41,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
     private $streamName = 'TestStream';
     /** @var CatchUpSubscriptionSettings */
     private $settings;
-    /** @var AsyncEventStoreConnection */
+    /** @var EventStoreConnection */
     private $connection;
 
     private function setUpTestCase(): Promise
@@ -145,11 +145,11 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
         }));
     }
 
-    private function eventAppearedResolver(): EventAppearedOnAsyncCatchupSubscription
+    private function eventAppearedResolver(): EventAppearedOnCatchupSubscription
     {
-        return new class() implements EventAppearedOnAsyncCatchupSubscription {
+        return new class() implements EventAppearedOnCatchupSubscription {
             public function __invoke(
-                AsyncEventStoreCatchUpSubscription $subscription,
+                EventStoreCatchUpSubscription $subscription,
                 ResolvedEvent $resolvedEvent
             ): Promise {
                 return new Success();
@@ -159,8 +159,8 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
 
     private function liveProcessingStartedResolver(
         Deferred $deferred
-    ): LiveProcessingStartedOnAsyncCatchUpSubscription {
-        return new class($deferred) implements LiveProcessingStartedOnAsyncCatchUpSubscription {
+    ): LiveProcessingStartedOnCatchUpSubscription {
+        return new class($deferred) implements LiveProcessingStartedOnCatchUpSubscription {
             private $deferred;
 
             public function __construct(Deferred $deferred)
@@ -168,7 +168,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
                 $this->deferred = $deferred;
             }
 
-            public function __invoke(AsyncEventStoreCatchUpSubscription $subscription): void
+            public function __invoke(EventStoreCatchUpSubscription $subscription): void
             {
                 $this->deferred->resolve(true);
             }

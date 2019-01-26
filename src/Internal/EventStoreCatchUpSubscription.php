@@ -19,17 +19,17 @@ use Amp\Promise;
 use Amp\Success;
 use Closure;
 use Generator;
-use Prooph\EventStore\AsyncCatchUpSubscriptionDropped;
-use Prooph\EventStore\AsyncEventStoreCatchUpSubscription;
-use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
+use Prooph\EventStore\Async\ClientConnectionEventArgs;
+use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
+use Prooph\EventStore\Async\EventAppearedOnSubscription;
+use Prooph\EventStore\Async\EventStoreCatchUpSubscription as AsyncEventStoreCatchUpSubscription;
+use Prooph\EventStore\Async\EventStoreConnection;
+use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
-use Prooph\EventStore\ClientConnectionEventArgs;
-use Prooph\EventStore\EventAppearedOnAsyncCatchupSubscription;
-use Prooph\EventStore\EventAppearedOnAsyncSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\Internal\DropData;
 use Prooph\EventStore\ListenerHandler;
-use Prooph\EventStore\LiveProcessingStartedOnAsyncCatchUpSubscription;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SubscriptionDropReason;
@@ -53,7 +53,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
     /** @var Logger */
     protected $log;
 
-    /** @var AsyncEventStoreConnection */
+    /** @var EventStoreConnection */
     private $connection;
     /** @var bool */
     private $resolveLinkTos;
@@ -65,11 +65,11 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
     /** @var int */
     protected $maxPushQueueSize;
 
-    /** @var EventAppearedOnAsyncCatchupSubscription */
+    /** @var EventAppearedOnCatchupSubscription */
     protected $eventAppeared;
-    /** @var LiveProcessingStartedOnAsyncCatchUpSubscription|null */
+    /** @var LiveProcessingStartedOnCatchUpSubscription|null */
     private $liveProcessingStarted;
-    /** @var AsyncCatchUpSubscriptionDropped|null */
+    /** @var CatchUpSubscriptionDropped|null */
     private $subscriptionDropped;
 
     /** @var bool */
@@ -97,13 +97,13 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
 
     /** @internal */
     public function __construct(
-        AsyncEventStoreConnection $connection,
+        EventStoreConnection $connection,
         Logger $logger,
         string $streamId,
         ?UserCredentials $userCredentials,
-        EventAppearedOnAsyncCatchupSubscription $eventAppeared,
-        ?LiveProcessingStartedOnAsyncCatchUpSubscription $liveProcessingStarted,
-        ?AsyncCatchUpSubscriptionDropped $subscriptionDropped,
+        EventAppearedOnCatchupSubscription $eventAppeared,
+        ?LiveProcessingStartedOnCatchUpSubscription $liveProcessingStarted,
+        ?CatchUpSubscriptionDropped $subscriptionDropped,
         CatchUpSubscriptionSettings $settings
     ) {
         if (null === self::$dropSubscriptionEvent) {
@@ -145,7 +145,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
     }
 
     abstract protected function readEventsTillAsync(
-        AsyncEventStoreConnection $connection,
+        EventStoreConnection $connection,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         ?int $lastCommitPosition,
@@ -279,7 +279,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
                     ));
                 }
 
-                $eventAppeared = new class(Closure::fromCallable([$this, 'enqueuePushedEvent'])) implements EventAppearedOnAsyncSubscription {
+                $eventAppeared = new class(Closure::fromCallable([$this, 'enqueuePushedEvent'])) implements EventAppearedOnSubscription {
                     private $callback;
 
                     public function __construct(callable $callback)

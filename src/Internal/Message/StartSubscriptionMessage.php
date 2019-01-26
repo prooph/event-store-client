@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Internal\Message;
 
 use Amp\Deferred;
-use Prooph\EventStore\EventAppearedOnAsyncSubscription;
+use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\UserCredentials;
 
@@ -29,7 +29,7 @@ class StartSubscriptionMessage implements Message
     private $resolveTo;
     /** @var UserCredentials|null */
     private $userCredentials;
-    /** @var EventAppearedOnAsyncSubscription */
+    /** @var EventAppearedOnSubscription */
     private $eventAppeared;
     /** @var SubscriptionDropped|null */
     private $subscriptionDropped;
@@ -43,7 +43,7 @@ class StartSubscriptionMessage implements Message
         string $streamId,
         bool $resolveTo,
         ?UserCredentials $userCredentials,
-        EventAppearedOnAsyncSubscription $eventAppeared,
+        EventAppearedOnSubscription $eventAppeared,
         ?SubscriptionDropped $subscriptionDropped,
         int $maxRetries,
         int $timeout
@@ -78,7 +78,7 @@ class StartSubscriptionMessage implements Message
         return $this->userCredentials;
     }
 
-    public function eventAppeared(): EventAppearedOnAsyncSubscription
+    public function eventAppeared(): EventAppearedOnSubscription
     {
         return $this->eventAppeared;
     }

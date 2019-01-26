@@ -19,9 +19,9 @@ use Amp\Success;
 use Amp\TimeoutException;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\AsyncEventStorePersistentSubscription;
+use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
+use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\Common\SystemEventTypes;
-use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\ExpectedVersion;
@@ -92,7 +92,7 @@ class happy_case_catching_up_to_link_to_events_manual_ack extends TestCase
             yield $this->conn->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
-                new class($this->eventsReceived, $this->eventReceivedCount, self::EVENT_WRITE_COUNT) implements EventAppearedOnAsyncPersistentSubscription {
+                new class($this->eventsReceived, $this->eventReceivedCount, self::EVENT_WRITE_COUNT) implements EventAppearedOnPersistentSubscription {
                     private $eventsReceived;
                     private $eventReceivedCount;
                     private $eventWriteCount;
@@ -105,7 +105,7 @@ class happy_case_catching_up_to_link_to_events_manual_ack extends TestCase
                     }
 
                     public function __invoke(
-                        AsyncEventStorePersistentSubscription $subscription,
+                        EventStorePersistentSubscription $subscription,
                         ResolvedEvent $resolvedEvent,
                         ?int $retryCount = null
                     ): Promise {

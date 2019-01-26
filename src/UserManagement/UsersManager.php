@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\UserManagement;
 
 use Amp\Promise;
+use Prooph\EventStore\Async\UserManagement\UsersManager as AsyncUsersManager;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
-use Prooph\EventStore\UserManagement\AsyncUsersManager;
 use Prooph\EventStore\UserManagement\ChangePasswordDetails;
 use Prooph\EventStore\UserManagement\ResetPasswordDetails;
 use Prooph\EventStore\UserManagement\UserCreationInformation;

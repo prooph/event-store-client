@@ -21,7 +21,7 @@ use function Amp\Promise\wait;
 use Amp\Success;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\EventAppearedOnAsyncSubscription;
+use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\ResolvedEvent;
@@ -135,7 +135,7 @@ class subscribe_should extends TestCase
             $subscription = yield $connection->subscribeToStreamAsync(
                 $stream,
                 false,
-                new class() implements EventAppearedOnAsyncSubscription {
+                new class() implements EventAppearedOnSubscription {
                     public function __invoke(
                         EventStoreSubscription $subscription,
                         ResolvedEvent $resolvedEvent
@@ -194,9 +194,9 @@ class subscribe_should extends TestCase
         }));
     }
 
-    private function eventAppearedResolver(Deferred $deferred): EventAppearedOnAsyncSubscription
+    private function eventAppearedResolver(Deferred $deferred): EventAppearedOnSubscription
     {
-        return new class($deferred) implements EventAppearedOnAsyncSubscription {
+        return new class($deferred) implements EventAppearedOnSubscription {
             private $deferred;
 
             public function __construct(Deferred $deferred)

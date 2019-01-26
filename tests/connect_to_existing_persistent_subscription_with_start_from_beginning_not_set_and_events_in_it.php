@@ -20,8 +20,8 @@ use Amp\Success;
 use Amp\TimeoutException;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\AsyncEventStorePersistentSubscription;
-use Prooph\EventStore\EventAppearedOnAsyncPersistentSubscription;
+use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
+use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
@@ -68,7 +68,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
         yield $this->conn->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
-            new class($deferred) implements EventAppearedOnAsyncPersistentSubscription {
+            new class($deferred) implements EventAppearedOnPersistentSubscription {
                 private $deferred;
 
                 public function __construct($deferred)
@@ -77,7 +77,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
                 }
 
                 public function __invoke(
-                    AsyncEventStorePersistentSubscription $subscription,
+                    EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
                 ): Promise {

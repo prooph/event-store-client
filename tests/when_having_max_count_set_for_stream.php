@@ -18,7 +18,7 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
-use Prooph\EventStore\AsyncEventStoreConnection;
+use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\SliceReadStatus;
@@ -32,7 +32,7 @@ class when_having_max_count_set_for_stream extends TestCase
 {
     /** @var string */
     private $stream = 'max-count-test-stream';
-    /** @var AsyncEventStoreConnection */
+    /** @var EventStoreConnection */
     private $conn;
     /** @var EventData[] */
     private $testEvents = [];
