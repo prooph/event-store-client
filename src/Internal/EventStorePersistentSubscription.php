@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use function Amp\call;
 use Amp\Deferred;
 use Amp\Delayed;
 use Amp\Loop;
@@ -37,7 +38,6 @@ use Prooph\EventStoreClient\Internal\Message\StartPersistentSubscriptionMessage;
 use Psr\Log\LoggerInterface as Logger;
 use SplQueue;
 use Throwable;
-use function Amp\call;
 
 class EventStorePersistentSubscription implements AsyncEventStorePersistentSubscription
 {
@@ -297,7 +297,6 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
 
         $this->subscription->notifyEventsFailed($eventIds, $action, $reason);
     }
-
 
     public function stop(?int $timeout = null): Promise
     {
