@@ -1,7 +1,22 @@
 # Change Log
 
-## [v1.0.0-beta-9](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-9)
+## [v1.0.0-beta-10](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-10)
 
+[Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-9...v1.0.0-beta-10)
+
+**Implemented enhancements:**
+
+- Event store persistent subscription [\#84](https://github.com/prooph/event-store-client/pull/84) ([prolic](https://github.com/prolic))
+
+**Closed issues:**
+
+- v1.0.0-beta-9 requires prooph/event-store dev-master instead of v8.0.0-beta-1 [\#82](https://github.com/prooph/event-store-client/issues/82)
+
+**Merged pull requests:**
+
+- Fix required version [\#83](https://github.com/prooph/event-store-client/pull/83) ([enumag](https://github.com/enumag))
+
+## [v1.0.0-beta-9](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-9) (2019-01-26)
 [Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-8...v1.0.0-beta-9)
 
 **Implemented enhancements:**
