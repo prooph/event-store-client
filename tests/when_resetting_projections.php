@@ -74,7 +74,9 @@ class when_resetting_projections extends TestCase
             );
             $status = $projectionStatus['status'];
 
-            $this->assertStringStartsWith('Preparing', $status);
+            if ($status !== 'Running') {
+                $this->assertStringStartsWith('Preparing', $status);
+            }
 
             yield new Delayed(500);
 
