@@ -16,7 +16,7 @@ The `EventStoreConnection` maintains a full-duplex connection between the client
 
 You need the [allegro/php-protobuf](https://github.com/allegro/php-protobuf/) PHP extension.
 
-The protobuf extension from Google will not work, because it doesn't support proto2, only proto3.
+The protobuf extension from Google (the one available via PECL) will not work, because it doesn't support proto2, only proto3. You need to install the [allegro/php-protobuf](https://github.com/allegro/php-protobuf/) PHP extension from source.
 
 Additional extensions are only needed if your app necessitates a high numbers of concurrent socket connections.
 
