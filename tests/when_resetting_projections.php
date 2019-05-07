@@ -65,19 +65,6 @@ class when_resetting_projections extends TestCase
     public function should_reset_the_projection(): void
     {
         $this->execute(function () {
-            $projectionStatus = \json_decode(
-                yield $this->projectionsManager->getStatusAsync(
-                    $this->projectionName,
-                    $this->credentials
-                ),
-                true
-            );
-            $status = $projectionStatus['status'];
-
-            if ($status !== 'Running') {
-                $this->assertStringStartsWith('Preparing', $status);
-            }
-
             yield new Delayed(500);
 
             $projectionStatus = \json_decode(
@@ -89,7 +76,7 @@ class when_resetting_projections extends TestCase
             );
             $status = $projectionStatus['status'];
 
-            $this->assertSame('Running', $status);
+            $this->assertTrue(\in_array($status, ['Starting/Initial', 'Running'], true));
         });
     }
 }
