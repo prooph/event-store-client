@@ -20,7 +20,7 @@
         convertWarningsToExceptions="true"
         processIsolation="false"
         stopOnFailure="false"
-        bootstrap="vendor/autoload.php"
+        bootstrap="tests/_bootstrap.php"
         failOnWarning="true"
         failOnRisky="true"
 >
