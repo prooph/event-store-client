@@ -91,4 +91,64 @@ class all_stream_with_no_acl_security extends AuthenticationTestCase
             yield $this->deleteStream('$all', 'adm', 'admpa$$');
         }));
     }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function reading_and_subscribing_is_not_allowed_when_no_credentials_are_passed_1(): void
+    {
+        wait(call(function () {
+            $this->expectException(AccessDenied::class);
+            yield $this->readEvent('$all', null, null);
+        }));
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function reading_and_subscribing_is_not_allowed_when_no_credentials_are_passed_2(): void
+    {
+        wait(call(function () {
+            $this->expectException(AccessDenied::class);
+            yield $this->readStreamForward('$all', null, null);
+        }));
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function reading_and_subscribing_is_not_allowed_when_no_credentials_are_passed_3(): void
+    {
+        wait(call(function () {
+            $this->expectException(AccessDenied::class);
+            yield $this->readStreamBackward('$all', null, null);
+        }));
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function reading_and_subscribing_is_not_allowed_when_no_credentials_are_passed_4(): void
+    {
+        wait(call(function () {
+            $this->expectException(AccessDenied::class);
+            yield $this->readMeta('$all', null, null);
+        }));
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function reading_and_subscribing_is_not_allowed_when_no_credentials_are_passed_5(): void
+    {
+        wait(call(function () {
+            $this->expectException(AccessDenied::class);
+            yield $this->subscribeToStream('$all', null, null);
+        }));
+    }
 }

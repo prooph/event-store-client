@@ -494,6 +494,8 @@ final class EventStoreNodeConnection implements
         $readEventPromise->onResolve(function (?Throwable $e, $eventReadResult) use ($stream, $deferred) {
             if ($e) {
                 $deferred->fail($e);
+
+                return;
             }
 
             \assert($eventReadResult instanceof EventReadResult);

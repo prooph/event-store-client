@@ -14,14 +14,21 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient\Security;
 
 use function Amp\call;
+use Amp\Deferred;
 use Amp\Promise;
+use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
+use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Common\SystemRoles;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ExpectedVersion;
+use Prooph\EventStore\Position;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\StreamMetadata;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\UserManagement\UsersManager;
@@ -85,6 +92,44 @@ class AuthenticationTestCase extends TestCase
         }));
     }
 
+    protected function readEvent(string $streamId, ?string $login, ?string $password): Promise
+    {
+        return $this->connection->readEventAsync(
+            $streamId,
+            -1,
+            false,
+            null === $login && null === $password
+                ? null
+                : new UserCredentials($login, $password)
+        );
+    }
+
+    protected function readStreamForward(string $streamId, ?string $login, ?string $password): Promise
+    {
+        return $this->connection->readStreamEventsForwardAsync(
+            $streamId,
+            0,
+            1,
+            false,
+            null === $login && null === $password
+                ? null
+                : new UserCredentials($login, $password)
+        );
+    }
+
+    protected function readStreamBackward(string $streamId, ?string $login, ?string $password): Promise
+    {
+        return $this->connection->readStreamEventsBackwardAsync(
+            $streamId,
+            0,
+            1,
+            false,
+            null === $login && null === $password
+                ? null
+                : new UserCredentials($login, $password)
+        );
+    }
+
     protected function writeStream(string $streamId, ?string $login, ?string $password): Promise
     {
         return $this->connection->appendToStreamAsync(
@@ -95,6 +140,120 @@ class AuthenticationTestCase extends TestCase
                 ? null
                 : new UserCredentials($login, $password)
         );
+    }
+
+    protected function readAllForward(?string $login, ?string $password): Promise
+    {
+        return $this->connection->readAllEventsForwardAsync(
+            Position::start(),
+            1,
+            false,
+            null === $login && null === $password
+                ? null
+                : new UserCredentials($login, $password)
+        );
+    }
+
+    protected function readAllBackward(?string $login, ?string $password): Promise
+    {
+        return $this->connection->readAllEventsBackwardAsync(
+            Position::end(),
+            1,
+            false,
+            null === $login && null === $password
+                ? null
+                : new UserCredentials($login, $password)
+        );
+    }
+
+    protected function readMeta(string $streamId, ?string $login, ?string $password): Promise
+    {
+        return $this->connection->getRawStreamMetadataAsync(
+            $streamId,
+            null === $login && null === $password
+                ? null
+                : new UserCredentials($login, $password)
+        );
+    }
+
+    protected function writeMeta(string $streamId, ?string $login, ?string $password, string $metawriteRole): Promise
+    {
+        return $this->connection->setStreamMetadataAsync(
+            $streamId,
+            ExpectedVersion::ANY,
+            null === $metawriteRole
+                ? StreamMetadata::create()
+                    ->build()
+                : StreamMetadata::create()
+                    ->setReadRoles($metawriteRole)
+                    ->setWriteRoles($metawriteRole)
+                    ->setMetadataReadRoles($metawriteRole)
+                    ->setMetadataWriteRoles($metawriteRole)
+                    ->build(),
+            null === $login && null === $password
+                ? null
+                : new UserCredentials($login, $password)
+        );
+    }
+
+    protected function subscribeToStream(string $streamId, ?string $login, ?string $password): Promise
+    {
+        return $this->connection->subscribeToStreamAsync(
+            $streamId,
+            false,
+            new class() implements EventAppearedOnSubscription {
+                public function __invoke(
+                    EventStoreSubscription $subscription,
+                    ResolvedEvent $resolvedEvent
+                ): Promise {
+                    return new Success();
+                }
+            },
+            null,
+            null === $login && null === $password
+                ? null
+                : new UserCredentials($login, $password)
+        );
+    }
+
+    protected function subscribeToAll(?string $login, ?string $password): Promise
+    {
+        return $this->connection->subscribeToAllAsync(
+            false,
+            new class() implements EventAppearedOnSubscription {
+                public function __invoke(
+                    EventStoreSubscription $subscription,
+                    ResolvedEvent $resolvedEvent
+                ): Promise {
+                    return new Success();
+                }
+            },
+            null,
+            null === $login && null === $password
+                ? null
+                : new UserCredentials($login, $password)
+        );
+    }
+
+    /** @return Promise<string> */
+    protected function createStreamWithMeta(StreamMetadata $metadata, ?string $streamPrefix = null): Promise
+    {
+        $stream = $streamPrefix ?? '' . $this->getName();
+
+        $deferred = new Deferred();
+
+        $promise = $this->connection->setStreamMetadataAsync(
+            $stream,
+            ExpectedVersion::NO_STREAM,
+            $metadata,
+            new UserCredentials('adm', 'admpa$$')
+        );
+
+        $promise->onResolve(function () use ($deferred, $stream) {
+            $deferred->resolve($stream);
+        });
+
+        return $deferred->promise();
     }
 
     protected function deleteStream(string $streamId, ?string $login, ?string $password): Promise
