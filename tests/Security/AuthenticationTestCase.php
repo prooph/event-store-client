@@ -176,7 +176,7 @@ class AuthenticationTestCase extends TestCase
         );
     }
 
-    protected function writeMeta(string $streamId, ?string $login, ?string $password, string $metawriteRole): Promise
+    protected function writeMeta(string $streamId, ?string $login, ?string $password, ?string $metawriteRole): Promise
     {
         return $this->connection->setStreamMetadataAsync(
             $streamId,

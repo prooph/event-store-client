@@ -151,4 +151,116 @@ class all_stream_with_no_acl_security extends AuthenticationTestCase
             yield $this->subscribeToStream('$all', null, null);
         }));
     }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function reading_and_subscribing_is_not_allowed_for_usual_user_1(): void
+    {
+        wait(call(function () {
+            $this->expectException(AccessDenied::class);
+            yield $this->readEvent('$all', 'user1', 'pa$$1');
+        }));
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function reading_and_subscribing_is_not_allowed_for_usual_user_2(): void
+    {
+        wait(call(function () {
+            $this->expectException(AccessDenied::class);
+            yield $this->readStreamForward('$all', 'user1', 'pa$$1');
+        }));
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function reading_and_subscribing_is_not_allowed_for_usual_user_3(): void
+    {
+        wait(call(function () {
+            $this->expectException(AccessDenied::class);
+            yield $this->readStreamBackward('$all', 'user1', 'pa$$1');
+        }));
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function reading_and_subscribing_is_not_allowed_for_usual_user_4(): void
+    {
+        wait(call(function () {
+            $this->expectException(AccessDenied::class);
+            yield $this->readMeta('$all', 'user1', 'pa$$1');
+        }));
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function reading_and_subscribing_is_not_allowed_for_usual_user_5(): void
+    {
+        wait(call(function () {
+            $this->expectException(AccessDenied::class);
+            yield $this->subscribeToStream('$all', 'user1', 'pa$$1');
+        }));
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     * @doesNotPerformAssertions
+     */
+    public function reading_and_subscribing_is_allowed_for_admin_user(): void
+    {
+        wait(call(function () {
+            yield $this->readEvent('$all', 'adm', 'admpa$$');
+            yield $this->readStreamForward('$all', 'adm', 'admpa$$');
+            yield $this->readStreamBackward('$all', 'adm', 'admpa$$');
+            yield $this->readMeta('$all', 'adm', 'admpa$$');
+            yield $this->subscribeToStream('$all', 'adm', 'admpa$$');
+        }));
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function meta_write_is_not_allowed_when_no_credentials_are_passed(): void
+    {
+        wait(call(function () {
+            $this->expectException(AccessDenied::class);
+            yield $this->writeMeta('$all', null, null, null);
+        }));
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     */
+    public function meta_write_is_not_allowed_for_usual_user(): void
+    {
+        wait(call(function () {
+            $this->expectException(AccessDenied::class);
+            yield $this->writeMeta('$all', 'user1', 'pa$$1', null);
+        }));
+    }
+
+    /**
+     * @test
+     * @throws Throwable
+     * @doesNotPerformAssertions
+     */
+    public function meta_write_is_allowed_for_admin_user(): void
+    {
+        wait(call(function () {
+            yield $this->writeMeta('$all', 'adm', 'admpa$$', null);
+        }));
+    }
 }
