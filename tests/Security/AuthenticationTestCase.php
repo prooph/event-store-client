@@ -35,7 +35,7 @@ use Prooph\EventStoreClient\UserManagement\UsersManager;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use Throwable;
 
-class AuthenticationTestCase extends TestCase
+abstract class AuthenticationTestCase extends TestCase
 {
     /** @var EventStoreConnection */
     protected $connection;
