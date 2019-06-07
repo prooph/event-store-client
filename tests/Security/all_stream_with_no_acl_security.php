@@ -24,11 +24,20 @@ class all_stream_with_no_acl_security extends AuthenticationTestCase
      * @test
      * @throws Throwable
      */
-    public function write_to_all_is_never_allowed_1(): void
+    public function write_to_all_is_never_allowed(): void
     {
         wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->writeStream('$all', null, null);
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->writeStream('$all', null, null);
+            });
+
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->writeStream('$all', 'user1', 'pa$$1');
+            });
+
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->writeStream('$all', 'adm', 'admpa$$');
+            });
         }));
     }
 
@@ -36,11 +45,20 @@ class all_stream_with_no_acl_security extends AuthenticationTestCase
      * @test
      * @throws Throwable
      */
-    public function write_to_all_is_never_allowed_2(): void
+    public function delete_of_all_is_never_allowed(): void
     {
         wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->writeStream('$all', 'user1', 'pa$$1');
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->deleteStream('$all', null, null);
+            });
+
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->deleteStream('$all', 'user1', 'pa$$1');
+            });
+
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->deleteStream('$all', 'adm', 'admpa$$');
+            });
         }));
     }
 
@@ -48,11 +66,28 @@ class all_stream_with_no_acl_security extends AuthenticationTestCase
      * @test
      * @throws Throwable
      */
-    public function write_to_all_is_never_allowed_3(): void
+    public function reading_and_subscribing_is_not_allowed_when_no_credentials_are_passed(): void
     {
         wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->writeStream('$all', 'adm', 'admpa$$');
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->readEvent('$all', null, null);
+            });
+
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->readStreamForward('$all', null, null);
+            });
+
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->readStreamBackward('$all', null, null);
+            });
+
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->readMeta('$all', null, null);
+            });
+
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->subscribeToStream('$all', null, null);
+            });
         }));
     }
 
@@ -60,155 +95,28 @@ class all_stream_with_no_acl_security extends AuthenticationTestCase
      * @test
      * @throws Throwable
      */
-    public function delete_of_all_is_never_allowed_1(): void
+    public function reading_and_subscribing_is_not_allowed_for_usual_user(): void
     {
         wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->deleteStream('$all', null, null);
-        }));
-    }
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->readEvent('$all', 'user2', 'pa$$2');
+            });
 
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function delete_of_all_is_never_allowed_2(): void
-    {
-        wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->deleteStream('$all', 'user1', 'pa$$1');
-        }));
-    }
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->readStreamForward('$all', 'user2', 'pa$$2');
+            });
 
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function delete_of_all_is_never_allowed_3(): void
-    {
-        wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->deleteStream('$all', 'adm', 'admpa$$');
-        }));
-    }
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->readStreamBackward('$all', 'user2', 'pa$$2');
+            });
 
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function reading_and_subscribing_is_not_allowed_when_no_credentials_are_passed_1(): void
-    {
-        wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->readEvent('$all', null, null);
-        }));
-    }
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->readMeta('$all', 'user2', 'pa$$2');
+            });
 
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function reading_and_subscribing_is_not_allowed_when_no_credentials_are_passed_2(): void
-    {
-        wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->readStreamForward('$all', null, null);
-        }));
-    }
-
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function reading_and_subscribing_is_not_allowed_when_no_credentials_are_passed_3(): void
-    {
-        wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->readStreamBackward('$all', null, null);
-        }));
-    }
-
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function reading_and_subscribing_is_not_allowed_when_no_credentials_are_passed_4(): void
-    {
-        wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->readMeta('$all', null, null);
-        }));
-    }
-
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function reading_and_subscribing_is_not_allowed_when_no_credentials_are_passed_5(): void
-    {
-        wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->subscribeToStream('$all', null, null);
-        }));
-    }
-
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function reading_and_subscribing_is_not_allowed_for_usual_user_1(): void
-    {
-        wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->readEvent('$all', 'user1', 'pa$$1');
-        }));
-    }
-
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function reading_and_subscribing_is_not_allowed_for_usual_user_2(): void
-    {
-        wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->readStreamForward('$all', 'user1', 'pa$$1');
-        }));
-    }
-
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function reading_and_subscribing_is_not_allowed_for_usual_user_3(): void
-    {
-        wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->readStreamBackward('$all', 'user1', 'pa$$1');
-        }));
-    }
-
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function reading_and_subscribing_is_not_allowed_for_usual_user_4(): void
-    {
-        wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->readMeta('$all', 'user1', 'pa$$1');
-        }));
-    }
-
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function reading_and_subscribing_is_not_allowed_for_usual_user_5(): void
-    {
-        wait(call(function () {
-            $this->expectException(AccessDenied::class);
-            yield $this->subscribeToStream('$all', 'user1', 'pa$$1');
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
+                return $this->subscribeToStream('$all', 'user2', 'pa$$2');
+            });
         }));
     }
 

@@ -18,9 +18,11 @@ use Amp\Deferred;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
+use PHPUnit\Framework\Constraint\Exception as ExceptionConstraint;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Async\EventStoreConnection;
+use Prooph\EventStore\Async\EventStoreTransaction;
 use Prooph\EventStore\Common\SystemRoles;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventData;
@@ -39,10 +41,12 @@ abstract class AuthenticationTestCase extends TestCase
 {
     /** @var EventStoreConnection */
     protected $connection;
+    /** @var UserCredentials|null */
+    protected $userCredentials;
 
     protected function setUp(): void
     {
-        $this->connection = TestConnection::create();
+        $this->connection = TestConnection::create($this->userCredentials);
         $this->connection->connectAsync();
     }
 
@@ -88,6 +92,90 @@ abstract class AuthenticationTestCase extends TestCase
                 'Administrator User',
                 [SystemRoles::ADMINS],
                 'admpa$$'
+            );
+
+            $connection = TestConnection::create(new UserCredentials(
+                \getenv('ES_USER'),
+                \getenv('ES_PASS')
+            ));
+            yield $connection->connectAsync();
+
+            yield $connection->setStreamMetadataAsync(
+                'noacl-stream',
+                ExpectedVersion::ANY,
+                StreamMetadata::create()->build()
+            );
+            yield $connection->setStreamMetadataAsync(
+                'read-stream',
+                ExpectedVersion::ANY,
+                StreamMetadata::create()->setReadRoles('user1')->build()
+            );
+            yield $connection->setStreamMetadataAsync(
+                'write-stream',
+                ExpectedVersion::ANY,
+                StreamMetadata::create()->setWriteRoles('user1')->build()
+            );
+            yield $connection->setStreamMetadataAsync(
+                'metaread-stream',
+                ExpectedVersion::ANY,
+                StreamMetadata::create()->setMetadataReadRoles('user1')->build()
+            );
+            yield $connection->setStreamMetadataAsync(
+                'metawrite-stream',
+                ExpectedVersion::ANY,
+                StreamMetadata::create()->setMetadataWriteRoles('user1')->build()
+            );
+
+            yield $connection->setStreamMetadataAsync(
+                '$all',
+                ExpectedVersion::ANY,
+                StreamMetadata::create()->setReadRoles('user1')->build(),
+                new UserCredentials('adm', 'admpa$$')
+            );
+
+            yield $connection->setStreamMetadataAsync(
+                '$system-acl',
+                ExpectedVersion::ANY,
+                StreamMetadata::create()
+                    ->setReadRoles('user1')
+                    ->setWriteRoles('user1')
+                    ->setMetadataReadRoles('user1')
+                    ->setMetadataWriteRoles('user1')
+                    ->build(),
+                new UserCredentials('adm', 'admpa$$')
+            );
+            yield $connection->setStreamMetadataAsync(
+                '$system-adm',
+                ExpectedVersion::ANY,
+                StreamMetadata::create()
+                    ->setReadRoles(SystemRoles::ADMINS)
+                    ->setWriteRoles(SystemRoles::ADMINS)
+                    ->setMetadataReadRoles(SystemRoles::ADMINS)
+                    ->setMetadataWriteRoles(SystemRoles::ADMINS)
+                    ->build(),
+                new UserCredentials('adm', 'admpa$$')
+            );
+
+            yield $connection->setStreamMetadataAsync(
+                'normal-all',
+                ExpectedVersion::ANY,
+                StreamMetadata::create()
+                    ->setReadRoles(SystemRoles::ALL)
+                    ->setWriteRoles(SystemRoles::ALL)
+                    ->setMetadataReadRoles(SystemRoles::ALL)
+                    ->setMetadataWriteRoles(SystemRoles::ALL)
+                    ->build()
+            );
+            yield $connection->setStreamMetadataAsync(
+                '$system-all',
+                ExpectedVersion::ANY,
+                StreamMetadata::create()
+                    ->setReadRoles(SystemRoles::ALL)
+                    ->setWriteRoles(SystemRoles::ALL)
+                    ->setMetadataReadRoles(SystemRoles::ALL)
+                    ->setMetadataWriteRoles(SystemRoles::ALL)
+                    ->build(),
+                new UserCredentials('adm', 'admpa$$')
             );
         }));
     }
@@ -136,6 +224,18 @@ abstract class AuthenticationTestCase extends TestCase
             $streamId,
             ExpectedVersion::ANY,
             $this->createEvents(),
+            null === $login && null === $password
+                ? null
+                : new UserCredentials($login, $password)
+        );
+    }
+
+    /** @return Promise<EventStoreTransaction> */
+    protected function transStart(string $streamId, ?string $login, ?string $password): Promise
+    {
+        return $this->connection->startTransactionAsync(
+            $streamId,
+            ExpectedVersion::ANY,
             null === $login && null === $password
                 ? null
                 : new UserCredentials($login, $password)
@@ -280,5 +380,24 @@ abstract class AuthenticationTestCase extends TestCase
                 ''
             ),
         ];
+    }
+
+    protected function expectExceptionFromCallback(string $expectedException, callable $callback): Promise
+    {
+        $deferred = new Deferred();
+
+        $promise = $callback();
+        $promise->onResolve(function ($e, $r) use ($deferred, $expectedException) {
+            $this->assertThat(
+                $e,
+                new ExceptionConstraint(
+                    $expectedException
+                )
+            );
+
+            $deferred->resolve($r);
+        });
+
+        return $deferred->promise();
     }
 }
