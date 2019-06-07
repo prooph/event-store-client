@@ -52,6 +52,7 @@ abstract class AuthenticationTestCase extends TestCase
 
     protected function tearDown(): void
     {
+        $this->userCredentials = null;
         $this->connection->close();
         $this->connection = null;
     }
@@ -61,10 +62,7 @@ abstract class AuthenticationTestCase extends TestCase
     {
         Promise\wait(call(function (): Generator {
             $manager = new UsersManager(
-                new EndPoint(
-                    (string) \getenv('ES_HOST'),
-                    (int) \getenv('ES_HTTP_PORT')
-                ),
+                TestConnection::httpEndPoint(),
                 5000,
                 EndpointExtensions::HTTP_SCHEMA,
                 new UserCredentials(
