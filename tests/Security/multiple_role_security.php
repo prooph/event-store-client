@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the prooph/event-store-client.
+ * This file is part of `prooph/event-store-client`.
  * (c) 2018-2019 prooph software GmbH <contact@prooph.de>
  * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient\Security;
 
 use function Amp\call;
-use Amp\Failure;
 use function Amp\Promise\wait;
 use Prooph\EventStore\Common\SystemRoles;
 use Prooph\EventStore\Exception\AccessDenied;
@@ -40,7 +39,7 @@ class multiple_role_security extends AuthenticationTestCase
                 ),
                 null
             );
-            yield $this->connection->setSystemSettingsAsync($settings, new UserCredentials("adm", "admpa$$"));
+            yield $this->connection->setSystemSettingsAsync($settings, new UserCredentials('adm', 'admpa$$'));
 
             yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
                 return $this->readEvent('usr-stream', null, null);
@@ -63,6 +62,11 @@ class multiple_role_security extends AuthenticationTestCase
             yield $this->deleteStream('usr-stream2', 'user1', 'pa$$1');
             yield $this->deleteStream('usr-stream3', 'user2', 'pa$$2');
             yield $this->deleteStream('usr-stream4', 'adm', 'admpa$$');
+
+            yield $this->connection->setSystemSettingsAsync(new SystemSettings(), new UserCredentials(
+                'adm',
+                'admpa$$'
+            ));
         }));
     }
 }

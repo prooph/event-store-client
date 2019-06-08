@@ -24,7 +24,6 @@ use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Async\EventStoreTransaction;
 use Prooph\EventStore\Common\SystemRoles;
-use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ExpectedVersion;
@@ -44,21 +43,8 @@ abstract class AuthenticationTestCase extends TestCase
     /** @var UserCredentials|null */
     protected $userCredentials;
 
-    protected function setUp(): void
-    {
-        $this->connection = TestConnection::create($this->userCredentials);
-        $this->connection->connectAsync();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->userCredentials = null;
-        $this->connection->close();
-        $this->connection = null;
-    }
-
     /** @throws Throwable */
-    public static function setUpBeforeClass(): void
+    protected function setUp(): void
     {
         Promise\wait(call(function (): Generator {
             $manager = new UsersManager(
@@ -174,6 +160,59 @@ abstract class AuthenticationTestCase extends TestCase
                     ->setMetadataWriteRoles(SystemRoles::ALL)
                     ->build(),
                 new UserCredentials('adm', 'admpa$$')
+            );
+        }));
+
+        $this->connection = TestConnection::create($this->userCredentials);
+        $this->connection->connectAsync();
+    }
+
+    /** @throws Throwable */
+    protected function tearDown(): void
+    {
+        $this->userCredentials = null;
+        $this->connection->close();
+        $this->connection = null;
+
+        Promise\wait(call(function (): Generator {
+            $manager = new UsersManager(
+                TestConnection::httpEndPoint(),
+                5000,
+                EndpointExtensions::HTTP_SCHEMA,
+                new UserCredentials(
+                    \getenv('ES_USER'),
+                    \getenv('ES_PASS')
+                )
+            );
+
+            yield $manager->deleteUserAsync('user1');
+            yield $manager->deleteUserAsync('user2');
+            yield $manager->deleteUserAsync('adm');
+
+            $connection = TestConnection::create(new UserCredentials(
+                \getenv('ES_USER'),
+                \getenv('ES_PASS')
+            ));
+            yield $connection->connectAsync();
+
+            yield $connection->setStreamMetadataAsync(
+                '$all',
+                ExpectedVersion::ANY,
+                StreamMetadata::create()->build(),
+                new UserCredentials(
+                    \getenv('ES_USER'),
+                    \getenv('ES_PASS')
+                )
+            );
+
+            yield $connection->setStreamMetadataAsync(
+                '$system-acl',
+                ExpectedVersion::ANY,
+                StreamMetadata::create()->build(),
+                new UserCredentials(
+                    \getenv('ES_USER'),
+                    \getenv('ES_PASS')
+                )
             );
         }));
     }
