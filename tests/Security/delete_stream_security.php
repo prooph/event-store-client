@@ -90,12 +90,12 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_normal_user_stream_with_no_user_is_not_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
-                    ->setDeleteRoles('user1')
-                    ->build()
-                );
+            $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
+                ->setDeleteRoles('user1')
+                ->build()
+            );
 
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($streamId) {
                 return $this->deleteStream($streamId, null, null);
             });
         }));
@@ -108,12 +108,12 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_normal_user_stream_with_not_authorized_user_is_not_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
-                    ->setDeleteRoles('user1')
-                    ->build()
-                );
+            $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
+                ->setDeleteRoles('user1')
+                ->build()
+            );
 
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($streamId) {
                 return $this->deleteStream($streamId, 'user2', 'pa$$2');
             });
         }));
@@ -160,12 +160,12 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_normal_admin_stream_with_no_user_is_not_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
-                    ->setDeleteRoles(SystemRoles::ADMINS)
-                    ->build()
-                );
+            $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
+                ->setDeleteRoles(SystemRoles::ADMINS)
+                ->build()
+            );
 
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($streamId) {
                 return $this->deleteStream($streamId, null, null);
             });
         }));
@@ -178,12 +178,12 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_normal_admin_stream_with_existing_user_is_not_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
-                    ->setDeleteRoles(SystemRoles::ADMINS)
-                    ->build()
-                );
+            $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
+                ->setDeleteRoles(SystemRoles::ADMINS)
+                ->build()
+            );
 
+            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($streamId) {
                 return $this->deleteStream($streamId, 'user1', 'pa$$1');
             });
         }));
