@@ -49,7 +49,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
     /** @var string */
     private $group;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->stream = '$' . Guid::generateString();
         $this->settings = PersistentSubscriptionSettings::create()
