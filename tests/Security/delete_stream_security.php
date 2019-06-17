@@ -192,6 +192,7 @@ class delete_stream_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
+     * @doesNotPerformAssertions
      */
     public function deleting_normal_admin_stream_with_admin_user_is_allowed(): void
     {
@@ -208,6 +209,7 @@ class delete_stream_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
+     * @doesNotPerformAssertions
      */
     public function deleting_normal_all_stream_with_no_user_is_allowed(): void
     {
@@ -224,6 +226,7 @@ class delete_stream_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
+     * @doesNotPerformAssertions
      */
     public function deleting_normal_all_stream_with_existing_user_is_allowed(): void
     {
@@ -240,6 +243,7 @@ class delete_stream_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
+     * @doesNotPerformAssertions
      */
     public function deleting_normal_all_stream_with_admin_user_is_allowed(): void
     {
