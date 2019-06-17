@@ -375,7 +375,7 @@ abstract class AuthenticationTestCase extends TestCase
     /** @return Promise<string> */
     protected function createStreamWithMeta(StreamMetadata $metadata, ?string $streamPrefix = null): Promise
     {
-        $stream = $streamPrefix ?? '' . $this->getName();
+        $stream = ($streamPrefix ?? '') . $this->getName();
 
         $deferred = new Deferred();
 
