@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the prooph/event-store-client.
+ * This file is part of `prooph/event-store-client`.
  * (c) 2018-2019 Alexander Miertsch <kontakt@codeliner.ws>
  * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
@@ -58,7 +58,7 @@ class overriden_system_stream_security extends AuthenticationTestCase
             $transId = (yield $this->transStart($stream, 'adm', 'admpa$$'))->transactionId();
             $trans = $this->connection->continueTransaction($transId, new UserCredentials('user1', 'pa$$1'));
 
-            assert($trans instanceof EventStoreTransaction);
+            \assert($trans instanceof EventStoreTransaction);
             yield $trans->writeAsync();
             yield $trans->commitAsync();
 
@@ -100,7 +100,7 @@ class overriden_system_stream_security extends AuthenticationTestCase
             $transId = (yield $this->transStart($stream, 'adm', 'admpa$$'))->transactionId();
             $trans = $this->connection->continueTransaction($transId, new UserCredentials('user2', 'pa$$2'));
 
-            assert($trans instanceof EventStoreTransaction);
+            \assert($trans instanceof EventStoreTransaction);
             yield $trans->writeAsync();
             yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($trans) {
                 return $trans->commitAsync();
@@ -152,7 +152,7 @@ class overriden_system_stream_security extends AuthenticationTestCase
             $transId = (yield $this->transStart($stream, 'adm', 'admpa$$'))->transactionId();
             $trans = $this->connection->continueTransaction($transId, null);
 
-            assert($trans instanceof EventStoreTransaction);
+            \assert($trans instanceof EventStoreTransaction);
             yield $trans->writeAsync();
             yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($trans) {
                 return $trans->commitAsync();
@@ -195,7 +195,7 @@ class overriden_system_stream_security extends AuthenticationTestCase
             $transId = (yield $this->transStart($stream, 'adm', 'admpa$$'))->transactionId();
             $trans = $this->connection->continueTransaction($transId, new UserCredentials('adm', 'admpa$$'));
 
-            assert($trans instanceof EventStoreTransaction);
+            \assert($trans instanceof EventStoreTransaction);
             yield $trans->writeAsync();
             yield $trans->commitAsync();
 
