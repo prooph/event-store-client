@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient\Security;
 
 use function Amp\call;
-use Amp\Delayed;
 use function Amp\Promise\wait;
 use Prooph\EventStore\Async\EventStoreTransaction;
 use Prooph\EventStore\Exception\AccessDenied;
