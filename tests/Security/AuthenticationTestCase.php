@@ -161,10 +161,10 @@ abstract class AuthenticationTestCase extends TestCase
                     ->build(),
                 new UserCredentials('adm', 'admpa$$')
             );
-        }));
 
-        $this->connection = TestConnection::create($this->userCredentials);
-        $this->connection->connectAsync();
+            $this->connection = TestConnection::create($this->userCredentials);
+            yield $this->connection->connectAsync();
+        }));
     }
 
     /** @throws Throwable */
