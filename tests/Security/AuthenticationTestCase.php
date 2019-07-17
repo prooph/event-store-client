@@ -30,6 +30,7 @@ use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\Position;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\StreamMetadata;
+use Prooph\EventStore\SystemSettings;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\UserManagement\UsersManager;
@@ -214,6 +215,11 @@ abstract class AuthenticationTestCase extends TestCase
                     \getenv('ES_PASS')
                 )
             );
+
+            yield $connection->setSystemSettingsAsync(new SystemSettings(), new UserCredentials(
+                'adm',
+                'admpa$$'
+            ));
         }));
     }
 
