@@ -15,6 +15,7 @@ namespace ProophTest\EventStoreClient\Security;
 
 use function Amp\call;
 use Amp\Deferred;
+use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
@@ -159,6 +160,8 @@ abstract class AuthenticationTestCase extends TestCase
 
             $this->connection = TestConnection::create($this->userCredentials);
             yield $this->connection->connectAsync();
+
+            yield new Delayed(100);
         }));
     }
 
@@ -198,10 +201,10 @@ abstract class AuthenticationTestCase extends TestCase
                 $this->adminUser()
             );
 
-            yield $connection->setSystemSettingsAsync(new SystemSettings(), new UserCredentials(
-                'adm',
-                'admpa$$'
-            ));
+            yield $connection->setSystemSettingsAsync(
+                new SystemSettings(),
+                $this->adminUser()
+            );
         }));
     }
 
