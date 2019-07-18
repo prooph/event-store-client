@@ -52,10 +52,7 @@ abstract class AuthenticationTestCase extends TestCase
                 TestConnection::httpEndPoint(),
                 5000,
                 EndpointExtensions::HTTP_SCHEMA,
-                new UserCredentials(
-                    \getenv('ES_USER'),
-                    \getenv('ES_PASS')
-                )
+                $this->adminUser()
             );
 
             yield $manager->createUserAsync(
@@ -79,10 +76,7 @@ abstract class AuthenticationTestCase extends TestCase
                 'admpa$$'
             );
 
-            $connection = TestConnection::create(new UserCredentials(
-                \getenv('ES_USER'),
-                \getenv('ES_PASS')
-            ));
+            $connection = TestConnection::create($this->adminUser());
             yield $connection->connectAsync();
 
             yield $connection->setStreamMetadataAsync(
@@ -180,40 +174,28 @@ abstract class AuthenticationTestCase extends TestCase
                 TestConnection::httpEndPoint(),
                 5000,
                 EndpointExtensions::HTTP_SCHEMA,
-                new UserCredentials(
-                    \getenv('ES_USER'),
-                    \getenv('ES_PASS')
-                )
+                $this->adminUser()
             );
 
             yield $manager->deleteUserAsync('user1');
             yield $manager->deleteUserAsync('user2');
             yield $manager->deleteUserAsync('adm');
 
-            $connection = TestConnection::create(new UserCredentials(
-                \getenv('ES_USER'),
-                \getenv('ES_PASS')
-            ));
+            $connection = TestConnection::create($this->adminUser());
             yield $connection->connectAsync();
 
             yield $connection->setStreamMetadataAsync(
                 '$all',
                 ExpectedVersion::ANY,
                 StreamMetadata::create()->build(),
-                new UserCredentials(
-                    \getenv('ES_USER'),
-                    \getenv('ES_PASS')
-                )
+                $this->adminUser()
             );
 
             yield $connection->setStreamMetadataAsync(
                 '$system-acl',
                 ExpectedVersion::ANY,
                 StreamMetadata::create()->build(),
-                new UserCredentials(
-                    \getenv('ES_USER'),
-                    \getenv('ES_PASS')
-                )
+                $this->adminUser()
             );
 
             yield $connection->setSystemSettingsAsync(new SystemSettings(), new UserCredentials(
@@ -442,5 +424,13 @@ abstract class AuthenticationTestCase extends TestCase
         });
 
         return $deferred->promise();
+    }
+
+    private function adminUser(): UserCredentials
+    {
+        return new UserCredentials(
+            \getenv('ES_USER'),
+            \getenv('ES_PASS')
+        );
     }
 }
