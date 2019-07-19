@@ -33,7 +33,7 @@ before_script:
   - tar xf EventStore-OSS-Linux-Ubuntu-18.04-v5.0.1.tar.gz
   - cd EventStore-OSS-Linux-Ubuntu-18.04-v5.0.1
   - echo starting event-store
-  - ./run-node.sh --run-projections=all --mem-db --ext-tcp-heartbeat-interval 5000 --ext-tcp-heartbeat-timeout 1500 > /dev/null &
+  - ./run-node.sh --run-projections=all --mem-db --ext-tcp-heartbeat-interval 5000 --ext-tcp-heartbeat-timeout 1500 > /tmp/es-log &
   - cd ..
   - git clone https://github.com/allegro/php-protobuf
   - cd php-protobuf
@@ -55,6 +55,7 @@ script:
   - if [[ $EXECUTE_CS_CHECK == 'true' ]]; then ./vendor/bin/php-cs-fixer fix -v --diff --dry-run; fi
 
 after_script:
+  - cat /tmp/es-log
   - echo stopping event-store
   - wget --http-user="admin" --http-password="changeit" --post-data='' http://localhost:2113/admin/shutdown
 
