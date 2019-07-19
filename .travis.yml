@@ -47,12 +47,11 @@ before_script:
   - echo "extension = protobuf.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - mkdir -p "$HOME/.php-cs-fixer"
   - if php --ri xdebug >/dev/null; then phpenv config-rm xdebug.ini; fi
-  - pecl install pcov
   - composer self-update
   - composer update --prefer-dist $DEPENDENCIES
 
 script:
-  - if [[ $TEST_COVERAGE == 'true' ]]; then ./vendor/bin/phpunit --exclude-group=ignore --coverage-text --coverage-clover ./build/logs/clover.xml; else ./vendor/bin/phpunit --exclude-group=ignore; fi
+  - if [[ $TEST_COVERAGE == 'true' ]]; then php -dzend_extension=xdebug.so ./vendor/bin/phpunit --exclude-group=ignore --coverage-text --coverage-clover ./build/logs/clover.xml; else ./vendor/bin/phpunit --exclude-group=ignore; fi
   - if [[ $EXECUTE_CS_CHECK == 'true' ]]; then ./vendor/bin/php-cs-fixer fix -v --diff --dry-run; fi
 
 after_script:
