@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the prooph/event-store-client.
- * (c) 2018-2019 prooph software GmbH <contact@prooph.de>
+ * This file is part of `prooph/event-store-client`.
+ * (c) 2018-2019 Alexander Miertsch <kontakt@codeliner.ws>
  * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -18,7 +18,6 @@ use function Amp\Promise\wait;
 use Prooph\EventStore\Async\EventStoreTransaction;
 use Prooph\EventStore\Common\SystemRoles;
 use Prooph\EventStore\Exception\AccessDenied;
-use Prooph\EventStore\Exception\NotAuthenticated;
 use Prooph\EventStore\UserCredentials;
 use Throwable;
 
