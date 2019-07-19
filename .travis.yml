@@ -33,7 +33,7 @@ before_script:
   - tar xf EventStore-OSS-Linux-Ubuntu-16.04-v5.0.1.tar.gz
   - cd EventStore-OSS-Linux-Ubuntu-16.04-v5.0.1
   - echo starting event-store
-  - ./run-node.sh --run-projections=all --mem-db --ext-tcp-heartbeat-interval 5000 --ext-tcp-heartbeat-timeout 1500 > /tmp/es-log &
+  - ./run-node.sh --run-projections=all --mem-db --ext-tcp-heartbeat-interval 5000 --ext-tcp-heartbeat-timeout 1500 > /dev/null &
   - cd ..
   - git clone https://github.com/allegro/php-protobuf
   - cd php-protobuf
@@ -47,15 +47,15 @@ before_script:
   - echo "extension = protobuf.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - mkdir -p "$HOME/.php-cs-fixer"
   - if php --ri xdebug >/dev/null; then phpenv config-rm xdebug.ini; fi
+  - if [[ $TEST_COVERAGE == 'true' ]]; then pecl install pcov; fi
   - composer self-update
   - composer update --prefer-dist $DEPENDENCIES
 
 script:
-  - if [[ $TEST_COVERAGE == 'true' ]]; then php -dzend_extension=xdebug.so ./vendor/bin/phpunit --exclude-group=ignore --coverage-text --coverage-clover ./build/logs/clover.xml; else ./vendor/bin/phpunit --exclude-group=ignore; fi
+  - if [[ $TEST_COVERAGE == 'true' ]]; then php ./vendor/bin/phpunit --exclude-group=ignore --coverage-text --coverage-clover ./build/logs/clover.xml; else ./vendor/bin/phpunit --exclude-group=ignore; fi
   - if [[ $EXECUTE_CS_CHECK == 'true' ]]; then ./vendor/bin/php-cs-fixer fix -v --diff --dry-run; fi
 
 after_script:
-  - cat /tmp/es-log
   - echo stopping event-store
   - wget --http-user="admin" --http-password="changeit" --post-data='' http://localhost:2113/admin/shutdown
 
