@@ -3,7 +3,7 @@ version: "3"
 services:
 
   eventstore1:
-   image: eventstore/eventstore:release-4.1.0
+   image: eventstore/eventstore:release-5.0.1
    env_file:
      - common-variables.env
    environment:
@@ -27,7 +27,7 @@ services:
         - escluster.net
 
   eventstore2:
-   image: eventstore/eventstore:release-4.1.0
+   image: eventstore/eventstore:release-5.0.1
    env_file:
      - common-variables.env
    environment:
@@ -51,7 +51,7 @@ services:
         - escluster.net
 
   eventstore3:
-   image: eventstore/eventstore:release-4.1.0
+   image: eventstore/eventstore:release-5.0.1
    env_file:
      - common-variables.env
    environment:
