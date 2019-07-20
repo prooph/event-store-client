@@ -2,7 +2,7 @@
 
 Run the following commands from repo root:
 
-## Start eventstore container
+## Start EventStore container
 
 The eventstore container takes a few seconds to be ready. So start it upfront.
 

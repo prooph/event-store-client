@@ -510,7 +510,7 @@ class catch_up_subscription_handles_errors extends TestCase
 
             $waitForOutOfOrderEvent->resolve(true);
 
-            yield new Delayed(100); // wait for subscription to do its job
+            yield new Delayed(250); // wait for subscription to do its job
 
             $result = yield Promise\timeout($this->raisedEventEvent->promise(), self::$timeoutMs);
 

@@ -11,7 +11,7 @@ services:
       - eventstore
 
   eventstore:
-    image: eventstore/eventstore:release-4.1.0
+    image: eventstore/eventstore:release-5.0.1
     ports:
       - 2113:2113
       - 1113:1113

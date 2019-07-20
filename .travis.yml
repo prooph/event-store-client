@@ -16,7 +16,6 @@ matrix:
     - php: 7.3
       env:
       - DEPENDENCIES=""
-      - TEST_COVERAGE=true
     - php: 7.3
       env:
       - DEPENDENCIES="--prefer-lowest --prefer-stable"
@@ -28,11 +27,11 @@ cache:
     - $HOME/.local
 
 before_script:
-  - echo downloading event-store 4.1.1-hotfix1
-  - wget https://eventstore.org/downloads/EventStore-OSS-Ubuntu-14.04-v4.1.1-hotfix1.tar.gz
+  - echo downloading EventStore 5.0.1
+  - wget https://eventstore.org/downloads/ubuntu/EventStore-OSS-Linux-Ubuntu-16.04-v5.0.1.tar.gz
   - echo extracting event-store
-  - tar xf EventStore-OSS-Ubuntu-14.04-v4.1.1-hotfix1.tar.gz
-  - cd EventStore-OSS-Ubuntu-14.04-v4.1.1-hotfix1
+  - tar xf EventStore-OSS-Linux-Ubuntu-16.04-v5.0.1.tar.gz
+  - cd EventStore-OSS-Linux-Ubuntu-16.04-v5.0.1
   - echo starting event-store
   - ./run-node.sh --run-projections=all --mem-db --ext-tcp-heartbeat-interval 5000 --ext-tcp-heartbeat-timeout 1500 > /dev/null &
   - cd ..
@@ -48,12 +47,12 @@ before_script:
   - echo "extension = protobuf.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - mkdir -p "$HOME/.php-cs-fixer"
   - if php --ri xdebug >/dev/null; then phpenv config-rm xdebug.ini; fi
+  - if [[ $TEST_COVERAGE == 'true' ]]; then pecl install pcov; fi
   - composer self-update
   - composer update --prefer-dist $DEPENDENCIES
-  - if [[ $EXECUTE_CS_CHECK == 'true' ]]; then composer require prooph/php-cs-fixer-config ^0.3; fi
 
 script:
-  - if [[ $TEST_COVERAGE == 'true' ]]; then php -dzend_extension=xdebug.so ./vendor/bin/phpunit --exclude-group=ignore --coverage-text --coverage-clover ./build/logs/clover.xml; else ./vendor/bin/phpunit --exclude-group=ignore; fi
+  - if [[ $TEST_COVERAGE == 'true' ]]; then php ./vendor/bin/phpunit --exclude-group=ignore --coverage-text --coverage-clover ./build/logs/clover.xml; else ./vendor/bin/phpunit --exclude-group=ignore; fi
   - if [[ $EXECUTE_CS_CHECK == 'true' ]]; then ./vendor/bin/php-cs-fixer fix -v --diff --dry-run; fi
 
 after_script:
