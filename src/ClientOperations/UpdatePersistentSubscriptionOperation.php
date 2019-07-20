@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
+use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\Common\SystemConsumerStrategies;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\InvalidOperationException;
@@ -24,11 +25,10 @@ use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Messages\ClientMessages\UpdatePersistentSubscription;
 use Prooph\EventStoreClient\Messages\ClientMessages\UpdatePersistentSubscriptionCompleted;
-use Prooph\EventStoreClient\Messages\ClientMessages\UpdatePersistentSubscriptionCompleted_UpdatePersistentSubscriptionResult as UpdatePersistentSubscriptionResult;
+use Prooph\EventStoreClient\Messages\ClientMessages\UpdatePersistentSubscriptionCompleted\UpdatePersistentSubscriptionResult;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -63,7 +63,7 @@ class UpdatePersistentSubscriptionOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): ProtobufMessage
+    protected function createRequestDto(): Message
     {
         $message = new UpdatePersistentSubscription();
         $message->setSubscriptionGroupName($this->groupName);
@@ -86,7 +86,7 @@ class UpdatePersistentSubscriptionOperation extends AbstractOperation
         return $message;
     }
 
-    protected function inspectResponse(ProtobufMessage $response): InspectionResult
+    protected function inspectResponse(Message $response): InspectionResult
     {
         \assert($response instanceof UpdatePersistentSubscriptionCompleted);
 
@@ -121,7 +121,7 @@ class UpdatePersistentSubscriptionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(ProtobufMessage $response): PersistentSubscriptionUpdateResult
+    protected function transformResponse(Message $response): PersistentSubscriptionUpdateResult
     {
         \assert($response instanceof UpdatePersistentSubscriptionCompleted);
 

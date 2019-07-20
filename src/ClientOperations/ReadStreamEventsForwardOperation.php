@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
+use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\ServerError;
 use Prooph\EventStore\ReadDirection;
@@ -24,12 +25,11 @@ use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Internal\EventMessageConverter;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEvents;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEventsCompleted;
-use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEventsCompleted_ReadStreamResult as ReadStreamResult;
+use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEventsCompleted\ReadStreamResult;
 use Prooph\EventStoreClient\Messages\ClientMessages\ResolvedIndexedEvent;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -72,7 +72,7 @@ class ReadStreamEventsForwardOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): ProtobufMessage
+    protected function createRequestDto(): Message
     {
         $message = new ReadStreamEvents();
         $message->setRequireMaster($this->requireMaster);
@@ -84,7 +84,7 @@ class ReadStreamEventsForwardOperation extends AbstractOperation
         return $message;
     }
 
-    protected function inspectResponse(ProtobufMessage $response): InspectionResult
+    protected function inspectResponse(Message $response): InspectionResult
     {
         \assert($response instanceof ReadStreamEventsCompleted);
 
@@ -114,7 +114,7 @@ class ReadStreamEventsForwardOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(ProtobufMessage $response): StreamEventsSlice
+    protected function transformResponse(Message $response): StreamEventsSlice
     {
         /* @var ReadStreamEventsCompleted $response */
         $records = $response->getEvents();

@@ -14,18 +14,19 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
+use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\UnexpectedOperationResult;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Internal\NewEventConverter;
+use Prooph\EventStoreClient\Messages\ClientMessages\NewEvent;
 use Prooph\EventStoreClient\Messages\ClientMessages\OperationResult;
 use Prooph\EventStoreClient\Messages\ClientMessages\TransactionWrite;
 use Prooph\EventStoreClient\Messages\ClientMessages\TransactionWriteCompleted;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -60,20 +61,24 @@ class TransactionalWriteOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): ProtobufMessage
+    protected function createRequestDto(): Message
     {
+        $events = \array_map(
+            function (EventData $event): NewEvent {
+                return NewEventConverter::convert($event);
+            },
+            $this->events
+        );
+
         $message = new TransactionWrite();
         $message->setRequireMaster($this->requireMaster);
         $message->setTransactionId($this->transactionId);
-
-        foreach ($this->events as $event) {
-            $message->appendEvents(NewEventConverter::convert($event));
-        }
+        $message->setEvents($events);
 
         return $message;
     }
 
-    protected function inspectResponse(ProtobufMessage $response): InspectionResult
+    protected function inspectResponse(Message $response): InspectionResult
     {
         \assert($response instanceof TransactionWriteCompleted);
 
@@ -98,7 +103,7 @@ class TransactionalWriteOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(ProtobufMessage $response): void
+    protected function transformResponse(Message $response): void
     {
     }
 

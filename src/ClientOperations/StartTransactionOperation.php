@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
+use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\Async\EventStoreTransaction;
 use Prooph\EventStore\Async\Internal\EventStoreTransactionConnection;
 use Prooph\EventStore\Exception\AccessDenied;
@@ -28,7 +29,6 @@ use Prooph\EventStoreClient\Messages\ClientMessages\TransactionStartCompleted;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -67,7 +67,7 @@ class StartTransactionOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): ProtobufMessage
+    protected function createRequestDto(): Message
     {
         $message = new TransactionStart();
         $message->setRequireMaster($this->requireMaster);
@@ -77,7 +77,7 @@ class StartTransactionOperation extends AbstractOperation
         return $message;
     }
 
-    protected function inspectResponse(ProtobufMessage $response): InspectionResult
+    protected function inspectResponse(Message $response): InspectionResult
     {
         \assert($response instanceof TransactionStartCompleted);
 
@@ -116,7 +116,7 @@ class StartTransactionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(ProtobufMessage $response): EventStoreTransaction
+    protected function transformResponse(Message $response): EventStoreTransaction
     {
         \assert($response instanceof TransactionStartCompleted);
 

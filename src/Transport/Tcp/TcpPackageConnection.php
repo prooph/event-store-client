@@ -24,7 +24,7 @@ use Amp\Socket\ConnectException;
 use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
-use Prooph\EventStore\Exception\PackageFramingException;
+use Prooph\EventStoreClient\Exception\PackageFramingException;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Psr\Log\LoggerInterface as Logger;
 use Throwable;

@@ -24,7 +24,6 @@ use Prooph\EventStore\Internal\ConnectToPersistentSubscriptions;
 use Prooph\EventStore\Internal\PersistentEventStoreSubscription;
 use Prooph\EventStore\PersistentSubscriptionNakEventAction;
 use Prooph\EventStore\PersistentSubscriptionResolvedEvent;
-use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Internal\EventMessageConverter;
@@ -33,8 +32,8 @@ use Prooph\EventStoreClient\Messages\ClientMessages\PersistentSubscriptionAckEve
 use Prooph\EventStoreClient\Messages\ClientMessages\PersistentSubscriptionConfirmation;
 use Prooph\EventStoreClient\Messages\ClientMessages\PersistentSubscriptionNakEvents;
 use Prooph\EventStoreClient\Messages\ClientMessages\PersistentSubscriptionStreamEventAppeared;
-use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped as SubscriptionDroppedMessage;
-use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped_SubscriptionDropReason as SubscriptionDropReasonMessage;
+use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped;
+use Prooph\EventStoreClient\Messages\ClientMessages\SubscriptionDropped\SubscriptionDropReason as SubscriptionDropReasonMessage;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
@@ -109,7 +108,7 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
     {
         if ($package->command()->equals(TcpCommand::persistentSubscriptionConfirmation())) {
             $message = new PersistentSubscriptionConfirmation();
-            $message->parseFromString($package->data());
+            $message->mergeFromString($package->data());
 
             $this->confirmSubscription($message->getLastCommitPosition(), $message->getLastEventNumber());
             $this->subscriptionId = $message->getSubscriptionId();
@@ -119,7 +118,7 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
 
         if ($package->command()->equals(TcpCommand::persistentSubscriptionStreamEventAppeared())) {
             $message = new PersistentSubscriptionStreamEventAppeared();
-            $message->parseFromString($package->data());
+            $message->mergeFromString($package->data());
 
             $event = EventMessageConverter::convertResolvedIndexedEventMessageToResolvedEvent($message->getEvent());
             $this->eventAppeared(new PersistentSubscriptionResolvedEvent($event, $message->getRetryCount()));
@@ -128,8 +127,8 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
         }
 
         if ($package->command()->equals(TcpCommand::subscriptionDropped())) {
-            $message = new SubscriptionDroppedMessage();
-            $message->parseFromString($package->data());
+            $message = new SubscriptionDropped();
+            $message->mergeFromString($package->data());
 
             if ($message->getReason() === SubscriptionDropReasonMessage::AccessDenied) {
                 $this->dropSubscription(SubscriptionDropReason::accessDenied(), new AccessDenied('You do not have access to the stream'));
@@ -180,12 +179,16 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
             throw new InvalidArgumentException('EventIds cannot be empty');
         }
 
+        $eventIds = \array_map(
+            function (EventId $eventId): string {
+                return $eventId->toBinary();
+            },
+            $eventIds
+        );
+
         $message = new PersistentSubscriptionAckEvents();
         $message->setSubscriptionId($this->subscriptionId);
-
-        foreach ($eventIds as $eventId) {
-            $message->appendProcessedEventIds($eventId->toBinary());
-        }
+        $message->setProcessedEventIds($eventIds);
 
         $login = null;
         $pass = null;
@@ -221,14 +224,18 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
             throw new InvalidArgumentException('EventIds cannot be empty');
         }
 
+        $eventIds = \array_map(
+            function (EventId $eventId): string {
+                return $eventId->toBinary();
+            },
+            $eventIds
+        );
+
         $message = new PersistentSubscriptionNakEvents();
         $message->setSubscriptionId($this->subscriptionId);
         $message->setMessage($reason);
         $message->setAction($action->value());
-
-        foreach ($eventIds as $eventId) {
-            $message->appendProcessedEventIds($eventId->toBinary());
-        }
+        $message->setProcessedEventIds($eventIds);
 
         $login = null;
         $pass = null;
