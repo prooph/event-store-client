@@ -429,6 +429,19 @@ abstract class AuthenticationTestCase extends TestCase
         return $deferred->promise();
     }
 
+    protected function expectNoExceptionFromCallback(callable $callback): Promise
+    {
+        $deferred = new Deferred();
+
+        $promise = $callback();
+        $promise->onResolve(function ($e, $r) use ($deferred) {
+            $this->assertNull($e);
+            $deferred->resolve($r);
+        });
+
+        return $deferred->promise();
+    }
+
     private function adminUser(): UserCredentials
     {
         return new UserCredentials(

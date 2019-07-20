@@ -63,24 +63,26 @@ class subscribe_to_all_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function subscribing_to_all_with_authorized_user_credentials_succeeds(): void
     {
         wait(call(function () {
-            yield $this->subscribeToAll('user1', 'pa$$1');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->subscribeToAll('user1', 'pa$$1');
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function subscribing_to_all_with_admin_user_credentials_succeeds(): void
     {
         wait(call(function () {
-            yield $this->subscribeToAll('adm', 'admpa$$');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->subscribeToAll('adm', 'admpa$$');
+            });
         }));
     }
 }

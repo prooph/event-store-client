@@ -123,16 +123,19 @@ class all_stream_with_no_acl_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function reading_and_subscribing_is_allowed_for_admin_user(): void
     {
         wait(call(function () {
-            yield $this->readEvent('$all', 'adm', 'admpa$$');
-            yield $this->readStreamForward('$all', 'adm', 'admpa$$');
-            yield $this->readStreamBackward('$all', 'adm', 'admpa$$');
-            yield $this->readMeta('$all', 'adm', 'admpa$$');
-            yield $this->subscribeToStream('$all', 'adm', 'admpa$$');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return call(function () {
+                    yield $this->readEvent('$all', 'adm', 'admpa$$');
+                    yield $this->readStreamForward('$all', 'adm', 'admpa$$');
+                    yield $this->readStreamBackward('$all', 'adm', 'admpa$$');
+                    yield $this->readMeta('$all', 'adm', 'admpa$$');
+                    yield $this->subscribeToStream('$all', 'adm', 'admpa$$');
+                });
+            });
         }));
     }
 
@@ -163,12 +166,13 @@ class all_stream_with_no_acl_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function meta_write_is_allowed_for_admin_user(): void
     {
         wait(call(function () {
-            yield $this->writeMeta('$all', 'adm', 'admpa$$', null);
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->writeMeta('$all', 'adm', 'admpa$$', null);
+            });
         }));
     }
 }

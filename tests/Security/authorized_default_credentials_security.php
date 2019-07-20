@@ -32,30 +32,33 @@ class authorized_default_credentials_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function all_operations_succeeds_when_passing_no_explicit_credentials(): void
     {
         wait(call(function () {
-            yield $this->readAllForward(null, null);
-            yield $this->readAllBackward(null, null);
+            yield $this->expectNoExceptionFromCallback(function () {
+                return call(function () {
+                    yield $this->readAllForward(null, null);
+                    yield $this->readAllBackward(null, null);
 
-            yield $this->readEvent('read-stream', null, null);
-            yield $this->readStreamForward('read-stream', null, null);
-            yield $this->readStreamBackward('read-stream', null, null);
+                    yield $this->readEvent('read-stream', null, null);
+                    yield $this->readStreamForward('read-stream', null, null);
+                    yield $this->readStreamBackward('read-stream', null, null);
 
-            yield $this->writeStream('write-stream', null, null);
+                    yield $this->writeStream('write-stream', null, null);
 
-            $trans = yield $this->transStart('write-stream', null, null);
-            \assert($trans instanceof EventStoreTransaction);
-            yield $trans->writeAsync();
-            yield $trans->commitAsync();
+                    $trans = yield $this->transStart('write-stream', null, null);
+                    \assert($trans instanceof EventStoreTransaction);
+                    yield $trans->writeAsync();
+                    yield $trans->commitAsync();
 
-            yield $this->readMeta('metaread-stream', null, null);
-            yield $this->writeMeta('metawrite-stream', null, null, 'user1');
+                    yield $this->readMeta('metaread-stream', null, null);
+                    yield $this->writeMeta('metawrite-stream', null, null, 'user1');
 
-            yield $this->subscribeToStream('read-stream', null, null);
-            yield $this->subscribeToAll(null, null);
+                    yield $this->subscribeToStream('read-stream', null, null);
+                    yield $this->subscribeToAll(null, null);
+                });
+            });
         }));
     }
 

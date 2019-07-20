@@ -64,36 +64,39 @@ class write_stream_meta_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_meta_to_stream_with_authorized_user_credentials_succeeds(): void
     {
         wait(call(function () {
-            yield $this->writeMeta('metawrite-stream', 'user1', 'pa$$1', 'user1');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->writeMeta('metawrite-stream', 'user1', 'pa$$1', 'user1');
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_meta_to_stream_with_admin_user_credentials_succeeds(): void
     {
         wait(call(function () {
-            yield $this->writeMeta('metawrite-stream', 'adm', 'admpa$$', 'user1');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->writeMeta('metawrite-stream', 'adm', 'admpa$$', 'user1');
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_meta_to_no_acl_stream_succeeds_when_no_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->writeMeta('noacl-stream', null, null, null);
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->writeMeta('noacl-stream', null, null, null);
+            });
         }));
     }
 
@@ -113,37 +116,42 @@ class write_stream_meta_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_meta_to_no_acl_stream_succeeds_when_any_existing_user_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->writeMeta('noacl-stream', 'user1', 'pa$$1', null);
-            yield $this->writeMeta('noacl-stream', 'user2', 'pa$$2', null);
+            yield $this->expectNoExceptionFromCallback(function () {
+                return call(function () {
+                    yield $this->writeMeta('noacl-stream', 'user1', 'pa$$1', null);
+                    yield $this->writeMeta('noacl-stream', 'user2', 'pa$$2', null);
+                });
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_meta_to_no_acl_stream_succeeds_when_admin_user_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->writeMeta('noacl-stream', 'adm', 'admpa$$', null);
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->writeMeta('noacl-stream', 'adm', 'admpa$$', null);
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_meta_to_all_access_normal_stream_succeeds_when_no_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->writeMeta('normal-all', null, null, SystemRoles::ALL);
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->writeMeta('normal-all', null, null, SystemRoles::ALL);
+            });
         }));
     }
 
@@ -163,25 +171,29 @@ class write_stream_meta_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_meta_to_all_access_normal_stream_succeeds_when_any_existing_user_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->writeMeta('normal-all', 'user1', 'pa$$1', SystemRoles::ALL);
-            yield $this->writeMeta('normal-all', 'user2', 'pa$$2', SystemRoles::ALL);
+            yield $this->expectNoExceptionFromCallback(function () {
+                return call(function () {
+                    yield $this->writeMeta('normal-all', 'user1', 'pa$$1', SystemRoles::ALL);
+                    yield $this->writeMeta('normal-all', 'user2', 'pa$$2', SystemRoles::ALL);
+                });
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_meta_to_all_access_normal_stream_succeeds_when_admin_user_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->writeMeta('normal-all', 'adm', 'admpa$$', SystemRoles::ALL);
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->writeMeta('normal-all', 'adm', 'admpa$$', SystemRoles::ALL);
+            });
         }));
     }
 }

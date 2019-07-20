@@ -40,33 +40,36 @@ class overriden_user_stream_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function operations_on_user_stream_succeeds_for_authorized_user(): void
     {
         wait(call(function () {
-            $stream = 'user-authorized-user';
+            yield $this->expectNoExceptionFromCallback(function () {
+                return call(function () {
+                    $stream = 'user-authorized-user';
 
-            yield $this->readEvent($stream, 'user1', 'pa$$1');
-            yield $this->ReadStreamForward($stream, 'user1', 'pa$$1');
-            yield $this->ReadStreamBackward($stream, 'user1', 'pa$$1');
+                    yield $this->readEvent($stream, 'user1', 'pa$$1');
+                    yield $this->ReadStreamForward($stream, 'user1', 'pa$$1');
+                    yield $this->ReadStreamBackward($stream, 'user1', 'pa$$1');
 
-            yield $this->writeStream($stream, 'user1', 'pa$$1');
-            yield $this->transStart($stream, 'user1', 'pa$$1');
+                    yield $this->writeStream($stream, 'user1', 'pa$$1');
+                    yield $this->transStart($stream, 'user1', 'pa$$1');
 
-            $transId = (yield $this->transStart($stream, 'adm', 'admpa$$'))->transactionId();
-            $trans = $this->connection->continueTransaction($transId, new UserCredentials('user1', 'pa$$1'));
+                    $transId = (yield $this->transStart($stream, 'adm', 'admpa$$'))->transactionId();
+                    $trans = $this->connection->continueTransaction($transId, new UserCredentials('user1', 'pa$$1'));
 
-            \assert($trans instanceof EventStoreTransaction);
-            yield $trans->writeAsync();
-            yield $trans->commitAsync();
+                    \assert($trans instanceof EventStoreTransaction);
+                    yield $trans->writeAsync();
+                    yield $trans->commitAsync();
 
-            yield $this->readMeta($stream, 'user1', 'pa$$1');
-            yield $this->writeMeta($stream, 'user1', 'pa$$1', null);
+                    yield $this->readMeta($stream, 'user1', 'pa$$1');
+                    yield $this->writeMeta($stream, 'user1', 'pa$$1', null);
 
-            yield $this->subscribeToStream($stream, 'user1', 'pa$$1');
+                    yield $this->subscribeToStream($stream, 'user1', 'pa$$1');
 
-            yield $this->deleteStream($stream, 'user1', 'pa$$1');
+                    yield $this->deleteStream($stream, 'user1', 'pa$$1');
+                });
+            });
         }));
     }
 
@@ -177,33 +180,36 @@ class overriden_user_stream_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function operations_on_user_stream_succeed_for_admin(): void
     {
         wait(call(function () {
-            $stream = 'user-admin';
+            yield $this->expectNoExceptionFromCallback(function () {
+                return call(function () {
+                    $stream = 'user-admin';
 
-            yield $this->readEvent($stream, 'adm', 'admpa$$');
-            yield $this->ReadStreamForward($stream, 'adm', 'admpa$$');
-            yield $this->ReadStreamBackward($stream, 'adm', 'admpa$$');
+                    yield $this->readEvent($stream, 'adm', 'admpa$$');
+                    yield $this->ReadStreamForward($stream, 'adm', 'admpa$$');
+                    yield $this->ReadStreamBackward($stream, 'adm', 'admpa$$');
 
-            yield $this->writeStream($stream, 'adm', 'admpa$$');
-            yield $this->transStart($stream, 'adm', 'admpa$$');
+                    yield $this->writeStream($stream, 'adm', 'admpa$$');
+                    yield $this->transStart($stream, 'adm', 'admpa$$');
 
-            $transId = (yield $this->transStart($stream, 'adm', 'admpa$$'))->transactionId();
-            $trans = $this->connection->continueTransaction($transId, new UserCredentials('adm', 'admpa$$'));
+                    $transId = (yield $this->transStart($stream, 'adm', 'admpa$$'))->transactionId();
+                    $trans = $this->connection->continueTransaction($transId, new UserCredentials('adm', 'admpa$$'));
 
-            \assert($trans instanceof EventStoreTransaction);
-            yield $trans->writeAsync();
-            yield $trans->commitAsync();
+                    \assert($trans instanceof EventStoreTransaction);
+                    yield $trans->writeAsync();
+                    yield $trans->commitAsync();
 
-            yield $this->readMeta($stream, 'adm', 'admpa$$');
-            yield $this->writeMeta($stream, 'adm', 'admpa$$', null);
+                    yield $this->readMeta($stream, 'adm', 'admpa$$');
+                    yield $this->writeMeta($stream, 'adm', 'admpa$$', null);
 
-            yield $this->subscribeToStream($stream, 'adm', 'admpa$$');
+                    yield $this->subscribeToStream($stream, 'adm', 'admpa$$');
 
-            yield $this->deleteStream($stream, 'adm', 'admpa$$');
+                    yield $this->deleteStream($stream, 'adm', 'admpa$$');
+                });
+            });
         }));
     }
 }

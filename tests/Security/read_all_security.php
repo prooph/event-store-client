@@ -72,26 +72,32 @@ class read_all_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function reading_all_with_authorized_user_credentials_succeeds(): void
     {
         wait(call(function () {
-            yield $this->readAllForward('user1', 'pa$$1');
-            yield $this->readAllBackward('user1', 'pa$$1');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return call(function () {
+                    yield $this->readAllForward('user1', 'pa$$1');
+                    yield $this->readAllBackward('user1', 'pa$$1');
+                });
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function reading_all_with_admin_credentials_succeeds(): void
     {
         wait(call(function () {
-            yield $this->readAllForward('adm', 'admpa$$');
-            yield $this->readAllBackward('adm', 'admpa$$');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return call(function () {
+                    yield $this->readAllForward('adm', 'admpa$$');
+                    yield $this->readAllBackward('adm', 'admpa$$');
+                });
+            });
         }));
     }
 }

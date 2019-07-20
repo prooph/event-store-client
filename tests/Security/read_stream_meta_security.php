@@ -50,36 +50,39 @@ class read_stream_meta_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function reading_stream_meta_with_authorized_user_credentials_succeeds(): void
     {
         wait(call(function () {
-            yield $this->readMeta('metaread-stream', 'user1', 'pa$$1');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->readMeta('metaread-stream', 'user1', 'pa$$1');
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function reading_stream_meta_with_admin_user_credentials_succeeds(): void
     {
         wait(call(function () {
-            yield $this->readMeta('metaread-stream', 'adm', 'admpa$$');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->readMeta('metaread-stream', 'adm', 'admpa$$');
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function reading_no_acl_stream_meta_succeeds_when_no_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->readMeta('noacl-stream', null, null);
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->readMeta('noacl-stream', null, null);
+            });
         }));
     }
 
@@ -99,50 +102,58 @@ class read_stream_meta_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function reading_no_acl_stream_meta_succeeds_when_any_existing_user_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->readMeta('noacl-stream', 'user1', 'pa$$1');
-            yield $this->readMeta('noacl-stream', 'user2', 'pa$$2');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return call(function () {
+                    yield $this->readMeta('noacl-stream', 'user1', 'pa$$1');
+                    yield $this->readMeta('noacl-stream', 'user2', 'pa$$2');
+                });
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function reading_no_acl_stream_meta_succeeds_when_admin_user_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->readMeta('noacl-stream', 'adm', 'admpa$$');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->readMeta('noacl-stream', 'adm', 'admpa$$');
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function reading_all_access_normal_stream_meta_succeeds_when_any_existing_user_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->readMeta('normal-all', 'user1', 'pa$$1');
-            yield $this->readMeta('normal-all', 'user2', 'pa$$2');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return call(function () {
+                    yield $this->readMeta('normal-all', 'user1', 'pa$$1');
+                    yield $this->readMeta('normal-all', 'user2', 'pa$$2');
+                });
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function reading_all_access_normal_stream_meta_succeeds_when_admin_user_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->readMeta('normal-all', 'adm', 'admpa$$');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->readMeta('normal-all', 'adm', 'admpa$$');
+            });
         }));
     }
 }

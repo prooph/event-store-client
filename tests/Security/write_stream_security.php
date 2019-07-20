@@ -82,36 +82,39 @@ class write_stream_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_to_stream_with_authorized_user_credentials_succeeds(): void
     {
         wait(call(function () {
-            yield $this->writeStream('write-stream', 'user1', 'pa$$1');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->writeStream('write-stream', 'user1', 'pa$$1');
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_to_stream_with_admin_user_credentials_succeeds(): void
     {
         wait(call(function () {
-            yield $this->writeStream('write-stream', 'adm', 'admpa$$');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->writeStream('write-stream', 'adm', 'admpa$$');
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_to_no_acl_stream_succeeds_when_no_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->writeStream('noacl-stream', null, null);
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->writeStream('noacl-stream', null, null);
+            });
         }));
     }
 
@@ -131,37 +134,42 @@ class write_stream_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_to_no_acl_stream_succeeds_when_any_existing_user_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->writeStream('noacl-stream', 'user1', 'pa$$1');
-            yield $this->writeStream('noacl-stream', 'user2', 'pa$$2');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return call(function () {
+                    yield $this->writeStream('noacl-stream', 'user1', 'pa$$1');
+                    yield $this->writeStream('noacl-stream', 'user2', 'pa$$2');
+                });
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_to_no_acl_stream_succeeds_when_any_admin_user_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->writeStream('noacl-stream', 'adm', 'admpa$$');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->writeStream('noacl-stream', 'adm', 'admpa$$');
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_to_all_access_normal_stream_succeeds_when_no_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->writeStream('normal-all', null, null);
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->writeStream('normal-all', null, null);
+            });
         }));
     }
 
@@ -181,25 +189,29 @@ class write_stream_security extends AuthenticationTestCase
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_to_all_access_normal_stream_succeeds_when_any_existing_user_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->writeStream('normal-all', 'user1', 'pa$$1');
-            yield $this->writeStream('normal-all', 'user2', 'pa$$2');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return call(function () {
+                    yield $this->writeStream('normal-all', 'user1', 'pa$$1');
+                    yield $this->writeStream('normal-all', 'user2', 'pa$$2');
+                });
+            });
         }));
     }
 
     /**
      * @test
      * @throws Throwable
-     * @doesNotPerformAssertions
      */
     public function writing_to_all_access_normal_stream_succeeds_when_any_admin_user_credentials_are_passed(): void
     {
         wait(call(function () {
-            yield $this->writeStream('normal-all', 'adm', 'admpa$$');
+            yield $this->expectNoExceptionFromCallback(function () {
+                return $this->writeStream('normal-all', 'adm', 'admpa$$');
+            });
         }));
     }
 }
