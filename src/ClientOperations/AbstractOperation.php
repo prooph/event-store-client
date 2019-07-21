@@ -196,8 +196,13 @@ abstract class AbstractOperation implements ClientOperation
             'Operation (%s)',
             \get_class($this)
         ));
-        $this->log->error('TcpPackage Data Dump:');
-        $this->log->error($package->data());
+        $this->log->error('TcpPackage Data Dump (base64):');
+
+        if (empty($package->data())) {
+            $this->log->error('--- NO DATA ---');
+        } else {
+            $this->log->error(\base64_encode($package->data()));
+        }
 
         $exception = UnexpectedCommand::with($expectedCommand->name(), $package->command()->name());
         $this->fail($exception);
