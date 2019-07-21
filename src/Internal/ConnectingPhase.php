@@ -34,7 +34,9 @@ final class ConnectingPhase
     public const IDENTIFICATION = 5;
     public const CONNECTED = 6;
 
+    /** @var string */
     private $name;
+    /** @var int */
     private $value;
 
     private function __construct(string $name)
@@ -87,7 +89,7 @@ final class ConnectingPhase
         return self::{$value}();
     }
 
-    public static function fromValue($value): self
+    public static function fromValue(int $value): self
     {
         foreach (self::OPTIONS as $name => $v) {
             if ($v === $value) {
@@ -100,7 +102,7 @@ final class ConnectingPhase
 
     public function equals(ConnectingPhase $other): bool
     {
-        return \get_class($this) === \get_class($other) && $this->name === $other->name;
+        return $this->name === $other->name;
     }
 
     public function name(): string
@@ -108,7 +110,7 @@ final class ConnectingPhase
         return $this->name;
     }
 
-    public function value()
+    public function value(): int
     {
         return $this->value;
     }

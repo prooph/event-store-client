@@ -20,6 +20,7 @@ class ClusterInfoDto
     /** @var MemberInfoDto[] */
     private $members = [];
 
+    /** @param MemberInfoDto[] */
     public function __construct(array $members = [])
     {
         foreach ($members as $member) {

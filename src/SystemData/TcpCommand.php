@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\SystemData;
 
+use Prooph\EventStore\Exception\InvalidArgumentException;
+
 /** @internal */
 final class TcpCommand
 {
@@ -162,7 +164,9 @@ final class TcpCommand
     public const IDENITFY_CLIENT = 0xF5;
     public const CLIENT_IDENTIFIED = 0xF6;
 
+    /** @var string */
     private $name;
+    /** @var int */
     private $value;
 
     private function __construct(string $name)
@@ -480,7 +484,7 @@ final class TcpCommand
         return self::{$value}();
     }
 
-    public static function fromValue($value): self
+    public static function fromValue(int $value): self
     {
         foreach (self::OPTIONS as $name => $v) {
             if ($v === $value) {
@@ -488,12 +492,12 @@ final class TcpCommand
             }
         }
 
-        throw new \InvalidArgumentException('Unknown enum value given');
+        throw new InvalidArgumentException('Unknown enum value given');
     }
 
     public function equals(TcpCommand $other): bool
     {
-        return \get_class($this) === \get_class($other) && $this->name === $other->name;
+        return $this->name === $other->name;
     }
 
     public function name(): string
@@ -501,7 +505,7 @@ final class TcpCommand
         return $this->name;
     }
 
-    public function value()
+    public function value(): int
     {
         return $this->value;
     }

@@ -159,7 +159,7 @@ class SubscriptionsManager
     public function removeSubscription(SubscriptionItem $subscription): bool
     {
         $result = isset($this->activeSubscriptions[$subscription->correlationId()]);
-        $this->logDebug('RemoveSubscription %s, result %s', $subscription, $result ? 'yes' : 'no');
+        $this->logDebug('RemoveSubscription %s, result %s', (string) $subscription, $result ? 'yes' : 'no');
         unset($this->activeSubscriptions[$subscription->correlationId()]);
 
         return $result;
@@ -168,13 +168,13 @@ class SubscriptionsManager
     public function scheduleSubscriptionRetry(SubscriptionItem $subscription): void
     {
         if (! $this->removeSubscription($subscription)) {
-            $this->logDebug('RemoveSubscription failed when trying to retry %s', $subscription);
+            $this->logDebug('RemoveSubscription failed when trying to retry %s', (string) $subscription);
 
             return;
         }
 
         if ($subscription->maxRetries() >= 0 && $subscription->retryCount() >= $subscription->maxRetries()) {
-            $this->logDebug('RETRIES LIMIT REACHED when trying to retry %s', $subscription);
+            $this->logDebug('RETRIES LIMIT REACHED when trying to retry %s', (string) $subscription);
             $subscription->operation()->dropSubscription(
                 SubscriptionDropReason::subscribingError(),
                 RetriesLimitReached::with($subscription->retryCount())
@@ -183,7 +183,7 @@ class SubscriptionsManager
             return;
         }
 
-        $this->logDebug('retrying subscription %s', $subscription);
+        $this->logDebug('retrying subscription %s', (string) $subscription);
         $this->retryPendingSubscriptions[] = $subscription;
     }
 
@@ -195,7 +195,7 @@ class SubscriptionsManager
     public function startSubscription(SubscriptionItem $subscription, TcpPackageConnection $connection): void
     {
         if ($subscription->isSubscribed()) {
-            $this->logDebug('StartSubscription REMOVING due to already subscribed %s', $subscription);
+            $this->logDebug('StartSubscription REMOVING due to already subscribed %s', (string) $subscription);
             $this->removeSubscription($subscription);
 
             return;
@@ -209,10 +209,10 @@ class SubscriptionsManager
         $this->activeSubscriptions[$correlationId] = $subscription;
 
         if (! $subscription->operation()->subscribe($correlationId, $connection)) {
-            $this->logDebug('StartSubscription REMOVING AS COULD NOT SUBSCRIBE %s', $subscription);
+            $this->logDebug('StartSubscription REMOVING AS COULD NOT SUBSCRIBE %s', (string) $subscription);
             $this->removeSubscription($subscription);
         }
-        $this->logDebug('StartSubscription SUBSCRIBING %s', $subscription);
+        $this->logDebug('StartSubscription SUBSCRIBING %s', (string) $subscription);
     }
 
     private function logDebug(string $message, ...$parameters): void

@@ -18,6 +18,7 @@ use Amp\Deferred;
 use Amp\Promise;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\JsonException;
+use Prooph\EventStore\Exception\UnexpectedValueException;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\Transport\Http\HttpStatusCode;
 use Prooph\EventStore\UserCredentials;
@@ -123,6 +124,10 @@ class UsersClient
                 return;
             }
 
+            if (! \is_string($body)) {
+                $deferred->fail(new UnexpectedValueException('No content received'));
+            }
+
             try {
                 $data = Json::decode($body);
             } catch (JsonException $e) {
@@ -168,6 +173,10 @@ class UsersClient
                 return;
             }
 
+            if (! \is_string($body)) {
+                $deferred->fail(new UnexpectedValueException('No content received'));
+            }
+
             try {
                 $data = Json::decode($body);
             } catch (JsonException $e) {
@@ -207,6 +216,10 @@ class UsersClient
                 $deferred->fail($exception);
 
                 return;
+            }
+
+            if (! \is_string($body)) {
+                $deferred->fail(new UnexpectedValueException('No content received'));
             }
 
             try {

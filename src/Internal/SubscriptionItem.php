@@ -129,7 +129,7 @@ class SubscriptionItem
             'Subscription %s (%s): %s, is subscribed: %s, retry count: %d, created: %s, last updated: %s',
             $this->operation->name(),
             $this->correlationId,
-            $this->operation,
+            (string) $this->operation,
             $this->isSubscribed ? 'yes' : 'no',
             $this->retryCount,
             DateTime::format($this->created),

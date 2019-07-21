@@ -128,7 +128,7 @@ class OperationItem
             'Operation %s (%s): %s, retry count: %d, created: %s, last updated: %s',
             $this->operation->name(),
             $this->correlationId,
-            $this->operation,
+            (string) $this->operation,
             $this->retryCount,
             DateTime::format($this->created),
             DateTime::format($this->lastUpdated)
