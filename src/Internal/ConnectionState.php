@@ -28,7 +28,9 @@ final class ConnectionState
     public const CONNECTED = 2;
     public const CLOSED = 3;
 
+    /** @var string */
     private $name;
+    /** @var int */
     private $value;
 
     private function __construct(string $name)
@@ -66,7 +68,7 @@ final class ConnectionState
         return self::{$value}();
     }
 
-    public static function fromValue($value): self
+    public static function fromValue(int $value): self
     {
         foreach (self::OPTIONS as $name => $v) {
             if ($v === $value) {
@@ -79,7 +81,7 @@ final class ConnectionState
 
     public function equals(ConnectionState $other): bool
     {
-        return \get_class($this) === \get_class($other) && $this->name === $other->name;
+        return $this->name === $other->name;
     }
 
     public function name(): string
@@ -87,7 +89,7 @@ final class ConnectionState
         return $this->name;
     }
 
-    public function value()
+    public function value(): int
     {
         return $this->value;
     }

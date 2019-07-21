@@ -143,7 +143,7 @@ class OperationsManager
                 $oldCorrId = $operation->correlationId();
                 $operation->setCorrelationId(Guid::generateAsHex());
                 $operation->incRetryCount();
-                $this->logDebug('retrying, old corrId %s, operation %s', $oldCorrId, $operation);
+                $this->logDebug('retrying, old corrId %s, operation %s', $oldCorrId, (string) $operation);
                 $this->scheduleOperation($operation, $connection);
             }
 
@@ -159,7 +159,7 @@ class OperationsManager
             return;
         }
 
-        $this->logDebug('ScheduleOperationRetry for %s', $operation);
+        $this->logDebug('ScheduleOperationRetry for %s', (string) $operation);
         if ($operation->maxRetries() >= 0 && $operation->retryCount() >= $operation->maxRetries()) {
             $operation->operation()->fail(
                 RetriesLimitReached::with($operation->retryCount())
@@ -174,13 +174,13 @@ class OperationsManager
     public function removeOperation(OperationItem $operation): bool
     {
         if (! isset($this->activeOperations[$operation->correlationId()])) {
-            $this->logDebug('RemoveOperation FAILED for %s', $operation);
+            $this->logDebug('RemoveOperation FAILED for %s', (string) $operation);
 
             return false;
         }
 
         unset($this->activeOperations[$operation->correlationId()]);
-        $this->logDebug('RemoveOperation SUCCEEDED for %s', $operation);
+        $this->logDebug('RemoveOperation SUCCEEDED for %s', (string) $operation);
 
         return true;
     }
@@ -207,16 +207,16 @@ class OperationsManager
         $package = $operation->operation()->createNetworkPackage($correlationId);
 
         $this->logDebug('ExecuteOperation package %s, %s, %s',
-            $package->command(),
+            (string) $package->command(),
             $package->correlationId(),
-            $operation
+            (string) $operation
         );
         $connection->enqueueSend($package);
     }
 
     public function enqueueOperation(OperationItem $operation): void
     {
-        $this->logDebug('EnqueueOperation WAITING for %s', $operation);
+        $this->logDebug('EnqueueOperation WAITING for %s', (string) $operation);
         $this->waitingOperations->enqueue($operation);
     }
 

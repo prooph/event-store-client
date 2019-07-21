@@ -137,7 +137,7 @@ class TcpPackageConnection
                 $this->isClosed = true;
                 $this->log->debug(\sprintf(
                     'TcpPackageConnection: connection to [%s, %s] failed. Error: %s',
-                    $this->remoteEndPoint,
+                    (string) $this->remoteEndPoint,
                     $this->connectionId,
                     $e->getMessage()
                 ));
@@ -146,7 +146,7 @@ class TcpPackageConnection
                 $this->isClosed = true;
                 $this->log->debug(\sprintf(
                     'TcpPackageConnection: connection [%s, %s] was closed with error %s',
-                    $this->remoteEndPoint,
+                    (string) $this->remoteEndPoint,
                     $this->connectionId,
                     $e->getMessage()
                 ));
@@ -155,7 +155,7 @@ class TcpPackageConnection
 
             $this->log->debug(\sprintf(
                 'TcpPackageConnection: connected to [%s, %s]',
-                $this->remoteEndPoint,
+                (string) $this->remoteEndPoint,
                 $this->connectionId
             ));
 
@@ -183,7 +183,7 @@ class TcpPackageConnection
             $this->connection->close();
             $message = \sprintf(
                 'TcpPackageConnection: [%s, %s]: Error when processing TcpPackage %s: %s. Connection will be closed',
-                $this->remoteEndPoint,
+                (string) $this->remoteEndPoint,
                 $this->connectionId,
                 isset($package) ? $package->command()->name() : '<invalid package>',
                 $e->getMessage()
@@ -210,7 +210,7 @@ class TcpPackageConnection
                 } catch (PackageFramingException $exception) {
                     $this->log->error(\sprintf(
                         'TcpPackageConnection: [%s, %s]. Invalid TCP frame received',
-                        $this->remoteEndPoint,
+                        (string) $this->remoteEndPoint,
                         $this->connectionId
                     ));
 

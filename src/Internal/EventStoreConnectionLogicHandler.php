@@ -185,7 +185,7 @@ class EventStoreConnectionLogicHandler
 
     public function enqueueMessage(Message $message): void
     {
-        $this->logDebug(\sprintf('enqueing message %s', $message));
+        $this->logDebug(\sprintf('enqueing message %s', (string) $message));
 
         $this->handler->handle($message);
     }
@@ -306,7 +306,7 @@ class EventStoreConnectionLogicHandler
             return;
         }
 
-        $this->logDebug('EstablishTcpConnection to [%s]', $endPoint);
+        $this->logDebug('EstablishTcpConnection to [%s]', (string) $endPoint);
 
         if (! $this->state->equals(ConnectionState::connecting())
             || ! $this->connectingPhase->equals(ConnectingPhase::endPointDiscovery())
@@ -400,7 +400,11 @@ class EventStoreConnectionLogicHandler
         $this->state = ConnectionState::connecting();
         $this->connectingPhase = ConnectingPhase::reconnecting();
 
-        $this->logDebug('TCP connection to [%s, %s] closed', $connection->remoteEndPoint(), $connection->connectionId());
+        $this->logDebug(
+            'TCP connection to [%s, %s] closed',
+            (string) $connection->remoteEndPoint(),
+            $connection->connectionId()
+        );
 
         $this->subscriptions->purgeSubscribedAndDroppedSubscriptions($this->connection->connectionId());
 
@@ -433,7 +437,11 @@ class EventStoreConnectionLogicHandler
             return;
         }
 
-        $this->logDebug('TCP connection to [%s, %s] established', $connection->remoteEndPoint(), $connection->connectionId());
+        $this->logDebug(
+            'TCP connection to [%s, %s] established',
+            (string) $connection->remoteEndPoint(),
+            $connection->connectionId()
+        );
         $elapsed = $this->stopWatch->elapsed();
 
         $this->heartbeatInfo = new HeartbeatInfo($this->packageNumber, true, $elapsed);
@@ -627,7 +635,7 @@ class EventStoreConnectionLogicHandler
                 $this->logDebug(
                     'StartOperation schedule %s, %s, %s, %s',
                     $operation->name(),
-                    $operation,
+                    (string) $operation,
                     $maxRetries,
                     $timeout
                 );
@@ -668,7 +676,7 @@ class EventStoreConnectionLogicHandler
                     'StartSubscription %s %s, %s, MaxRetries: %d, Timeout: %d',
                     $this->state->equals(ConnectionState::connected()) ? 'fire' : 'enqueue',
                     $operation->name(),
-                    $operation,
+                    (string) $operation,
                     $message->maxRetries(),
                     $message->timeout()
                 );
@@ -718,7 +726,7 @@ class EventStoreConnectionLogicHandler
                     'StartSubscription %s %s, %s, MaxRetries: %d, Timeout: %d',
                     $this->state->equals(ConnectionState::connected()) ? 'fire' : 'enqueue',
                     $operation->name(),
-                    $operation,
+                    (string) $operation,
                     $message->maxRetries(),
                     $message->timeout()
                 );
@@ -748,7 +756,7 @@ class EventStoreConnectionLogicHandler
             $this->logDebug(
                 'IGNORED: HandleTcpPackage connId %s, package %s, %s',
                 $connection->connectionId(),
-                $package->command(),
+                (string) $package->command(),
                 $package->correlationId()
             );
 
@@ -758,7 +766,7 @@ class EventStoreConnectionLogicHandler
         $this->logDebug(
             'HandleTcpPackage connId %s, package %s, %s',
             $this->connection->connectionId(),
-            $package->command(),
+            (string) $package->command(),
             $package->correlationId()
         );
 
@@ -818,9 +826,9 @@ class EventStoreConnectionLogicHandler
 
             $this->logDebug(
                 'HandleTcpPackage OPERATION DECISION %s (%s), %s',
-                $result->decision(),
+                (string) $result->decision(),
                 $result->description(),
-                $operation
+                (string) $operation
             );
 
             switch ($result->decision()->value()) {
@@ -847,9 +855,9 @@ class EventStoreConnectionLogicHandler
             $this->logDebug(
                 'HandleTcpPackage %s SUBSCRIPTION DECISION %s (%s), %s',
                 $package->correlationId(),
-                $result->decision(),
+                (string) $result->decision(),
                 $result->description(),
-                $operation
+                (string) $operation
             );
 
             switch ($result->decision()->value()) {
@@ -873,7 +881,7 @@ class EventStoreConnectionLogicHandler
             $this->logDebug(
                 'HandleTcpPackage UNMAPPED PACKAGE with CorrelationId %s, Command: %s',
                 $package->correlationId(),
-                $package->command()
+                (string) $package->command()
             );
         }
     }
@@ -900,7 +908,7 @@ class EventStoreConnectionLogicHandler
         $msg = \sprintf(
             'EventStoreNodeConnection \'%s\': going to reconnect to [%s]. Current end point: [%s]',
             $this->esConnection->connectionName(),
-            $endPoint,
+            (string) $endPoint,
             $this->connection->remoteEndPoint()
         );
 

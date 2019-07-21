@@ -26,7 +26,9 @@ final class TcpFlags
     public const AUTHENTICATED = 0x01;
     public const TRUSTED_WRITE = 0x02;
 
+    /** @var string */
     private $name;
+    /** @var int */
     private $value;
 
     private function __construct(string $name)
@@ -59,7 +61,7 @@ final class TcpFlags
         return self::{$value}();
     }
 
-    public static function fromValue($value): self
+    public static function fromValue(int $value): self
     {
         foreach (self::OPTIONS as $name => $v) {
             if ($v === $value) {
@@ -72,7 +74,7 @@ final class TcpFlags
 
     public function equals(TcpFlags $other): bool
     {
-        return \get_class($this) === \get_class($other) && $this->name === $other->name;
+        return $this->name === $other->name;
     }
 
     public function name(): string
@@ -80,7 +82,7 @@ final class TcpFlags
         return $this->name;
     }
 
-    public function value()
+    public function value(): int
     {
         return $this->value;
     }

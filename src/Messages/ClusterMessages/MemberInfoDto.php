@@ -80,7 +80,7 @@ class MemberInfoDto
         }
     }
 
-    public function instanceId()
+    public function instanceId(): string
     {
         return $this->instanceId;
     }

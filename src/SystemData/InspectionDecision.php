@@ -30,7 +30,9 @@ final class InspectionDecision
     public const RECONNECT = 3;
     public const SUBSCRIBED = 4;
 
+    /** @var string */
     private $name;
+    /** @var int */
     private $value;
 
     private function __construct(string $name)
@@ -73,7 +75,7 @@ final class InspectionDecision
         return self::{$value}();
     }
 
-    public static function fromValue($value): self
+    public static function fromValue(int $value): self
     {
         foreach (self::OPTIONS as $name => $v) {
             if ($v === $value) {
@@ -86,7 +88,7 @@ final class InspectionDecision
 
     public function equals(InspectionDecision $other): bool
     {
-        return \get_class($this) === \get_class($other) && $this->name === $other->name;
+        return $this->name === $other->name;
     }
 
     public function name(): string
@@ -94,7 +96,7 @@ final class InspectionDecision
         return $this->name;
     }
 
-    public function value()
+    public function value(): int
     {
         return $this->value;
     }
