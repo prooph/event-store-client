@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
+use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\ConditionalWriteResult;
 use Prooph\EventStore\ConditionalWriteStatus;
 use Prooph\EventStore\EventData;
@@ -23,13 +24,13 @@ use Prooph\EventStore\Exception\UnexpectedOperationResult;
 use Prooph\EventStore\Position;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Internal\NewEventConverter;
+use Prooph\EventStoreClient\Messages\ClientMessages\NewEvent;
 use Prooph\EventStoreClient\Messages\ClientMessages\OperationResult;
 use Prooph\EventStoreClient\Messages\ClientMessages\WriteEvents;
 use Prooph\EventStoreClient\Messages\ClientMessages\WriteEventsCompleted;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -68,21 +69,25 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): ProtobufMessage
+    protected function createRequestDto(): Message
     {
+        $events = \array_map(
+            function (EventData $event): NewEvent {
+                return NewEventConverter::convert($event);
+            },
+            $this->events
+        );
+
         $message = new WriteEvents();
         $message->setEventStreamId($this->stream);
         $message->setExpectedVersion($this->expectedVersion);
         $message->setRequireMaster($this->requireMaster);
-
-        foreach ($this->events as $event) {
-            $message->appendEvents(NewEventConverter::convert($event));
-        }
+        $message->setEvents($events);
 
         return $message;
     }
 
-    protected function inspectResponse(ProtobufMessage $response): InspectionResult
+    protected function inspectResponse(Message $response): InspectionResult
     {
         \assert($response instanceof WriteEventsCompleted);
 
@@ -120,7 +125,7 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(ProtobufMessage $response): ConditionalWriteResult
+    protected function transformResponse(Message $response): ConditionalWriteResult
     {
         \assert($response instanceof WriteEventsCompleted);
 

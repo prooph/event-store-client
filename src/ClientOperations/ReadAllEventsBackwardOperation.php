@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
+use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\AllEventsSlice;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\ServerError;
@@ -24,11 +25,10 @@ use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Internal\EventMessageConverter;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadAllEvents;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadAllEventsCompleted;
-use Prooph\EventStoreClient\Messages\ClientMessages\ReadAllEventsCompleted_ReadAllResult as ReadAllResult;
+use Prooph\EventStoreClient\Messages\ClientMessages\ReadAllEventsCompleted\ReadAllResult;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -67,7 +67,7 @@ class ReadAllEventsBackwardOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): ProtobufMessage
+    protected function createRequestDto(): Message
     {
         $message = new ReadAllEvents();
         $message->setRequireMaster($this->requireMaster);
@@ -79,7 +79,7 @@ class ReadAllEventsBackwardOperation extends AbstractOperation
         return $message;
     }
 
-    protected function inspectResponse(ProtobufMessage $response): InspectionResult
+    protected function inspectResponse(Message $response): InspectionResult
     {
         \assert($response instanceof ReadAllEventsCompleted);
 
@@ -102,7 +102,7 @@ class ReadAllEventsBackwardOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(ProtobufMessage $response): AllEventsSlice
+    protected function transformResponse(Message $response): AllEventsSlice
     {
         /* @var ReadAllEventsCompleted $response */
         $records = $response->getEvents();

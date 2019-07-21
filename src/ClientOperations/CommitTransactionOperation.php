@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
+use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\InvalidTransaction;
 use Prooph\EventStore\Exception\StreamDeleted;
@@ -28,7 +29,6 @@ use Prooph\EventStoreClient\Messages\ClientMessages\TransactionCommitCompleted;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -59,7 +59,7 @@ class CommitTransactionOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): ProtobufMessage
+    protected function createRequestDto(): Message
     {
         $message = new TransactionCommit();
         $message->setRequireMaster($this->requireMaster);
@@ -68,7 +68,7 @@ class CommitTransactionOperation extends AbstractOperation
         return $message;
     }
 
-    protected function inspectResponse(ProtobufMessage $response): InspectionResult
+    protected function inspectResponse(Message $response): InspectionResult
     {
         \assert($response instanceof TransactionCommitCompleted);
 
@@ -108,7 +108,7 @@ class CommitTransactionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(ProtobufMessage $response): WriteResult
+    protected function transformResponse(Message $response): WriteResult
     {
         \assert($response instanceof TransactionCommitCompleted);
 

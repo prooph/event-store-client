@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
+use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\EventReadResult;
 use Prooph\EventStore\EventReadStatus;
 use Prooph\EventStore\Exception\AccessDenied;
@@ -23,11 +24,10 @@ use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Internal\EventMessageConverter;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadEvent;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadEventCompleted;
-use Prooph\EventStoreClient\Messages\ClientMessages\ReadEventCompleted_ReadEventResult as ReadEventResult;
+use Prooph\EventStoreClient\Messages\ClientMessages\ReadEventCompleted\ReadEventResult;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -66,7 +66,7 @@ class ReadEventOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): ProtobufMessage
+    protected function createRequestDto(): Message
     {
         $message = new ReadEvent();
         $message->setEventStreamId($this->stream);
@@ -77,7 +77,7 @@ class ReadEventOperation extends AbstractOperation
         return $message;
     }
 
-    protected function inspectResponse(ProtobufMessage $response): InspectionResult
+    protected function inspectResponse(Message $response): InspectionResult
     {
         /** @var ReadEventCompleted $response */
 
@@ -111,7 +111,7 @@ class ReadEventOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(ProtobufMessage $response): EventReadResult
+    protected function transformResponse(Message $response): EventReadResult
     {
         /* @var ReadEventCompleted $response */
         $eventMessage = $response->getEvent();

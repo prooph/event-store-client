@@ -56,7 +56,7 @@ class VolatileSubscriptionOperation extends AbstractSubscriptionOperation
     {
         if ($package->command()->equals(TcpCommand::subscriptionConfirmation())) {
             $message = new SubscriptionConfirmation();
-            $message->parseFromString($package->data());
+            $message->mergeFromString($package->data());
 
             $this->confirmSubscription($message->getLastCommitPosition(), $message->getLastEventNumber());
 
@@ -65,7 +65,8 @@ class VolatileSubscriptionOperation extends AbstractSubscriptionOperation
 
         if ($package->command()->equals(TcpCommand::streamEventAppeared())) {
             $message = new StreamEventAppeared();
-            $message->parseFromString($package->data());
+            $message->mergeFromString($package->data());
+
             $event = EventMessageConverter::convertResolvedEventMessageToResolvedEvent($message->getEvent());
             $this->eventAppeared($event);
 
@@ -78,10 +79,10 @@ class VolatileSubscriptionOperation extends AbstractSubscriptionOperation
     protected function createSubscriptionObject(int $lastCommitPosition, ?int $lastEventNumber): EventStoreSubscription
     {
         return new VolatileEventStoreSubscription(
-                $this,
-                $this->streamId,
-                $lastCommitPosition,
-                $lastEventNumber
+            $this,
+            $this->streamId,
+            $lastCommitPosition,
+            $lastEventNumber
         );
     }
 

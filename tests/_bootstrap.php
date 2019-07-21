@@ -16,7 +16,8 @@ namespace ProophTest\EventStoreClient;
 use RuntimeException;
 
 require_once __DIR__ . '/../vendor/autoload.php';
-
+/*
 if (! \extension_loaded('protobuf')) {
     throw new RuntimeException('ext-protobuf is missing');
 }
+*/

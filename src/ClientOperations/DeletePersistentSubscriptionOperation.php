@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
+use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\Exception\UnexpectedOperationResult;
@@ -22,11 +23,10 @@ use Prooph\EventStore\Internal\PersistentSubscriptionDeleteStatus;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Messages\ClientMessages\DeletePersistentSubscription;
 use Prooph\EventStoreClient\Messages\ClientMessages\DeletePersistentSubscriptionCompleted;
-use Prooph\EventStoreClient\Messages\ClientMessages\DeletePersistentSubscriptionCompleted_DeletePersistentSubscriptionResult as DeletePersistentSubscriptionResult;
+use Prooph\EventStoreClient\Messages\ClientMessages\DeletePersistentSubscriptionCompleted\DeletePersistentSubscriptionResult;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -57,7 +57,7 @@ class DeletePersistentSubscriptionOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): ProtobufMessage
+    protected function createRequestDto(): Message
     {
         $message = new DeletePersistentSubscription();
         $message->setEventStreamId($this->stream);
@@ -66,7 +66,7 @@ class DeletePersistentSubscriptionOperation extends AbstractOperation
         return $message;
     }
 
-    protected function inspectResponse(ProtobufMessage $response): InspectionResult
+    protected function inspectResponse(Message $response): InspectionResult
     {
         \assert($response instanceof DeletePersistentSubscriptionCompleted);
 
@@ -101,7 +101,7 @@ class DeletePersistentSubscriptionOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(ProtobufMessage $response): PersistentSubscriptionDeleteResult
+    protected function transformResponse(Message $response): PersistentSubscriptionDeleteResult
     {
         \assert($response instanceof DeletePersistentSubscriptionCompleted);
 

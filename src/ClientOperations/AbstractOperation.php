@@ -15,20 +15,20 @@ namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
 use Amp\Promise;
+use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\NotAuthenticated;
 use Prooph\EventStore\Exception\ServerError;
 use Prooph\EventStore\Exception\UnexpectedCommand;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled;
-use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled_MasterInfo as MasterInfo;
-use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled_NotHandledReason as NotHandledReason;
+use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled\MasterInfo;
+use Prooph\EventStoreClient\Messages\ClientMessages\NotHandled\NotHandledReason;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\SystemData\TcpFlags;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
-use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 use Throwable;
 
@@ -64,12 +64,12 @@ abstract class AbstractOperation implements ClientOperation
         $this->responseClassName = $responseClassName;
     }
 
-    abstract protected function createRequestDto(): ProtobufMessage;
+    abstract protected function createRequestDto(): Message;
 
-    abstract protected function inspectResponse(ProtobufMessage $response): InspectionResult;
+    abstract protected function inspectResponse(Message $response): InspectionResult;
 
     // we need generics
-    abstract protected function transformResponse(ProtobufMessage $response);
+    abstract protected function transformResponse(Message $response);
 
     public function promise(): Promise
     {
@@ -100,8 +100,7 @@ abstract class AbstractOperation implements ClientOperation
     {
         if ($package->command()->equals($this->responseCommand)) {
             $responseMessage = new $this->responseClassName();
-            \assert($responseMessage instanceof ProtobufMessage);
-            $responseMessage->parseFromString($package->data());
+            $responseMessage->mergeFromString($package->data());
 
             return $this->inspectResponse($responseMessage);
         }
@@ -118,7 +117,7 @@ abstract class AbstractOperation implements ClientOperation
         }
     }
 
-    protected function succeed(ProtobufMessage $response): void
+    protected function succeed(Message $response): void
     {
         try {
             $result = $this->transformResponse($response);
@@ -153,7 +152,7 @@ abstract class AbstractOperation implements ClientOperation
     private function inspectNotHandled(TcpPackage $package): InspectionResult
     {
         $message = new NotHandled();
-        $message->parseFromString($package->data());
+        $message->mergeFromString($package->data());
 
         switch ($message->getReason()) {
             case NotHandledReason::NotReady:
@@ -162,7 +161,7 @@ abstract class AbstractOperation implements ClientOperation
                 return new InspectionResult(InspectionDecision::retry(), 'Not handled: too busy');
             case NotHandledReason::NotMaster:
                 $masterInfo = new MasterInfo();
-                $masterInfo->parseFromString($message->getAdditionalInfo());
+                $masterInfo->mergeFromString($message->getAdditionalInfo());
 
                 return new InspectionResult(
                     InspectionDecision::reconnect(),

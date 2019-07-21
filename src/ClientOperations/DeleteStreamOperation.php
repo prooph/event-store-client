@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
+use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\DeleteResult;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\InvalidTransaction;
@@ -28,7 +29,6 @@ use Prooph\EventStoreClient\Messages\ClientMessages\OperationResult;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
-use ProtobufMessage;
 use Psr\Log\LoggerInterface as Logger;
 
 /** @internal */
@@ -67,7 +67,7 @@ class DeleteStreamOperation extends AbstractOperation
         );
     }
 
-    protected function createRequestDto(): ProtobufMessage
+    protected function createRequestDto(): Message
     {
         $message = new DeleteStream();
         $message->setEventStreamId($this->stream);
@@ -78,7 +78,7 @@ class DeleteStreamOperation extends AbstractOperation
         return $message;
     }
 
-    public function inspectResponse(ProtobufMessage $response): InspectionResult
+    public function inspectResponse(Message $response): InspectionResult
     {
         /** @var DeleteStreamCompleted $response */
 
@@ -120,7 +120,7 @@ class DeleteStreamOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(ProtobufMessage $response): DeleteResult
+    protected function transformResponse(Message $response): DeleteResult
     {
         \assert($response instanceof DeleteStreamCompleted);
 
