@@ -1,7 +1,33 @@
 # Change Log
 
-## [v1.0.0-beta-10](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-10)
+## [v1.0.0-RC-1](https://github.com/prooph/event-store-client/tree/v1.0.0-RC-1)
 
+[Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-10...v1.0.0-RC-1)
+
+**Implemented enhancements:**
+
+- Add ACL security tests [\#50](https://github.com/prooph/event-store-client/issues/50)
+- polishing [\#96](https://github.com/prooph/event-store-client/pull/96) ([prolic](https://github.com/prolic))
+- use google/protobuf \(extension and/or lib\)  [\#95](https://github.com/prooph/event-store-client/pull/95) ([prolic](https://github.com/prolic))
+- ACL Security Tests [\#93](https://github.com/prooph/event-store-client/pull/93) ([prolic](https://github.com/prolic))
+- better test [\#91](https://github.com/prooph/event-store-client/pull/91) ([prolic](https://github.com/prolic))
+
+**Fixed bugs:**
+
+- ConnectionClosed exception [\#86](https://github.com/prooph/event-store-client/issues/86)
+- ACL Security Tests [\#93](https://github.com/prooph/event-store-client/pull/93) ([prolic](https://github.com/prolic))
+
+**Closed issues:**
+
+- Possible bug when trying to use the ProjectionsManager [\#89](https://github.com/prooph/event-store-client/issues/89)
+- Reconnect to persistent subscription after a connection drop [\#85](https://github.com/prooph/event-store-client/issues/85)
+
+**Merged pull requests:**
+
+- Change copyright [\#94](https://github.com/prooph/event-store-client/pull/94) ([codeliner](https://github.com/codeliner))
+- Make sure people do not try to install protobuf extension from PECL [\#90](https://github.com/prooph/event-store-client/pull/90) ([simensen](https://github.com/simensen))
+
+## [v1.0.0-beta-10](https://github.com/prooph/event-store-client/tree/v1.0.0-beta-10) (2019-02-03)
 [Full Changelog](https://github.com/prooph/event-store-client/compare/v1.0.0-beta-9...v1.0.0-beta-10)
 
 **Implemented enhancements:**
