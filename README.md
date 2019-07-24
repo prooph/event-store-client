@@ -32,20 +32,6 @@ Additional extensions are only needed if your app necessitates a high numbers of
 
 You can install prooph/event-store-client via composer by adding `"prooph/event-store-client": "dev-master"` as requirement to your composer.json.
 
-To install allegro/php-protobuf:
-
-```bash
-git clone https://github.com/allegro/php-protobuf
-cd php-protobuf
-git checkout v0.12.3
-phpize
-./configure
-make
-sudo make install
-
-add "extension=protobuf.so" to your php.ini
-```
-
 ### Server
 
 Using docker:
