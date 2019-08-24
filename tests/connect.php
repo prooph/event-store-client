@@ -133,7 +133,7 @@ class connect extends TestCase
 
             $this->expectException(InvalidOperationException::class);
 
-            yield $connection->appendToStreamAsync('stream', ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
+            yield $connection->appendToStreamAsync('stream', ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
         }));
     }
 }

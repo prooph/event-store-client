@@ -69,7 +69,7 @@ class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
 
         yield $this->conn->appendToStreamAsync(
             $this->streamName,
-            ExpectedVersion::EMPTY_STREAM,
+            ExpectedVersion::NO_STREAM,
             $this->testEvents
         );
 

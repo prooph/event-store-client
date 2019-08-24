@@ -276,11 +276,11 @@ class transaction extends TestCase
 
             $transaction = yield $this->conn->startTransactionAsync(
                 $stream,
-                ExpectedVersion::EMPTY_STREAM
+                ExpectedVersion::NO_STREAM
             );
             \assert($transaction instanceof EventStoreTransaction);
 
-            yield $this->conn->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
+            yield $this->conn->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
@@ -305,7 +305,7 @@ class transaction extends TestCase
             );
             \assert($transaction instanceof EventStoreTransaction);
 
-            yield $this->conn->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
+            yield $this->conn->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
@@ -327,13 +327,13 @@ class transaction extends TestCase
 
             $transaction = yield $this->conn->startTransactionAsync(
                 $stream,
-                ExpectedVersion::EMPTY_STREAM
+                ExpectedVersion::NO_STREAM
             );
             \assert($transaction instanceof EventStoreTransaction);
 
             yield $transaction->writeAsync([TestEvent::newTestEvent()]);
 
-            yield $this->conn->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
+            yield $this->conn->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
 
             $this->expectException(StreamDeleted::class);
 

@@ -49,13 +49,13 @@ class read_stream_events_with_unresolved_linkto extends TestCase
 
         yield $this->conn->appendToStreamAsync(
             $this->stream,
-            ExpectedVersion::EMPTY_STREAM,
+            ExpectedVersion::NO_STREAM,
             $this->testEvents
         );
 
         yield $this->conn->appendToStreamAsync(
             $this->links,
-            ExpectedVersion::EMPTY_STREAM,
+            ExpectedVersion::NO_STREAM,
             [new EventData(null, SystemEventTypes::LINK_TO, false, '0@read_stream_events_with_unresolved_linkto')]
         );
 

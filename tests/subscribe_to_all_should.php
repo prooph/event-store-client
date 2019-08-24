@@ -97,7 +97,7 @@ class subscribe_to_all_should extends TestCase
 
             $create = $store->appendToStreamAsync(
                 $stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 [TestEvent::newTestEvent()]
             );
 
@@ -135,7 +135,7 @@ class subscribe_to_all_should extends TestCase
                 $this->droppedWithCountdown($dropped)
             );
 
-            $delete = $store->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
+            $delete = $store->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
 
             try {
                 yield Promise\timeout($delete, self::TIMEOUT);

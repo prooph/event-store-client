@@ -38,7 +38,7 @@ class when_working_with_metadata extends TestCase
 
             yield $connection->appendToStreamAsync(
                 $stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 [TestEvent::newTestEvent()]
             );
 

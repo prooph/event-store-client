@@ -131,7 +131,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
 
             yield $this->conn->appendToStreamAsync(
                 $stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 [TestEvent::newTestEvent()]
             );
 
@@ -183,7 +183,7 @@ class subscribe_to_stream_catching_up_should extends TestCase
 
             yield $this->conn->appendToStreamAsync(
                 $stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 [TestEvent::newTestEvent()]
             );
 
