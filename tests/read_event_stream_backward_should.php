@@ -88,7 +88,7 @@ class read_event_stream_backward_should extends TestCase
 
             $store = TestConnection::create();
             yield $store->connectAsync();
-            yield $store->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
+            yield $store->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
 
             $read = yield $store->readStreamEventsBackwardAsync(
                 $stream,
@@ -141,7 +141,7 @@ class read_event_stream_backward_should extends TestCase
             $testEvents = TestEvent::newAmount(10);
             yield $store->appendToStreamAsync(
                 $stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 $testEvents
             );
 
@@ -172,7 +172,7 @@ class read_event_stream_backward_should extends TestCase
             $testEvents = TestEvent::newAmount(10);
             yield $store->appendToStreamAsync(
                 $stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 $testEvents
             );
 
@@ -210,7 +210,7 @@ class read_event_stream_backward_should extends TestCase
             $testEvents = TestEvent::newAmount(10);
             yield $store->appendToStreamAsync(
                 $stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 $testEvents
             );
 
@@ -241,7 +241,7 @@ class read_event_stream_backward_should extends TestCase
             $testEvents = TestEvent::newAmount(10);
             yield $store->appendToStreamAsync(
                 $stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 $testEvents
             );
 
@@ -272,7 +272,7 @@ class read_event_stream_backward_should extends TestCase
             $testEvents = TestEvent::newAmount(10);
             yield $store->appendToStreamAsync(
                 $stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 $testEvents
             );
 
@@ -303,7 +303,7 @@ class read_event_stream_backward_should extends TestCase
             $testEvents = TestEvent::newAmount(10);
             yield $store->appendToStreamAsync(
                 $stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 $testEvents
             );
 

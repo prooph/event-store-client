@@ -66,7 +66,7 @@ class read_all_events_backward_should extends TestCase
 
         $this->testEvents = TestEvent::newAmount(20);
 
-        yield $this->conn->appendToStreamAsync('stream-' . Guid::generateAsHex(), ExpectedVersion::EMPTY_STREAM, $this->testEvents);
+        yield $this->conn->appendToStreamAsync('stream-' . Guid::generateAsHex(), ExpectedVersion::NO_STREAM, $this->testEvents);
 
         $result = yield $this->conn->appendToStreamAsync('stream-' . Guid::generateAsHex(), ExpectedVersion::NO_STREAM, $this->testEvents);
         \assert($result instanceof WriteResult);

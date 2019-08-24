@@ -223,7 +223,7 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
         $this->execute(function () {
             yield $this->conn->appendToStreamAsync(
                 $this->stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 TestEvent::newAmount(2)
             );
 
@@ -279,13 +279,13 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
 
             yield $this->conn->setStreamMetadataAsync(
                 $this->stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 $metadata
             );
 
             yield $this->conn->deleteStreamAsync(
                 $this->stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 true
             );
 
@@ -336,7 +336,7 @@ END;
 
             yield $this->conn->setRawStreamMetadataAsync(
                 $this->stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 $metadata
             );
 
@@ -398,7 +398,7 @@ END;
 
             yield $this->conn->setStreamMetadataAsync(
                 $this->stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 $metadata
             );
 
@@ -448,7 +448,7 @@ END;
 
             yield $this->conn->setStreamMetadataAsync(
                 $this->stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 $metadata
             );
 
@@ -487,7 +487,7 @@ END;
 
             yield $this->conn->setRawStreamMetadataAsync(
                 $this->stream,
-                ExpectedVersion::EMPTY_STREAM,
+                ExpectedVersion::NO_STREAM,
                 $metadata
             );
 

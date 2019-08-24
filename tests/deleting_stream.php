@@ -40,7 +40,7 @@ class deleting_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            yield $connection->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
+            yield $connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
 
             $connection->close();
         }));
@@ -101,7 +101,7 @@ class deleting_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, [TestEvent::newTestEvent()]);
+            yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
 
             $delete = yield $connection->deleteStreamAsync($stream, 0, true);
             \assert($delete instanceof DeleteResult);
@@ -126,11 +126,11 @@ class deleting_stream extends TestCase
 
             yield $connection->connectAsync();
 
-            yield $connection->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
+            yield $connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
 
             try {
                 $this->expectException(StreamDeleted::class);
-                yield $connection->deleteStreamAsync($stream, ExpectedVersion::EMPTY_STREAM, true);
+                yield $connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
             } finally {
                 $connection->close();
             }

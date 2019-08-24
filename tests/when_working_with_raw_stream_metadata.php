@@ -56,7 +56,7 @@ class when_working_with_raw_stream_metadata extends TestCase
         $this->execute(function () {
             yield $this->conn->setStreamMetadataAsync(
                 $this->stream,
-                ExpectedVersion::EMPTY_STREAM
+                ExpectedVersion::NO_STREAM
             );
 
             $meta = yield $this->conn->getRawStreamMetadataAsync($this->stream);
@@ -77,7 +77,7 @@ class when_working_with_raw_stream_metadata extends TestCase
         $this->execute(function () {
             yield $this->conn->setStreamMetadataAsync(
                 $this->stream,
-                ExpectedVersion::EMPTY_STREAM
+                ExpectedVersion::NO_STREAM
             );
 
             $meta = yield $this->conn->getRawStreamMetadataAsync($this->stream);
@@ -159,7 +159,7 @@ class when_working_with_raw_stream_metadata extends TestCase
         $this->execute(function () {
             yield $this->conn->setStreamMetadataAsync(
                 $this->stream,
-                ExpectedVersion::EMPTY_STREAM
+                ExpectedVersion::NO_STREAM
             );
 
             $meta = yield $this->conn->getRawStreamMetadataAsync($this->stream);
@@ -186,7 +186,7 @@ class when_working_with_raw_stream_metadata extends TestCase
 
             yield $this->conn->setStreamMetadataAsync(
                 $this->stream,
-                ExpectedVersion::EMPTY_STREAM
+                ExpectedVersion::NO_STREAM
             );
 
             $meta = yield $this->conn->getRawStreamMetadataAsync($this->stream);
@@ -215,7 +215,7 @@ class when_working_with_raw_stream_metadata extends TestCase
 
             yield $this->conn->setStreamMetadataAsync(
                 $this->stream,
-                ExpectedVersion::EMPTY_STREAM
+                ExpectedVersion::NO_STREAM
             );
         });
     }
@@ -243,7 +243,7 @@ class when_working_with_raw_stream_metadata extends TestCase
     public function getting_metadata_for_deleted_stream_returns_empty_string_and_signals_stream_deletion(): void
     {
         $this->execute(function () {
-            yield $this->conn->setStreamMetadataAsync($this->stream, ExpectedVersion::EMPTY_STREAM);
+            yield $this->conn->setStreamMetadataAsync($this->stream, ExpectedVersion::NO_STREAM);
 
             yield $this->conn->deleteStreamAsync($this->stream, ExpectedVersion::NO_STREAM, true);
 

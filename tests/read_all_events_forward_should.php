@@ -70,7 +70,7 @@ class read_all_events_forward_should extends TestCase
         $this->testEvents = TestEvent::newAmount(20);
         $this->stream = 'read_all_events_forward_should-' . Guid::generateAsHex();
 
-        yield $this->conn->appendToStreamAsync($this->stream, ExpectedVersion::EMPTY_STREAM, $this->testEvents);
+        yield $this->conn->appendToStreamAsync($this->stream, ExpectedVersion::NO_STREAM, $this->testEvents);
     }
 
     protected function end(): Generator
