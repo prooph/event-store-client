@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Transport\Http;
 
-use Amp\Artax\Client;
-use Amp\Artax\DefaultClient;
-use Amp\Artax\Request;
-use Amp\Artax\Response;
+use Amp\Http\Client\Client;
+use Amp\Http\Client\Interceptor\SetRequestTimeout;
+use Amp\Http\Client\Request;
+use Amp\Http\Client\Response;
 use Prooph\EventStore\Transport\Http\HttpMethod;
 use Prooph\EventStore\UserCredentials;
 use Throwable;
@@ -29,8 +29,8 @@ class HttpClient
 
     public function __construct(int $operationTimeout)
     {
-        $this->client = new DefaultClient();
-        $this->client->setOption(Client::OP_TRANSFER_TIMEOUT, $operationTimeout);
+        $this->client = new Client();
+        $this->client->addApplicationInterceptor(new SetRequestTimeout($operationTimeout, $operationTimeout, $operationTimeout));
     }
 
     public function get(

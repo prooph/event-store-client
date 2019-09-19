@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\UserManagement;
 
-use Amp\Artax\Response;
+use Amp\Http\Client\Response;
 use Amp\Deferred;
 use Amp\Promise;
 use Prooph\EventStore\EndPoint;

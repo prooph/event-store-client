@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Amp\Artax\Client;
-use Amp\Artax\DefaultClient;
-use Amp\Artax\Request;
-use Amp\Artax\Response;
+use Amp\Http\Client\Client;
+use Amp\Http\Client\Interceptor\SetRequestTimeout;
+use Amp\Http\Client\Request;
+use Amp\Http\Client\Response;
 use function Amp\call;
 use Amp\Delayed;
 use Amp\Promise;
@@ -90,8 +90,8 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         $this->gossipTimeout = $gossipTimeout;
         $this->preferRandomNode = $preferRandomNode;
 
-        $this->client = new DefaultClient();
-        $this->client->setOption(Client::OP_TRANSFER_TIMEOUT, $gossipTimeout);
+        $this->client = new Client();
+        $this->client->addApplicationInterceptor(new SetRequestTimeout($gossipTimeout, $gossipTimeout, $gossipTimeout));
     }
 
     /** {@inheritdoc} */
