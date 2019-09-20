@@ -112,11 +112,11 @@ class HttpClient
         $request = new Request($url, $method);
 
         if (null !== $userCredentials) {
-            $request = $this->addAuthenticationHeader($request, $userCredentials);
+            $this->addAuthenticationHeader($request, $userCredentials);
         }
 
         if ('' !== $hostHeader) {
-            $request = $request->withHeader('Host', $hostHeader);
+            $request->setHeader('Host', $hostHeader);
         }
 
         $this->client->request($request)->onResolve(
@@ -144,12 +144,12 @@ class HttpClient
         $request = new Request($url, $method);
 
         if (null !== $userCredentials) {
-            $request = $this->addAuthenticationHeader($request, $userCredentials);
+            $this->addAuthenticationHeader($request, $userCredentials);
         }
 
-        $request = $request->withHeader('Content-Type', $contentType);
-        $request = $request->withHeader('Content-Length', (string) \strlen($body));
-        $request = $request->withBody($body);
+        $request->setHeader('Content-Type', $contentType);
+        $request->setHeader('Content-Length', (string) \strlen($body));
+        $request->setBody($body);
 
         $this->client->request($request)->onResolve(
             function (?Throwable $e, ?Response $response) use ($onSuccess, $onException): void {
@@ -167,7 +167,7 @@ class HttpClient
     private function addAuthenticationHeader(
         Request $request,
         UserCredentials $userCredentials
-    ): Request {
+    ): void {
         $httpAuthentication = \sprintf(
             '%s:%s',
             $userCredentials->username(),
@@ -176,6 +176,6 @@ class HttpClient
 
         $encodedCredentials = \base64_encode($httpAuthentication);
 
-        return $request->withHeader('Authorization', 'Basic ' . $encodedCredentials);
+        $request->setHeader('Authorization', 'Basic ' . $encodedCredentials);
     }
 }
