@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use function Amp\call;
+use Amp\Delayed;
 use Amp\Http\Client\Client;
 use Amp\Http\Client\Interceptor\SetRequestTimeout;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
-use function Amp\call;
-use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
 use Generator;

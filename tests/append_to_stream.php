@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
 use Amp\Http\Client\Client;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
-use function Amp\call;
 use function Amp\Promise\wait;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\ConditionalWriteResult;

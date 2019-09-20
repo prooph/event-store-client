@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\UserManagement;
 
-use Amp\Http\Client\Response;
 use Amp\Deferred;
+use Amp\Http\Client\Response;
 use Amp\Promise;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\JsonException;
