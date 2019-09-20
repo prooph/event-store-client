@@ -16,10 +16,10 @@ namespace Prooph\EventStoreClient\Transport\Tcp;
 use function Amp\call;
 use Amp\Loop;
 use Amp\Promise;
-use Amp\Socket\ClientConnectContext;
-use Amp\Socket\ClientSocket;
 use Amp\Socket\ClientTlsContext;
 use function Amp\Socket\connect;
+use Amp\Socket\ConnectContext;
+use Amp\Socket\EncryptableSocket;
 use Amp\Socket\ConnectException;
 use Generator;
 use Prooph\EventStore\EndPoint;
@@ -46,7 +46,7 @@ class TcpPackageConnection
     private $validateServer;
     /** @var int */
     private $timeout;
-    /** @var ClientSocket|null */
+    /** @var EncryptableSocket|null */
     private $connection;
     /** @var bool */
     private $isClosed = true;
@@ -116,7 +116,7 @@ class TcpPackageConnection
     {
         return call(function (): Generator {
             try {
-                $context = (new ClientConnectContext())
+                $context = (new ConnectContext())
                     ->withConnectTimeout($this->timeout);
 
                 $uri = \sprintf('tcp://%s:%s', $this->remoteEndPoint->host(), $this->remoteEndPoint->port());
