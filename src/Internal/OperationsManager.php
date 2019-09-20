@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Amp\Promise;
 use Prooph\EventStore\Exception\ConnectionClosed;
 use Prooph\EventStore\Exception\OperationTimedOut;
 use Prooph\EventStore\Exception\RetriesLimitReached;
