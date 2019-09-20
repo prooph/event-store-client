@@ -245,7 +245,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
                 if (! empty($header)) {
                     $headerData = \explode(':', $header);
-                    $request = $request->withHeader($headerData[0], $headerData[1]);
+                    $request->setHeader($headerData[0], $headerData[1]);
                 }
 
                 $response = yield $this->client->request($request);
@@ -258,7 +258,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
                 return null;
             }
 
-            $json = yield $response->getBody()->getInputStream()->read();
+            $json = yield $response->getBody()->read();
             $data = Json::decode($json);
 
             $members = [];
