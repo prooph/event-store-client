@@ -185,7 +185,7 @@ class PersistentSubscriptionsClient
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve($response->getBody());
+                    $deferred->resolve($response->getBody()->buffer());
                 } else {
                     $deferred->fail(new PersistentSubscriptionCommandFailed(
                         $response->getStatus(),
