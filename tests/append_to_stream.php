@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Artax\DefaultClient;
-use Amp\Artax\Request;
-use Amp\Artax\Response;
+use Amp\Http\Client\Client;
+use Amp\Http\Client\Request;
+use Amp\Http\Client\Response;
 use function Amp\call;
 use function Amp\Promise\wait;
 use PHPUnit\Framework\TestCase;
@@ -696,9 +696,9 @@ class append_to_stream extends TestCase
             );
 
             $request = new Request($url, 'GET');
-            $request = $request->withAddedHeader('Accept', 'application/vnd.eventstore.atom+json');
+            $request->addHeader('Accept', 'application/vnd.eventstore.atom+json');
 
-            $client = new DefaultClient();
+            $client = new Client();
 
             $response = yield $client->request($request);
 
