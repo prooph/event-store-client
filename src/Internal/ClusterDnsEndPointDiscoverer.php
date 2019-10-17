@@ -91,7 +91,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         $this->preferRandomNode = $preferRandomNode;
 
         $this->client = new Client();
-        $this->client->addApplicationInterceptor(new SetRequestTimeout($gossipTimeout, $gossipTimeout, $gossipTimeout));
+        $this->client = $this->client->withApplicationInterceptor(new SetRequestTimeout($gossipTimeout, $gossipTimeout, $gossipTimeout));
     }
 
     /** {@inheritdoc} */

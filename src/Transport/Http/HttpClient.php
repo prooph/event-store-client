@@ -30,7 +30,7 @@ class HttpClient
     public function __construct(int $operationTimeout)
     {
         $this->client = new Client();
-        $this->client->addApplicationInterceptor(new SetRequestTimeout($operationTimeout, $operationTimeout, $operationTimeout));
+        $this->client = $this->client->withApplicationInterceptor(new SetRequestTimeout($operationTimeout, $operationTimeout, $operationTimeout));
     }
 
     public function get(
