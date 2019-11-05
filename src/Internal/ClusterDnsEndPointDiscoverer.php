@@ -15,7 +15,8 @@ namespace Prooph\EventStoreClient\Internal;
 
 use function Amp\call;
 use Amp\Delayed;
-use Amp\Http\Client\Client;
+use Amp\Http\Client\HttpClient;
+use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Interceptor\SetRequestTimeout;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
@@ -47,8 +48,8 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
     /** @var GossipSeed[] */
     private $gossipSeeds = [];
 
-    /** @var Client */
-    private $client;
+    /** @var HttpClient */
+    private $httpClient;
     /** @var MemberInfoDto[] */
     private $oldGossip = [];
     /** @var int */
@@ -90,8 +91,9 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         $this->gossipTimeout = $gossipTimeout;
         $this->preferRandomNode = $preferRandomNode;
 
-        $this->client = new Client();
-        $this->client = $this->client->withApplicationInterceptor(new SetRequestTimeout($gossipTimeout, $gossipTimeout, $gossipTimeout));
+        $builder = new HttpClientBuilder();
+        $builder->intercept(new SetRequestTimeout($gossipTimeout, $gossipTimeout, $gossipTimeout));
+        $this->httpClient = $builder->build();
     }
 
     /** {@inheritdoc} */
@@ -248,7 +250,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
                     $request->setHeader($headerData[0], $headerData[1]);
                 }
 
-                $response = yield $this->client->request($request);
+                $response = yield $this->httpClient->request($request);
                 \assert($response instanceof Response);
             } catch (Throwable $e) {
                 return null;

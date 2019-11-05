@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Transport\Http;
 
-use Amp\Http\Client\Client;
+use Amp\Http\Client\HttpClient as AmpHttpClient;
+use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Interceptor\SetRequestTimeout;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
@@ -24,13 +25,14 @@ use Throwable;
 /** @internal  */
 class HttpClient
 {
-    /** @var Client */
-    private $client;
+    /** @var AmpHttpClient */
+    private $httpClient;
 
     public function __construct(int $operationTimeout)
     {
-        $this->client = new Client();
-        $this->client = $this->client->withApplicationInterceptor(new SetRequestTimeout($operationTimeout, $operationTimeout, $operationTimeout));
+        $builder = new HttpClientBuilder();
+        $builder->intercept(new SetRequestTimeout($operationTimeout, $operationTimeout, $operationTimeout));
+        $this->httpClient = $builder->build();
     }
 
     public function get(
@@ -119,7 +121,7 @@ class HttpClient
             $request->setHeader('Host', $hostHeader);
         }
 
-        $this->client->request($request)->onResolve(
+        $this->httpClient->request($request)->onResolve(
             function (?Throwable $e, ?Response $response) use ($onSuccess, $onException): void {
                 if ($e) {
                     $onException($e);
@@ -151,7 +153,7 @@ class HttpClient
         $request->setHeader('Content-Length', (string) \strlen($body));
         $request->setBody($body);
 
-        $this->client->request($request)->onResolve(
+        $this->httpClient->request($request)->onResolve(
             function (?Throwable $e, ?Response $response) use ($onSuccess, $onException): void {
                 if ($e) {
                     $onException($e);

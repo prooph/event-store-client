@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
-use Amp\Http\Client\Client;
+use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use function Amp\Promise\wait;
@@ -698,9 +698,9 @@ class append_to_stream extends TestCase
             $request = new Request($url, 'GET');
             $request->addHeader('Accept', 'application/vnd.eventstore.atom+json');
 
-            $client = new Client();
+            $httpClient = HttpClientBuilder::buildDefault();
 
-            $response = yield $client->request($request);
+            $response = yield $httpClient->request($request);
 
             \assert($response instanceof Response);
 

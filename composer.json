@@ -22,7 +22,7 @@
     "php": "^7.2",
     "ext-json": "*",
     "amphp/amp": "^2.1.2",
-    "amphp/http-client": "^4.0.0-RC6",
+    "amphp/http-client": "^4.0.0-RC7",
     "amphp/byte-stream": "^1.6",
     "amphp/file": "^1.0.0",
     "amphp/socket": "^1.0.0",
