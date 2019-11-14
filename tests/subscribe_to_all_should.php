@@ -15,7 +15,6 @@ namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
 use Amp\Promise;
-use function Amp\Promise\timeout;
 use Amp\Success;
 use Amp\TimeoutException;
 use PHPUnit\Framework\TestCase;
