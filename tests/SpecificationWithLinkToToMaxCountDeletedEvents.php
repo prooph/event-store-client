@@ -68,7 +68,7 @@ trait SpecificationWithLinkToToMaxCountDeletedEvents
             ]
         );
 
-        $this->conn->appendToStreamAsync(
+        yield $this->conn->appendToStreamAsync(
             $this->linkedStreamName,
             ExpectedVersion::ANY,
             [

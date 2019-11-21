@@ -28,6 +28,8 @@ use Prooph\EventStore\PersistentSubscriptionNakEventAction;
 use Prooph\EventStore\PersistentSubscriptions\PersistentSubscriptionDetails;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\Transport\Http\EndpointExtensions;
+use Prooph\EventStore\UserCredentials;
 use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\PersistentSubscriptions\PersistentSubscriptionsManager;
 use ProophTest\EventStoreClient\CountdownEvent;
@@ -55,7 +57,9 @@ class persistent_subscription_manager extends TestCase
                 (string) \getenv('ES_HOST'),
                 (int) \getenv('ES_HTTP_PORT')
             ),
-            5000
+            5000,
+            EndpointExtensions::HTTP_SCHEMA,
+            DefaultData::adminCredentials()
         );
         $this->stream = Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
