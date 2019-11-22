@@ -381,7 +381,7 @@ class ProjectionsManager implements AsyncProjectionsManager
     public function updateQueryAsync(
         string $name,
         string $query,
-        bool $emitEnabled = false,
+        bool $emitEnabled = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
         if ('' === $name) {
