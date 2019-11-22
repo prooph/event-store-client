@@ -48,11 +48,15 @@ In the docker-folder you'll find three different docker-compose setups (single n
 
 ## Quick Start
 
-For a short overview please see the annotated Quickstart in the `examples` folder.
+For a short overview please see the `examples` folder.
 
 ## Unit tests
 
+### Plain PHP
+
 Run the server with memory database
+
+Note: This is the start-script of the Event Store database, not something provided by this library!
 
 ```console
 ./run-node.sh --run-projections=all --mem-db
@@ -67,6 +71,10 @@ You need to ignore the `ignore` group
 Those are tests that only work against an empty database and can only be run manually.
 
 Before next run, restart the server. This way you can always start with a clean server.
+
+### Using Docker
+
+See: https://github.com/prooph/event-store-client/tree/master/docker/unittest
 
 ## Documentation
 
