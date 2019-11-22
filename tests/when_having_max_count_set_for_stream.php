@@ -15,7 +15,6 @@ namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventStoreConnection;

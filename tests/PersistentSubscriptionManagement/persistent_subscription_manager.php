@@ -29,7 +29,6 @@ use Prooph\EventStore\PersistentSubscriptions\PersistentSubscriptionDetails;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
-use Prooph\EventStore\UserCredentials;
 use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\PersistentSubscriptions\PersistentSubscriptionsManager;
 use ProophTest\EventStoreClient\CountdownEvent;
