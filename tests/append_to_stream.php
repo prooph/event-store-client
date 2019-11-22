@@ -695,14 +695,25 @@ class append_to_stream extends TestCase
                 $stream
             );
 
+            $httpAuthentication = \sprintf(
+                '%s:%s',
+                DefaultData::adminUsername(),
+                DefaultData::adminPassword()
+            );
+
+            $encodedCredentials = \base64_encode($httpAuthentication);
+
             $request = new Request($url, 'GET');
             $request = $request->withAddedHeader('Accept', 'application/vnd.eventstore.atom+json');
+            $request = $request->withHeader('Authorization', 'Basic ' . $encodedCredentials);
 
             $client = new DefaultClient();
 
             $response = yield $client->request($request);
 
             \assert($response instanceof Response);
+
+            $this->assertSame(200, $response->getStatus());
 
             $body = yield $response->getBody()->read();
 
