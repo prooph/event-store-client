@@ -185,7 +185,7 @@ class EventStoreConnectionLogicHandler
 
     public function enqueueMessage(Message $message): void
     {
-        $this->logDebug(\sprintf('enqueing message %s', (string) $message));
+        $this->logDebug(\sprintf('enqueuing message %s', (string) $message));
 
         $this->handler->handle($message);
     }
