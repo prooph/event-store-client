@@ -467,15 +467,21 @@ class ProjectionsClient
         EndPoint $endPoint,
         string $name,
         string $query,
-        bool $emitEnabled = false,
+        ?bool $emitEnabled = null,
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
+        $url = '/projection/%s/query';
+
+        if (null !== $emitEnabled) {
+            $url .= '?emit=' . (int) $emitEnabled;
+        }
+
         return $this->sendPut(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
-                '/projection/%s/query?emit=' . (int) $emitEnabled,
+                $url,
                 $name
             ),
             $query,
