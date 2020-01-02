@@ -185,7 +185,7 @@ class EventStoreConnectionLogicHandler
 
     public function enqueueMessage(Message $message): void
     {
-        $this->logDebug(\sprintf('enqueing message %s', (string) $message));
+        $this->logDebug(\sprintf('enqueuing message %s', (string) $message));
 
         $this->handler->handle($message);
     }
@@ -212,7 +212,10 @@ class EventStoreConnectionLogicHandler
                 )));
                 break;
             case ConnectionState::CLOSED:
-                $deferred->fail(new ObjectDisposed($this->esConnection->connectionName()));
+                $deferred->fail(new ObjectDisposed(\sprintf(
+                    'EventStoreNodeConnection \'%s\' is closed',
+                    $this->esConnection->connectionName()
+                )));
                 break;
         }
     }
@@ -642,7 +645,10 @@ class EventStoreConnectionLogicHandler
                 $this->operations->scheduleOperation(new OperationItem($operation, $maxRetries, $timeout), $this->connection);
                 break;
             case ConnectionState::CLOSED:
-                $operation->fail(new ObjectDisposed($this->esConnection->connectionName()));
+                $operation->fail(new ObjectDisposed(\sprintf(
+                    'EventStoreNodeConnection \'%s\' is closed',
+                    $this->esConnection->connectionName()
+                )));
                 break;
         }
     }
@@ -691,7 +697,10 @@ class EventStoreConnectionLogicHandler
 
                 break;
             case ConnectionState::CLOSED:
-                $message->deferred()->fail(new ObjectDisposed($this->esConnection->connectionName()));
+                $message->deferred()->fail(new ObjectDisposed(\sprintf(
+                    'EventStoreNodeConnection \'%s\' is closed',
+                    $this->esConnection->connectionName()
+                )));
                 break;
         }
     }
@@ -741,7 +750,10 @@ class EventStoreConnectionLogicHandler
 
                 break;
             case ConnectionState::CLOSED:
-                $message->deferred()->fail(new ObjectDisposed($this->esConnection->connectionName()));
+                $message->deferred()->fail(new ObjectDisposed(\sprintf(
+                    'EventStoreNodeConnection \'%s\' is closed',
+                    $this->esConnection->connectionName()
+                )));
                 break;
         }
     }
