@@ -15,10 +15,16 @@ matrix:
         - DEPENDENCIES="--prefer-lowest --prefer-stable"
     - php: 7.3
       env:
-      - DEPENDENCIES=""
+        - DEPENDENCIES=""
     - php: 7.3
       env:
-      - DEPENDENCIES="--prefer-lowest --prefer-stable"
+        - DEPENDENCIES="--prefer-lowest --prefer-stable"
+    - php: 7.4
+      env:
+        - DEPENDENCIES=""
+    - php: 7.4
+      env:
+        - DEPENDENCIES="--prefer-lowest --prefer-stable"
 
 cache:
   directories:
