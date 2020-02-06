@@ -2,8 +2,8 @@
 
 /**
  * This file is part of `prooph/event-store-client`.
- * (c) 2018-2019 Alexander Miertsch <kontakt@codeliner.ws>
- * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ * (c) 2018-2020 Alexander Miertsch <kontakt@codeliner.ws>
+ * (c) 2018-2020 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,11 +16,11 @@ namespace Prooph\EventStoreClient\Transport\Tcp;
 use function Amp\call;
 use Amp\Loop;
 use Amp\Promise;
-use Amp\Socket\ClientConnectContext;
-use Amp\Socket\ClientSocket;
 use Amp\Socket\ClientTlsContext;
 use function Amp\Socket\connect;
+use Amp\Socket\ConnectContext;
 use Amp\Socket\ConnectException;
+use Amp\Socket\EncryptableSocket;
 use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
@@ -46,7 +46,7 @@ class TcpPackageConnection
     private $validateServer;
     /** @var int */
     private $timeout;
-    /** @var ClientSocket|null */
+    /** @var EncryptableSocket|null */
     private $connection;
     /** @var bool */
     private $isClosed = true;
@@ -116,7 +116,7 @@ class TcpPackageConnection
     {
         return call(function (): Generator {
             try {
-                $context = (new ClientConnectContext())
+                $context = (new ConnectContext())
                     ->withConnectTimeout($this->timeout);
 
                 $uri = \sprintf('tcp://%s:%s', $this->remoteEndPoint->host(), $this->remoteEndPoint->port());

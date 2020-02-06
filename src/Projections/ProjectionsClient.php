@@ -2,8 +2,8 @@
 
 /**
  * This file is part of `prooph/event-store-client`.
- * (c) 2018-2019 Alexander Miertsch <kontakt@codeliner.ws>
- * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ * (c) 2018-2020 Alexander Miertsch <kontakt@codeliner.ws>
+ * (c) 2018-2020 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Projections;
 
-use Amp\Artax\Response;
 use Amp\Deferred;
+use Amp\Http\Client\Response;
 use Amp\Promise;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\JsonException;
@@ -541,7 +541,7 @@ class ProjectionsClient
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve($response->getBody());
+                    $deferred->resolve($response->getBody()->buffer());
                 } else {
                     $deferred->fail(new ProjectionCommandFailed(
                         $response->getStatus(),
@@ -574,7 +574,7 @@ class ProjectionsClient
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve($response->getBody());
+                    $deferred->resolve($response->getBody()->buffer());
                 } else {
                     $deferred->fail(new ProjectionCommandFailed(
                         $response->getStatus(),

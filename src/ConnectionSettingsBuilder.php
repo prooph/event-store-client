@@ -2,8 +2,8 @@
 
 /**
  * This file is part of `prooph/event-store-client`.
- * (c) 2018-2019 Alexander Miertsch <kontakt@codeliner.ws>
- * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ * (c) 2018-2020 Alexander Miertsch <kontakt@codeliner.ws>
+ * (c) 2018-2020 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient;
 
 use Amp\ByteStream\ResourceOutputStream;
-use Amp\File\Handle;
+use Amp\File\File;
 use Amp\Log\ConsoleFormatter;
 use Amp\Log\StreamHandler;
 use Monolog\Formatter\LineFormatter;
@@ -105,7 +105,7 @@ class ConnectionSettingsBuilder
         return $this;
     }
 
-    public function useFileLogger(Handle $handle): self
+    public function useFileLogger(File $file): self
     {
         if (! \class_exists(StreamHandler::class)) {
             throw new RuntimeException(\sprintf(
@@ -114,7 +114,7 @@ class ConnectionSettingsBuilder
             ));
         }
 
-        $logHandler = new StreamHandler($handle);
+        $logHandler = new StreamHandler($file);
         $logHandler->setFormatter(new LineFormatter());
 
         $this->log = new MonoLog('event-store-client');

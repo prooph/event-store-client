@@ -2,8 +2,8 @@
 
 /**
  * This file is part of `prooph/event-store-client`.
- * (c) 2018-2019 Alexander Miertsch <kontakt@codeliner.ws>
- * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ * (c) 2018-2020 Alexander Miertsch <kontakt@codeliner.ws>
+ * (c) 2018-2020 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,10 +13,11 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Transport\Http;
 
-use Amp\Artax\Client;
-use Amp\Artax\DefaultClient;
-use Amp\Artax\Request;
-use Amp\Artax\Response;
+use Amp\Http\Client\HttpClient as AmpHttpClient;
+use Amp\Http\Client\HttpClientBuilder;
+use Amp\Http\Client\Interceptor\SetRequestTimeout;
+use Amp\Http\Client\Request;
+use Amp\Http\Client\Response;
 use Prooph\EventStore\Transport\Http\HttpMethod;
 use Prooph\EventStore\UserCredentials;
 use Throwable;
@@ -24,13 +25,14 @@ use Throwable;
 /** @internal  */
 class HttpClient
 {
-    /** @var Client */
-    private $client;
+    /** @var AmpHttpClient */
+    private $httpClient;
 
     public function __construct(int $operationTimeout)
     {
-        $this->client = new DefaultClient();
-        $this->client->setOption(Client::OP_TRANSFER_TIMEOUT, $operationTimeout);
+        $builder = new HttpClientBuilder();
+        $builder->intercept(new SetRequestTimeout($operationTimeout, $operationTimeout, $operationTimeout));
+        $this->httpClient = $builder->build();
     }
 
     public function get(
@@ -112,14 +114,14 @@ class HttpClient
         $request = new Request($url, $method);
 
         if (null !== $userCredentials) {
-            $request = $this->addAuthenticationHeader($request, $userCredentials);
+            $this->addAuthenticationHeader($request, $userCredentials);
         }
 
         if ('' !== $hostHeader) {
-            $request = $request->withHeader('Host', $hostHeader);
+            $request->setHeader('Host', $hostHeader);
         }
 
-        $this->client->request($request)->onResolve(
+        $this->httpClient->request($request)->onResolve(
             function (?Throwable $e, ?Response $response) use ($onSuccess, $onException): void {
                 if ($e) {
                     $onException($e);
@@ -144,14 +146,14 @@ class HttpClient
         $request = new Request($url, $method);
 
         if (null !== $userCredentials) {
-            $request = $this->addAuthenticationHeader($request, $userCredentials);
+            $this->addAuthenticationHeader($request, $userCredentials);
         }
 
-        $request = $request->withHeader('Content-Type', $contentType);
-        $request = $request->withHeader('Content-Length', (string) \strlen($body));
-        $request = $request->withBody($body);
+        $request->setHeader('Content-Type', $contentType);
+        $request->setHeader('Content-Length', (string) \strlen($body));
+        $request->setBody($body);
 
-        $this->client->request($request)->onResolve(
+        $this->httpClient->request($request)->onResolve(
             function (?Throwable $e, ?Response $response) use ($onSuccess, $onException): void {
                 if ($e) {
                     $onException($e);
@@ -167,7 +169,7 @@ class HttpClient
     private function addAuthenticationHeader(
         Request $request,
         UserCredentials $userCredentials
-    ): Request {
+    ): void {
         $httpAuthentication = \sprintf(
             '%s:%s',
             $userCredentials->username(),
@@ -176,6 +178,6 @@ class HttpClient
 
         $encodedCredentials = \base64_encode($httpAuthentication);
 
-        return $request->withHeader('Authorization', 'Basic ' . $encodedCredentials);
+        $request->setHeader('Authorization', 'Basic ' . $encodedCredentials);
     }
 }

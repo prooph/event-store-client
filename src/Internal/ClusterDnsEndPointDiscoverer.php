@@ -2,8 +2,8 @@
 
 /**
  * This file is part of `prooph/event-store-client`.
- * (c) 2018-2019 Alexander Miertsch <kontakt@codeliner.ws>
- * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ * (c) 2018-2020 Alexander Miertsch <kontakt@codeliner.ws>
+ * (c) 2018-2020 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,12 +13,13 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Amp\Artax\Client;
-use Amp\Artax\DefaultClient;
-use Amp\Artax\Request;
-use Amp\Artax\Response;
 use function Amp\call;
 use Amp\Delayed;
+use Amp\Http\Client\HttpClient;
+use Amp\Http\Client\HttpClientBuilder;
+use Amp\Http\Client\Interceptor\SetRequestTimeout;
+use Amp\Http\Client\Request;
+use Amp\Http\Client\Response;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
@@ -47,8 +48,8 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
     /** @var GossipSeed[] */
     private $gossipSeeds = [];
 
-    /** @var Client */
-    private $client;
+    /** @var HttpClient */
+    private $httpClient;
     /** @var MemberInfoDto[] */
     private $oldGossip = [];
     /** @var int */
@@ -90,8 +91,9 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         $this->gossipTimeout = $gossipTimeout;
         $this->preferRandomNode = $preferRandomNode;
 
-        $this->client = new DefaultClient();
-        $this->client->setOption(Client::OP_TRANSFER_TIMEOUT, $gossipTimeout);
+        $builder = new HttpClientBuilder();
+        $builder->intercept(new SetRequestTimeout($gossipTimeout, $gossipTimeout, $gossipTimeout));
+        $this->httpClient = $builder->build();
     }
 
     /** {@inheritdoc} */
@@ -245,10 +247,10 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
                 if (! empty($header)) {
                     $headerData = \explode(':', $header);
-                    $request = $request->withHeader($headerData[0], $headerData[1]);
+                    $request->setHeader($headerData[0], $headerData[1]);
                 }
 
-                $response = yield $this->client->request($request);
+                $response = yield $this->httpClient->request($request);
                 \assert($response instanceof Response);
             } catch (Throwable $e) {
                 return null;
@@ -258,7 +260,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
                 return null;
             }
 
-            $json = yield $response->getBody()->getInputStream()->read();
+            $json = yield $response->getBody()->read();
             $data = Json::decode($json);
 
             $members = [];

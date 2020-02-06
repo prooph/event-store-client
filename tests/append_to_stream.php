@@ -2,8 +2,8 @@
 
 /**
  * This file is part of `prooph/event-store-client`.
- * (c) 2018-2019 Alexander Miertsch <kontakt@codeliner.ws>
- * (c) 2018-2019 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ * (c) 2018-2020 Alexander Miertsch <kontakt@codeliner.ws>
+ * (c) 2018-2020 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Artax\DefaultClient;
-use Amp\Artax\Request;
-use Amp\Artax\Response;
 use function Amp\call;
+use Amp\Http\Client\HttpClientBuilder;
+use Amp\Http\Client\Request;
+use Amp\Http\Client\Response;
 use function Amp\Promise\wait;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\ConditionalWriteResult;
@@ -704,12 +704,12 @@ class append_to_stream extends TestCase
             $encodedCredentials = \base64_encode($httpAuthentication);
 
             $request = new Request($url, 'GET');
-            $request = $request->withAddedHeader('Accept', 'application/vnd.eventstore.atom+json');
-            $request = $request->withHeader('Authorization', 'Basic ' . $encodedCredentials);
+            $request->addHeader('Accept', 'application/vnd.eventstore.atom+json');
+            $request->setHeader('Authorization', 'Basic ' . $encodedCredentials);
 
-            $client = new DefaultClient();
+            $httpClient = HttpClientBuilder::buildDefault();
 
-            $response = yield $client->request($request);
+            $response = yield $httpClient->request($request);
 
             \assert($response instanceof Response);
 
