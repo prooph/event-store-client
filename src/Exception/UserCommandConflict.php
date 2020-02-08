@@ -17,8 +17,7 @@ use Prooph\EventStore\Exception\UserCommandConflict as BaseException;
 
 class UserCommandConflict extends BaseException
 {
-    /** @var int */
-    private $httpStatusCode;
+    private int $httpStatusCode;
 
     public function __construct(int $httpStatusCode, string $message)
     {

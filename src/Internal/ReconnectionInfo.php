@@ -16,10 +16,8 @@ namespace Prooph\EventStoreClient\Internal;
 /** @internal */
 class ReconnectionInfo
 {
-    /** @var int */
-    private $reconnectionAttempt;
-    /** @var int */
-    private $timestamp;
+    private int $reconnectionAttempt;
+    private int $timestamp;
 
     public function __construct(int $reconnectionAttempt, int $timestamp)
     {

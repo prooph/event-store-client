@@ -19,16 +19,11 @@ use Prooph\EventStore\Internal\Consts;
 
 class DnsClusterSettingsBuilder
 {
-    /** @var string */
-    private $clusterDns;
-    /** @var int */
-    private $maxDiscoverAttempts = Consts::DEFAULT_MAX_CLUSTER_DISCOVER_ATTEMPTS;
-    /** @var int */
-    private $managerExternalHttpPort = Consts::DEFAULT_CLUSTER_MANAGER_EXTERNAL_HTTP_PORT;
-    /** @var int */
-    private $gossipTimeout = 1000;
-    /** @var bool */
-    private $preferRandomNode = false;
+    private string $clusterDns;
+    private int $maxDiscoverAttempts = Consts::DEFAULT_MAX_CLUSTER_DISCOVER_ATTEMPTS;
+    private int $managerExternalHttpPort = Consts::DEFAULT_CLUSTER_MANAGER_EXTERNAL_HTTP_PORT;
+    private int $gossipTimeout = 1000;
+    private bool $preferRandomNode = false;
 
     public function setClusterDns(string $clusterDns): self
     {

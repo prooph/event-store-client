@@ -21,10 +21,8 @@ use Prooph\EventStoreClient\Uri;
 /** @internal */
 final class SingleEndpointDiscoverer implements EndPointDiscoverer
 {
-    /** @var Uri */
-    private $uri;
-    /** @var bool */
-    private $useSslConnection;
+    private Uri $uri;
+    private bool $useSslConnection;
 
     public function __construct(Uri $uri, bool $useSslConnection)
     {

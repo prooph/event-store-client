@@ -32,54 +32,31 @@ use Psr\Log\NullLogger;
  */
 class ConnectionSettingsBuilder
 {
-    /** @var Logger */
-    private $log;
-    /** @var bool */
-    private $verboseLogging = false;
-    /** @var int */
-    private $maxQueueSize = Consts::DEFAULT_MAX_QUEUE_SIZE;
-    /** @var int */
-    private $maxConcurrentItems = Consts::DEFAULT_MAX_CONCURRENT_ITEMS;
-    /** @var int */
-    private $maxRetries = Consts::DEFAULT_MAX_OPERATIONS_RETRY;
-    /** @var int */
-    private $maxReconnections = Consts::DEFAULT_MAX_RECONNECTIONS;
-    /** @var bool */
-    private $requireMaster = Consts::DEFAULT_REQUIRE_MASTER;
-    /** @var int */
-    private $reconnectionDelay = Consts::DEFAULT_RECONNECTION_DELAY;
-    /** @var int */
-    private $operationTimeout = Consts::DEFAULT_OPERATION_TIMEOUT;
-    /** @var int */
-    private $operationTimeoutCheckPeriod = Consts::DEFAULT_OPERATION_TIMEOUT_CHECK_PERIOD;
-    /** @var UserCredentials|null */
-    private $defaultUserCredentials;
-    /** @var bool */
-    private $useSslConnection = false;
-    /** @var string */
-    private $targetHost = '';
-    /** @var bool */
-    private $validateServer = false;
-    /** @var bool */
-    private $failOnNoServerResponse = true;
-    /** @var int */
-    private $heartbeatInterval = 750;
-    /** @var int */
-    private $heartbeatTimeout = 1500;
-    /** @var int */
-    private $clientConnectionTimeout = 1000;
-    /** @var string */
-    private $clusterDns = '';
-    /** @var int */
-    private $maxDiscoverAttempts = Consts::DEFAULT_MAX_CLUSTER_DISCOVER_ATTEMPTS;
-    /** @var int */
-    private $gossipExternalHttpPort = Consts::DEFAULT_CLUSTER_MANAGER_EXTERNAL_HTTP_PORT;
-    /** @var int */
-    private $gossipTimeout = 1000;
+    private Logger $log;
+    private bool $verboseLogging = false;
+    private int $maxQueueSize = Consts::DEFAULT_MAX_QUEUE_SIZE;
+    private int $maxConcurrentItems = Consts::DEFAULT_MAX_CONCURRENT_ITEMS;
+    private int $maxRetries = Consts::DEFAULT_MAX_OPERATIONS_RETRY;
+    private int $maxReconnections = Consts::DEFAULT_MAX_RECONNECTIONS;
+    private bool $requireMaster = Consts::DEFAULT_REQUIRE_MASTER;
+    private int $reconnectionDelay = Consts::DEFAULT_RECONNECTION_DELAY;
+    private int $operationTimeout = Consts::DEFAULT_OPERATION_TIMEOUT;
+    private int $operationTimeoutCheckPeriod = Consts::DEFAULT_OPERATION_TIMEOUT_CHECK_PERIOD;
+    private ?UserCredentials $defaultUserCredentials = null;
+    private bool $useSslConnection = false;
+    private string $targetHost = '';
+    private bool $validateServer = false;
+    private bool $failOnNoServerResponse = true;
+    private int $heartbeatInterval = 750;
+    private int $heartbeatTimeout = 1500;
+    private int $clientConnectionTimeout = 1000;
+    private string $clusterDns = '';
+    private int $maxDiscoverAttempts = Consts::DEFAULT_MAX_CLUSTER_DISCOVER_ATTEMPTS;
+    private int $gossipExternalHttpPort = Consts::DEFAULT_CLUSTER_MANAGER_EXTERNAL_HTTP_PORT;
+    private int $gossipTimeout = 1000;
     /** @var GossipSeed[] */
-    private $gossipSeeds = [];
-    /** @var bool */
-    private $preferRandomNode = false;
+    private array $gossipSeeds = [];
+    private bool $preferRandomNode = false;
 
     /** @internal */
     public function __construct()

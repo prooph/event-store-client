@@ -16,6 +16,8 @@ namespace ProophTest\EventStoreClient;
 use function Amp\call;
 use Amp\Parallel\Worker\DefaultPool;
 use Amp\Promise;
+use Closure;
+use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Async\EventStoreTransaction;
@@ -32,15 +34,14 @@ use Throwable;
 
 class transaction extends TestCase
 {
-    /** @var EventStoreConnection */
-    private $conn;
+    private EventStoreConnection $conn;
 
     /**
      * @throws Throwable
      */
-    private function execute(callable $function): void
+    private function execute(Closure $function): void
     {
-        Promise\wait(call(function () use ($function) {
+        Promise\wait(call(function () use ($function): Generator {
             $this->conn = TestConnection::create();
 
             yield $this->conn->connectAsync();

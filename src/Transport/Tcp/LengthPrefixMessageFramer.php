@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Transport\Tcp;
 
+use Closure;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\PackageFramingException;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
@@ -20,14 +21,10 @@ use Prooph\EventStoreClient\SystemData\TcpPackage;
 /** @internal */
 class LengthPrefixMessageFramer
 {
-    /** @var int */
-    private $maxPackageSize;
-    /** @var string|null */
-    private $messageBuffer;
-    /** @var callable(string $bytes): void */
-    private $receivedHandler;
-    /** @var int */
-    private $packageLength = 0;
+    private int $maxPackageSize;
+    private ?string $messageBuffer = null;
+    private Closure $receivedHandler;
+    private int $packageLength = 0;
 
     public function __construct(int $maxPackageSize = 64 * 1024 * 1024)
     {
@@ -93,8 +90,7 @@ class LengthPrefixMessageFramer
         }
     }
 
-    /** @var callable(string $data): void */
-    public function registerMessageArrivedCallback(callable $handler): void
+    public function registerMessageArrivedCallback(Closure $handler): void
     {
         $this->receivedHandler = $handler;
     }

@@ -23,8 +23,7 @@ class read_all_events_forward_with_linkto_to_deleted_event extends TestCase
 {
     use SpecificationWithLinkToToDeletedEvents;
 
-    /** @var StreamEventsSlice */
-    private $read;
+    private StreamEventsSlice $read;
 
     protected function when(): Generator
     {

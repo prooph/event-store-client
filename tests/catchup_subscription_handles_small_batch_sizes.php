@@ -37,12 +37,9 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
 {
     private const TIMEOUT = 10000;
 
-    /** @var string */
-    private $streamName = 'TestStream';
-    /** @var CatchUpSubscriptionSettings */
-    private $settings;
-    /** @var EventStoreConnection */
-    private $connection;
+    private string $streamName = 'TestStream';
+    private CatchUpSubscriptionSettings $settings;
+    private EventStoreConnection $connection;
 
     private function setUpTestCase(): Promise
     {
@@ -161,7 +158,7 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
         Deferred $deferred
     ): LiveProcessingStartedOnCatchUpSubscription {
         return new class($deferred) implements LiveProcessingStartedOnCatchUpSubscription {
-            private $deferred;
+            private Deferred $deferred;
 
             public function __construct(Deferred $deferred)
             {

@@ -23,8 +23,7 @@ class read_all_events_forward_with_linkto_passed_max_count extends TestCase
 {
     use SpecificationWithLinkToToMaxCountDeletedEvents;
 
-    /** @var StreamEventsSlice */
-    private $read;
+    private StreamEventsSlice $read;
 
     protected function when(): Generator
     {

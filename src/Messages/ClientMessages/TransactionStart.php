@@ -25,15 +25,15 @@ class TransactionStart extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>string event_stream_id = 1;</code>
      */
-    private $event_stream_id = '';
+    private string $event_stream_id = '';
     /**
      * Generated from protobuf field <code>int64 expected_version = 2;</code>
      */
-    private $expected_version = 0;
+    private int $expected_version = 0;
     /**
      * Generated from protobuf field <code>bool require_master = 3;</code>
      */
-    private $require_master = false;
+    private bool $require_master = false;
 
     /**
      * Constructor.

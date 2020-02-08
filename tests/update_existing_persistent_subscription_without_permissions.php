@@ -26,10 +26,8 @@ class update_existing_persistent_subscription_without_permissions extends TestCa
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $stream;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
+    private string $stream;
+    private PersistentSubscriptionSettings $settings;
 
     protected function given(): Generator
     {

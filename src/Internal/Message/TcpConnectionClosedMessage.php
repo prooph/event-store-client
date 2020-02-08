@@ -19,10 +19,8 @@ use Throwable;
 /** @internal */
 class TcpConnectionClosedMessage implements Message
 {
-    /** @var TcpPackageConnection */
-    private $tcpPackageConnection;
-    /** @var Throwable|null */
-    private $exception;
+    private TcpPackageConnection $tcpPackageConnection;
+    private ?Throwable $exception;
 
     public function __construct(TcpPackageConnection $tcpPackageConnection, ?Throwable $exception = null)
     {

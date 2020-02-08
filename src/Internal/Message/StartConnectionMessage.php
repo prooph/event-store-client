@@ -19,10 +19,8 @@ use Prooph\EventStoreClient\Internal\EndPointDiscoverer;
 /** @internal */
 class StartConnectionMessage implements Message
 {
-    /** @var Deferred */
-    private $deferred;
-    /** @var EndPointDiscoverer */
-    private $endPointDiscoverer;
+    private Deferred $deferred;
+    private EndPointDiscoverer $endPointDiscoverer;
 
     public function __construct(Deferred $deferred, EndPointDiscoverer $endPointDiscoverer)
     {

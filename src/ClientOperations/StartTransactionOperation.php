@@ -34,14 +34,10 @@ use Psr\Log\LoggerInterface as Logger;
 /** @internal */
 class StartTransactionOperation extends AbstractOperation
 {
-    /** @var bool */
-    private $requireMaster;
-    /** @var string */
-    private $stream;
-    /** @var int */
-    private $expectedVersion;
-    /** @var EventStoreTransactionConnection */
-    protected $parentConnection;
+    private bool $requireMaster;
+    private string $stream;
+    private int $expectedVersion;
+    protected EventStoreTransactionConnection $parentConnection;
 
     public function __construct(
         Logger $logger,

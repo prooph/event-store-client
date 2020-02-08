@@ -34,10 +34,8 @@ use Psr\Log\LoggerInterface as Logger;
 /** @internal */
 class CommitTransactionOperation extends AbstractOperation
 {
-    /** @var bool */
-    private $requireMaster;
-    /** @var int */
-    private $transactionId;
+    private bool $requireMaster;
+    private int $transactionId;
 
     public function __construct(
         Logger $logger,

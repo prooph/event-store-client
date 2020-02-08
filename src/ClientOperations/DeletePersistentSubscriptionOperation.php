@@ -32,10 +32,8 @@ use Psr\Log\LoggerInterface as Logger;
 /** @internal */
 class DeletePersistentSubscriptionOperation extends AbstractOperation
 {
-    /** @var string */
-    private $stream;
-    /** @var string */
-    private $groupName;
+    private string $stream;
+    private string $groupName;
 
     public function __construct(
         Logger $logger,

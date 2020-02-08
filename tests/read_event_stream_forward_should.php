@@ -260,9 +260,7 @@ class read_event_stream_forward_should extends TestCase
             \assert($read instanceof StreamEventsSlice);
 
             $events = \array_map(
-                function (ResolvedEvent $e): RecordedEvent {
-                    return $e->event();
-                },
+                fn (ResolvedEvent $e): RecordedEvent => $e->event(),
                 $read->events()
             );
 
@@ -298,9 +296,7 @@ class read_event_stream_forward_should extends TestCase
             \assert($read instanceof StreamEventsSlice);
 
             $events = \array_map(
-                function (ResolvedEvent $e): RecordedEvent {
-                    return $e->event();
-                },
+                fn (ResolvedEvent $e): RecordedEvent => $e->event(),
                 $read->events()
             );
 

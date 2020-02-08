@@ -17,6 +17,7 @@ use function Amp\call;
 use Amp\Promise;
 use function Amp\Promise\wait;
 use Amp\Success;
+use Closure;
 use Generator;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\EventData;
@@ -29,12 +30,9 @@ use Throwable;
 
 trait ProjectionSpecification
 {
-    /** @var ProjectionsManager */
-    protected $projectionsManager;
-    /** @var EventStoreConnection */
-    protected $connection;
-    /** @var UserCredentials */
-    protected $credentials;
+    protected ProjectionsManager $projectionsManager;
+    protected EventStoreConnection $connection;
+    protected UserCredentials $credentials;
 
     protected function given(): Generator
     {
@@ -44,9 +42,9 @@ trait ProjectionSpecification
     abstract protected function when(): Generator;
 
     /** @throws Throwable */
-    protected function execute(callable $test): void
+    protected function execute(Closure $test): void
     {
-        wait(call(function () use ($test) {
+        wait(call(function () use ($test): Generator {
             $this->credentials = DefaultData::adminCredentials();
             $this->connection = TestConnection::create();
 

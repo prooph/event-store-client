@@ -21,6 +21,7 @@ use function Amp\Socket\connect;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\ConnectException;
 use Amp\Socket\EncryptableSocket;
+use Closure;
 use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
@@ -32,35 +33,21 @@ use Throwable;
 /** @internal */
 class TcpPackageConnection
 {
-    /** @var Logger */
-    private $log;
-    /** @var EndPoint */
-    private $remoteEndPoint;
-    /** @var string */
-    private $connectionId;
-    /** bool */
-    private $ssl;
-    /** @var string */
-    private $targetHost;
-    /** @var bool */
-    private $validateServer;
-    /** @var int */
-    private $timeout;
-    /** @var EncryptableSocket|null */
-    private $connection;
-    /** @var bool */
-    private $isClosed = true;
-    /** @var callable */
-    private $handlePackage;
-    /** @var callable */
-    private $onError;
-    /** @var callable */
-    private $connectionEstablished;
-    /** @var callable */
-    private $connectionClosed;
+    private Logger $log;
+    private EndPoint $remoteEndPoint;
+    private string $connectionId;
+    private bool $ssl;
+    private string $targetHost;
+    private bool $validateServer;
+    private int $timeout;
+    private ?EncryptableSocket $connection = null;
+    private bool $isClosed = true;
+    private Closure $handlePackage;
+    private Closure $onError;
+    private Closure $connectionEstablished;
+    private Closure $connectionClosed;
 
-    /** @var LengthPrefixMessageFramer */
-    private $framer;
+    private LengthPrefixMessageFramer $framer;
 
     public function __construct(
         Logger $logger,
@@ -70,10 +57,10 @@ class TcpPackageConnection
         string $targetHost,
         bool $validateServer,
         int $timeout,
-        callable $handlePackage,
-        callable $onError,
-        callable $connectionEstablished,
-        callable $connectionClosed
+        Closure $handlePackage,
+        Closure $onError,
+        Closure $connectionEstablished,
+        Closure $connectionClosed
     ) {
         if ($ssl && empty($targetHost)) {
             throw new InvalidArgumentException('Target host cannot be empty when using SSL');

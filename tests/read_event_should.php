@@ -28,14 +28,10 @@ class read_event_should extends TestCase
 {
     use SpecificationWithConnection;
 
-    /** @var EventId */
-    private $eventId0;
-    /** @var EventId */
-    private $eventId1;
-    /** @var string */
-    private $testStream;
-    /** @var string */
-    private $deletedStream;
+    private EventId $eventId0;
+    private EventId $eventId1;
+    private string $testStream;
+    private string $deletedStream;
 
     protected function when(): Generator
     {

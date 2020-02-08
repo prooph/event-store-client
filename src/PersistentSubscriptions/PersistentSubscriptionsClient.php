@@ -30,10 +30,8 @@ use Throwable;
 /** @internal */
 class PersistentSubscriptionsClient
 {
-    /** @var HttpClient */
-    private $client;
-    /** @var int */
-    private $operationTimeout;
+    private HttpClient $client;
+    private int $operationTimeout;
 
     public function __construct(int $operationTimeout)
     {

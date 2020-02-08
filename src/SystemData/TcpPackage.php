@@ -27,18 +27,12 @@ class TcpPackage
 
     public const DATA_OFFSET = 4;
 
-    /** @var TcpCommand */
-    private $command;
-    /** @var TcpFlags */
-    private $flags;
-    /** @var string */
-    private $correlationId;
-    /** @var string */
-    private $data;
-    /** @var string|null */
-    private $login;
-    /** @var string|null */
-    private $password;
+    private TcpCommand $command;
+    private TcpFlags $flags;
+    private string $correlationId;
+    private string $data;
+    private ?string $login;
+    private ?string $password;
 
     public static function fromRawData(string $bytes): TcpPackage
     {

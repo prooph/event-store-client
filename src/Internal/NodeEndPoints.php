@@ -19,10 +19,8 @@ use Prooph\EventStore\Exception\InvalidArgumentException;
 /** @internal */
 class NodeEndPoints
 {
-    /** @var EndPoint|null */
-    private $tcpEndPoint;
-    /** @var EndPoint|null */
-    private $secureTcpEndPoint;
+    private ?EndPoint $tcpEndPoint;
+    private ?EndPoint $secureTcpEndPoint;
 
     public function __construct(?EndPoint $tcpEndPoint, ?EndPoint $secureTcpEndPoint = null)
     {

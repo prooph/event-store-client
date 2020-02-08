@@ -20,13 +20,10 @@ use Prooph\EventStore\Internal\Consts;
 class GossipSeedClusterSettingsBuilder
 {
     /** @var GossipSeed[] */
-    private $gossipSeeds = [];
-    /** @var int */
-    private $maxDiscoverAttempts = Consts::DEFAULT_MAX_CLUSTER_DISCOVER_ATTEMPTS;
-    /** @var int */
-    private $gossipTimeout = 1000;
-    /** @var bool */
-    private $preferRandomNode = false;
+    private array $gossipSeeds = [];
+    private int $maxDiscoverAttempts = Consts::DEFAULT_MAX_CLUSTER_DISCOVER_ATTEMPTS;
+    private int $gossipTimeout = 1000;
+    private bool $preferRandomNode = false;
 
     public function addEndPoint(EndPoint $endPoint): self
     {
@@ -37,8 +34,6 @@ class GossipSeedClusterSettingsBuilder
 
     /**
      * @param EndPoint[] $endPoints
-     *
-     * @return GossipSeedClusterSettingsBuilder
      */
     public function addEndPoints(array $endPoints): self
     {
@@ -58,8 +53,6 @@ class GossipSeedClusterSettingsBuilder
 
     /**
      * @param GossipSeed[] $gossipSeeds
-     *
-     * @return GossipSeedClusterSettingsBuilder
      */
     public function addGossipSeeds(array $gossipSeeds): self
     {

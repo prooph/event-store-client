@@ -25,19 +25,19 @@ class ReadEvent extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>string event_stream_id = 1;</code>
      */
-    private $event_stream_id = '';
+    private string $event_stream_id = '';
     /**
      * Generated from protobuf field <code>int64 event_number = 2;</code>
      */
-    private $event_number = 0;
+    private int $event_number = 0;
     /**
      * Generated from protobuf field <code>bool resolve_link_tos = 3;</code>
      */
-    private $resolve_link_tos = false;
+    private bool $resolve_link_tos = false;
     /**
      * Generated from protobuf field <code>bool require_master = 4;</code>
      */
-    private $require_master = false;
+    private bool $require_master = false;
 
     /**
      * Constructor.

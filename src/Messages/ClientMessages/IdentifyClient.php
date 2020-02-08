@@ -25,11 +25,11 @@ class IdentifyClient extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>int32 version = 1;</code>
      */
-    private $version = 0;
+    private int $version = 0;
     /**
      * Generated from protobuf field <code>string connection_name = 2;</code>
      */
-    private $connection_name = '';
+    private string $connection_name = '';
 
     /**
      * Constructor.

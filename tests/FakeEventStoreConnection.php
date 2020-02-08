@@ -15,6 +15,7 @@ namespace ProophTest\EventStoreClient;
 
 use Amp\Promise;
 use Amp\Success;
+use Closure;
 use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
 use Prooph\EventStore\Async\ClientAuthenticationFailedEventArgs;
 use Prooph\EventStore\Async\ClientClosedEventArgs;
@@ -44,22 +45,15 @@ use Prooph\EventStoreClient\ConnectionSettings;
 /** @internal */
 class FakeEventStoreConnection implements EventStoreConnection
 {
-    /** @var callable */
-    private $readAllEventsForwardAsync;
-    /** @var callable */
-    private $readStreamEventsForwardAsync;
-    /** @var callable */
-    private $subscribeToStreamAsync;
-    /** @var callable */
-    private $subscribeToAllAsync;
-    /** @var EventHandler */
-    private $eventHandler;
+    private Closure $readAllEventsForwardAsync;
+    private Closure $readStreamEventsForwardAsync;
+    private Closure $subscribeToStreamAsync;
+    private Closure $subscribeToAllAsync;
+    private EventHandler $eventHandler;
 
     public function __construct()
     {
-        $this->readAllEventsForwardAsync = function (Position $position, int $start, int $count, ?UserCredentials $credentials): Promise {
-            return new Success();
-        };
+        $this->readAllEventsForwardAsync = fn (Position $position, int $start, int $count, ?UserCredentials $credentials): Promise => new Success();
 
         $this->eventHandler = new EventHandler();
     }
@@ -324,32 +318,32 @@ class FakeEventStoreConnection implements EventStoreConnection
         throw new \RuntimeException('Not implemented');
     }
 
-    public function onConnected(callable $handler): ListenerHandler
+    public function onConnected(Closure $handler): ListenerHandler
     {
         return $this->eventHandler->whenConnected($handler);
     }
 
-    public function onDisconnected(callable $handler): ListenerHandler
+    public function onDisconnected(Closure $handler): ListenerHandler
     {
         return $this->eventHandler->whenDisconnected($handler);
     }
 
-    public function onReconnecting(callable $handler): ListenerHandler
+    public function onReconnecting(Closure $handler): ListenerHandler
     {
         return $this->eventHandler->whenReconnecting($handler);
     }
 
-    public function onClosed(callable $handler): ListenerHandler
+    public function onClosed(Closure $handler): ListenerHandler
     {
         return $this->eventHandler->whenClosed($handler);
     }
 
-    public function onErrorOccurred(callable $handler): ListenerHandler
+    public function onErrorOccurred(Closure $handler): ListenerHandler
     {
         return $this->eventHandler->whenErrorOccurred($handler);
     }
 
-    public function onAuthenticationFailed(callable $handler): ListenerHandler
+    public function onAuthenticationFailed(Closure $handler): ListenerHandler
     {
         return $this->eventHandler->whenAuthenticationFailed($handler);
     }
@@ -389,22 +383,22 @@ class FakeEventStoreConnection implements EventStoreConnection
         $this->eventHandler->detach($handler);
     }
 
-    public function handleReadStreamEventsForwardAsync(callable $callback): void
+    public function handleReadStreamEventsForwardAsync(Closure $callback): void
     {
         $this->readStreamEventsForwardAsync = $callback;
     }
 
-    public function handleReadAllEventsForwardAsync(callable $callback): void
+    public function handleReadAllEventsForwardAsync(Closure $callback): void
     {
         $this->readAllEventsForwardAsync = $callback;
     }
 
-    public function handleSubscribeToStreamAsync(callable $callback): void
+    public function handleSubscribeToStreamAsync(Closure $callback): void
     {
         $this->subscribeToStreamAsync = $callback;
     }
 
-    public function handleSubscribeToAllAsync(callable $callback): void
+    public function handleSubscribeToAllAsync(Closure $callback): void
     {
         $this->subscribeToAllAsync = $callback;
     }

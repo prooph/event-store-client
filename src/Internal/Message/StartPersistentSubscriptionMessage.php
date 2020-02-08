@@ -14,29 +14,21 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Internal\Message;
 
 use Amp\Deferred;
+use Closure;
 use Prooph\EventStore\UserCredentials;
 
 /** @internal  */
 class StartPersistentSubscriptionMessage implements Message
 {
-    /** @var Deferred */
-    private $deferred;
-    /** @var string */
-    private $subscriptionId;
-    /** @var string */
-    private $streamId;
-    /** @var int */
-    private $bufferSize;
-    /** @var UserCredentials|null */
-    private $userCredentials;
-    /** @var callable */
-    private $eventAppeared;
-    /** @var callable|null */
-    private $subscriptionDropped;
-    /** @var int */
-    private $maxRetries;
-    /** @var int */
-    private $timeout;
+    private Deferred $deferred;
+    private string $subscriptionId;
+    private string $streamId;
+    private int $bufferSize;
+    private ?UserCredentials $userCredentials;
+    private Closure $eventAppeared;
+    private ?Closure $subscriptionDropped;
+    private int $maxRetries;
+    private int $timeout;
 
     public function __construct(
         Deferred $deferred,
@@ -44,8 +36,8 @@ class StartPersistentSubscriptionMessage implements Message
         string $streamId,
         int $bufferSize,
         ?UserCredentials $userCredentials,
-        callable $eventAppeared,
-        ?callable $subscriptionDropped,
+        Closure $eventAppeared,
+        ?Closure $subscriptionDropped,
         int $maxRetries,
         int $timeout
     ) {
@@ -85,12 +77,12 @@ class StartPersistentSubscriptionMessage implements Message
         return $this->userCredentials;
     }
 
-    public function eventAppeared(): callable
+    public function eventAppeared(): Closure
     {
         return $this->eventAppeared;
     }
 
-    public function subscriptionDropped(): ?callable
+    public function subscriptionDropped(): ?Closure
     {
         return $this->subscriptionDropped;
     }

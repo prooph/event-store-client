@@ -30,10 +30,8 @@ final class InspectionDecision
     public const RECONNECT = 3;
     public const SUBSCRIBED = 4;
 
-    /** @var string */
-    private $name;
-    /** @var int */
-    private $value;
+    private string $name;
+    private int $value;
 
     private function __construct(string $name)
     {

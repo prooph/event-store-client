@@ -17,8 +17,7 @@ use Prooph\EventStore\Exception\ProjectionCommandConflict as BaseException;
 
 class ProjectionCommandConflict extends BaseException
 {
-    /** @var int */
-    private $httpStatusCode;
+    private int $httpStatusCode;
 
     public function __construct(int $httpStatusCode, string $message)
     {

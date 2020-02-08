@@ -21,18 +21,13 @@ use Prooph\EventStore\Exception\OutOfRangeException;
  */
 final class ClusterSettings
 {
-    /** @var string */
-    private $clusterDns = '';
-    /** @var int */
-    private $maxDiscoverAttempts;
-    /** @var int */
-    private $externalGossipPort = 0;
+    private string $clusterDns = '';
+    private int $maxDiscoverAttempts;
+    private int $externalGossipPort = 0;
     /** @var GossipSeed[] */
-    private $gossipSeeds = [];
-    /** @var int */
-    private $gossipTimeout = 0;
-    /** @var bool */
-    private $preferRandomNode;
+    private array $gossipSeeds = [];
+    private int $gossipTimeout = 0;
+    private bool $preferRandomNode;
 
     public static function create(): ClusterSettingsBuilder
     {

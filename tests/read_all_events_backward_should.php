@@ -37,11 +37,9 @@ class read_all_events_backward_should extends TestCase
     use SpecificationWithConnection;
 
     /** @var EventData[] */
-    private $testEvents;
-    /** @var Position */
-    private $endOfEvents;
-    /** @var string */
-    private $stream;
+    private array $testEvents;
+    private Position $endOfEvents;
+    private string $stream;
 
     protected function when(): Generator
     {
@@ -124,9 +122,7 @@ class read_all_events_backward_should extends TestCase
             \assert($read instanceof AllEventsSlice);
 
             $readEvents = \array_map(
-                function (ResolvedEvent $resolvedEvent): RecordedEvent {
-                    return $resolvedEvent->event();
-                },
+                fn (ResolvedEvent $resolvedEvent): RecordedEvent => $resolvedEvent->event(),
                 \array_slice($read->events(), 0, \count($this->testEvents))
             );
 

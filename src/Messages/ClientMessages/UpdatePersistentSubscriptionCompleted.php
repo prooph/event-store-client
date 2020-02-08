@@ -25,11 +25,11 @@ class UpdatePersistentSubscriptionCompleted extends \Google\Protobuf\Internal\Me
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.UpdatePersistentSubscriptionCompleted.UpdatePersistentSubscriptionResult result = 1;</code>
      */
-    private $result = 0;
+    private int $result = 0;
     /**
      * Generated from protobuf field <code>string reason = 2;</code>
      */
-    private $reason = '';
+    private string $reason = '';
 
     /**
      * Constructor.

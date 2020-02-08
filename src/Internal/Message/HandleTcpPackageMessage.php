@@ -19,10 +19,8 @@ use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
 /** @internal */
 class HandleTcpPackageMessage implements Message
 {
-    /** @var TcpPackageConnection */
-    private $tcpPackageConnection;
-    /** @var TcpPackage */
-    private $tcpPackage;
+    private TcpPackageConnection $tcpPackageConnection;
+    private TcpPackage $tcpPackage;
 
     public function __construct(TcpPackageConnection $tcpPackageConnection, TcpPackage $tcpPackage)
     {

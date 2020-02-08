@@ -19,14 +19,10 @@ use Prooph\EventStore\Exception\InvalidArgumentException;
 /** @internal */
 class InspectionResult
 {
-    /** @var InspectionDecision */
-    private $inspectionDecision;
-    /** @var string */
-    private $description;
-    /** @var EndPoint|null */
-    private $tcpEndPoint;
-    /** @var EndPoint|null */
-    private $secureTcpEndPoint;
+    private InspectionDecision $inspectionDecision;
+    private string $description;
+    private ?EndPoint $tcpEndPoint;
+    private ?EndPoint $secureTcpEndPoint;
 
     public function __construct(
         InspectionDecision $decision,

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use Closure;
 use Prooph\EventStore\Exception\ConnectionClosed;
 use Prooph\EventStore\Exception\OperationTimedOut;
 use Prooph\EventStore\Exception\RetriesLimitReached;
@@ -25,20 +26,16 @@ use SplQueue;
 /** @internal */
 class OperationsManager
 {
-    /** @var callable */
-    private $operationItemSeqNoComparer;
-    /** @var string */
-    private $connectionName;
-    /** @var ConnectionSettings */
-    private $settings;
+    private Closure $operationItemSeqNoComparer;
+    private string $connectionName;
+    private ConnectionSettings $settings;
     /** @var OperationItem[] */
-    private $activeOperations = [];
+    private array $activeOperations = [];
     /** @var SplQueue<OperationItem> */
-    private $waitingOperations;
+    private SplQueue $waitingOperations;
     /** @var OperationItem[] */
-    private $retryPendingOperations = [];
-    /** @var int */
-    private $totalOperationCount = 0;
+    private array $retryPendingOperations = [];
+    private int $totalOperationCount = 0;
 
     public function __construct(string $connectionName, ConnectionSettings $settings)
     {

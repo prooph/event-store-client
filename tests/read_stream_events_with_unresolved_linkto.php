@@ -30,11 +30,9 @@ class read_stream_events_with_unresolved_linkto extends TestCase
     use SpecificationWithConnection;
 
     /** @var EventData[] */
-    private $testEvents;
-    /** @var string */
-    private $stream;
-    /** @var string */
-    private $links;
+    private array $testEvents;
+    private string $stream;
+    private string $links;
 
     protected function when(): Generator
     {

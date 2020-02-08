@@ -20,10 +20,8 @@ use Prooph\EventStore\EndPoint;
  */
 class GossipSeed
 {
-    /** @var EndPoint */
-    private $endPoint;
-    /** @var string */
-    private $hostHeader;
+    private EndPoint $endPoint;
+    private string $hostHeader;
 
     public function __construct(EndPoint $endPoint, string $hostHeader = '')
     {

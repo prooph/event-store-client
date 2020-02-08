@@ -33,18 +33,12 @@ class update_existing_persistent_subscription_with_subscribers extends TestCase
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $stream;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
-    /** @var Deferred */
-    private $dropped;
-    /** @var SubscriptionDropReason */
-    private $reason;
-    /** @var Throwable */
-    private $exception;
-    /** @var Throwable */
-    private $caught;
+    private string $stream;
+    private PersistentSubscriptionSettings $settings;
+    private Deferred $dropped;
+    private ?SubscriptionDropReason $reason;
+    private ?Throwable $exception;
+    private ?Throwable $caught = null;
 
     protected function given(): Generator
     {
@@ -80,12 +74,9 @@ class update_existing_persistent_subscription_with_subscribers extends TestCase
                 }
             },
             new class($this->dropped, $this->reason, $this->exception) implements PersistentSubscriptionDropped {
-                /** @var Deferred */
-                private $dropped;
-                /** @var SubscriptionDropReason */
-                private $reason;
-                /** @var Throwable */
-                private $exception;
+                private Deferred $dropped;
+                private ?SubscriptionDropReason $reason;
+                private ?Throwable $exception;
 
                 public function __construct($dropped, &$reason, &$exception)
                 {

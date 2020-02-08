@@ -16,6 +16,7 @@ namespace ProophTest\EventStoreClient\Helper;
 use function Amp\call;
 use Amp\Promise;
 use Amp\Success;
+use Generator;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\WriteResult;
@@ -23,12 +24,9 @@ use Prooph\EventStore\WriteResult;
 /** @internal */
 class StreamWriter
 {
-    /** @var EventStoreConnection */
-    private $connection;
-    /** @var string */
-    private $stream;
-    /** @var int */
-    private $version;
+    private EventStoreConnection $connection;
+    private string $stream;
+    private int $version;
 
     public function __construct(EventStoreConnection $connection, string $stream, int $version)
     {
@@ -40,7 +38,7 @@ class StreamWriter
     /** @return Promise<TailWriter> */
     public function append(array $events): Promise
     {
-        return call(function () use ($events) {
+        return call(function () use ($events): Generator {
             foreach ($events as $key => $event) {
                 $expVer = $this->version === ExpectedVersion::ANY ? ExpectedVersion::ANY : $this->version + $key;
                 $result = yield $this->connection->appendToStreamAsync($this->stream, $expVer, [$event]);

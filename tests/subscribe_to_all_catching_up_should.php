@@ -17,6 +17,7 @@ use function Amp\call;
 use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
+use Closure;
 use Exception;
 use Generator;
 use PHPUnit\Framework\TestCase;
@@ -47,13 +48,12 @@ class subscribe_to_all_catching_up_should extends TestCase
 {
     private const TIMEOUT = 10000;
 
-    /** @var EventStoreConnection */
-    private $conn;
+    private EventStoreConnection $conn;
 
     /**
      * @throws Throwable
      */
-    private function execute(callable $function): void
+    private function execute(Closure $function): void
     {
         Promise\wait(call(function () use ($function): Generator {
             $this->conn = TestConnection::create();
@@ -106,8 +106,7 @@ class subscribe_to_all_catching_up_should extends TestCase
                 },
                 null,
                 new class($dropped) implements CatchUpSubscriptionDropped {
-                    /** @var CountdownEvent */
-                    private $dropped;
+                    private CountdownEvent $dropped;
 
                     public function __construct(CountdownEvent $dropped)
                     {
@@ -165,8 +164,7 @@ class subscribe_to_all_catching_up_should extends TestCase
                 },
                 null,
                 new class($dropped) implements CatchUpSubscriptionDropped {
-                    /** @var CountdownEvent */
-                    private $dropped;
+                    private CountdownEvent $dropped;
 
                     public function __construct(CountdownEvent $dropped)
                     {
@@ -211,8 +209,7 @@ class subscribe_to_all_catching_up_should extends TestCase
                 null,
                 CatchUpSubscriptionSettings::default(),
                 new class($appeared) implements EventAppearedOnCatchupSubscription {
-                    /** @var ManualResetEventSlim */
-                    private $appeared;
+                    private ManualResetEventSlim $appeared;
 
                     public function __construct(ManualResetEventSlim $appeared)
                     {
@@ -232,8 +229,7 @@ class subscribe_to_all_catching_up_should extends TestCase
                 },
                 null,
                 new class($dropped) implements CatchUpSubscriptionDropped {
-                    /** @var CountdownEvent */
-                    private $dropped;
+                    private CountdownEvent $dropped;
 
                     public function __construct(CountdownEvent $dropped)
                     {
@@ -307,10 +303,8 @@ class subscribe_to_all_catching_up_should extends TestCase
                 $position,
                 CatchUpSubscriptionSettings::default(),
                 new class($events, $appeared) implements EventAppearedOnCatchupSubscription {
-                    /** @var array */
-                    private $events;
-                    /** @var CountdownEvent */
-                    private $appeared;
+                    private array $events;
+                    private CountdownEvent $appeared;
 
                     public function __construct(array &$events, CountdownEvent $appeared)
                     {
@@ -332,8 +326,7 @@ class subscribe_to_all_catching_up_should extends TestCase
                 },
                 null,
                 new class($dropped) implements CatchUpSubscriptionDropped {
-                    /** @var CountdownEvent */
-                    private $dropped;
+                    private CountdownEvent $dropped;
 
                     public function __construct(CountdownEvent $dropped)
                     {
@@ -413,10 +406,8 @@ class subscribe_to_all_catching_up_should extends TestCase
                 $lastEvent->originalPosition(),
                 CatchUpSubscriptionSettings::default(),
                 new class($events, $appeared) implements EventAppearedOnCatchupSubscription {
-                    /** @var array */
-                    private $events;
-                    /** @var CountdownEvent */
-                    private $appeared;
+                    private array $events;
+                    private CountdownEvent $appeared;
 
                     public function __construct(array &$events, CountdownEvent $appeared)
                     {
@@ -438,8 +429,7 @@ class subscribe_to_all_catching_up_should extends TestCase
                 },
                 null,
                 new class($dropped) implements CatchUpSubscriptionDropped {
-                    /** @var CountdownEvent */
-                    private $dropped;
+                    private CountdownEvent $dropped;
 
                     public function __construct(CountdownEvent $dropped)
                     {
@@ -523,10 +513,8 @@ class subscribe_to_all_catching_up_should extends TestCase
                 $lastEvent->originalPosition(),
                 CatchUpSubscriptionSettings::default(),
                 new class($events, $appeared) implements EventAppearedOnCatchupSubscription {
-                    /** @var array */
-                    private $events;
-                    /** @var CountdownEvent */
-                    private $appeared;
+                    private array $events;
+                    private CountdownEvent $appeared;
 
                     public function __construct(array &$events, CountdownEvent $appeared)
                     {
@@ -546,8 +534,7 @@ class subscribe_to_all_catching_up_should extends TestCase
                 },
                 null,
                 new class($dropped) implements CatchUpSubscriptionDropped {
-                    /** @var CountdownEvent */
-                    private $dropped;
+                    private CountdownEvent $dropped;
 
                     public function __construct(CountdownEvent $dropped)
                     {

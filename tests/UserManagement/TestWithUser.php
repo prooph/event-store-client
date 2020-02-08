@@ -15,6 +15,7 @@ namespace ProophTest\EventStoreClient\UserManagement;
 
 use function Amp\call;
 use function Amp\Promise\wait;
+use Closure;
 use Generator;
 use Prooph\EventStore\Util\Guid;
 use ProophTest\EventStoreClient\DefaultData;
@@ -22,8 +23,7 @@ use Throwable;
 
 abstract class TestWithUser extends TestWithNode
 {
-    /** @var string */
-    protected $username;
+    protected string $username;
 
     protected function setUp(): void
     {
@@ -33,7 +33,7 @@ abstract class TestWithUser extends TestWithNode
     }
 
     /** @throws Throwable */
-    protected function execute(callable $function): void
+    protected function execute(Closure $function): void
     {
         wait(call(function () use ($function): Generator {
             yield $this->manager->createUserAsync(

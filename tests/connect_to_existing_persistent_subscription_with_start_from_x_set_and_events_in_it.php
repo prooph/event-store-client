@@ -33,18 +33,12 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $stream;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
-    /** @var string */
-    private $group = 'startinx2';
-    /** @var Deferred */
-    private $resetEvent;
-    /** @var ResolvedEvent */
-    private $firstEvent;
-    /** @var EventId */
-    private $eventId;
+    private string $stream;
+    private PersistentSubscriptionSettings $settings;
+    private string $group = 'startinx2';
+    private Deferred $resetEvent;
+    private ?ResolvedEvent $firstEvent;
+    private EventId $eventId;
 
     protected function setUp(): void
     {
@@ -71,9 +65,9 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
             $this->stream,
             $this->group,
             new class($this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
-                private $deferred;
-                private $firstEvent;
-                private $set = false;
+                private Deferred $deferred;
+                private ?ResolvedEvent $firstEvent;
+                private bool $set = false;
 
                 public function __construct($deferred, &$firstEvent)
                 {

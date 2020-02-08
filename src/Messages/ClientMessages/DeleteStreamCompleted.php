@@ -25,19 +25,19 @@ class DeleteStreamCompleted extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.OperationResult result = 1;</code>
      */
-    private $result = 0;
+    private int $result = 0;
     /**
      * Generated from protobuf field <code>string message = 2;</code>
      */
-    private $message = '';
+    private string $message = '';
     /**
      * Generated from protobuf field <code>int64 prepare_position = 3;</code>
      */
-    private $prepare_position = 0;
+    private int $prepare_position = 0;
     /**
      * Generated from protobuf field <code>int64 commit_position = 4;</code>
      */
-    private $commit_position = 0;
+    private int $commit_position = 0;
 
     /**
      * Constructor.

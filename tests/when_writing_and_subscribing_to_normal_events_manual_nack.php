@@ -32,18 +32,14 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends TestCase
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $streamName;
-    /** @var string */
-    private $groupName;
+    private string $streamName;
+    private string $groupName;
 
     public const BUFFER_COUNT = 10;
     public const EVENT_WRITE_COUNT = self::BUFFER_COUNT * 2;
 
-    /** @var Deferred */
-    private $eventsReceived;
-    /** @var int */
-    private $eventReceivedCount = 0;
+    private Deferred $eventsReceived;
+    private int $eventReceivedCount = 0;
 
     protected function setUp(): void
     {
@@ -80,10 +76,8 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends TestCase
                 $this->streamName,
                 $this->groupName,
                 new class($this->eventReceivedCount, $this->eventsReceived) implements EventAppearedOnPersistentSubscription {
-                    /** @var int */
-                    private $eventReceivedCount;
-                    /** @var Deferred */
-                    private $eventsReceived;
+                    private int $eventReceivedCount;
+                    private Deferred $eventsReceived;
 
                     public function __construct(int &$eventReceivedCount, Deferred $eventsReceived)
                     {

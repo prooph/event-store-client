@@ -25,10 +25,8 @@ class update_non_existing_persistent_subscription extends TestCase
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $stream;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
+    private string $stream;
+    private PersistentSubscriptionSettings $settings;
 
     protected function given(): Generator
     {

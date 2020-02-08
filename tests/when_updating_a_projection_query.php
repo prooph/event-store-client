@@ -22,12 +22,9 @@ class when_updating_a_projection_query extends TestCase
 {
     use ProjectionSpecification;
 
-    /** @var string */
-    private $projectionName;
-    /** @var string */
-    private $streamName;
-    /** @var string */
-    private $newQuery;
+    private string $projectionName;
+    private string $streamName;
+    private string $newQuery;
 
     protected function given(): Generator
     {

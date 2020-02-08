@@ -28,12 +28,9 @@ use Prooph\EventStore\UserCredentials;
  */
 class QueryManager implements AsyncQueryManager
 {
-    /** @var int */
-    private $queryTimeout;
-    /** @var ProjectionsManager */
-    private $projectionsManager;
-    /** @var UserCredentials|null */
-    private $defaultUserCredentials;
+    private int $queryTimeout;
+    private ProjectionsManager $projectionsManager;
+    private ?UserCredentials $defaultUserCredentials;
 
     public function __construct(
         EndPoint $httpEndPoint,
@@ -75,7 +72,7 @@ class QueryManager implements AsyncQueryManager
         string $type = 'JS',
         ?UserCredentials $userCredentials = null
     ): Promise {
-        $userCredentials = $userCredentials ?? $this->defaultUserCredentials;
+        $userCredentials ??= $this->defaultUserCredentials;
 
         $promise = call(function () use ($name, $query, $initialPollingDelay,
             $maximumPollingDelay, $type, $userCredentials

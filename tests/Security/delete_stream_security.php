@@ -29,15 +29,9 @@ class delete_stream_security extends AuthenticationTestCase
     public function delete_of_all_is_never_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->deleteStream('$all', null, null);
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->deleteStream('$all', 'user1', 'pa$$1');
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->deleteStream('$all', 'adm', 'admpa$$');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream('$all', null, null));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream('$all', 'user1', 'pa$$1'));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream('$all', 'adm', 'admpa$$'));
         }));
     }
 
@@ -48,13 +42,11 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_normal_no_acl_stream_with_no_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()->build());
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()->build());
 
-                    yield $this->deleteStream($streamId, null, null);
-                });
-            });
+                yield $this->deleteStream($streamId, null, null);
+            }));
         }));
     }
 
@@ -65,13 +57,11 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_normal_no_acl_stream_with_existing_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()->build());
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()->build());
 
-                    yield $this->deleteStream($streamId, 'user1', 'pa$$1');
-                });
-            });
+                yield $this->deleteStream($streamId, 'user1', 'pa$$1');
+            }));
         }));
     }
 
@@ -82,13 +72,11 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_normal_no_acl_stream_with_admin_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()->build());
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()->build());
 
-                    yield $this->deleteStream($streamId, 'adm', 'admpa$$');
-                });
-            });
+                yield $this->deleteStream($streamId, 'adm', 'admpa$$');
+            }));
         }));
     }
 
@@ -104,9 +92,7 @@ class delete_stream_security extends AuthenticationTestCase
                 ->build()
             );
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($streamId) {
-                return $this->deleteStream($streamId, null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, null, null));
         }));
     }
 
@@ -122,9 +108,7 @@ class delete_stream_security extends AuthenticationTestCase
                 ->build()
             );
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($streamId) {
-                return $this->deleteStream($streamId, 'user2', 'pa$$2');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, 'user2', 'pa$$2'));
         }));
     }
 
@@ -135,16 +119,14 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_normal_user_stream_with_authorized_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
-                        ->setDeleteRoles('user1')
-                        ->build()
-                    );
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
+                    ->setDeleteRoles('user1')
+                    ->build()
+                );
 
-                    yield $this->deleteStream($streamId, 'user1', 'pa$$1');
-                });
-            });
+                yield $this->deleteStream($streamId, 'user1', 'pa$$1');
+            }));
         }));
     }
 
@@ -155,16 +137,14 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_normal_user_stream_with_admin_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
-                        ->setDeleteRoles('user1')
-                        ->build()
-                    );
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
+                    ->setDeleteRoles('user1')
+                    ->build()
+                );
 
-                    yield $this->deleteStream($streamId, 'adm', 'admpa$$');
-                });
-            });
+                yield $this->deleteStream($streamId, 'adm', 'admpa$$');
+            }));
         }));
     }
 
@@ -180,9 +160,7 @@ class delete_stream_security extends AuthenticationTestCase
                 ->build()
             );
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($streamId) {
-                return $this->deleteStream($streamId, null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, null, null));
         }));
     }
 
@@ -198,9 +176,7 @@ class delete_stream_security extends AuthenticationTestCase
                 ->build()
             );
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($streamId) {
-                return $this->deleteStream($streamId, 'user1', 'pa$$1');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, 'user1', 'pa$$1'));
         }));
     }
 
@@ -211,16 +187,14 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_normal_admin_stream_with_admin_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
-                        ->setDeleteRoles(SystemRoles::ADMINS)
-                        ->build()
-                    );
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
+                    ->setDeleteRoles(SystemRoles::ADMINS)
+                    ->build()
+                );
 
-                    yield $this->deleteStream($streamId, 'adm', 'admpa$$');
-                });
-            });
+                yield $this->deleteStream($streamId, 'adm', 'admpa$$');
+            }));
         }));
     }
 
@@ -231,16 +205,14 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_normal_all_stream_with_no_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
-                        ->setDeleteRoles(SystemRoles::ALL)
-                        ->build()
-                    );
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
+                    ->setDeleteRoles(SystemRoles::ALL)
+                    ->build()
+                );
 
-                    yield $this->deleteStream($streamId, null, null);
-                });
-            });
+                yield $this->deleteStream($streamId, null, null);
+            }));
         }));
     }
 
@@ -251,16 +223,14 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_normal_all_stream_with_existing_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
-                        ->setDeleteRoles(SystemRoles::ALL)
-                        ->build()
-                    );
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
+                    ->setDeleteRoles(SystemRoles::ALL)
+                    ->build()
+                );
 
-                    yield $this->deleteStream($streamId, 'user1', 'pa$$1');
-                });
-            });
+                yield $this->deleteStream($streamId, 'user1', 'pa$$1');
+            }));
         }));
     }
 
@@ -271,16 +241,14 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_normal_all_stream_with_admin_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
-                        ->setDeleteRoles(SystemRoles::ALL)
-                        ->build()
-                    );
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
+                    ->setDeleteRoles(SystemRoles::ALL)
+                    ->build()
+                );
 
-                    yield $this->deleteStream($streamId, 'adm', 'admpa$$');
-                });
-            });
+                yield $this->deleteStream($streamId, 'adm', 'admpa$$');
+            }));
         }));
     }
 
@@ -298,9 +266,7 @@ class delete_stream_security extends AuthenticationTestCase
                 '$'
             );
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($streamId) {
-                return $this->deleteStream($streamId, null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, null, null));
         }));
     }
 
@@ -316,9 +282,7 @@ class delete_stream_security extends AuthenticationTestCase
                 '$'
             );
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($streamId) {
-                return $this->deleteStream($streamId, 'user1', 'pa$$1');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, 'user1', 'pa$$1'));
         }));
     }
 
@@ -329,16 +293,14 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_system_no_acl_stream_with_admin_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(
-                        StreamMetadata::create()->build(),
-                        '$'
-                    );
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(
+                    StreamMetadata::create()->build(),
+                    '$'
+                );
 
-                    yield $this->deleteStream($streamId, 'adm', 'admpa$$');
-                });
-            });
+                yield $this->deleteStream($streamId, 'adm', 'admpa$$');
+            }));
         }));
     }
 
@@ -356,9 +318,7 @@ class delete_stream_security extends AuthenticationTestCase
                 '$'
             );
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($streamId) {
-                return $this->deleteStream($streamId, null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, null, null));
         }));
     }
 
@@ -376,9 +336,7 @@ class delete_stream_security extends AuthenticationTestCase
                 '$'
             );
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($streamId) {
-                return $this->deleteStream($streamId, 'user2', 'pa$$2');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, 'user2', 'pa$$2'));
         }));
     }
 
@@ -389,18 +347,16 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_system_user_stream_with_authorized_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(
-                        StreamMetadata::create()
-                            ->setDeleteRoles('user1')
-                            ->build(),
-                        '$'
-                    );
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(
+                    StreamMetadata::create()
+                        ->setDeleteRoles('user1')
+                        ->build(),
+                    '$'
+                );
 
-                    yield $this->deleteStream($streamId, 'user1', 'pa$$1');
-                });
-            });
+                yield $this->deleteStream($streamId, 'user1', 'pa$$1');
+            }));
         }));
     }
 
@@ -411,18 +367,16 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_system_user_stream_with_admin_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(
-                        StreamMetadata::create()
-                            ->setDeleteRoles('user1')
-                            ->build(),
-                        '$'
-                    );
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(
+                    StreamMetadata::create()
+                        ->setDeleteRoles('user1')
+                        ->build(),
+                    '$'
+                );
 
-                    yield $this->deleteStream($streamId, 'adm', 'admpa$$');
-                });
-            });
+                yield $this->deleteStream($streamId, 'adm', 'admpa$$');
+            }));
         }));
     }
 
@@ -440,9 +394,7 @@ class delete_stream_security extends AuthenticationTestCase
                 '$'
             );
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($streamId) {
-                return $this->deleteStream($streamId, null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, null, null));
         }));
     }
 
@@ -460,9 +412,7 @@ class delete_stream_security extends AuthenticationTestCase
                 '$'
             );
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($streamId) {
-                return $this->deleteStream($streamId, 'user1', 'pa$$1');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, 'user1', 'pa$$1'));
         }));
     }
 
@@ -473,18 +423,16 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_system_admin_stream_with_admin_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(
-                        StreamMetadata::create()
-                            ->setDeleteRoles(SystemRoles::ADMINS)
-                            ->build(),
-                        '$'
-                    );
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(
+                    StreamMetadata::create()
+                        ->setDeleteRoles(SystemRoles::ADMINS)
+                        ->build(),
+                    '$'
+                );
 
-                    yield $this->deleteStream($streamId, 'adm', 'admpa$$');
-                });
-            });
+                yield $this->deleteStream($streamId, 'adm', 'admpa$$');
+            }));
         }));
     }
 
@@ -495,18 +443,16 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_system_all_stream_with_no_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(
-                        StreamMetadata::create()
-                            ->setDeleteRoles(SystemRoles::ALL)
-                            ->build(),
-                        '$'
-                    );
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(
+                    StreamMetadata::create()
+                        ->setDeleteRoles(SystemRoles::ALL)
+                        ->build(),
+                    '$'
+                );
 
-                    yield $this->deleteStream($streamId, null, null);
-                });
-            });
+                yield $this->deleteStream($streamId, null, null);
+            }));
         }));
     }
 
@@ -517,18 +463,16 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_system_all_stream_with_existing_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(
-                        StreamMetadata::create()
-                            ->setDeleteRoles(SystemRoles::ALL)
-                            ->build(),
-                        '$'
-                    );
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(
+                    StreamMetadata::create()
+                        ->setDeleteRoles(SystemRoles::ALL)
+                        ->build(),
+                    '$'
+                );
 
-                    yield $this->deleteStream($streamId, 'user1', 'pa$$1');
-                });
-            });
+                yield $this->deleteStream($streamId, 'user1', 'pa$$1');
+            }));
         }));
     }
 
@@ -539,18 +483,16 @@ class delete_stream_security extends AuthenticationTestCase
     public function deleting_system_all_stream_with_admin_user_is_allowed(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $streamId = yield $this->createStreamWithMeta(
-                        StreamMetadata::create()
-                            ->setDeleteRoles(SystemRoles::ALL)
-                            ->build(),
-                        '$'
-                    );
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $streamId = yield $this->createStreamWithMeta(
+                    StreamMetadata::create()
+                        ->setDeleteRoles(SystemRoles::ALL)
+                        ->build(),
+                    '$'
+                );
 
-                    yield $this->deleteStream($streamId, 'adm', 'admpa$$');
-                });
-            });
+                yield $this->deleteStream($streamId, 'adm', 'admpa$$');
+            }));
         }));
     }
 }

@@ -116,40 +116,24 @@ class stream_security_inheritance extends AuthenticationTestCase
     public function acl_inheritance_is_working_properly_on_user_streams(): void
     {
         wait(call(function () {
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('user-no-acl', null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('user-no-acl', null, null));
             yield $this->writeStream('user-no-acl', 'user1', 'pa$$1');
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('user-no-acl', 'user2', 'pa$$2');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('user-no-acl', 'user2', 'pa$$2'));
             yield $this->writeStream('user-no-acl', 'adm', 'admpa$$');
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('user-w-diff', null, null);
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('user-w-diff', 'user1', 'pa$$1');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('user-w-diff', null, null));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('user-w-diff', 'user1', 'pa$$1'));
             yield $this->writeStream('user-w-diff', 'user2', 'pa$$2');
             yield $this->writeStream('user-w-diff', 'adm', 'admpa$$');
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('user-w-multiple', null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('user-w-multiple', null, null));
             yield $this->writeStream('user-w-multiple', 'user1', 'pa$$1');
             yield $this->writeStream('user-w-multiple', 'user2', 'pa$$2');
             yield $this->writeStream('user-w-multiple', 'adm', 'admpa$$');
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('user-w-restricted', null, null);
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('user-w-restricted', 'user1', 'pa$$1');
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('user-w-restricted', 'user2', 'pa$$2');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('user-w-restricted', null, null));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('user-w-restricted', 'user1', 'pa$$1'));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('user-w-restricted', 'user2', 'pa$$2'));
             yield $this->writeStream('user-w-restricted', 'adm', 'admpa$$');
 
             yield $this->writeStream('user-w-all', null, null);
@@ -162,13 +146,9 @@ class stream_security_inheritance extends AuthenticationTestCase
             yield $this->readEvent('user-no-acl', 'user2', 'pa$$2');
             yield $this->readEvent('user-no-acl', 'adm', 'admpa$$');
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->readEvent('user-r-restricted', null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readEvent('user-r-restricted', null, null));
             yield $this->readEvent('user-r-restricted', 'user1', 'pa$$1');
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->readEvent('user-r-restricted', 'user2', 'pa$$2');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readEvent('user-r-restricted', 'user2', 'pa$$2'));
             yield $this->readEvent('user-r-restricted', 'adm', 'admpa$$');
         }));
     }
@@ -180,40 +160,24 @@ class stream_security_inheritance extends AuthenticationTestCase
     public function acl_inheritance_is_working_properly_on_system_streams(): void
     {
         wait(call(function () {
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('$sys-no-acl', null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('$sys-no-acl', null, null));
             yield $this->writeStream('$sys-no-acl', 'user1', 'pa$$1');
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('$sys-no-acl', 'user2', 'pa$$2');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('$sys-no-acl', 'user2', 'pa$$2'));
             yield $this->writeStream('$sys-no-acl', 'adm', 'admpa$$');
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('$sys-w-diff', null, null);
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('$sys-w-diff', 'user1', 'pa$$1');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('$sys-w-diff', null, null));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('$sys-w-diff', 'user1', 'pa$$1'));
             yield $this->writeStream('$sys-w-diff', 'user2', 'pa$$2');
             yield $this->writeStream('$sys-w-diff', 'adm', 'admpa$$');
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('$sys-w-multiple', null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('$sys-w-multiple', null, null));
             yield $this->writeStream('$sys-w-multiple', 'user1', 'pa$$1');
             yield $this->writeStream('$sys-w-multiple', 'user2', 'pa$$2');
             yield $this->writeStream('$sys-w-multiple', 'adm', 'admpa$$');
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('$sys-w-restricted', null, null);
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('$sys-w-restricted', 'user1', 'pa$$1');
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('$sys-w-restricted', 'user2', 'pa$$2');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('$sys-w-restricted', null, null));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('$sys-w-restricted', 'user1', 'pa$$1'));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('$sys-w-restricted', 'user2', 'pa$$2'));
             yield $this->writeStream('$sys-w-restricted', 'adm', 'admpa$$');
 
             yield $this->writeStream('$sys-w-all', null, null);
@@ -221,15 +185,9 @@ class stream_security_inheritance extends AuthenticationTestCase
             yield $this->writeStream('$sys-w-all', 'user2', 'pa$$2');
             yield $this->writeStream('$sys-w-all', 'adm', 'admpa$$');
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->readEvent('$sys-no-acl', null, null);
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->readEvent('$sys-no-acl', 'user1', 'pa$$1');
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->readEvent('$sys-no-acl', 'user2', 'pa$$2');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readEvent('$sys-no-acl', null, null));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readEvent('$sys-no-acl', 'user1', 'pa$$1'));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readEvent('$sys-no-acl', 'user2', 'pa$$2'));
             yield $this->readEvent('$sys-no-acl', 'adm', 'admpa$$');
         }));
     }

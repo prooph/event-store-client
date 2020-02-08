@@ -20,7 +20,7 @@ use ReflectionObject;
 
 class ConnectionString
 {
-    private static $allowedValues = [
+    private static array $allowedValues = [
         'verboselogging' => 'bool',
         'maxqueuesize' => 'int',
         'maxconcurrentitems' => 'int',
@@ -50,7 +50,7 @@ class ConnectionString
         string $connectionString,
         ?ConnectionSettings $settings = null
     ): ConnectionSettings {
-        $settings = $settings ?? ConnectionSettings::default();
+        $settings ??= ConnectionSettings::default();
         $reflection = new ReflectionObject($settings);
         $properties = $reflection->getProperties();
         $values = self::getParts($connectionString);
@@ -67,7 +67,7 @@ class ConnectionString
                 throw new InvalidArgumentException(\sprintf(
                     'Key %s is not an allowed key in %s',
                     $key,
-                    __CLASS__
+                    self::class
                 ));
             }
 

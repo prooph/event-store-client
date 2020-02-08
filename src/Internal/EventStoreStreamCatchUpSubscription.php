@@ -35,10 +35,8 @@ use Throwable;
 
 class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription implements AsyncEventStoreStreamCatchUpSubscription
 {
-    /** @var int */
-    private $nextReadEventNumber;
-    /** @var int */
-    private $lastProcessedEventNumber;
+    private int $nextReadEventNumber;
+    private int $lastProcessedEventNumber;
 
     /**
      * @internal

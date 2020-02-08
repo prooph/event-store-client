@@ -19,6 +19,7 @@ use Amp\Delayed;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
+use Closure;
 use Generator;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription as AsyncEventStorePersistentSubscription;
@@ -41,46 +42,25 @@ use Throwable;
 
 class EventStorePersistentSubscription implements AsyncEventStorePersistentSubscription
 {
-    /** @var EventStoreConnectionLogicHandler */
-    private $handler;
-
-    /** @var ResolvedEvent */
-    private static $dropSubscriptionEvent;
-
-    /** @var string */
-    private $subscriptionId;
-    /** @var string */
-    private $streamId;
-    /** @var callable */
-    private $eventAppeared;
-    /** @var callable|null */
-    private $subscriptionDropped;
-    /** @var UserCredentials|null */
-    private $userCredentials;
-    /** @var Logger */
-    private $log;
-    /** @var bool */
-    private $verbose;
-    /** @var ConnectionSettings */
-    private $settings;
-    /** @var bool */
-    private $autoAck;
-
-    /** @var PersistentEventStoreSubscription */
-    private $subscription;
+    private EventStoreConnectionLogicHandler $handler;
+    private static ?ResolvedEvent $dropSubscriptionEvent = null;
+    private string $subscriptionId;
+    private string $streamId;
+    private EventAppearedOnPersistentSubscription $eventAppeared;
+    private ?PersistentSubscriptionDropped $subscriptionDropped;
+    private ?UserCredentials $userCredentials;
+    private Logger $log;
+    private bool $verbose;
+    private ConnectionSettings $settings;
+    private bool $autoAck;
+    private PersistentEventStoreSubscription $subscription;
     /** @var SplQueue */
     private $queue;
-    /** @var bool */
-    private $isProcessing = false;
-    /** @var DropData */
-    private $dropData;
-
-    /** @var bool */
-    private $isDropped = false;
-    /** @var int */
-    private $bufferSize;
-    /** @var ManualResetEventSlim */
-    private $stopped;
+    private bool $isProcessing = false;
+    private ?DropData $dropData = null;
+    private bool $isDropped = false;
+    private int $bufferSize;
+    private ManualResetEventSlim $stopped;
 
     /** @internal  */
     public function __construct(
@@ -121,8 +101,8 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
         string $streamId,
         int $bufferSize,
         ?UserCredentials $userCredentials,
-        callable $onEventAppeared,
-        ?callable $onSubscriptionDropped,
+        Closure $onEventAppeared,
+        ?Closure $onSubscriptionDropped,
         ConnectionSettings $settings
     ): Promise {
         $deferred = new Deferred();
@@ -151,12 +131,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
     {
         $this->stopped->reset();
 
-        $eventAppeared = function (
-            PersistentEventStoreSubscription $subscription,
-            PersistentSubscriptionResolvedEvent $resolvedEvent
-        ): Promise {
-            return $this->onEventAppeared($resolvedEvent);
-        };
+        $eventAppeared = fn (PersistentEventStoreSubscription $subscription, PersistentSubscriptionResolvedEvent $resolvedEvent): Promise => $this->onEventAppeared($resolvedEvent);
 
         $subscriptionDropped = function (
             PersistentEventStoreSubscription $subscription,
@@ -216,9 +191,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
     public function acknowledgeMultiple(array $events): void
     {
         $ids = \array_map(
-            function (InternalResolvedEvent $event): EventId {
-                return $event->originalEvent()->eventId();
-            },
+            fn (InternalResolvedEvent $event): EventId => $event->originalEvent()->eventId(),
             $events
         );
 
@@ -275,9 +248,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
         string $reason
     ): void {
         $ids = \array_map(
-            function (InternalResolvedEvent $event): EventId {
-                return $event->originalEvent()->eventId();
-            },
+            fn (InternalResolvedEvent $event): EventId => $event->originalEvent()->eventId(),
             $events
         );
 

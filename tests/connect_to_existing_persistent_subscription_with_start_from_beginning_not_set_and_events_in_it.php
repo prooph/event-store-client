@@ -33,14 +33,10 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $stream;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
-    /** @var string */
-    private $group = 'startinbeginning1';
-    /** @var Deferred */
-    private $resetEvent;
+    private string $stream;
+    private PersistentSubscriptionSettings $settings;
+    private string $group = 'startinbeginning1';
+    private Deferred $resetEvent;
 
     protected function setUp(): void
     {

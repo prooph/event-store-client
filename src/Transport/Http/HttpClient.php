@@ -18,6 +18,7 @@ use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Interceptor\SetRequestTimeout;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
+use Closure;
 use Prooph\EventStore\Transport\Http\HttpMethod;
 use Prooph\EventStore\UserCredentials;
 use Throwable;
@@ -25,8 +26,7 @@ use Throwable;
 /** @internal  */
 class HttpClient
 {
-    /** @var AmpHttpClient */
-    private $httpClient;
+    private AmpHttpClient $httpClient;
 
     public function __construct(int $operationTimeout)
     {
@@ -38,8 +38,8 @@ class HttpClient
     public function get(
         string $url,
         ?UserCredentials $userCredentials,
-        callable $onSuccess,
-        callable $onException
+        Closure $onSuccess,
+        Closure $onException
     ): void {
         $this->receive(
             HttpMethod::GET,
@@ -55,8 +55,8 @@ class HttpClient
         string $body,
         string $contentType,
         ?UserCredentials $userCredentials,
-        callable $onSuccess,
-        callable $onException
+        Closure $onSuccess,
+        Closure $onException
     ): void {
         $this->send(
             HttpMethod::POST,
@@ -72,8 +72,8 @@ class HttpClient
     public function delete(
         string $url,
         ?UserCredentials $userCredentials,
-        callable $onSuccess,
-        callable $onException
+        Closure $onSuccess,
+        Closure $onException
     ): void {
         $this->receive(
             HttpMethod::DELETE,
@@ -89,8 +89,8 @@ class HttpClient
         string $body,
         string $contentType,
         ?UserCredentials $userCredentials,
-        callable $onSuccess,
-        callable $onException
+        Closure $onSuccess,
+        Closure $onException
     ): void {
         $this->send(
             HttpMethod::PUT,
@@ -107,8 +107,8 @@ class HttpClient
         string $method,
         string $url,
         ?UserCredentials $userCredentials,
-        callable $onSuccess,
-        callable $onException,
+        Closure $onSuccess,
+        Closure $onException,
         string $hostHeader = ''
     ): void {
         $request = new Request($url, $method);
@@ -140,8 +140,8 @@ class HttpClient
         string $body,
         string $contentType,
         ?UserCredentials $userCredentials,
-        callable $onSuccess,
-        callable $onException
+        Closure $onSuccess,
+        Closure $onException
     ): void {
         $request = new Request($url, $method);
 

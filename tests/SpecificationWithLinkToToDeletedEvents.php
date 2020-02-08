@@ -23,10 +23,8 @@ trait SpecificationWithLinkToToDeletedEvents
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    protected $linkedStreamName;
-    /** @var string */
-    protected $deletedStreamName;
+    protected string $linkedStreamName;
+    protected string $deletedStreamName;
 
     protected function given(): Generator
     {

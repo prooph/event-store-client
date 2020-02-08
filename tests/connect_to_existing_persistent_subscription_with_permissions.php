@@ -28,12 +28,9 @@ class connect_to_existing_persistent_subscription_with_permissions extends TestC
 {
     use SpecificationWithConnection;
 
-    /** @var Promise */
-    private $sub;
-    /** @var string */
-    private $stream;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
+    private Promise $sub;
+    private string $stream;
+    private PersistentSubscriptionSettings $settings;
 
     protected function setUp(): void
     {

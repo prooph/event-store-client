@@ -25,31 +25,31 @@ class TransactionCommitCompleted extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>int64 transaction_id = 1;</code>
      */
-    private $transaction_id = 0;
+    private int $transaction_id = 0;
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.OperationResult result = 2;</code>
      */
-    private $result = 0;
+    private int $result = 0;
     /**
      * Generated from protobuf field <code>string message = 3;</code>
      */
-    private $message = '';
+    private string $message = '';
     /**
      * Generated from protobuf field <code>int64 first_event_number = 4;</code>
      */
-    private $first_event_number = 0;
+    private int $first_event_number = 0;
     /**
      * Generated from protobuf field <code>int64 last_event_number = 5;</code>
      */
-    private $last_event_number = 0;
+    private int $last_event_number = 0;
     /**
      * Generated from protobuf field <code>int64 prepare_position = 6;</code>
      */
-    private $prepare_position = 0;
+    private int $prepare_position = 0;
     /**
      * Generated from protobuf field <code>int64 commit_position = 7;</code>
      */
-    private $commit_position = 0;
+    private int $commit_position = 0;
 
     /**
      * Constructor.

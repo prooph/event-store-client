@@ -36,11 +36,9 @@ class read_all_events_forward_should extends TestCase
     use SpecificationWithConnection;
 
     /** @var EventData[] */
-    private $testEvents;
-    /** @var Position */
-    private $from;
-    /** @var string */
-    private $stream;
+    private array $testEvents;
+    private Position $from;
+    private string $stream;
 
     protected function when(): Generator
     {
@@ -111,9 +109,7 @@ class read_all_events_forward_should extends TestCase
             \assert($read instanceof AllEventsSlice);
 
             $events = \array_map(
-                function (ResolvedEvent $e): RecordedEvent {
-                    return $e->event();
-                },
+                fn (ResolvedEvent $e): RecordedEvent => $e->event(),
                 \array_slice($read->events(), \count($read->events()) - \count($this->testEvents))
             );
 
@@ -192,9 +188,7 @@ class read_all_events_forward_should extends TestCase
             $this->assertLessThan(30, \count($read->events()));
 
             $events = \array_map(
-                function (ResolvedEvent $e): RecordedEvent {
-                    return $e->event();
-                },
+                fn (ResolvedEvent $e): RecordedEvent => $e->event(),
                 \array_slice($read->events(), \count($read->events()) - \count($this->testEvents))
             );
 

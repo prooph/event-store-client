@@ -25,19 +25,19 @@ class ResolvedEvent extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.EventRecord event = 1;</code>
      */
-    private $event = null;
+    private ?EventRecord $event = null;
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.EventRecord link = 2;</code>
      */
-    private $link = null;
+    private ?EventRecord $link = null;
     /**
      * Generated from protobuf field <code>int64 commit_position = 3;</code>
      */
-    private $commit_position = 0;
+    private int $commit_position = 0;
     /**
      * Generated from protobuf field <code>int64 prepare_position = 4;</code>
      */
-    private $prepare_position = 0;
+    private int $prepare_position = 0;
 
     /**
      * Constructor.

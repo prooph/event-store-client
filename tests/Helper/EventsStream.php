@@ -16,6 +16,7 @@ namespace ProophTest\EventStoreClient\Helper;
 use function Amp\call;
 use Amp\Promise;
 use Amp\Success;
+use Generator;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\StreamEventsSlice;
 
@@ -27,7 +28,7 @@ class EventsStream
     /** @return Promise<int> */
     public static function count(EventStoreConnection $connection, string $stream): Promise
     {
-        return call(function () use ($connection, $stream) {
+        return call(function () use ($connection, $stream): Generator {
             $result = 0;
 
             while (true) {

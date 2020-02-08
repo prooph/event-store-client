@@ -18,12 +18,9 @@ use Prooph\EventStoreClient\ClientOperations\ClientOperation;
 /** @internal  */
 class StartOperationMessage implements Message
 {
-    /** @var ClientOperation */
-    private $operation;
-    /** @var int */
-    private $maxRetries;
-    /** @var int */
-    private $timeout;
+    private ClientOperation $operation;
+    private int $maxRetries;
+    private int $timeout;
 
     public function __construct(ClientOperation $operation, int $maxRetries, int $timeout)
     {

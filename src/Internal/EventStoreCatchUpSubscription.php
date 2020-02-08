@@ -40,60 +40,31 @@ use Throwable;
 
 abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSubscription
 {
-    /** @var ResolvedEvent */
-    private static $dropSubscriptionEvent;
+    private static ?ResolvedEvent $dropSubscriptionEvent = null;
 
-    /** @var bool */
-    private $isSubscribedToAll;
-    /** @var string */
-    private $streamId;
-    /** @var string */
-    private $subscriptionName;
-
-    /** @var Logger */
-    protected $log;
-
-    /** @var EventStoreConnection */
-    private $connection;
-    /** @var bool */
-    private $resolveLinkTos;
-    /** @var UserCredentials|null */
-    private $userCredentials;
-
-    /** @var int */
-    protected $readBatchSize;
-    /** @var int */
-    protected $maxPushQueueSize;
-
-    /** @var EventAppearedOnCatchupSubscription */
-    protected $eventAppeared;
-    /** @var LiveProcessingStartedOnCatchUpSubscription|null */
-    private $liveProcessingStarted;
-    /** @var CatchUpSubscriptionDropped|null */
-    private $subscriptionDropped;
-
-    /** @var bool */
-    protected $verbose;
-
+    private bool $isSubscribedToAll;
+    private string $streamId;
+    private string $subscriptionName;
+    protected Logger $log;
+    private EventStoreConnection $connection;
+    private bool $resolveLinkTos;
+    private ?UserCredentials $userCredentials;
+    protected int $readBatchSize;
+    protected int $maxPushQueueSize;
+    protected EventAppearedOnCatchupSubscription $eventAppeared;
+    private ?LiveProcessingStartedOnCatchUpSubscription $liveProcessingStarted;
+    private ?CatchUpSubscriptionDropped $subscriptionDropped;
+    protected bool $verbose;
     /** @var SplQueue<ResolvedEvent> */
-    private $liveQueue;
-    /** @var EventStoreSubscription|null */
-    private $subscription;
-    /** @var DropData|null */
-    private $dropData;
-    /** @var bool */
-    private $allowProcessing;
-    /** @var bool */
-    private $isProcessing;
-    /** @var bool */
-    protected $shouldStop;
-    /** @var bool */
-    private $isDropped;
-    /** @var ManualResetEventSlim */
-    private $stopped;
-
-    /** @var ListenerHandler */
-    private $connectListener;
+    private SplQueue $liveQueue;
+    private ?EventStoreSubscription $subscription = null;
+    private ?DropData $dropData = null;
+    private bool $allowProcessing = false;
+    private bool $isProcessing = false;
+    protected bool $shouldStop = false;
+    private bool $isDropped = false;
+    private ManualResetEventSlim $stopped;
+    private ListenerHandler $connectListener;
 
     /** @internal */
     public function __construct(
@@ -282,7 +253,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
                 $eventAppeared = new class(Closure::fromCallable([$this, 'enqueuePushedEvent'])) implements EventAppearedOnSubscription {
                     private $callback;
 
-                    public function __construct(callable $callback)
+                    public function __construct(Closure $callback)
                     {
                         $this->callback = $callback;
                     }
@@ -298,7 +269,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
                 $subscriptionDropped = new class(Closure::fromCallable([$this, 'serverSubscriptionDropped'])) implements SubscriptionDropped {
                     private $callback;
 
-                    public function __construct(callable $callback)
+                    public function __construct(Closure $callback)
                     {
                         $this->callback = $callback;
                     }
@@ -472,7 +443,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
                     \assert($e instanceof ResolvedEvent);
 
                     if ($e === self::$dropSubscriptionEvent) {
-                        $this->dropData = $this->dropData ?? new DropData(SubscriptionDropReason::unknown(), new \Exception('Drop reason not specified'));
+                        $this->dropData ??= new DropData(SubscriptionDropReason::unknown(), new \Exception('Drop reason not specified'));
                         $this->dropSubscription($this->dropData->reason(), $this->dropData->error());
 
                         $this->isProcessing = false;

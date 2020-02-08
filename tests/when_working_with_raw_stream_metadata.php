@@ -15,6 +15,7 @@ namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
 use function Amp\Promise\wait;
+use Closure;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventStoreConnection;
@@ -28,16 +29,14 @@ use Throwable;
 
 class when_working_with_raw_stream_metadata extends TestCase
 {
-    /** @var string */
-    private $stream;
-    /** @var EventStoreConnection */
-    private $conn;
+    private string $stream;
+    private EventStoreConnection $conn;
 
     /** @throws Throwable */
-    private function execute(callable $function): void
+    private function execute(Closure $function): void
     {
         wait(call(function () use ($function): Generator {
-            $this->stream = __CLASS__ . '\\' . $this->getName();
+            $this->stream = self::class . '\\' . $this->getName();
             $this->conn = TestConnection::create();
             yield $this->conn->connectAsync();
 

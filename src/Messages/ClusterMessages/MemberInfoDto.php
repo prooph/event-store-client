@@ -18,56 +18,27 @@ use Ramsey\Uuid\Uuid;
 
 class MemberInfoDto
 {
-    /** @var string */
-    private $instanceId;
-
-    /** @var int */
-    private $timeStamp;
-    /** @var VNodeState */
-    private $state;
-    /** @var bool */
-    private $isAlive;
-
-    /** @var string */
-    private $internalTcpIp;
-    /** @var int */
-    private $internalTcpPort;
-    /** @var int */
-    private $internalSecureTcpPort;
-
-    /** @var string */
-    private $externalTcpIp;
-    /** @var int */
-    private $externalTcpPort;
-    /** @var int */
-    private $externalSecureTcpPort;
-
-    /** @var string */
-    private $internalHttpIp;
-    /** @var int */
-    private $internalHttpPort;
-
-    /** @var string */
-    private $externalHttpIp;
-    /** @var int */
-    private $externalHttpPort;
-
-    /** @var int */
-    private $lastCommitPosition;
-    /** @var int */
-    private $writerCheckpoint;
-    /** @var int */
-    private $chaserCheckpoint;
-
-    /** @var int */
-    private $epochPosition;
-    /** @var int */
-    private $epochNumber;
-    /** @var string */
-    private $epochId;
-
-    /** @var int */
-    private $nodePriority;
+    private string $instanceId;
+    private int $timeStamp;
+    private VNodeState $state;
+    private bool $isAlive;
+    private string $internalTcpIp;
+    private int $internalTcpPort;
+    private int $internalSecureTcpPort;
+    private string $externalTcpIp;
+    private int $externalTcpPort;
+    private int $externalSecureTcpPort;
+    private string $internalHttpIp;
+    private int $internalHttpPort;
+    private string $externalHttpIp;
+    private int $externalHttpPort;
+    private int $lastCommitPosition;
+    private int $writerCheckpoint;
+    private int $chaserCheckpoint;
+    private int $epochPosition;
+    private int $epochNumber;
+    private string $epochId;
+    private int $nodePriority;
 
     public function __construct(array $data = [])
     {

@@ -33,18 +33,14 @@ class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $streamName;
-    /** @var string */
-    private $groupName;
+    private string $streamName;
+    private string $groupName;
 
     private const BUFFER_COUNT = 10;
     private const EVENT_WRITE_COUNT = self::BUFFER_COUNT * 2;
 
-    /** @var Deferred */
-    private $eventsReceived;
-    /** @var int */
-    private $eventReceivedCount;
+    private Deferred $eventsReceived;
+    private int $eventReceivedCount = 0;
 
     protected function setUp(): void
     {
@@ -92,7 +88,7 @@ class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
                 $this->streamName,
                 $this->groupName,
                 new class($this->eventsReceived, $this->eventReceivedCount, self::EVENT_WRITE_COUNT) implements EventAppearedOnPersistentSubscription {
-                    private $eventsReceived;
+                    private Deferred $eventsReceived;
                     private $eventReceivedCount;
                     private $eventWriteCount;
 

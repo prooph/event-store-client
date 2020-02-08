@@ -17,8 +17,7 @@ use Prooph\EventStore\Exception\PersistentSubscriptionCommandFailed as BaseExcep
 
 class PersistentSubscriptionCommandFailed extends BaseException
 {
-    /** @var int */
-    private $httpStatusCode;
+    private int $httpStatusCode;
 
     public function __construct(int $httpStatusCode, string $message)
     {

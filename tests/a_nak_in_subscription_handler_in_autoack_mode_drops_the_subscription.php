@@ -36,18 +36,12 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $stream;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
-    /** @var Deferred */
-    private $resetEvent;
-    /** @var Throwable */
-    private $exception;
-    /** @var SubscriptionDropReason */
-    private $reason;
-    /** @var string */
-    private $group;
+    private string $stream;
+    private PersistentSubscriptionSettings $settings;
+    private Deferred $resetEvent;
+    private ?\Throwable $exception;
+    private SubscriptionDropReason $reason;
+    private string $group;
 
     protected function setUp(): void
     {
@@ -93,7 +87,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
             new class(Closure::fromCallable($dropBehaviour)) implements PersistentSubscriptionDropped {
                 private $callback;
 
-                public function __construct(callable $callback)
+                public function __construct(Closure $callback)
                 {
                     $this->callback = $callback;
                 }

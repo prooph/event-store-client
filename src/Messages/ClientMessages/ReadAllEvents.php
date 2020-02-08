@@ -25,23 +25,23 @@ class ReadAllEvents extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>int64 commit_position = 1;</code>
      */
-    private $commit_position = 0;
+    private int $commit_position = 0;
     /**
      * Generated from protobuf field <code>int64 prepare_position = 2;</code>
      */
-    private $prepare_position = 0;
+    private int $prepare_position = 0;
     /**
      * Generated from protobuf field <code>int32 max_count = 3;</code>
      */
-    private $max_count = 0;
+    private int $max_count = 0;
     /**
      * Generated from protobuf field <code>bool resolve_link_tos = 4;</code>
      */
-    private $resolve_link_tos = false;
+    private bool $resolve_link_tos = false;
     /**
      * Generated from protobuf field <code>bool require_master = 5;</code>
      */
-    private $require_master = false;
+    private bool $require_master = false;
 
     /**
      * Constructor.

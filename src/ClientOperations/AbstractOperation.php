@@ -35,18 +35,12 @@ use Throwable;
 /** @internal */
 abstract class AbstractOperation implements ClientOperation
 {
-    /** @var Logger */
-    private $log;
-    /** @var Deferred */
-    protected $deferred;
-    /** @var UserCredentials|null */
-    protected $credentials;
-    /** @var TcpCommand */
-    private $requestCommand;
-    /** @var TcpCommand */
-    private $responseCommand;
-    /** @var string */
-    private $responseClassName;
+    private Logger $log;
+    protected Deferred $deferred;
+    protected ?UserCredentials $credentials;
+    private TcpCommand $requestCommand;
+    private TcpCommand $responseCommand;
+    private string $responseClassName;
 
     public function __construct(
         Logger $logger,

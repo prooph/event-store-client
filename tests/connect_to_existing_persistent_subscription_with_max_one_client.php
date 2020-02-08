@@ -29,16 +29,11 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends Te
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $stream;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
-    /** @var Throwable */
-    private $exception;
-    /** @var string */
-    private $group = 'startinbeginning1';
-    /** @var EventStorePersistentSubscription|null */
-    private $firstSubscription;
+    private string $stream;
+    private PersistentSubscriptionSettings $settings;
+    private Throwable $exception;
+    private string $group = 'startinbeginning1';
+    private ?EventStorePersistentSubscription $firstSubscription;
 
     protected function setUp(): void
     {

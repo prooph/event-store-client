@@ -32,18 +32,12 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $stream;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
-    /** @var string */
-    private $group = 'startinbeginning1';
-    /** @var Deferred */
-    private $resetEvent;
-    /** @var ResolvedEvent */
-    private $firstEvent;
-    /** @var EventId */
-    private $eventId;
+    private string $stream;
+    private PersistentSubscriptionSettings $settings;
+    private string $group = 'startinbeginning1';
+    private Deferred $resetEvent;
+    private ?ResolvedEvent $firstEvent;
+    private EventId $eventId;
 
     protected function setUp(): void
     {
@@ -80,7 +74,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
             $this->group,
             new class($this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
                 private $deferred;
-                private $firstEvent;
+                private ?ResolvedEvent $firstEvent;
 
                 public function __construct($deferred, &$firstEvent)
                 {

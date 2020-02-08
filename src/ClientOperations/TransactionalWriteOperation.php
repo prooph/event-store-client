@@ -32,12 +32,10 @@ use Psr\Log\LoggerInterface as Logger;
 /** @internal */
 class TransactionalWriteOperation extends AbstractOperation
 {
-    /** @var bool */
-    private $requireMaster;
-    /** @var int */
-    private $transactionId;
+    private bool $requireMaster;
+    private int $transactionId;
     /** @var EventData[] */
-    private $events;
+    private array $events;
 
     public function __construct(
         Logger $logger,
@@ -64,9 +62,7 @@ class TransactionalWriteOperation extends AbstractOperation
     protected function createRequestDto(): Message
     {
         $events = \array_map(
-            function (EventData $event): NewEvent {
-                return NewEventConverter::convert($event);
-            },
+            fn (EventData $event): NewEvent => NewEventConverter::convert($event),
             $this->events
         );
 
