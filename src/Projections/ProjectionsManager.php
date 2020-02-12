@@ -29,9 +29,10 @@ class ProjectionsManager implements AsyncProjectionsManager
         EndPoint $httpEndPoint,
         int $operationTimeout,
         bool $tlsTerminatedEndpoint = false,
+        bool $verifyPeer = true,
         ?UserCredentials $defaultUserCredentials = null
     ) {
-        $this->client = new ProjectionsClient($operationTimeout, $tlsTerminatedEndpoint);
+        $this->client = new ProjectionsClient($operationTimeout, $tlsTerminatedEndpoint, $verifyPeer);
         $this->httpEndPoint = $httpEndPoint;
         $this->defaultUserCredentials = $defaultUserCredentials;
     }

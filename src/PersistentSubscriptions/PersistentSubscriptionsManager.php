@@ -30,9 +30,10 @@ class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsMana
         EndPoint $httpEndPoint,
         int $operationTimeout,
         bool $tlsTerminatedEndpoint = false,
+        bool $verifyPeer = true,
         ?UserCredentials $defaultUserCredentials = null
     ) {
-        $this->client = new PersistentSubscriptionsClient($operationTimeout, $tlsTerminatedEndpoint);
+        $this->client = new PersistentSubscriptionsClient($operationTimeout, $tlsTerminatedEndpoint, $verifyPeer);
         $this->httpEndPoint = $httpEndPoint;
         $this->defaultUserCredentials = $defaultUserCredentials;
     }

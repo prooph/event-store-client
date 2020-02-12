@@ -40,9 +40,9 @@ class UsersClient
     private int $operationTimeout;
     private string $httpSchema;
 
-    public function __construct(int $operationTimeout, bool $tlsTerminatedEndpoint)
+    public function __construct(int $operationTimeout, bool $tlsTerminatedEndpoint, bool $verifyPeer)
     {
-        $this->client = new HttpClient($operationTimeout);
+        $this->client = new HttpClient($operationTimeout, $verifyPeer);
         $this->operationTimeout = $operationTimeout;
         $this->httpSchema = $tlsTerminatedEndpoint ? EndpointExtensions::HTTPS_SCHEMA : EndpointExtensions::HTTP_SCHEMA;
     }

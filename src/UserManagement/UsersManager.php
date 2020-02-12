@@ -33,9 +33,10 @@ class UsersManager implements AsyncUsersManager
         EndPoint $endPoint,
         int $operationTimeout,
         bool $tlsTerminatedEndpoint = false,
+        bool $verifyPeer = true,
         ?UserCredentials $userCredentials = null
     ) {
-        $this->client = new UsersClient($operationTimeout, $tlsTerminatedEndpoint);
+        $this->client = new UsersClient($operationTimeout, $tlsTerminatedEndpoint, $verifyPeer);
         $this->endPoint = $endPoint;
         $this->defaultCredentials = $userCredentials;
     }
