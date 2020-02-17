@@ -26,10 +26,8 @@ final class TcpFlags
     public const AUTHENTICATED = 0x01;
     public const TRUSTED_WRITE = 0x02;
 
-    /** @var string */
-    private $name;
-    /** @var int */
-    private $value;
+    private string $name;
+    private int $value;
 
     private function __construct(string $name)
     {

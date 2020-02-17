@@ -25,27 +25,27 @@ class MasterInfo extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>string external_tcp_address = 1;</code>
      */
-    private $external_tcp_address = '';
+    private string $external_tcp_address = '';
     /**
      * Generated from protobuf field <code>int32 external_tcp_port = 2;</code>
      */
-    private $external_tcp_port = 0;
+    private int $external_tcp_port = 0;
     /**
      * Generated from protobuf field <code>string external_http_address = 3;</code>
      */
-    private $external_http_address = '';
+    private string $external_http_address = '';
     /**
      * Generated from protobuf field <code>int32 external_http_port = 4;</code>
      */
-    private $external_http_port = 0;
+    private int $external_http_port = 0;
     /**
      * Generated from protobuf field <code>string external_secure_tcp_address = 5;</code>
      */
-    private $external_secure_tcp_address = '';
+    private string $external_secure_tcp_address = '';
     /**
      * Generated from protobuf field <code>int32 external_secure_tcp_port = 6;</code>
      */
-    private $external_secure_tcp_port = 0;
+    private int $external_secure_tcp_port = 0;
 
     /**
      * Constructor.

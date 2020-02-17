@@ -197,7 +197,7 @@ class subscribe_should extends TestCase
     private function eventAppearedResolver(Deferred $deferred): EventAppearedOnSubscription
     {
         return new class($deferred) implements EventAppearedOnSubscription {
-            private $deferred;
+            private Deferred $deferred;
 
             public function __construct(Deferred $deferred)
             {
@@ -218,7 +218,7 @@ class subscribe_should extends TestCase
     private function subscriptionDroppedResolver(Deferred $deferred): SubscriptionDropped
     {
         return new class($deferred) implements SubscriptionDropped {
-            private $deferred;
+            private Deferred $deferred;
 
             public function __construct(Deferred $deferred)
             {

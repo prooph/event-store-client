@@ -21,22 +21,14 @@ use Prooph\EventStore\UserCredentials;
 /** @internal  */
 class StartSubscriptionMessage implements Message
 {
-    /** @var Deferred */
-    private $deferred;
-    /** @var string */
-    private $streamId;
-    /** @var bool */
-    private $resolveTo;
-    /** @var UserCredentials|null */
-    private $userCredentials;
-    /** @var EventAppearedOnSubscription */
-    private $eventAppeared;
-    /** @var SubscriptionDropped|null */
-    private $subscriptionDropped;
-    /** @var int */
-    private $maxRetries;
-    /** @var int */
-    private $timeout;
+    private Deferred $deferred;
+    private string $streamId;
+    private bool $resolveTo;
+    private ?UserCredentials $userCredentials;
+    private EventAppearedOnSubscription $eventAppeared;
+    private ?SubscriptionDropped $subscriptionDropped;
+    private int $maxRetries;
+    private int $timeout;
 
     public function __construct(
         Deferred $deferred,

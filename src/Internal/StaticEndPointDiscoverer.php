@@ -20,8 +20,7 @@ use Prooph\EventStore\EndPoint;
 /** @internal */
 final class StaticEndPointDiscoverer implements EndPointDiscoverer
 {
-    /** @var Promise */
-    private $promise;
+    private Promise $promise;
 
     public function __construct(EndPoint $endPoint, bool $isSsl)
     {

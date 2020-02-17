@@ -24,7 +24,7 @@ class when_listing_one_time_projections extends TestCase
     use ProjectionSpecification;
 
     /** @var ProjectionDetails[] */
-    private $result;
+    private array $result;
 
     protected function given(): Generator
     {

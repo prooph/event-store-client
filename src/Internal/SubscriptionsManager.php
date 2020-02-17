@@ -26,16 +26,13 @@ use SplQueue;
 /** @internal  */
 class SubscriptionsManager
 {
-    /** @var string */
-    private $connectionName;
-    /** @var ConnectionSettings */
-    private $settings;
+    private string $connectionName;
+    private ConnectionSettings $settings;
     /** @var SubscriptionItem[] */
-    private $activeSubscriptions = [];
-    /** @var SplQueue */
-    private $waitingSubscriptions;
+    private array $activeSubscriptions = [];
+    private SplQueue $waitingSubscriptions;
     /** @var SubscriptionItem[] */
-    private $retryPendingSubscriptions = [];
+    private array $retryPendingSubscriptions = [];
 
     public function __construct(string $connectionName, ConnectionSettings $settings)
     {

@@ -29,10 +29,8 @@ class connect_to_existing_persistent_subscription_without_permissions extends Te
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $stream;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
+    private string $stream;
+    private PersistentSubscriptionSettings $settings;
 
     protected function setUp(): void
     {

@@ -28,9 +28,7 @@ class subscribe_to_all_security extends AuthenticationTestCase
     public function subscribing_to_all_with_not_existing_credentials_is_not_authenticated(): void
     {
         wait(call(function () {
-            yield $this->expectExceptionFromCallback(NotAuthenticated::class, function () {
-                return $this->subscribeToAll('badlogin', 'badpass');
-            });
+            yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->subscribeToAll('badlogin', 'badpass'));
         }));
     }
 
@@ -41,9 +39,7 @@ class subscribe_to_all_security extends AuthenticationTestCase
     public function subscribing_to_all_with_no_credentials_is_denied(): void
     {
         wait(call(function () {
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->subscribeToAll(null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->subscribeToAll(null, null));
         }));
     }
 
@@ -54,9 +50,7 @@ class subscribe_to_all_security extends AuthenticationTestCase
     public function subscribing_to_all_with_not_authorized_user_credentials_is_denied(): void
     {
         wait(call(function () {
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->subscribeToAll('user2', 'pa$$2');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->subscribeToAll('user2', 'pa$$2'));
         }));
     }
 
@@ -67,9 +61,7 @@ class subscribe_to_all_security extends AuthenticationTestCase
     public function subscribing_to_all_with_authorized_user_credentials_succeeds(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return $this->subscribeToAll('user1', 'pa$$1');
-            });
+            yield $this->expectNoExceptionFromCallback(fn () => $this->subscribeToAll('user1', 'pa$$1'));
         }));
     }
 
@@ -80,9 +72,7 @@ class subscribe_to_all_security extends AuthenticationTestCase
     public function subscribing_to_all_with_admin_user_credentials_succeeds(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return $this->subscribeToAll('adm', 'admpa$$');
-            });
+            yield $this->expectNoExceptionFromCallback(fn () => $this->subscribeToAll('adm', 'admpa$$'));
         }));
     }
 }

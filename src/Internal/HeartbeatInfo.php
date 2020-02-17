@@ -16,12 +16,9 @@ namespace Prooph\EventStoreClient\Internal;
 /** @internal */
 class HeartbeatInfo
 {
-    /** @var int */
-    private $lastPackageNumber;
-    /** @var bool */
-    private $isIntervalStage;
-    /** @var int */
-    private $timestamp;
+    private int $lastPackageNumber;
+    private bool $isIntervalStage;
+    private int $timestamp;
 
     public function __construct(int $lastPackageNumber, bool $isIntervalStage, int $timestamp)
     {

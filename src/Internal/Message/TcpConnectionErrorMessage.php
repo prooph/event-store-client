@@ -19,10 +19,8 @@ use Throwable;
 /** @internal */
 class TcpConnectionErrorMessage implements Message
 {
-    /** @var TcpPackageConnection */
-    private $tcpPackageConnection;
-    /** @var Throwable */
-    private $exception;
+    private TcpPackageConnection $tcpPackageConnection;
+    private Throwable $exception;
 
     public function __construct(TcpPackageConnection $tcpPackageConnection, Throwable $exception)
     {

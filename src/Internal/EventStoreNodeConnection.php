@@ -15,6 +15,7 @@ namespace Prooph\EventStoreClient\Internal;
 
 use Amp\Deferred;
 use Amp\Promise;
+use Closure;
 use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
 use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
@@ -75,16 +76,11 @@ final class EventStoreNodeConnection implements
     EventStoreConnection,
     EventStoreTransactionConnection
 {
-    /** @var string */
-    private $connectionName;
-    /** @var ConnectionSettings */
-    private $settings;
-    /** @var ClusterSettings|null */
-    private $clusterSettings;
-    /** @var EndPointDiscoverer */
-    private $endPointDiscoverer;
-    /** @var EventStoreConnectionLogicHandler */
-    private $handler;
+    private string $connectionName;
+    private ConnectionSettings $settings;
+    private ?ClusterSettings $clusterSettings;
+    private EndPointDiscoverer $endPointDiscoverer;
+    private EventStoreConnectionLogicHandler $handler;
 
     public function __construct(
         ConnectionSettings $settings,
@@ -859,32 +855,32 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
-    public function onConnected(callable $handler): ListenerHandler
+    public function onConnected(Closure $handler): ListenerHandler
     {
         return $this->handler->onConnected($handler);
     }
 
-    public function onDisconnected(callable $handler): ListenerHandler
+    public function onDisconnected(Closure $handler): ListenerHandler
     {
         return $this->handler->onDisconnected($handler);
     }
 
-    public function onReconnecting(callable $handler): ListenerHandler
+    public function onReconnecting(Closure $handler): ListenerHandler
     {
         return $this->handler->onReconnecting($handler);
     }
 
-    public function onClosed(callable $handler): ListenerHandler
+    public function onClosed(Closure $handler): ListenerHandler
     {
         return $this->handler->onClosed($handler);
     }
 
-    public function onErrorOccurred(callable $handler): ListenerHandler
+    public function onErrorOccurred(Closure $handler): ListenerHandler
     {
         return $this->handler->onErrorOccurred($handler);
     }
 
-    public function onAuthenticationFailed(callable $handler): ListenerHandler
+    public function onAuthenticationFailed(Closure $handler): ListenerHandler
     {
         return $this->handler->onAuthenticationFailed($handler);
     }

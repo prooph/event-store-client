@@ -25,43 +25,43 @@ class EventRecord extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>string event_stream_id = 1;</code>
      */
-    private $event_stream_id = '';
+    private string $event_stream_id = '';
     /**
      * Generated from protobuf field <code>int64 event_number = 2;</code>
      */
-    private $event_number = 0;
+    private int $event_number = 0;
     /**
      * Generated from protobuf field <code>bytes event_id = 3;</code>
      */
-    private $event_id = '';
+    private string $event_id = '';
     /**
      * Generated from protobuf field <code>string event_type = 4;</code>
      */
-    private $event_type = '';
+    private string $event_type = '';
     /**
      * Generated from protobuf field <code>int32 data_content_type = 5;</code>
      */
-    private $data_content_type = 0;
+    private int $data_content_type = 0;
     /**
      * Generated from protobuf field <code>int32 metadata_content_type = 6;</code>
      */
-    private $metadata_content_type = 0;
+    private int $metadata_content_type = 0;
     /**
      * Generated from protobuf field <code>bytes data = 7;</code>
      */
-    private $data = '';
+    private string $data = '';
     /**
      * Generated from protobuf field <code>bytes metadata = 8;</code>
      */
-    private $metadata = '';
+    private string $metadata = '';
     /**
      * Generated from protobuf field <code>int64 created = 9;</code>
      */
-    private $created = 0;
+    private int $created = 0;
     /**
      * Generated from protobuf field <code>int64 created_epoch = 10;</code>
      */
-    private $created_epoch = 0;
+    private int $created_epoch = 0;
 
     /**
      * Constructor.

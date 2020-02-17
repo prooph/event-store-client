@@ -33,14 +33,10 @@ use Psr\Log\LoggerInterface as Logger;
 /** @internal */
 class ReadEventOperation extends AbstractOperation
 {
-    /** @var bool */
-    private $requireMaster;
-    /** @var string */
-    private $stream;
-    /** @var int */
-    private $eventNumber;
-    /** @var bool */
-    private $resolveLinkTos;
+    private bool $requireMaster;
+    private string $stream;
+    private int $eventNumber;
+    private bool $resolveLinkTos;
 
     public function __construct(
         Logger $logger,

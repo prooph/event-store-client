@@ -18,6 +18,7 @@ use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
+use Closure;
 use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventStoreSubscription;
@@ -49,34 +50,20 @@ use Throwable;
 /** @internal  */
 abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 {
-    /** @var Logger */
-    private $log;
-    /** @var Deferred */
-    private $deferred;
-    /** @var string */
-    protected $streamId;
-    /** @var bool */
-    protected $resolveLinkTos;
-    /** @var UserCredentials|null */
-    protected $userCredentials;
-    /** @var callable */
-    protected $eventAppeared;
-    /** @var callable|null */
-    private $subscriptionDropped;
-    /** @var bool */
-    private $verboseLogging;
-    /** @var callable(?TcpPackageConnection $connection) */
-    protected $getConnection;
-    /** @var int */
-    private $maxQueueSize = 2000;
-    /** @var SplQueue */
-    private $actionQueue;
-    /** @var EventStoreSubscription */
-    private $subscription;
-    /** @var bool */
-    private $unsubscribed = false;
-    /** @var string */
-    protected $correlationId;
+    private Logger $log;
+    private Deferred $deferred;
+    protected string $streamId;
+    protected bool $resolveLinkTos;
+    protected ?UserCredentials $userCredentials;
+    protected Closure $eventAppeared;
+    private ?Closure $subscriptionDropped;
+    private bool $verboseLogging;
+    protected Closure $getConnection;
+    private int $maxQueueSize = 2000;
+    private SplQueue $actionQueue;
+    private ?EventStoreSubscription $subscription = null;
+    private bool $unsubscribed = false;
+    protected string $correlationId;
 
     public function __construct(
         Logger $logger,
@@ -84,10 +71,10 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
         string $streamId,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
-        callable $eventAppeared,
-        ?callable $subscriptionDropped,
+        Closure $eventAppeared,
+        ?Closure $subscriptionDropped,
         bool $verboseLogging,
-        callable $getConnection
+        Closure $getConnection
     ) {
         $this->log = $logger;
         $this->deferred = $deferred;
@@ -282,7 +269,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
             }
 
             if (! $reason->equals(SubscriptionDropReason::userInitiated())) {
-                $exception = $exception ?? new \Exception('Subscription dropped for ' . $reason);
+                $exception ??= new \Exception('Subscription dropped for ' . $reason);
 
                 try {
                     $this->deferred->fail($exception);
@@ -361,12 +348,10 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
             ));
         }
 
-        $this->executeActionAsync(function () use ($e): Promise {
-            return ($this->eventAppeared)($this->subscription, $e);
-        });
+        $this->executeActionAsync(fn (): Promise => ($this->eventAppeared)($this->subscription, $e));
     }
 
-    private function executeActionAsync(callable $action): void
+    private function executeActionAsync(Closure $action): void
     {
         $this->actionQueue->enqueue($action);
 
@@ -385,7 +370,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
         return call(function (): Generator {
             while (! $this->actionQueue->isEmpty()) {
                 $action = $this->actionQueue->dequeue();
-                \assert(\is_callable($action));
+                \assert($action instanceof Closure);
 
                 try {
                     yield $action();

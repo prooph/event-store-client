@@ -25,7 +25,7 @@ class StreamEventAppeared extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.ResolvedEvent event = 1;</code>
      */
-    private $event = null;
+    private ?ResolvedEvent $event = null;
 
     /**
      * Constructor.

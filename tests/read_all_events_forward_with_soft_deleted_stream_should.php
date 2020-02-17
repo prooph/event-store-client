@@ -31,9 +31,8 @@ class read_all_events_forward_with_soft_deleted_stream_should extends TestCase
     use SpecificationWithConnection;
 
     /** @var EventData[] */
-    private $testEvents;
-    /** @var string */
-    private $streamName = 'read_all_events_forward_with_soft_deleted_stream_should';
+    private array $testEvents;
+    private string $streamName = 'read_all_events_forward_with_soft_deleted_stream_should';
 
     private function cleanUp(): Generator
     {

@@ -18,7 +18,7 @@ use Prooph\EventStore\Exception\InvalidArgumentException;
 class ClusterInfoDto
 {
     /** @var MemberInfoDto[] */
-    private $members = [];
+    private array $members = [];
 
     /** @param MemberInfoDto[] */
     public function __construct(array $members = [])

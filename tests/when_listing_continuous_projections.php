@@ -25,9 +25,8 @@ class when_listing_continuous_projections extends TestCase
     use ProjectionSpecification;
 
     /** @var ProjectionDetails[] */
-    private $result;
-    /** @var string */
-    private $projectionName;
+    private array $result;
+    private string $projectionName;
 
     protected function given(): Generator
     {

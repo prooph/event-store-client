@@ -19,7 +19,7 @@
   ],
   "prefer-stable": true,
   "require": {
-    "php": "^7.2",
+    "php": "^7.4",
     "ext-json": "*",
     "amphp/amp": "^2.1.2",
     "amphp/http-client": "^4.0.0",
@@ -35,9 +35,8 @@
     "doctrine/instantiator": "^1.1",
     "php-coveralls/php-coveralls": "^2.1",
     "phpspec/prophecy": "^1.7.2",
-    "phpunit/phpunit": "^8.2.2",
-    "prooph/php-cs-fixer-config": "^0.3",
-    "sebastian/object-enumerator": "^3.0.3"
+    "phpunit/phpunit": "^9.0",
+    "prooph/php-cs-fixer-config": "^0.3"
   },
   "suggest": {
     "ext/protobuf": "for protobuf PHP extension (pecl)"

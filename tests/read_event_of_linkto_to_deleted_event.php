@@ -24,8 +24,7 @@ class read_event_of_linkto_to_deleted_event extends TestCase
 {
     use SpecificationWithLinkToToDeletedEvents;
 
-    /** @var EventReadResult */
-    private $read;
+    private EventReadResult $read;
 
     protected function when(): Generator
     {

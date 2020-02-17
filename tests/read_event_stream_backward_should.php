@@ -185,9 +185,7 @@ class read_event_stream_backward_should extends TestCase
             \assert($read instanceof StreamEventsSlice);
 
             $events = \array_map(
-                function (ResolvedEvent $e): RecordedEvent {
-                    return $e->event();
-                },
+                fn (ResolvedEvent $e): RecordedEvent => $e->event(),
                 \array_reverse($read->events())
             );
 
@@ -316,9 +314,7 @@ class read_event_stream_backward_should extends TestCase
             \assert($read instanceof StreamEventsSlice);
 
             $events = \array_map(
-                function (ResolvedEvent $e): RecordedEvent {
-                    return $e->event();
-                },
+                fn (ResolvedEvent $e): RecordedEvent => $e->event(),
                 $read->events()
             );
 

@@ -32,12 +32,9 @@ use Throwable;
 
 class when_committing_empty_transaction extends TestCase
 {
-    /** @var EventStoreConnection */
-    private $connection;
-    /** @var EventData */
-    private $firstEvent;
-    /** @var string */
-    private $stream;
+    private EventStoreConnection $connection;
+    private EventData $firstEvent;
+    private string $stream;
 
     protected function setUp(): void
     {

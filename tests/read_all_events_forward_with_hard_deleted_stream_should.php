@@ -35,11 +35,9 @@ class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
     use SpecificationWithConnection;
 
     /** @var EventData[] */
-    private $testEvents;
-    /** @var string */
-    private $streamName;
-    /** @var Position */
-    private $from;
+    private array $testEvents;
+    private string $streamName;
+    private Position $from;
 
     protected function when(): Generator
     {

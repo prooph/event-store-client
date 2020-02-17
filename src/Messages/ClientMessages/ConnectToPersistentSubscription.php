@@ -25,15 +25,15 @@ class ConnectToPersistentSubscription extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>string subscription_id = 1;</code>
      */
-    private $subscription_id = '';
+    private string $subscription_id = '';
     /**
      * Generated from protobuf field <code>string event_stream_id = 2;</code>
      */
-    private $event_stream_id = '';
+    private string $event_stream_id = '';
     /**
      * Generated from protobuf field <code>int32 allowed_in_flight_messages = 3;</code>
      */
-    private $allowed_in_flight_messages = 0;
+    private int $allowed_in_flight_messages = 0;
 
     /**
      * Constructor.

@@ -24,7 +24,7 @@ class when_listing_all_projections extends TestCase
     use ProjectionSpecification;
 
     /** @var ProjectionDetails[] */
-    private $result;
+    private array $result;
 
     protected function when(): Generator
     {

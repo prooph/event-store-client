@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
+use Closure;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\Exception\AccessDenied;
@@ -44,12 +45,9 @@ use Psr\Log\LoggerInterface as Logger;
 /** @internal */
 class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOperation implements ConnectToPersistentSubscriptions
 {
-    /** @var string */
-    private $groupName;
-    /** @var int */
-    private $bufferSize;
-    /** @var string */
-    private $subscriptionId;
+    private string $groupName;
+    private int $bufferSize;
+    private string $subscriptionId = '';
 
     public function __construct(
         Logger $logger,
@@ -58,10 +56,10 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
         int $bufferSize,
         string $streamId,
         ?UserCredentials $userCredentials,
-        callable $eventAppeared,
-        ?callable $subscriptionDropped,
+        Closure $eventAppeared,
+        ?Closure $subscriptionDropped,
         bool $verboseLogging,
-        callable $getConnection
+        Closure $getConnection
     ) {
         parent::__construct(
             $logger,
@@ -180,9 +178,7 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
         }
 
         $eventIds = \array_map(
-            function (EventId $eventId): string {
-                return $eventId->toBinary();
-            },
+            fn (EventId $eventId): string => $eventId->toBinary(),
             $eventIds
         );
 
@@ -225,9 +221,7 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
         }
 
         $eventIds = \array_map(
-            function (EventId $eventId): string {
-                return $eventId->toBinary();
-            },
+            fn (EventId $eventId): string => $eventId->toBinary(),
             $eventIds
         );
 

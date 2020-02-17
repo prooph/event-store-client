@@ -16,6 +16,7 @@ namespace ProophTest\EventStoreClient;
 use function Amp\call;
 use Amp\Delayed;
 use function Amp\Promise\wait;
+use Closure;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventStoreConnection;
@@ -36,8 +37,7 @@ use Throwable;
 
 class soft_delete extends TestCase
 {
-    /** @var EventStoreConnection */
-    private $conn;
+    private EventStoreConnection $conn;
 
     protected function setUpTestCase(): Generator
     {
@@ -51,9 +51,9 @@ class soft_delete extends TestCase
     }
 
     /** @throws Throwable */
-    protected function execute(callable $callback): void
+    protected function execute(Closure $callback): void
     {
-        wait(call(function () use ($callback) {
+        wait(call(function () use ($callback): Generator {
             yield from $this->setUpTestCase();
 
             yield from $callback();
@@ -139,25 +139,19 @@ class soft_delete extends TestCase
             $this->assertCount(3, $result->events());
 
             $expectedIds = \array_map(
-                function (EventData $eventData): string {
-                    return $eventData->eventId()->toString();
-                },
+                fn (EventData $eventData): string => $eventData->eventId()->toString(),
                 $events
             );
 
             $actualIds = \array_map(
-                function (ResolvedEvent $resolvedEvent): string {
-                    return $resolvedEvent->originalEvent()->eventId()->toString();
-                },
+                fn (ResolvedEvent $resolvedEvent): string => $resolvedEvent->originalEvent()->eventId()->toString(),
                 $result->events()
             );
 
             $this->assertSame($expectedIds, $actualIds);
 
             $actualNumbers = \array_map(
-                function (ResolvedEvent $resolvedEvent): int {
-                    return $resolvedEvent->originalEvent()->eventNumber();
-                },
+                fn (ResolvedEvent $resolvedEvent): int => $resolvedEvent->originalEvent()->eventNumber(),
                 $result->events()
             );
 
@@ -214,25 +208,19 @@ class soft_delete extends TestCase
             $this->assertCount(3, $result->events());
 
             $expectedIds = \array_map(
-                function (EventData $eventData): string {
-                    return $eventData->eventId()->toString();
-                },
+                fn (EventData $eventData): string => $eventData->eventId()->toString(),
                 $events
             );
 
             $actualIds = \array_map(
-                function (ResolvedEvent $resolvedEvent): string {
-                    return $resolvedEvent->originalEvent()->eventId()->toString();
-                },
+                fn (ResolvedEvent $resolvedEvent): string => $resolvedEvent->originalEvent()->eventId()->toString(),
                 $result->events()
             );
 
             $this->assertSame($expectedIds, $actualIds);
 
             $actualNumbers = \array_map(
-                function (ResolvedEvent $resolvedEvent): int {
-                    return $resolvedEvent->originalEvent()->eventNumber();
-                },
+                fn (ResolvedEvent $resolvedEvent): int => $resolvedEvent->originalEvent()->eventNumber(),
                 $result->events()
             );
 
@@ -289,25 +277,19 @@ class soft_delete extends TestCase
             $this->assertCount(3, $result->events());
 
             $expectedIds = \array_map(
-                function (EventData $eventData): string {
-                    return $eventData->eventId()->toString();
-                },
+                fn (EventData $eventData): string => $eventData->eventId()->toString(),
                 $events
             );
 
             $actualIds = \array_map(
-                function (ResolvedEvent $resolvedEvent): string {
-                    return $resolvedEvent->originalEvent()->eventId()->toString();
-                },
+                fn (ResolvedEvent $resolvedEvent): string => $resolvedEvent->originalEvent()->eventId()->toString(),
                 $result->events()
             );
 
             $this->assertSame($expectedIds, $actualIds);
 
             $actualNumbers = \array_map(
-                function (ResolvedEvent $resolvedEvent): int {
-                    return $resolvedEvent->originalEvent()->eventNumber();
-                },
+                fn (ResolvedEvent $resolvedEvent): int => $resolvedEvent->originalEvent()->eventNumber(),
                 $result->events()
             );
 
@@ -381,9 +363,7 @@ class soft_delete extends TestCase
             $this->assertCount(3, $result->events());
 
             $actualNumbers = \array_map(
-                function (ResolvedEvent $resolvedEvent): int {
-                    return $resolvedEvent->originalEvent()->eventNumber();
-                },
+                fn (ResolvedEvent $resolvedEvent): int => $resolvedEvent->originalEvent()->eventNumber(),
                 $result->events()
             );
 
@@ -502,9 +482,7 @@ class soft_delete extends TestCase
             $this->assertCount(3, $result->events());
 
             $actualNumbers = \array_map(
-                function (ResolvedEvent $resolvedEvent): int {
-                    return $resolvedEvent->originalEvent()->eventNumber();
-                },
+                fn (ResolvedEvent $resolvedEvent): int => $resolvedEvent->originalEvent()->eventNumber(),
                 $result->events()
             );
 
@@ -569,9 +547,7 @@ class soft_delete extends TestCase
             $this->assertCount(5, $result->events());
 
             $actualNumbers = \array_map(
-                function (ResolvedEvent $resolvedEvent): int {
-                    return $resolvedEvent->originalEvent()->eventNumber();
-                },
+                fn (ResolvedEvent $resolvedEvent): int => $resolvedEvent->originalEvent()->eventNumber(),
                 $result->events()
             );
 

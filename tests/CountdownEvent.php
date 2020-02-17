@@ -21,10 +21,8 @@ use Prooph\EventStore\Exception\RuntimeException;
 /** @internal */
 class CountdownEvent
 {
-    /** @var int */
-    private $counter;
-    /** @var Deferred */
-    private $deferred;
+    private int $counter;
+    private Deferred $deferred;
 
     public function __construct(int $counter)
     {
@@ -56,7 +54,7 @@ class CountdownEvent
         $deferred = new Deferred();
         $newPromise = $deferred->promise();
 
-        $promise->onResolve(function (?\Throwable $exception = null, $result) use ($deferred) {
+        $promise->onResolve(function (?\Throwable $exception = null, $result) use ($deferred): void {
             if ($exception) {
                 $deferred->resolve(false);
             } else {

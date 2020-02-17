@@ -28,14 +28,10 @@ use Prooph\EventStoreClient\Exception\UserCommandFailed;
 
 class UsersManager implements AsyncUsersManager
 {
-    /** @var UsersClient */
-    private $client;
-    /** @var EndPoint */
-    private $endPoint;
-    /** @var string */
-    private $schema;
-    /** @var UserCredentials|null */
-    private $defaultCredentials;
+    private UsersClient $client;
+    private EndPoint $endPoint;
+    private string $schema;
+    private ?UserCredentials $defaultCredentials;
 
     public function __construct(
         EndPoint $endPoint,

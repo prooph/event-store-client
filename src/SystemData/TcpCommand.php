@@ -164,10 +164,8 @@ final class TcpCommand
     public const IDENITFY_CLIENT = 0xF5;
     public const CLIENT_IDENTIFIED = 0xF6;
 
-    /** @var string */
-    private $name;
-    /** @var int */
-    private $value;
+    private string $name;
+    private int $value;
 
     private function __construct(string $name)
     {

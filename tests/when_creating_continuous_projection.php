@@ -24,16 +24,11 @@ class when_creating_continuous_projection extends TestCase
 {
     use ProjectionSpecification;
 
-    /** @var string */
-    private $projectionName;
-    /** @var string */
-    private $streamName;
-    /** @var string */
-    private $emittedStreamName;
-    /** @var string */
-    private $query;
-    /** @var string */
-    private $projectionId;
+    private string $projectionName;
+    private string $streamName;
+    private string $emittedStreamName;
+    private string $query;
+    private string $projectionId;
 
     public function given(): Generator
     {
@@ -93,7 +88,7 @@ class when_creating_continuous_projection extends TestCase
      */
     public function should_have_turn_on_emit_to_stream(string $projectionId): void
     {
-        $this->execute(function () use ($projectionId) {
+        $this->execute(function () use ($projectionId): Generator {
             $event = yield $this->connection->readEventAsync(
                 '$projections-' . $projectionId,
                 0,

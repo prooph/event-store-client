@@ -44,32 +44,30 @@ class overriden_system_stream_security extends AuthenticationTestCase
     public function operations_on_system_stream_succeed_for_authorized_user(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $stream = '$sys-authorized-user';
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $stream = '$sys-authorized-user';
 
-                    yield $this->readEvent($stream, 'user1', 'pa$$1');
-                    yield $this->ReadStreamForward($stream, 'user1', 'pa$$1');
-                    yield $this->ReadStreamBackward($stream, 'user1', 'pa$$1');
+                yield $this->readEvent($stream, 'user1', 'pa$$1');
+                yield $this->ReadStreamForward($stream, 'user1', 'pa$$1');
+                yield $this->ReadStreamBackward($stream, 'user1', 'pa$$1');
 
-                    yield $this->writeStream($stream, 'user1', 'pa$$1');
-                    yield $this->transStart($stream, 'user1', 'pa$$1');
+                yield $this->writeStream($stream, 'user1', 'pa$$1');
+                yield $this->transStart($stream, 'user1', 'pa$$1');
 
-                    $transId = (yield $this->transStart($stream, 'adm', 'admpa$$'))->transactionId();
-                    $trans = $this->connection->continueTransaction($transId, new UserCredentials('user1', 'pa$$1'));
+                $transId = (yield $this->transStart($stream, 'adm', 'admpa$$'))->transactionId();
+                $trans = $this->connection->continueTransaction($transId, new UserCredentials('user1', 'pa$$1'));
 
-                    \assert($trans instanceof EventStoreTransaction);
-                    yield $trans->writeAsync();
-                    yield $trans->commitAsync();
+                \assert($trans instanceof EventStoreTransaction);
+                yield $trans->writeAsync();
+                yield $trans->commitAsync();
 
-                    yield $this->readMeta($stream, 'user1', 'pa$$1');
-                    yield $this->writeMeta($stream, 'user1', 'pa$$1', null);
+                yield $this->readMeta($stream, 'user1', 'pa$$1');
+                yield $this->writeMeta($stream, 'user1', 'pa$$1', null);
 
-                    yield $this->subscribeToStream($stream, 'user1', 'pa$$1');
+                yield $this->subscribeToStream($stream, 'user1', 'pa$$1');
 
-                    yield $this->deleteStream($stream, 'user1', 'pa$$1');
-                });
-            });
+                yield $this->deleteStream($stream, 'user1', 'pa$$1');
+            }));
         }));
     }
 
@@ -82,46 +80,26 @@ class overriden_system_stream_security extends AuthenticationTestCase
         wait(call(function () {
             $stream = '$sys-not-authorized-user';
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->readEvent($stream, 'user2', 'pa$$2');
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->ReadStreamForward($stream, 'user2', 'pa$$2');
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->ReadStreamBackward($stream, 'user2', 'pa$$2');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readEvent($stream, 'user2', 'pa$$2'));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->ReadStreamForward($stream, 'user2', 'pa$$2'));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->ReadStreamBackward($stream, 'user2', 'pa$$2'));
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->writeStream($stream, 'user2', 'pa$$2');
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->transStart($stream, 'user2', 'pa$$2');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream($stream, 'user2', 'pa$$2'));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->transStart($stream, 'user2', 'pa$$2'));
 
             $transId = (yield $this->transStart($stream, 'adm', 'admpa$$'))->transactionId();
             $trans = $this->connection->continueTransaction($transId, new UserCredentials('user2', 'pa$$2'));
 
             \assert($trans instanceof EventStoreTransaction);
             yield $trans->writeAsync();
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($trans) {
-                return $trans->commitAsync();
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $trans->commitAsync());
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->readMeta($stream, 'user2', 'pa$$2');
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->writeMeta($stream, 'user2', 'pa$$2', null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readMeta($stream, 'user2', 'pa$$2'));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeMeta($stream, 'user2', 'pa$$2', null));
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->subscribeToStream($stream, 'user2', 'pa$$2');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->subscribeToStream($stream, 'user2', 'pa$$2'));
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->deleteStream($stream, 'user2', 'pa$$2');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($stream, 'user2', 'pa$$2'));
         }));
     }
 
@@ -134,46 +112,26 @@ class overriden_system_stream_security extends AuthenticationTestCase
         wait(call(function () {
             $stream = '$sys-anonymous-user';
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->readEvent($stream, null, null);
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->ReadStreamForward($stream, null, null);
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->ReadStreamBackward($stream, null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readEvent($stream, null, null));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->ReadStreamForward($stream, null, null));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->ReadStreamBackward($stream, null, null));
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->writeStream($stream, null, null);
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->transStart($stream, null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream($stream, null, null));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->transStart($stream, null, null));
 
             $transId = (yield $this->transStart($stream, 'adm', 'admpa$$'))->transactionId();
             $trans = $this->connection->continueTransaction($transId, null);
 
             \assert($trans instanceof EventStoreTransaction);
             yield $trans->writeAsync();
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($trans) {
-                return $trans->commitAsync();
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $trans->commitAsync());
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->readMeta($stream, null, null);
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->writeMeta($stream, null, null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readMeta($stream, null, null));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeMeta($stream, null, null, null));
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->subscribeToStream($stream, null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->subscribeToStream($stream, null, null));
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () use ($stream) {
-                return $this->deleteStream($stream, null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($stream, null, null));
         }));
     }
 
@@ -184,32 +142,30 @@ class overriden_system_stream_security extends AuthenticationTestCase
     public function operations_on_system_stream_succeed_for_admin(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    $stream = '$sys-admin';
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                $stream = '$sys-admin';
 
-                    yield $this->readEvent($stream, 'adm', 'admpa$$');
-                    yield $this->ReadStreamForward($stream, 'adm', 'admpa$$');
-                    yield $this->ReadStreamBackward($stream, 'adm', 'admpa$$');
+                yield $this->readEvent($stream, 'adm', 'admpa$$');
+                yield $this->ReadStreamForward($stream, 'adm', 'admpa$$');
+                yield $this->ReadStreamBackward($stream, 'adm', 'admpa$$');
 
-                    yield $this->writeStream($stream, 'adm', 'admpa$$');
-                    yield $this->transStart($stream, 'adm', 'admpa$$');
+                yield $this->writeStream($stream, 'adm', 'admpa$$');
+                yield $this->transStart($stream, 'adm', 'admpa$$');
 
-                    $transId = (yield $this->transStart($stream, 'adm', 'admpa$$'))->transactionId();
-                    $trans = $this->connection->continueTransaction($transId, new UserCredentials('adm', 'admpa$$'));
+                $transId = (yield $this->transStart($stream, 'adm', 'admpa$$'))->transactionId();
+                $trans = $this->connection->continueTransaction($transId, new UserCredentials('adm', 'admpa$$'));
 
-                    \assert($trans instanceof EventStoreTransaction);
-                    yield $trans->writeAsync();
-                    yield $trans->commitAsync();
+                \assert($trans instanceof EventStoreTransaction);
+                yield $trans->writeAsync();
+                yield $trans->commitAsync();
 
-                    yield $this->readMeta($stream, 'adm', 'admpa$$');
-                    yield $this->writeMeta($stream, 'adm', 'admpa$$', null);
+                yield $this->readMeta($stream, 'adm', 'admpa$$');
+                yield $this->writeMeta($stream, 'adm', 'admpa$$', null);
 
-                    yield $this->subscribeToStream($stream, 'adm', 'admpa$$');
+                yield $this->subscribeToStream($stream, 'adm', 'admpa$$');
 
-                    yield $this->deleteStream($stream, 'adm', 'admpa$$');
-                });
-            });
+                yield $this->deleteStream($stream, 'adm', 'admpa$$');
+            }));
         }));
     }
 }

@@ -23,12 +23,9 @@ class when_resetting_projections extends TestCase
 {
     use ProjectionSpecification;
 
-    /** @var string */
-    private $projectionName;
-    /** @var string */
-    private $streamName;
-    /** @var string */
-    private $query;
+    private string $projectionName;
+    private string $streamName;
+    private string $query;
 
     public function given(): Generator
     {

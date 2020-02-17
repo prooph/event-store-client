@@ -25,11 +25,11 @@ class PersistentSubscriptionAckEvents extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>string subscription_id = 1;</code>
      */
-    private $subscription_id = '';
+    private string $subscription_id = '';
     /**
      * Generated from protobuf field <code>repeated bytes processed_event_ids = 2;</code>
      */
-    private $processed_event_ids;
+    private \Google\Protobuf\Internal\RepeatedField $processed_event_ids;
 
     /**
      * Constructor.

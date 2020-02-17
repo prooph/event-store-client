@@ -16,61 +16,38 @@ namespace Prooph\EventStoreClient;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\OutOfRangeException;
 use Prooph\EventStore\UserCredentials;
-use Psr\Log\LoggerInterface as Log;
+use Psr\Log\LoggerInterface as Logger;
 
 /**
  * All times are milliseconds
  */
 final class ConnectionSettings
 {
-    /** @var Log */
-    private $log;
-    /** @var bool */
-    private $verboseLogging;
-    /** @var int */
-    private $maxQueueSize;
-    /** @var int */
-    private $maxConcurrentItems;
-    /** @var int */
-    private $maxRetries;
-    /** @var int */
-    private $maxReconnections;
-    /** @var bool */
-    private $requireMaster;
-    /** @var int */
-    private $reconnectionDelay;
-    /** @var int */
-    private $operationTimeout;
-    /** @var int */
-    private $operationTimeoutCheckPeriod;
-    /** @var UserCredentials|null */
-    private $defaultUserCredentials;
-    /** @var bool */
-    private $useSslConnection;
-    /** @var string */
-    private $targetHost = '';
-    /** @var bool */
-    private $validateServer;
-    /** @var bool */
-    private $failOnNoServerResponse;
-    /** @var int */
-    private $heartbeatInterval;
-    /** @var int */
-    private $heartbeatTimeout;
-    /** @var string */
-    private $clusterDns;
-    /** @var int */
-    private $maxDiscoverAttempts;
-    /** @var int */
-    private $externalGossipPort;
+    private Logger $log;
+    private bool $verboseLogging;
+    private int $maxQueueSize;
+    private int $maxConcurrentItems;
+    private int $maxRetries;
+    private int $maxReconnections;
+    private bool $requireMaster;
+    private int $reconnectionDelay;
+    private int $operationTimeout;
+    private int $operationTimeoutCheckPeriod;
+    private ?UserCredentials $defaultUserCredentials;
+    private bool $useSslConnection;
+    private string $targetHost = '';
+    private bool $validateServer;
+    private bool $failOnNoServerResponse;
+    private int $heartbeatInterval;
+    private int $heartbeatTimeout;
+    private string $clusterDns;
+    private int $maxDiscoverAttempts;
+    private int $externalGossipPort;
     /** @var GossipSeed[] */
-    private $gossipSeeds = [];
-    /** @var int */
-    private $gossipTimeout;
-    /** @var bool */
-    private $preferRandomNode;
-    /** @var int */
-    private $clientConnectionTimeout;
+    private array $gossipSeeds = [];
+    private int $gossipTimeout;
+    private bool $preferRandomNode;
+    private int $clientConnectionTimeout;
 
     public static function default(): self
     {
@@ -84,7 +61,7 @@ final class ConnectionSettings
 
     /** @internal */
     public function __construct(
-        Log $logger,
+        Logger $logger,
         bool $verboseLogging,
         int $maxQueueSize,
         int $maxConcurrentItems,
@@ -165,7 +142,7 @@ final class ConnectionSettings
         $this->clientConnectionTimeout = $clientConnectionTimeout;
     }
 
-    public function log(): Log
+    public function log(): Logger
     {
         return $this->log;
     }

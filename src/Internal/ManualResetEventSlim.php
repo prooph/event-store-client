@@ -19,10 +19,8 @@ use Amp\Promise;
 /** @internal */
 class ManualResetEventSlim
 {
-    /** @var bool */
-    private $isSet;
-    /** @var Deferred */
-    private $deferred;
+    private bool $isSet;
+    private Deferred $deferred;
 
     public function __construct(bool $isSet = false)
     {

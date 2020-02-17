@@ -32,14 +32,10 @@ class Uri
 
     private const TCP_PORT_DEFAULT = 1113;
 
-    /** @var string */
-    private $scheme;
-    /** @var UserCredentials|null */
-    private $userCredentials;
-    /** @var string */
-    private $host;
-    /** @var int */
-    private $port;
+    private string $scheme;
+    private ?UserCredentials $userCredentials;
+    private string $host;
+    private int $port;
 
     public function __construct(
         string $scheme,
@@ -109,9 +105,7 @@ class Uri
         // to match and thus prevent double-encoding.
         return \preg_replace_callback(
             '/(?:[^%' . self::CHAR_UNRESERVED . self::CHAR_SUB_DELIMS . ']+|%(?![A-Fa-f0-9]{2}))/u',
-            function (array $matches): string {
-                return \rawurlencode($matches[0]);
-            },
+            fn (array $matches): string => \rawurlencode($matches[0]),
             $part
         );
     }

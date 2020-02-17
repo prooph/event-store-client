@@ -18,6 +18,7 @@ use Amp\Deferred;
 use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
+use Closure;
 use Generator;
 use PHPUnit\Framework\Constraint\Exception as ExceptionConstraint;
 use PHPUnit\Framework\TestCase;
@@ -40,10 +41,8 @@ use Throwable;
 
 abstract class AuthenticationTestCase extends TestCase
 {
-    /** @var EventStoreConnection */
-    protected $connection;
-    /** @var UserCredentials|null */
-    protected $userCredentials;
+    protected ?EventStoreConnection $connection;
+    protected ?UserCredentials $userCredentials = null;
 
     /** @throws Throwable */
     protected function setUp(): void
@@ -377,7 +376,7 @@ abstract class AuthenticationTestCase extends TestCase
             new UserCredentials('adm', 'admpa$$')
         );
 
-        $promise->onResolve(function () use ($deferred, $stream) {
+        $promise->onResolve(function () use ($deferred, $stream): void {
             $deferred->resolve($stream);
         });
 
@@ -410,12 +409,12 @@ abstract class AuthenticationTestCase extends TestCase
         ];
     }
 
-    protected function expectExceptionFromCallback(string $expectedException, callable $callback): Promise
+    protected function expectExceptionFromCallback(string $expectedException, Closure $callback): Promise
     {
         $deferred = new Deferred();
 
         $promise = $callback();
-        $promise->onResolve(function ($e, $r) use ($deferred, $expectedException) {
+        $promise->onResolve(function ($e, $r) use ($deferred, $expectedException): void {
             $this->assertThat(
                 $e,
                 new ExceptionConstraint(
@@ -429,12 +428,12 @@ abstract class AuthenticationTestCase extends TestCase
         return $deferred->promise();
     }
 
-    protected function expectNoExceptionFromCallback(callable $callback): Promise
+    protected function expectNoExceptionFromCallback(Closure $callback): Promise
     {
         $deferred = new Deferred();
 
         $promise = $callback();
-        $promise->onResolve(function ($e, $r) use ($deferred) {
+        $promise->onResolve(function ($e, $r) use ($deferred): void {
             $this->assertNull($e);
             $deferred->resolve($r);
         });

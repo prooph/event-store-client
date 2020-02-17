@@ -28,12 +28,8 @@ class read_all_security extends AuthenticationTestCase
     public function reading_all_with_not_existing_credentials_is_not_authenticated(): void
     {
         wait(call(function () {
-            yield $this->expectExceptionFromCallback(NotAuthenticated::class, function () {
-                return $this->readAllForward('badlogin', 'badpass');
-            });
-            yield $this->expectExceptionFromCallback(NotAuthenticated::class, function () {
-                return $this->readAllBackward('badlogin', 'badpass');
-            });
+            yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->readAllForward('badlogin', 'badpass'));
+            yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->readAllBackward('badlogin', 'badpass'));
         }));
     }
 
@@ -44,12 +40,8 @@ class read_all_security extends AuthenticationTestCase
     public function reading_all_with_no_credentials_is_denied(): void
     {
         wait(call(function () {
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->readAllForward(null, null);
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->readAllBackward(null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readAllForward(null, null));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readAllBackward(null, null));
         }));
     }
 
@@ -60,12 +52,8 @@ class read_all_security extends AuthenticationTestCase
     public function reading_all_with_not_authorized_user_credentials_is_denied(): void
     {
         wait(call(function () {
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->readAllForward('user2', 'pa$$2');
-            });
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->readAllBackward('user2', 'pa$$2');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readAllForward('user2', 'pa$$2'));
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readAllBackward('user2', 'pa$$2'));
         }));
     }
 
@@ -76,12 +64,10 @@ class read_all_security extends AuthenticationTestCase
     public function reading_all_with_authorized_user_credentials_succeeds(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    yield $this->readAllForward('user1', 'pa$$1');
-                    yield $this->readAllBackward('user1', 'pa$$1');
-                });
-            });
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                yield $this->readAllForward('user1', 'pa$$1');
+                yield $this->readAllBackward('user1', 'pa$$1');
+            }));
         }));
     }
 
@@ -92,12 +78,10 @@ class read_all_security extends AuthenticationTestCase
     public function reading_all_with_admin_credentials_succeeds(): void
     {
         wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(function () {
-                return call(function () {
-                    yield $this->readAllForward('adm', 'admpa$$');
-                    yield $this->readAllBackward('adm', 'admpa$$');
-                });
-            });
+            yield $this->expectNoExceptionFromCallback(fn () => call(function () {
+                yield $this->readAllForward('adm', 'admpa$$');
+                yield $this->readAllBackward('adm', 'admpa$$');
+            }));
         }));
     }
 }

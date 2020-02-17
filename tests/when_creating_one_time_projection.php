@@ -22,10 +22,8 @@ class when_creating_one_time_projection extends TestCase
 {
     use ProjectionSpecification;
 
-    /** @var string */
-    private $streamName;
-    /** @var string */
-    private $query;
+    private string $streamName;
+    private string $query;
 
     public function given(): Generator
     {

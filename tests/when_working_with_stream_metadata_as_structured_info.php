@@ -15,6 +15,8 @@ namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
 use function Amp\Promise\wait;
+use Closure;
+use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Exception\RuntimeException;
@@ -29,16 +31,14 @@ use Throwable;
 
 class when_working_with_stream_metadata_as_structured_info extends TestCase
 {
-    /** @var string */
-    private $stream;
-    /** @var EventStoreConnection */
-    private $conn;
+    private string $stream;
+    private EventStoreConnection $conn;
 
     /** @throws Throwable */
-    private function execute(callable $function): void
+    private function execute(Closure $function): void
     {
-        wait(call(function () use ($function) {
-            $this->stream = __CLASS__ . '\\' . $this->getName();
+        wait(call(function () use ($function): Generator {
+            $this->stream = self::class . '\\' . $this->getName();
             $this->conn = TestConnection::create(DefaultData::adminCredentials());
             yield $this->conn->connectAsync();
 

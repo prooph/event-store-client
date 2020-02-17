@@ -21,10 +21,8 @@ use Prooph\EventStore\ExpectedVersion;
 
 class ParallelTransactionTask implements Task
 {
-    /** @var string */
-    private $stream;
-    /** @var string */
-    private $metadata;
+    private string $stream;
+    private string $metadata;
 
     public function __construct(string $stream, string $metadata)
     {

@@ -25,11 +25,11 @@ class SubscriptionConfirmation extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>int64 last_commit_position = 1;</code>
      */
-    private $last_commit_position = 0;
+    private int $last_commit_position = 0;
     /**
      * Generated from protobuf field <code>int64 last_event_number = 2;</code>
      */
-    private $last_event_number = 0;
+    private int $last_event_number = 0;
 
     /**
      * Constructor.

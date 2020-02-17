@@ -31,12 +31,9 @@ class deleting_existing_persistent_subscription_with_subscriber extends TestCase
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $stream;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
-    /** @var Deferred */
-    private $called;
+    private string $stream;
+    private PersistentSubscriptionSettings $settings;
+    private Deferred $called;
 
     protected function setUp(): void
     {

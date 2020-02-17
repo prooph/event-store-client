@@ -32,8 +32,7 @@ use Throwable;
 
 class connect extends TestCase
 {
-    /** @var EndPoint */
-    private $blackhole;
+    private EndPoint $blackhole;
 
     protected function setUp(): void
     {
@@ -78,7 +77,7 @@ class connect extends TestCase
                 $settings
             );
 
-            $connection->onClosed(function () use ($closed) {
+            $connection->onClosed(function () use ($closed): void {
                 $closed->resolve(true);
             });
 
@@ -116,7 +115,7 @@ class connect extends TestCase
                 $settings
             );
 
-            $connection->onClosed(function (ClientClosedEventArgs $args) use ($closed) {
+            $connection->onClosed(function (ClientClosedEventArgs $args) use ($closed): void {
                 $this->assertInstanceOf(EventStoreConnection::class, $args->connection());
                 $this->assertEquals('Reconnection limit reached', $args->reason());
 

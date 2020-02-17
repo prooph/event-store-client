@@ -22,8 +22,7 @@ use Prooph\EventStore\EventData;
 /** @internal */
 class OngoingTransaction
 {
-    /** @var EventStoreTransaction */
-    private $transaction;
+    private EventStoreTransaction $transaction;
 
     public function __construct(EventStoreTransaction $transaction)
     {
@@ -46,8 +45,6 @@ class OngoingTransaction
     /** @return Promise<WriteResult> */
     public function commitAsync(): Promise
     {
-        return call(function (): Generator {
-            return yield $this->transaction->commitAsync();
-        });
+        return call(fn (): Generator => yield $this->transaction->commitAsync());
     }
 }

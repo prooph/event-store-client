@@ -55,7 +55,7 @@ class EventStoreConnectionFactory
         ?ConnectionSettings $connectionSettings = null,
         ?string $connectionName = null
     ): EventStoreConnection {
-        $connectionSettings = $connectionSettings ?? ConnectionSettings::default();
+        $connectionSettings ??= ConnectionSettings::default();
 
         if (null !== $uri) {
             $scheme = \strtolower($uri->scheme());
@@ -171,7 +171,7 @@ class EventStoreConnectionFactory
         ?ConnectionSettings $settings = null,
         ?string $connectionName = null
     ): EventStoreConnection {
-        $settings = $settings ?? ConnectionSettings::default();
+        $settings ??= ConnectionSettings::default();
 
         return new EventStoreNodeConnection(
             $settings,

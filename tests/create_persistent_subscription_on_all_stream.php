@@ -25,7 +25,7 @@ class create_persistent_subscription_on_all_stream extends TestCase
     use SpecificationWithConnection;
 
     /** PersistentSubscriptionSettings */
-    private $settings;
+    private PersistentSubscriptionSettings $settings;
 
     protected function setUp(): void
     {

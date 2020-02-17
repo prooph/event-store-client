@@ -25,11 +25,11 @@ class DeletePersistentSubscription extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>string subscription_group_name = 1;</code>
      */
-    private $subscription_group_name = '';
+    private string $subscription_group_name = '';
     /**
      * Generated from protobuf field <code>string event_stream_id = 2;</code>
      */
-    private $event_stream_id = '';
+    private string $event_stream_id = '';
 
     /**
      * Constructor.

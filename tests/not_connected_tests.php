@@ -65,7 +65,7 @@ class not_connected_tests extends TestCase
                 \var_dump('error');
             });
 
-            $connection->onClosed(function () use ($deferred) {
+            $connection->onClosed(function () use ($deferred): void {
                 $deferred->resolve();
             });
 

@@ -33,17 +33,12 @@ class connect_to_persistent_subscription_with_retries extends TestCase
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $stream;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
-    /** @var Deferred */
-    private $resetEvent;
-    /** @var EventId */
-    private $eventId;
-    /** @var int|null */
-    private $retryCount;
-    private $group = 'retries';
+    private string $stream;
+    private PersistentSubscriptionSettings $settings;
+    private Deferred $resetEvent;
+    private EventId $eventId;
+    private ?int $retryCount;
+    private string $group = 'retries';
 
     protected function setUp(): void
     {
@@ -69,7 +64,7 @@ class connect_to_persistent_subscription_with_retries extends TestCase
             $this->stream,
             'agroupname55',
             new class($this->retryCount, $this->resetEvent) implements EventAppearedOnPersistentSubscription {
-                private $retryCount;
+                private ?int $retryCount;
                 private $resetEvent;
 
                 public function __construct(&$retryCount, $resetEvent)

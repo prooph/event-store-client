@@ -40,14 +40,10 @@ class persistent_subscription_manager extends TestCase
 {
     use SpecificationWithConnection;
 
-    /** @var PersistentSubscriptionsManager */
-    private $manager;
-    /** @var string */
-    private $stream;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
-    /** @var EventStorePersistentSubscription */
-    private $sub;
+    private PersistentSubscriptionsManager $manager;
+    private string $stream;
+    private PersistentSubscriptionSettings $settings;
+    private EventStorePersistentSubscription $sub;
 
     protected function setUp(): void
     {
@@ -273,8 +269,7 @@ class persistent_subscription_manager extends TestCase
                 $this->stream,
                 'existing',
                 new class($event) implements EventAppearedOnPersistentSubscription {
-                    /** @var CountdownEvent */
-                    private $event;
+                    private CountdownEvent $event;
 
                     public function __construct(CountdownEvent $event)
                     {

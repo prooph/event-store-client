@@ -23,14 +23,10 @@ use Prooph\EventStore\UserCredentials;
 
 class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsManager
 {
-    /** @var PersistentSubscriptionsClient */
-    private $client;
-    /** @var EndPoint */
-    private $httpEndPoint;
-    /** @var string */
-    private $httpSchema;
-    /** @var UserCredentials|null */
-    private $defaultUserCredentials;
+    private PersistentSubscriptionsClient $client;
+    private EndPoint $httpEndPoint;
+    private string $httpSchema;
+    private ?UserCredentials $defaultUserCredentials;
 
     public function __construct(
         EndPoint $httpEndPoint,

@@ -21,26 +21,16 @@ use Prooph\EventStoreClient\ClientOperations\ClientOperation;
 /** @internal */
 class OperationItem
 {
-    /** @var int */
-    private static $nextSeqNo = -1;
-    /** @var int */
-    private $segNo;
-    /** @var ClientOperation */
-    private $operation;
-    /** @var int */
-    private $maxRetries;
-    /** @var int */
-    private $timeout;
-    /** @var DateTimeImmutable */
-    private $created;
-    /** @var string */
-    private $connectionId;
-    /** @var string */
-    private $correlationId;
-    /** @var int */
-    private $retryCount;
-    /** @var DateTimeImmutable */
-    private $lastUpdated;
+    private static int $nextSeqNo = -1;
+    private int $segNo;
+    private ClientOperation $operation;
+    private int $maxRetries;
+    private int $timeout;
+    private DateTimeImmutable $created;
+    private string $connectionId;
+    private string $correlationId;
+    private int $retryCount;
+    private DateTimeImmutable $lastUpdated;
 
     public function __construct(ClientOperation $operation, int $maxRetries, int $timeout)
     {

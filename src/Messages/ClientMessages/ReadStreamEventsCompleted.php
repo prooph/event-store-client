@@ -25,31 +25,31 @@ class ReadStreamEventsCompleted extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>repeated .Prooph.EventStoreClient.Messages.ClientMessages.ResolvedIndexedEvent events = 1;</code>
      */
-    private $events;
+    private \Google\Protobuf\Internal\RepeatedField $events;
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.ReadStreamEventsCompleted.ReadStreamResult result = 2;</code>
      */
-    private $result = 0;
+    private int $result = 0;
     /**
      * Generated from protobuf field <code>int64 next_event_number = 3;</code>
      */
-    private $next_event_number = 0;
+    private int $next_event_number = 0;
     /**
      * Generated from protobuf field <code>int64 last_event_number = 4;</code>
      */
-    private $last_event_number = 0;
+    private int $last_event_number = 0;
     /**
      * Generated from protobuf field <code>bool is_end_of_stream = 5;</code>
      */
-    private $is_end_of_stream = false;
+    private bool $is_end_of_stream = false;
     /**
      * Generated from protobuf field <code>int64 last_commit_position = 6;</code>
      */
-    private $last_commit_position = 0;
+    private int $last_commit_position = 0;
     /**
      * Generated from protobuf field <code>string error = 7;</code>
      */
-    private $error = '';
+    private string $error = '';
 
     /**
      * Constructor.

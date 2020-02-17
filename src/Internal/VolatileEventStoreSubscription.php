@@ -19,8 +19,7 @@ use Prooph\EventStoreClient\ClientOperations\VolatileSubscriptionOperation;
 /** @internal */
 class VolatileEventStoreSubscription extends EventStoreSubscription
 {
-    /** @var VolatileSubscriptionOperation */
-    private $subscriptionOperation;
+    private VolatileSubscriptionOperation $subscriptionOperation;
 
     public function __construct(
         VolatileSubscriptionOperation $subscriptionOperation,

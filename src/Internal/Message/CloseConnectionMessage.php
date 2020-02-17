@@ -18,10 +18,8 @@ use Throwable;
 /** @internal */
 class CloseConnectionMessage implements Message
 {
-    /** @var string */
-    private $reason;
-    /** @var Throwable|null */
-    private $exception;
+    private string $reason;
+    private ?Throwable $exception;
 
     public function __construct(string $reason, ?Throwable $exception = null)
     {

@@ -33,20 +33,15 @@ class happy_case_writing_and_subscribing_to_normal_events_manual_ack extends Tes
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $streamName;
-    /** @var string */
-    private $groupName;
+    private string $streamName;
+    private string $groupName;
 
     private const BUFFER_COUNT = 10;
     private const EVENT_WRITE_COUNT = self::BUFFER_COUNT * 2;
 
-    /** @var int */
-    private $bufferCount = 10;
-    /** @var Deferred */
-    private $eventsReceived;
-    /** @var int */
-    private $eventReceivedCount;
+    private int $bufferCount = 10;
+    private Deferred $eventsReceived;
+    private int $eventReceivedCount = 0;
 
     protected function setUp(): void
     {
@@ -80,7 +75,7 @@ class happy_case_writing_and_subscribing_to_normal_events_manual_ack extends Tes
                 $this->streamName,
                 $this->groupName,
                 new class($this->eventsReceived, $this->eventReceivedCount, self::EVENT_WRITE_COUNT) implements EventAppearedOnPersistentSubscription {
-                    private $eventsReceived;
+                    private Deferred $eventsReceived;
                     private $eventReceivedCount;
                     private $eventWriteCount;
 

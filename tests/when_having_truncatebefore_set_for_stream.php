@@ -32,7 +32,7 @@ class when_having_truncatebefore_set_for_stream extends TestCase
     use SpecificationWithConnection;
 
     /** @var EventData[] */
-    private $testEvents = [];
+    private array $testEvents = [];
 
     protected function setUp(): void
     {

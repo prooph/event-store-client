@@ -27,8 +27,7 @@ class connect_to_non_existing_persistent_subscription_with_permissions extends T
 {
     use SpecificationWithConnection;
 
-    /** @var Throwable */
-    private $exception;
+    private Throwable $exception;
 
     protected function when(): Generator
     {

@@ -18,8 +18,7 @@ use Prooph\EventStoreClient\Internal\NodeEndPoints;
 /** @internal */
 class EstablishTcpConnectionMessage implements Message
 {
-    /** @var NodeEndPoints */
-    private $nodeEndPoints;
+    private NodeEndPoints $nodeEndPoints;
 
     public function __construct(NodeEndPoints $nodeEndPoints)
     {

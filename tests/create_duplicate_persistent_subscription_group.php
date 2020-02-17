@@ -24,10 +24,8 @@ class create_duplicate_persistent_subscription_group extends TestCase
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $stream;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
+    private string $stream;
+    private PersistentSubscriptionSettings $settings;
 
     protected function setUp(): void
     {

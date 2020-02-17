@@ -34,10 +34,8 @@ final class ConnectingPhase
     public const IDENTIFICATION = 5;
     public const CONNECTED = 6;
 
-    /** @var string */
-    private $name;
-    /** @var int */
-    private $value;
+    private string $name;
+    private int $value;
 
     private function __construct(string $name)
     {

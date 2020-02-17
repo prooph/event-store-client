@@ -25,15 +25,15 @@ class TransactionWrite extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>int64 transaction_id = 1;</code>
      */
-    private $transaction_id = 0;
+    private int $transaction_id = 0;
     /**
      * Generated from protobuf field <code>repeated .Prooph.EventStoreClient.Messages.ClientMessages.NewEvent events = 2;</code>
      */
-    private $events;
+    private \Google\Protobuf\Internal\RepeatedField $events;
     /**
      * Generated from protobuf field <code>bool require_master = 3;</code>
      */
-    private $require_master = false;
+    private bool $require_master = false;
 
     /**
      * Constructor.

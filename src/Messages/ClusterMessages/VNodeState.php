@@ -41,10 +41,8 @@ final class VNodeState
     public const SHUTTING_DOWN = 9;
     public const SHUTDOWN = 10;
 
-    /** @var string */
-    private $name;
-    /** @var int */
-    private $value;
+    private string $name;
+    private int $value;
 
     private function __construct(string $name)
     {

@@ -41,21 +41,15 @@ class multiple_role_security extends AuthenticationTestCase
             );
             yield $this->connection->setSystemSettingsAsync($settings, new UserCredentials('adm', 'admpa$$'));
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->readEvent('usr-stream', null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readEvent('usr-stream', null, null));
 
             yield $this->readEvent('usr-stream', 'user1', 'pa$$1');
             yield $this->readEvent('usr-stream', 'user2', 'pa$$2');
             yield $this->readEvent('usr-stream', 'adm', 'admpa$$');
 
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('user-stream', null, null);
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('user-stream', null, null));
             yield $this->writeStream('usr-stream', 'user1', 'pa$$1');
-            yield $this->expectExceptionFromCallback(AccessDenied::class, function () {
-                return $this->writeStream('usr-stream', 'user2', 'pa$$2');
-            });
+            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('usr-stream', 'user2', 'pa$$2'));
             yield $this->writeStream('usr-stream', 'adm', 'admpa$$');
 
             yield $this->deleteStream('usr-stream1', null, null);

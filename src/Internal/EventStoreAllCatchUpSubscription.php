@@ -32,10 +32,8 @@ use Throwable;
 
 class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription implements AsyncEventStoreAllCatchUpSubscription
 {
-    /** @var Position */
-    private $nextReadPosition;
-    /** @var Position */
-    private $lastProcessedPosition;
+    private Position $nextReadPosition;
+    private Position $lastProcessedPosition;
 
     /**
      * @internal

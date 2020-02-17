@@ -17,8 +17,7 @@ use Prooph\EventStore\Exception\UserCommandFailed as BaseException;
 
 class UserCommandFailed extends BaseException
 {
-    /** @var int */
-    private $httpStatusCode;
+    private int $httpStatusCode;
 
     public function __construct(int $httpStatusCode, string $message)
     {

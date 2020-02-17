@@ -34,12 +34,9 @@ use Psr\Log\LoggerInterface as Logger;
 /** @internal */
 class UpdatePersistentSubscriptionOperation extends AbstractOperation
 {
-    /** @var string */
-    private $stream;
-    /** @var string */
-    private $groupName;
-    /** @var PersistentSubscriptionSettings */
-    private $settings;
+    private string $stream;
+    private string $groupName;
+    private PersistentSubscriptionSettings $settings;
 
     public function __construct(
         Logger $logger,

@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use Closure;
 use Prooph\EventStore\Exception\RuntimeException;
 use Prooph\EventStoreClient\Internal\Message\Message;
 
 /** @internal */
 class MessageHandler
 {
-    /** @var array */
-    private $handlers = [];
+    private array $handlers = [];
 
-    public function registerHandler(string $messageName, callable $handler): void
+    public function registerHandler(string $messageName, Closure $handler): void
     {
         $this->handlers[$messageName] = $handler;
     }

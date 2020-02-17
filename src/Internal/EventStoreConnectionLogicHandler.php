@@ -15,6 +15,8 @@ namespace Prooph\EventStoreClient\Internal;
 
 use Amp\Deferred;
 use Amp\Loop;
+use Amp\Promise;
+use Closure;
 use Exception;
 use Generator;
 use Prooph\EventStore\Async\ClientAuthenticationFailedEventArgs;
@@ -25,12 +27,15 @@ use Prooph\EventStore\Async\ClientReconnectingEventArgs;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Async\Internal\EventHandler;
 use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\Exception\CannotEstablishConnection;
 use Prooph\EventStore\Exception\EventStoreConnectionException;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\Exception\ObjectDisposed;
 use Prooph\EventStore\Internal\Consts;
 use Prooph\EventStore\ListenerHandler;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\ClientOperations\ClientOperation;
 use Prooph\EventStoreClient\ClientOperations\ConnectToPersistentSubscriptionOperation;
@@ -60,45 +65,25 @@ class EventStoreConnectionLogicHandler
 {
     private const CLIENT_VERSION = 1;
 
-    /** @var EventStoreConnection */
-    private $esConnection;
-    /** @var TcpPackageConnection|null */
-    private $connection;
-    /** @var ConnectionSettings */
-    private $settings;
-    /** @var ConnectionState */
-    private $state;
-    /** @var ConnectingPhase */
-    private $connectingPhase;
-    /** @var EndPointDiscoverer */
-    private $endPointDiscoverer;
-    /** @var MessageHandler */
-    private $handler;
-    /** @var OperationsManager */
-    private $operations;
-    /** @var SubscriptionsManager */
-    private $subscriptions;
-    /** @var EventHandler */
-    private $eventHandler;
-    /** @var StopWatch */
-    private $stopWatch;
-    /** @var string */
-    private $timerTickWatcherId;
-
-    /** @var ReconnectionInfo */
-    private $reconnInfo;
-    /** @var HeartbeatInfo */
-    private $heartbeatInfo;
-    /** @var AuthInfo */
-    private $authInfo;
-    /** @var IdentifyInfo */
-    private $identityInfo;
-    /** @var bool */
-    private $wasConnected = false;
-    /** @var int */
-    private $packageNumber = 0;
-    /** @var int */
-    private $lastTimeoutsTimeStamp;
+    private EventStoreConnection $esConnection;
+    private ?TcpPackageConnection $connection = null;
+    private ConnectionSettings $settings;
+    private ConnectionState $state;
+    private ConnectingPhase $connectingPhase;
+    private EndPointDiscoverer $endPointDiscoverer;
+    private MessageHandler $handler;
+    private OperationsManager $operations;
+    private SubscriptionsManager $subscriptions;
+    private EventHandler $eventHandler;
+    private StopWatch $stopWatch;
+    private string $timerTickWatcherId = '';
+    private ?ReconnectionInfo $reconnInfo = null;
+    private HeartbeatInfo $heartbeatInfo;
+    private AuthInfo $authInfo;
+    private IdentifyInfo $identityInfo;
+    private bool $wasConnected = false;
+    private int $packageNumber = 0;
+    private int $lastTimeoutsTimeStamp;
 
     public function __construct(EventStoreConnection $connection, ConnectionSettings $settings)
     {
@@ -670,12 +655,12 @@ class EventStoreConnectionLogicHandler
                     $message->streamId(),
                     $message->resolveTo(),
                     $message->userCredentials(),
-                    $message->eventAppeared(),
-                    $message->subscriptionDropped(),
+                    fn (EventStoreSubscription $subscription, ResolvedEvent $resolvedEvent): Promise => ($message->eventAppeared())($subscription, $resolvedEvent),
+                    function (EventStoreSubscription $subscription, SubscriptionDropReason $reason, ?Throwable $exception = null) use ($message): void {
+                        ($message->subscriptionDropped())($subscription, $reason, $exception);
+                    },
                     $this->settings->verboseLogging(),
-                    function (): ?TcpPackageConnection {
-                        return $this->connection;
-                    }
+                    fn (): ?TcpPackageConnection => $this->connection
                 );
 
                 $this->logDebug(
@@ -726,9 +711,7 @@ class EventStoreConnectionLogicHandler
                     $message->eventAppeared(),
                     $message->subscriptionDropped(),
                     $this->settings->verboseLogging(),
-                    function (): ?TcpPackageConnection {
-                        return $this->connection;
-                    }
+                    fn (): ?TcpPackageConnection => $this->connection
                 );
 
                 $this->logDebug(
@@ -996,32 +979,32 @@ class EventStoreConnectionLogicHandler
         $this->eventHandler->authenticationFailed(new ClientAuthenticationFailedEventArgs($this->esConnection, $reason));
     }
 
-    public function onConnected(callable $handler): ListenerHandler
+    public function onConnected(Closure $handler): ListenerHandler
     {
         return $this->eventHandler->whenConnected($handler);
     }
 
-    public function onDisconnected(callable $handler): ListenerHandler
+    public function onDisconnected(Closure $handler): ListenerHandler
     {
         return $this->eventHandler->whenDisconnected($handler);
     }
 
-    public function onReconnecting(callable $handler): ListenerHandler
+    public function onReconnecting(Closure $handler): ListenerHandler
     {
         return $this->eventHandler->whenReconnecting($handler);
     }
 
-    public function onClosed(callable $handler): ListenerHandler
+    public function onClosed(Closure $handler): ListenerHandler
     {
         return $this->eventHandler->whenClosed($handler);
     }
 
-    public function onErrorOccurred(callable $handler): ListenerHandler
+    public function onErrorOccurred(Closure $handler): ListenerHandler
     {
         return $this->eventHandler->whenErrorOccurred($handler);
     }
 
-    public function onAuthenticationFailed(callable $handler): ListenerHandler
+    public function onAuthenticationFailed(Closure $handler): ListenerHandler
     {
         return $this->eventHandler->whenAuthenticationFailed($handler);
     }

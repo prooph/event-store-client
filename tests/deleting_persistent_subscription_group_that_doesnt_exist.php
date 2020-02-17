@@ -24,8 +24,7 @@ class deleting_persistent_subscription_group_that_doesnt_exist extends TestCase
 {
     use SpecificationWithConnection;
 
-    /** @var string */
-    private $stream;
+    private string $stream;
 
     protected function setUp(): void
     {

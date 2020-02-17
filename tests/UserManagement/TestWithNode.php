@@ -15,6 +15,7 @@ namespace ProophTest\EventStoreClient\UserManagement;
 
 use function Amp\call;
 use function Amp\Promise\wait;
+use Closure;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\EndPoint;
@@ -23,8 +24,7 @@ use Throwable;
 
 abstract class TestWithNode extends TestCase
 {
-    /** @var UsersManager */
-    protected $manager;
+    protected UsersManager $manager;
 
     protected function setUp(): void
     {
@@ -38,7 +38,7 @@ abstract class TestWithNode extends TestCase
     }
 
     /** @throws Throwable */
-    protected function execute(callable $function): void
+    protected function execute(Closure $function): void
     {
         wait(call(function () use ($function): Generator {
             yield from $function();
