@@ -25,67 +25,67 @@ class CreatePersistentSubscription extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>string subscription_group_name = 1;</code>
      */
-    private string $subscription_group_name = '';
+    protected $subscription_group_name = '';
     /**
      * Generated from protobuf field <code>string event_stream_id = 2;</code>
      */
-    private string $event_stream_id = '';
+    protected $event_stream_id = '';
     /**
      * Generated from protobuf field <code>bool resolve_link_tos = 3;</code>
      */
-    private bool $resolve_link_tos = false;
+    protected $resolve_link_tos = false;
     /**
      * Generated from protobuf field <code>int64 start_from = 4;</code>
      */
-    private int $start_from = 0;
+    protected $start_from = 0;
     /**
      * Generated from protobuf field <code>int32 message_timeout_milliseconds = 5;</code>
      */
-    private int $message_timeout_milliseconds = 0;
+    protected $message_timeout_milliseconds = 0;
     /**
      * Generated from protobuf field <code>bool record_statistics = 6;</code>
      */
-    private bool $record_statistics = false;
+    protected $record_statistics = false;
     /**
      * Generated from protobuf field <code>int32 live_buffer_size = 7;</code>
      */
-    private int $live_buffer_size = 0;
+    protected $live_buffer_size = 0;
     /**
      * Generated from protobuf field <code>int32 read_batch_size = 8;</code>
      */
-    private int $read_batch_size = 0;
+    protected $read_batch_size = 0;
     /**
      * Generated from protobuf field <code>int32 buffer_size = 9;</code>
      */
-    private int $buffer_size = 0;
+    protected $buffer_size = 0;
     /**
      * Generated from protobuf field <code>int32 max_retry_count = 10;</code>
      */
-    private int $max_retry_count = 0;
+    protected $max_retry_count = 0;
     /**
      * Generated from protobuf field <code>bool prefer_round_robin = 11;</code>
      */
-    private bool $prefer_round_robin = false;
+    protected $prefer_round_robin = false;
     /**
      * Generated from protobuf field <code>int32 checkpoint_after_time = 12;</code>
      */
-    private int $checkpoint_after_time = 0;
+    protected $checkpoint_after_time = 0;
     /**
      * Generated from protobuf field <code>int32 checkpoint_max_count = 13;</code>
      */
-    private int $checkpoint_max_count = 0;
+    protected $checkpoint_max_count = 0;
     /**
      * Generated from protobuf field <code>int32 checkpoint_min_count = 14;</code>
      */
-    private int $checkpoint_min_count = 0;
+    protected $checkpoint_min_count = 0;
     /**
      * Generated from protobuf field <code>int32 subscriber_max_count = 15;</code>
      */
-    private int $subscriber_max_count = 0;
+    protected $subscriber_max_count = 0;
     /**
      * Generated from protobuf field <code>string named_consumer_strategy = 16;</code>
      */
-    private string $named_consumer_strategy = '';
+    protected $named_consumer_strategy = '';
 
     /**
      * Constructor.

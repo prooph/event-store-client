@@ -25,19 +25,19 @@ class DeleteStream extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>string event_stream_id = 1;</code>
      */
-    private string $event_stream_id = '';
+    protected $event_stream_id = '';
     /**
      * Generated from protobuf field <code>int64 expected_version = 2;</code>
      */
-    private int $expected_version = 0;
+    protected $expected_version = 0;
     /**
      * Generated from protobuf field <code>bool require_master = 3;</code>
      */
-    private bool $require_master = false;
+    protected $require_master = false;
     /**
      * Generated from protobuf field <code>bool hard_delete = 4;</code>
      */
-    private bool $hard_delete = false;
+    protected $hard_delete = false;
 
     /**
      * Constructor.

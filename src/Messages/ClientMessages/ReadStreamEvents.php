@@ -25,23 +25,23 @@ class ReadStreamEvents extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>string event_stream_id = 1;</code>
      */
-    private string $event_stream_id = '';
+    protected $event_stream_id = '';
     /**
      * Generated from protobuf field <code>int64 from_event_number = 2;</code>
      */
-    private int $from_event_number = 0;
+    protected $from_event_number = 0;
     /**
      * Generated from protobuf field <code>int32 max_count = 3;</code>
      */
-    private int $max_count = 0;
+    protected $max_count = 0;
     /**
      * Generated from protobuf field <code>bool resolve_link_tos = 4;</code>
      */
-    private bool $resolve_link_tos = false;
+    protected $resolve_link_tos = false;
     /**
      * Generated from protobuf field <code>bool require_master = 5;</code>
      */
-    private bool $require_master = false;
+    protected $require_master = false;
 
     /**
      * Constructor.

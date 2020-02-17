@@ -25,19 +25,19 @@ class ScavengeDatabaseCompleted extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.ScavengeDatabaseCompleted.ScavengeResult result = 1;</code>
      */
-    private int $result = 0;
+    protected $result = 0;
     /**
      * Generated from protobuf field <code>string error = 2;</code>
      */
-    private string $error = '';
+    protected $error = '';
     /**
      * Generated from protobuf field <code>int32 total_time_ms = 3;</code>
      */
-    private int $total_time_ms = 0;
+    protected $total_time_ms = 0;
     /**
      * Generated from protobuf field <code>int64 total_space_saved = 4;</code>
      */
-    private int $total_space_saved = 0;
+    protected $total_space_saved = 0;
 
     /**
      * Constructor.

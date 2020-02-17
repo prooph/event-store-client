@@ -25,7 +25,7 @@ class SubscriptionDropped extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.SubscriptionDropped.SubscriptionDropReason reason = 1;</code>
      */
-    private int $reason = 0;
+    protected $reason = 0;
 
     /**
      * Constructor.

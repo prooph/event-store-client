@@ -25,15 +25,15 @@ class PersistentSubscriptionConfirmation extends \Google\Protobuf\Internal\Messa
     /**
      * Generated from protobuf field <code>int64 last_commit_position = 1;</code>
      */
-    private int $last_commit_position = 0;
+    protected $last_commit_position = 0;
     /**
      * Generated from protobuf field <code>string subscription_id = 2;</code>
      */
-    private string $subscription_id = '';
+    protected $subscription_id = '';
     /**
      * Generated from protobuf field <code>int64 last_event_number = 3;</code>
      */
-    private int $last_event_number = 0;
+    protected $last_event_number = 0;
 
     /**
      * Constructor.

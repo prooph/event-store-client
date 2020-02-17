@@ -25,31 +25,31 @@ class ReadAllEventsCompleted extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>int64 commit_position = 1;</code>
      */
-    private int $commit_position = 0;
+    protected $commit_position = 0;
     /**
      * Generated from protobuf field <code>int64 prepare_position = 2;</code>
      */
-    private int $prepare_position = 0;
+    protected $prepare_position = 0;
     /**
      * Generated from protobuf field <code>repeated .Prooph.EventStoreClient.Messages.ClientMessages.ResolvedEvent events = 3;</code>
      */
-    private \Google\Protobuf\Internal\RepeatedField $events;
+    private $events;
     /**
      * Generated from protobuf field <code>int64 next_commit_position = 4;</code>
      */
-    private int $next_commit_position = 0;
+    protected $next_commit_position = 0;
     /**
      * Generated from protobuf field <code>int64 next_prepare_position = 5;</code>
      */
-    private int $next_prepare_position = 0;
+    protected $next_prepare_position = 0;
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.ReadAllEventsCompleted.ReadAllResult result = 6;</code>
      */
-    private int $result = 0;
+    protected $result = 0;
     /**
      * Generated from protobuf field <code>string error = 7;</code>
      */
-    private string $error = '';
+    protected $error = '';
 
     /**
      * Constructor.

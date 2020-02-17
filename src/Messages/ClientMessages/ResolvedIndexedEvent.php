@@ -25,11 +25,11 @@ class ResolvedIndexedEvent extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.EventRecord event = 1;</code>
      */
-    private ?EventRecord $event = null;
+    protected $event = null;
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.EventRecord link = 2;</code>
      */
-    private ?EventRecord $link = null;
+    protected $link = null;
 
     /**
      * Constructor.

@@ -25,11 +25,11 @@ class DeletePersistentSubscriptionCompleted extends \Google\Protobuf\Internal\Me
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.DeletePersistentSubscriptionCompleted.DeletePersistentSubscriptionResult result = 1;</code>
      */
-    private int $result = 0;
+    protected $result = 0;
     /**
      * Generated from protobuf field <code>string reason = 2;</code>
      */
-    private string $reason = '';
+    protected $reason = '';
 
     /**
      * Constructor.

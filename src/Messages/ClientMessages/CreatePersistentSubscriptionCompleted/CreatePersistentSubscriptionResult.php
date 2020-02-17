@@ -39,7 +39,7 @@ class CreatePersistentSubscriptionResult
      */
     const AccessDenied = 3;
 
-    private static array $valueToName = [
+    private static $valueToName = [
         self::Success => 'Success',
         self::AlreadyExists => 'AlreadyExists',
         self::Fail => 'Fail',
@@ -50,7 +50,7 @@ class CreatePersistentSubscriptionResult
     {
         if (! isset(self::$valueToName[$value])) {
             throw new UnexpectedValueException(\sprintf(
-                    'Enum %s has no name defined for value %s', self::class, $value));
+                    'Enum %s has no name defined for value %s', __CLASS__, $value));
         }
 
         return self::$valueToName[$value];
@@ -58,10 +58,10 @@ class CreatePersistentSubscriptionResult
 
     public static function value($name)
     {
-        $const = self::class . '::' . \strtoupper($name);
+        $const = __CLASS__ . '::' . \strtoupper($name);
         if (! \defined($const)) {
             throw new UnexpectedValueException(\sprintf(
-                    'Enum %s has no value defined for name %s', self::class, $name));
+                    'Enum %s has no value defined for name %s', __CLASS__, $name));
         }
 
         return \constant($const);
