@@ -25,11 +25,11 @@ class NotHandled extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.NotHandled.NotHandledReason reason = 1;</code>
      */
-    private int $reason = 0;
+    protected $reason = 0;
     /**
      * Generated from protobuf field <code>bytes additional_info = 2;</code>
      */
-    private string $additional_info = '';
+    protected $additional_info = '';
 
     /**
      * Constructor.

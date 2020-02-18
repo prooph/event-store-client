@@ -25,15 +25,15 @@ class TransactionWriteCompleted extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>int64 transaction_id = 1;</code>
      */
-    private int $transaction_id = 0;
+    protected $transaction_id = 0;
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.OperationResult result = 2;</code>
      */
-    private int $result = 0;
+    protected $result = 0;
     /**
      * Generated from protobuf field <code>string message = 3;</code>
      */
-    private string $message = '';
+    protected $message = '';
 
     /**
      * Constructor.

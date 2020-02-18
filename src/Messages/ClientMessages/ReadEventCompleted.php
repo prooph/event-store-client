@@ -25,15 +25,15 @@ class ReadEventCompleted extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.ReadEventCompleted.ReadEventResult result = 1;</code>
      */
-    private int $result = 0;
+    protected $result = 0;
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.ResolvedIndexedEvent event = 2;</code>
      */
-    private ?ResolvedIndexedEvent $event = null;
+    protected $event = null;
     /**
      * Generated from protobuf field <code>string error = 3;</code>
      */
-    private string $error = '';
+    protected $error = '';
 
     /**
      * Constructor.

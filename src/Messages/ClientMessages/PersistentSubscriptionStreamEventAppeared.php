@@ -25,11 +25,11 @@ class PersistentSubscriptionStreamEventAppeared extends \Google\Protobuf\Interna
     /**
      * Generated from protobuf field <code>.Prooph.EventStoreClient.Messages.ClientMessages.ResolvedIndexedEvent event = 1;</code>
      */
-    private ?ResolvedIndexedEvent $event = null;
+    protected $event = null;
     /**
      * Generated from protobuf field <code>int32 retryCount = 2;</code>
      */
-    private int $retryCount = 0;
+    protected $retryCount = 0;
 
     /**
      * Constructor.

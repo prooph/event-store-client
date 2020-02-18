@@ -25,27 +25,27 @@ class NewEvent extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>bytes event_id = 1;</code>
      */
-    private string $event_id = '';
+    protected $event_id = '';
     /**
      * Generated from protobuf field <code>string event_type = 2;</code>
      */
-    private string $event_type = '';
+    protected $event_type = '';
     /**
      * Generated from protobuf field <code>int32 data_content_type = 3;</code>
      */
-    private int $data_content_type = 0;
+    protected $data_content_type = 0;
     /**
      * Generated from protobuf field <code>int32 metadata_content_type = 4;</code>
      */
-    private int $metadata_content_type = 0;
+    protected $metadata_content_type = 0;
     /**
      * Generated from protobuf field <code>bytes data = 5;</code>
      */
-    private string $data = '';
+    protected $data = '';
     /**
      * Generated from protobuf field <code>bytes metadata = 6;</code>
      */
-    private string $metadata = '';
+    protected $metadata = '';
 
     /**
      * Constructor.
