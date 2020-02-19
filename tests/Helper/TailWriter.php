@@ -15,7 +15,6 @@ namespace ProophTest\EventStoreClient\Helper;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Generator;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\EventData;
@@ -38,7 +37,7 @@ class TailWriter
         return call(function () use ($event, $expectedVersion): Generator {
             yield $this->connection->appendToStreamAsync($this->stream, $expectedVersion, [$event]);
 
-            return new Success($this);
+            return $this;
         });
     }
 }

@@ -21,6 +21,7 @@ cache:
     - $HOME/.local
 
 before_script:
+  - echo "extension = uv.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo downloading EventStore 5.0.5
   - wget https://eventstore.org/downloads/ubuntu/EventStore-OSS-Linux-Ubuntu-16.04-v5.0.5.tar.gz
   - echo extracting event-store

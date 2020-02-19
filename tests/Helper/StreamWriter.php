@@ -15,9 +15,9 @@ namespace ProophTest\EventStoreClient\Helper;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Generator;
 use Prooph\EventStore\Async\EventStoreConnection;
+use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\WriteResult;
 
@@ -35,7 +35,10 @@ class StreamWriter
         $this->version = $version;
     }
 
-    /** @return Promise<TailWriter> */
+    /**
+     * @param EventData[] $events
+     * @return Promise<TailWriter>
+     */
     public function append(array $events): Promise
     {
         return call(function () use ($events): Generator {
@@ -52,7 +55,7 @@ class StreamWriter
                 }
             }
 
-            return new Success(new TailWriter($this->connection, $this->stream));
+            return new TailWriter($this->connection, $this->stream);
         });
     }
 }
