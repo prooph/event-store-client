@@ -188,6 +188,7 @@ class EventStoreConnectionLogicHandler
                 $this->timerTickWatcherId = Loop::repeat(Consts::TIMER_PERIOD, function (): void {
                     $this->timerTick();
                 });
+                Loop::unreference($this->timerTickWatcherId);
                 $this->endPointDiscoverer = $endPointDiscoverer;
                 $this->state = ConnectionState::connecting();
                 $this->connectingPhase = ConnectingPhase::reconnecting();
