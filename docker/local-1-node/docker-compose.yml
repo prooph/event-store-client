@@ -2,7 +2,7 @@ version: '3'
 
 services:
   php:
-    image: prooph/php:7.2-cli
+    image: prooph/php:7.4-cli
     volumes:
       - ./../../:/app
     command: tail -f /dev/null
