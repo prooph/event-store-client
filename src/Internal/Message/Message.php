@@ -13,8 +13,12 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal\Message;
 
+use Amp\Promise;
+
 /** @internal */
 interface Message
 {
+    public function getPromise(): ?Promise;
+
     public function __toString(): string;
 }

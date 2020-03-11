@@ -84,6 +84,7 @@ class EventStoreConnectionLogicHandler
     private bool $wasConnected = false;
     private int $packageNumber = 0;
     private int $lastTimeoutsTimeStamp;
+    private array $currentMessagePromises = [];
 
     public function __construct(EventStoreConnection $connection, ConnectionSettings $settings)
     {
@@ -171,6 +172,24 @@ class EventStoreConnectionLogicHandler
     public function enqueueMessage(Message $message): void
     {
         $this->logDebug(\sprintf('enqueuing message %s', (string) $message));
+
+        $promise = $message->getPromise();
+        if ($promise !== null) {
+            if ($this->connection) {
+                $this->connection->reference();
+            }
+
+            $this->currentMessagePromises[\spl_object_id($promise)] = true;
+            $promise->onResolve(
+                function () use ($promise) {
+                    unset($this->currentMessagePromises[\spl_object_id($promise)]);
+
+                    if ($this->connection && $this->currentMessagePromises === []) {
+                        $this->connection->unreference();
+                    }
+                }
+            );
+        }
 
         $this->handler->handle($message);
     }
@@ -329,6 +348,10 @@ class EventStoreConnectionLogicHandler
             );
 
             yield $this->connection->connectAsync();
+
+            if ($this->currentMessagePromises === []) {
+                $this->connection->unreference();
+            }
 
             if (null !== $this->connection && ! $this->connection->isClosed()) {
                 $this->connection->startReceiving();

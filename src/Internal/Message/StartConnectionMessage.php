@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Internal\Message;
 
 use Amp\Deferred;
+use Amp\Promise;
 use Prooph\EventStoreClient\Internal\EndPointDiscoverer;
 
 /** @internal */
@@ -36,6 +37,11 @@ class StartConnectionMessage implements Message
     public function endPointDiscoverer(): EndPointDiscoverer
     {
         return $this->endPointDiscoverer;
+    }
+
+    public function getPromise(): ?Promise
+    {
+        return $this->deferred->promise();
     }
 
     public function __toString(): string

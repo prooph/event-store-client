@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Internal\Message;
 
 use Amp\Deferred;
+use Amp\Promise;
 use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\UserCredentials;
@@ -88,6 +89,11 @@ class StartSubscriptionMessage implements Message
     public function timeout(): int
     {
         return $this->timeout;
+    }
+
+    public function getPromise(): ?Promise
+    {
+        return $this->deferred->promise();
     }
 
     public function __toString(): string
