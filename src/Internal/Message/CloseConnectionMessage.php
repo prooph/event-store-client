@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal\Message;
 
+use Amp\Promise;
 use Throwable;
 
 /** @internal */
@@ -37,6 +38,12 @@ class CloseConnectionMessage implements Message
     public function exception(): ?Throwable
     {
         return $this->exception;
+    }
+
+    /** @psalm-pure */
+    public function getPromise(): ?Promise
+    {
+        return null;
     }
 
     /** @psalm-pure */

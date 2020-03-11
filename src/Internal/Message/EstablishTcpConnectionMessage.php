@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal\Message;
 
+use Amp\Promise;
 use Prooph\EventStoreClient\Internal\NodeEndPoints;
 
 /**
@@ -33,6 +34,12 @@ class EstablishTcpConnectionMessage implements Message
     public function nodeEndPoints(): NodeEndPoints
     {
         return $this->nodeEndPoints;
+    }
+
+    /** @psalm-pure */
+    public function getPromise(): ?Promise
+    {
+        return null;
     }
 
     /** @psalm-pure */

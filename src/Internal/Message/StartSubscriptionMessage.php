@@ -16,8 +16,10 @@ namespace Prooph\EventStoreClient\Internal\Message;
 use Amp\Deferred;
 use Amp\Promise;
 use Closure;
+use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
 use Throwable;
@@ -114,6 +116,12 @@ class StartSubscriptionMessage implements Message
     public function timeout(): int
     {
         return $this->timeout;
+    }
+
+    /** @psalm-pure */
+    public function getPromise(): ?Promise
+    {
+        return $this->deferred->promise();
     }
 
     /** @psalm-pure */

@@ -126,6 +126,12 @@ class StartPersistentSubscriptionMessage implements Message
     }
 
     /** @psalm-pure */
+    public function getPromise(): ?Promise
+    {
+        return $this->deferred->promise();
+    }
+
+    /** @psalm-pure */
     public function __toString(): string
     {
         return 'StartPersistentSubscriptionMessage';

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal\Message;
 
+use Amp\Promise;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
 
 /** @internal */
@@ -29,6 +30,12 @@ class TcpConnectionEstablishedMessage implements Message
     public function tcpPackageConnection(): TcpPackageConnection
     {
         return $this->tcpPackageConnection;
+    }
+
+    /** @psalm-pure */
+    public function getPromise(): ?Promise
+    {
+        return null;
     }
 
     /** @psalm-pure */
