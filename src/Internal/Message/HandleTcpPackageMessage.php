@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal\Message;
 
+use Amp\Promise;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
 
@@ -36,6 +37,11 @@ class HandleTcpPackageMessage implements Message
     public function tcpPackage(): TcpPackage
     {
         return $this->tcpPackage;
+    }
+
+    public function getPromise(): ?Promise
+    {
+        return null;
     }
 
     public function __toString(): string

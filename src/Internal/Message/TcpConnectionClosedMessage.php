@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal\Message;
 
+use Amp\Promise;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
 use Throwable;
 
@@ -36,6 +37,11 @@ class TcpConnectionClosedMessage implements Message
     public function exception(): ?Throwable
     {
         return $this->exception;
+    }
+
+    public function getPromise(): ?Promise
+    {
+        return null;
     }
 
     public function __toString(): string

@@ -220,4 +220,18 @@ class TcpPackageConnection
     {
         return $this->isClosed;
     }
+
+    public function reference(): void
+    {
+        if ($this->connection) {
+            $this->connection->reference();
+        }
+    }
+
+    public function unreference(): void
+    {
+        if ($this->connection) {
+            $this->connection->unreference();
+        }
+    }
 }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal\Message;
 
+use Amp\Promise;
 use Prooph\EventStoreClient\ClientOperations\ClientOperation;
 
 /** @internal  */
@@ -42,6 +43,11 @@ class StartOperationMessage implements Message
     public function timeout(): int
     {
         return $this->timeout;
+    }
+
+    public function getPromise(): ?Promise
+    {
+        return $this->operation->promise();
     }
 
     public function __toString(): string
