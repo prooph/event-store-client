@@ -84,7 +84,7 @@ class EventStoreConnectionLogicHandler
     private bool $wasConnected = false;
     private int $packageNumber = 0;
     private int $lastTimeoutsTimeStamp;
-    private array $currentMessagePromises = [];
+    private \SplObjectStorage $currentMessagePromises;
 
     public function __construct(EventStoreConnection $connection, ConnectionSettings $settings)
     {
@@ -99,6 +99,7 @@ class EventStoreConnectionLogicHandler
         $this->stopWatch = StopWatch::startNew();
         // this allows first connection to connect quick
         $this->lastTimeoutsTimeStamp = -$this->settings->operationTimeoutCheckPeriod();
+        $this->currentMessagePromises = new \SplObjectStorage();
 
         $this->handler->registerHandler(
             StartConnectionMessage::class,
@@ -179,12 +180,12 @@ class EventStoreConnectionLogicHandler
                 $this->connection->reference();
             }
 
-            $this->currentMessagePromises[\spl_object_id($promise)] = true;
+            $this->currentMessagePromises->attach($promise);
             $promise->onResolve(
                 function () use ($promise) {
-                    unset($this->currentMessagePromises[\spl_object_id($promise)]);
+                    $this->currentMessagePromises->detach($promise);
 
-                    if ($this->connection && $this->currentMessagePromises === []) {
+                    if ($this->connection && $this->currentMessagePromises->count() === 0) {
                         $this->connection->unreference();
                     }
                 }
@@ -349,7 +350,7 @@ class EventStoreConnectionLogicHandler
 
             yield $this->connection->connectAsync();
 
-            if ($this->currentMessagePromises === []) {
+            if ($this->currentMessagePromises->count() === 0) {
                 $this->connection->unreference();
             }
 
