@@ -28,7 +28,7 @@
     "amphp/socket": "^1.0.0",
     "google/protobuf": "^3.9",
     "prooph/event-store": "dev-master",
-    "ramsey/uuid": "^3.8"
+    "ramsey/uuid": "^3.8 || ^4.0"
   },
   "require-dev": {
     "amphp/log": "^1.0",
