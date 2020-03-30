@@ -36,7 +36,7 @@
     "doctrine/instantiator": "^1.1",
     "php-coveralls/php-coveralls": "^2.1",
     "phpspec/prophecy": "^1.7.2",
-    "phpunit/phpunit": "^8.0",
+    "phpunit/phpunit": "^9.0",
     "prooph/php-cs-fixer-config": "^0.3"
   },
   "suggest": {
