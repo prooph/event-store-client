@@ -61,8 +61,6 @@ trait ProjectionSpecification
 
     protected function end(): Generator
     {
-        $this->connection->close();
-
         yield new Success();
     }
 

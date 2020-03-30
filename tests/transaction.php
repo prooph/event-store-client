@@ -43,8 +43,6 @@ class transaction extends AsyncTestCase
             yield $this->conn->connectAsync();
 
             yield from $function();
-
-            $this->conn->close();
         });
     }
 

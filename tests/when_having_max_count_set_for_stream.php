@@ -59,8 +59,6 @@ class when_having_max_count_set_for_stream extends AsyncTestCase
             );
 
             yield from $function();
-
-            $this->conn->close();
         });
     }
 

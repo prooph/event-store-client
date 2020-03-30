@@ -47,8 +47,6 @@ class appending_to_implicitly_created_stream extends AsyncTestCase
         $total = yield EventsStream::count($connection, $stream);
 
         $this->assertCount($total, $events);
-
-        $connection->close();
     }
 
     /**
@@ -73,8 +71,6 @@ class appending_to_implicitly_created_stream extends AsyncTestCase
         $total = yield EventsStream::count($connection, $stream);
 
         $this->assertCount($total, $events);
-
-        $connection->close();
     }
 
     /**
@@ -97,11 +93,7 @@ class appending_to_implicitly_created_stream extends AsyncTestCase
 
         $this->expectException(WrongExpectedVersion::class);
 
-        try {
-            yield $first6->then($events[0], 6);
-        } finally {
-            $connection->close();
-        }
+        yield $first6->then($events[0], 6);
     }
 
     /**
@@ -124,11 +116,7 @@ class appending_to_implicitly_created_stream extends AsyncTestCase
 
         $this->expectException(WrongExpectedVersion::class);
 
-        try {
-            yield $first6->then($events[0], 4);
-        } finally {
-            $connection->close();
-        }
+        yield $first6->then($events[0], 4);
     }
 
     /**
@@ -154,8 +142,6 @@ class appending_to_implicitly_created_stream extends AsyncTestCase
         $total = yield EventsStream::count($connection, $stream);
 
         $this->assertCount($total - 1, $events);
-
-        $connection->close();
     }
 
     /**
@@ -181,8 +167,6 @@ class appending_to_implicitly_created_stream extends AsyncTestCase
         $total = yield EventsStream::count($connection, $stream);
 
         $this->assertCount($total, $events);
-
-        $connection->close();
     }
 
     /**
@@ -208,8 +192,6 @@ class appending_to_implicitly_created_stream extends AsyncTestCase
         $total = yield EventsStream::count($connection, $stream);
 
         $this->assertCount($total, $events);
-
-        $connection->close();
     }
 
     /**
@@ -237,8 +219,6 @@ class appending_to_implicitly_created_stream extends AsyncTestCase
         $total = yield EventsStream::count($connection, $stream);
 
         $this->assertCount($total, $events);
-
-        $connection->close();
     }
 
     /**
@@ -260,8 +240,6 @@ class appending_to_implicitly_created_stream extends AsyncTestCase
         $total = yield EventsStream::count($connection, $stream);
 
         $this->assertCount($total, $events);
-
-        $connection->close();
     }
 
     /**
@@ -283,8 +261,6 @@ class appending_to_implicitly_created_stream extends AsyncTestCase
         $total = yield EventsStream::count($connection, $stream);
 
         $this->assertCount($total, $events);
-
-        $connection->close();
     }
 
     /**
@@ -306,8 +282,6 @@ class appending_to_implicitly_created_stream extends AsyncTestCase
         $total = yield EventsStream::count($connection, $stream);
 
         $this->assertCount($total, $events);
-
-        $connection->close();
     }
 
     /**
@@ -329,8 +303,6 @@ class appending_to_implicitly_created_stream extends AsyncTestCase
         $total = yield EventsStream::count($connection, $stream);
 
         $this->assertCount($total, $events);
-
-        $connection->close();
     }
 
     /**
@@ -352,10 +324,6 @@ class appending_to_implicitly_created_stream extends AsyncTestCase
 
         $this->expectException(WrongExpectedVersion::class);
 
-        try {
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
-        } finally {
-            $connection->close();
-        }
+        yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
     }
 }

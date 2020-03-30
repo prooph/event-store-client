@@ -67,11 +67,6 @@ class when_committing_empty_transaction extends AsyncTestCase
         $this->assertSame(2, $result->nextExpectedVersion());
     }
 
-    protected function tearDown(): void
-    {
-        $this->connection->close();
-    }
-
     /**
      * @test
      */

@@ -60,8 +60,6 @@ class subscribe_to_all_should extends AsyncTestCase
                 new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
 
             );
-
-            $connection->close();
         });
     }
 

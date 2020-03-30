@@ -41,8 +41,6 @@ class read_all_events_forward_with_soft_deleted_stream_should extends AsyncTestC
             StreamMetadata::create()->build(),
             DefaultData::adminCredentials()
         );
-
-        $this->conn->close();
     }
 
     protected function when(): Generator

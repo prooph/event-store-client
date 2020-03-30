@@ -39,8 +39,6 @@ class when_working_with_raw_stream_metadata extends AsyncTestCase
             yield $this->conn->connectAsync();
 
             yield from $function();
-
-            $this->conn->close();
         });
     }
 

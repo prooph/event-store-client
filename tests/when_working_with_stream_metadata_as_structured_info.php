@@ -41,8 +41,6 @@ class when_working_with_stream_metadata_as_structured_info extends AsyncTestCase
             yield $this->conn->connectAsync();
 
             yield from $function();
-
-            $this->conn->close();
         });
     }
 
