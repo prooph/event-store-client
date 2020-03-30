@@ -13,15 +13,14 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class update_existing_persistent_subscription extends TestCase
+class update_existing_persistent_subscription extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -52,12 +51,11 @@ class update_existing_persistent_subscription extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      * @doesNotPerformAssertions
      */
-    public function the_completion_succeeds(): void
+    public function the_completion_succeeds(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             yield $this->conn->updatePersistentSubscriptionAsync(
                 $this->stream,
                 'existing',

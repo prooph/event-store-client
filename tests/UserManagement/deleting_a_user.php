@@ -13,23 +13,22 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
+use Generator;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\UserCommandFailed;
 use Prooph\EventStore\Transport\Http\HttpStatusCode;
 use Prooph\EventStore\UserManagement\UserDetails;
 use Prooph\EventStore\Util\Guid;
 use ProophTest\EventStoreClient\DefaultData;
-use Throwable;
 
 class deleting_a_user extends TestWithNode
 {
     /**
      * @test
-     * @throws Throwable
      */
-    public function deleting_non_existing_user_throws(): void
+    public function deleting_non_existing_user_throws(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(UserCommandFailed::class);
 
             try {
@@ -44,12 +43,11 @@ class deleting_a_user extends TestWithNode
 
     /**
      * @test
-     * @throws Throwable
      * @doesNotPerformAssertions
      */
-    public function deleting_created_user_deletes_it(): void
+    public function deleting_created_user_deletes_it(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $user = Guid::generateString();
 
             yield $this->manager->createUserAsync($user, 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
@@ -59,11 +57,10 @@ class deleting_a_user extends TestWithNode
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function deleting_empty_user_throws(): void
+    public function deleting_empty_user_throws(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
 
             yield $this->manager->deleteUserAsync('', DefaultData::adminCredentials());
@@ -72,11 +69,10 @@ class deleting_a_user extends TestWithNode
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function can_delete_a_user(): void
+    public function can_delete_a_user(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $name = Guid::generateString();
 
             yield $this->manager->createUserAsync(

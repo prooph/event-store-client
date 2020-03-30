@@ -13,14 +13,13 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\EventReadResult;
 use Prooph\EventStore\EventReadStatus;
-use Throwable;
 
-class read_event_of_linkto_to_deleted_event extends TestCase
+class read_event_of_linkto_to_deleted_event extends AsyncTestCase
 {
     use SpecificationWithLinkToToDeletedEvents;
 
@@ -37,11 +36,10 @@ class read_event_of_linkto_to_deleted_event extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_linked_event_is_returned(): void
+    public function the_linked_event_is_returned(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->assertNotNull($this->read->event()->link());
 
             yield new Success();
@@ -50,11 +48,10 @@ class read_event_of_linkto_to_deleted_event extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_deleted_event_is_not_resolved(): void
+    public function the_deleted_event_is_not_resolved(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->assertNull($this->read->event()->event());
 
             yield new Success();
@@ -63,11 +60,10 @@ class read_event_of_linkto_to_deleted_event extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_status_is_success(): void
+    public function the_status_is_success(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->assertTrue(EventReadStatus::success()->equals($this->read->status()));
 
             yield new Success();

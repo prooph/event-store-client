@@ -15,11 +15,11 @@ namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
 use Amp\Delayed;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Closure;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
 use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
 use Prooph\EventStore\Async\EventAppearedOnSubscription;
@@ -37,18 +37,15 @@ use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 
-class subscribe_to_stream_catching_up_should extends TestCase
+class subscribe_to_stream_catching_up_should extends AsyncTestCase
 {
     private const TIMEOUT = 5000;
 
     private EventStoreConnection $conn;
 
-    /**
-     * @throws Throwable
-     */
-    private function execute(Closure $function): void
+    private function execute(Closure $function): Promise
     {
-        Promise\wait(call(function () use ($function): Generator {
+        return call(function () use ($function): Generator {
             $this->conn = TestConnection::create();
 
             yield $this->conn->connectAsync();
@@ -56,16 +53,15 @@ class subscribe_to_stream_catching_up_should extends TestCase
             yield from $function();
 
             $this->conn->close();
-        }));
+        });
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function be_able_to_subscribe_to_non_existing_stream(): void
+    public function be_able_to_subscribe_to_non_existing_stream(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'be_able_to_subscribe_to_non_existing_stream';
 
             $appeared = new ManualResetEventSlim(false);
@@ -109,11 +105,10 @@ class subscribe_to_stream_catching_up_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function be_able_to_subscribe_to_non_existing_stream_and_then_catch_event(): void
+    public function be_able_to_subscribe_to_non_existing_stream_and_then_catch_event(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'be_able_to_subscribe_to_non_existing_stream_and_then_catch_event';
 
             $appeared = new CountdownEvent(1);
@@ -150,11 +145,10 @@ class subscribe_to_stream_catching_up_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function allow_multiple_subscriptions_to_same_stream(): void
+    public function allow_multiple_subscriptions_to_same_stream(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'allow_multiple_subscriptions_to_same_stream';
 
             $appeared = new CountdownEvent(2);
@@ -207,11 +201,10 @@ class subscribe_to_stream_catching_up_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function call_dropped_callback_after_stop_method_call(): void
+    public function call_dropped_callback_after_stop_method_call(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'call_dropped_callback_after_stop_method_call';
 
             $dropped = new CountdownEvent(1);
@@ -241,11 +234,10 @@ class subscribe_to_stream_catching_up_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function call_dropped_callback_when_an_error_occurs_while_processing_an_event(): void
+    public function call_dropped_callback_when_an_error_occurs_while_processing_an_event(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'call_dropped_callback_when_an_error_occurs_while_processing_an_event';
 
             yield $this->conn->appendToStreamAsync(
@@ -278,11 +270,10 @@ class subscribe_to_stream_catching_up_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function read_all_existing_events_and_keep_listening_to_new_ones(): void
+    public function read_all_existing_events_and_keep_listening_to_new_ones(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'read_all_existing_events_and_keep_listening_to_new_ones';
 
             /** @var ResolvedEvent[] $events */
@@ -337,11 +328,10 @@ class subscribe_to_stream_catching_up_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function filter_events_and_keep_listening_to_new_ones(): void
+    public function filter_events_and_keep_listening_to_new_ones(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'filter_events_and_keep_listening_to_new_ones';
 
             /** @var ResolvedEvent[] $events */
@@ -400,11 +390,10 @@ class subscribe_to_stream_catching_up_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function filter_events_and_work_if_nothing_was_written_after_subscription(): void
+    public function filter_events_and_work_if_nothing_was_written_after_subscription(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'filter_events_and_work_if_nothing_was_written_after_subscription';
 
             /** @var ResolvedEvent[] $events */

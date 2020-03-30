@@ -13,12 +13,11 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
 use Amp\Delayed;
-use function Amp\Promise\wait;
+use Amp\PHPUnit\AsyncTestCase;
+use Amp\Promise;
 use Closure;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\Exception\StreamDeleted;
@@ -35,40 +34,30 @@ use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 
-class soft_delete extends TestCase
+class soft_delete extends AsyncTestCase
 {
     private EventStoreConnection $conn;
 
-    protected function setUpTestCase(): Generator
+    protected function setUpAsync(): Promise
     {
         $this->conn = TestConnection::create(DefaultData::adminCredentials());
-        yield $this->conn->connectAsync();
+
+        return call(function (): Generator {
+            yield $this->conn->connectAsync();
+        });
     }
 
-    protected function tearDownTestCase(): void
+    protected function execute(Closure $callback): Generator
     {
-        $this->conn->close();
-    }
-
-    /** @throws Throwable */
-    protected function execute(Closure $callback): void
-    {
-        wait(call(function () use ($callback): Generator {
-            yield from $this->setUpTestCase();
-
-            yield from $callback();
-
-            $this->tearDownTestCase();
-        }));
+        yield from $callback();
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function soft_deleted_stream_returns_no_stream_and_no_events_on_read(): void
+    public function soft_deleted_stream_returns_no_stream_and_no_events_on_read(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'soft_deleted_stream_returns_no_stream_and_no_events_on_read';
 
             $result = yield $this->conn->appendToStreamAsync(
@@ -98,11 +87,10 @@ class soft_delete extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function soft_deleted_stream_allows_recreation_when_expver_any(): void
+    public function soft_deleted_stream_allows_recreation_when_expver_any(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'soft_deleted_stream_allows_recreation_when_expver_any';
 
             yield $this->conn->appendToStreamAsync(
@@ -167,11 +155,10 @@ class soft_delete extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function soft_deleted_stream_allows_recreation_when_expver_no_stream(): void
+    public function soft_deleted_stream_allows_recreation_when_expver_no_stream(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'soft_deleted_stream_allows_recreation_when_expver_no_stream';
 
             yield $this->conn->appendToStreamAsync(
@@ -236,11 +223,10 @@ class soft_delete extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function soft_deleted_stream_allows_recreation_when_expver_is_exact(): void
+    public function soft_deleted_stream_allows_recreation_when_expver_is_exact(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'soft_deleted_stream_allows_recreation_when_expver_is_exact';
 
             yield $this->conn->appendToStreamAsync(
@@ -305,11 +291,10 @@ class soft_delete extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function soft_deleted_stream_when_recreated_preserves_metadata_except_truncatebefore(): void
+    public function soft_deleted_stream_when_recreated_preserves_metadata_except_truncatebefore(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'soft_deleted_stream_when_recreated_preserves_metadata_except_truncatebefore';
 
             $result = yield $this->conn->appendToStreamAsync(
@@ -384,11 +369,10 @@ class soft_delete extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function soft_deleted_stream_can_be_hard_deleted(): void
+    public function soft_deleted_stream_can_be_hard_deleted(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'soft_deleted_stream_can_be_deleted';
 
             $result = yield $this->conn->appendToStreamAsync(
@@ -430,11 +414,10 @@ class soft_delete extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function soft_deleted_stream_allows_recreation_only_for_first_write(): void
+    public function soft_deleted_stream_allows_recreation_only_for_first_write(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'soft_deleted_stream_allows_recreation_only_for_first_write';
 
             $result = yield $this->conn->appendToStreamAsync(
@@ -498,11 +481,10 @@ class soft_delete extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function soft_deleted_stream_appends_both_concurrent_writes_when_expver_any(): void
+    public function soft_deleted_stream_appends_both_concurrent_writes_when_expver_any(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'soft_deleted_stream_appends_both_concurrent_writes_when_expver_any';
 
             $result = yield $this->conn->appendToStreamAsync(
@@ -563,11 +545,10 @@ class soft_delete extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function setting_json_metadata_on_empty_soft_deleted_stream_recreates_stream_not_overriding_metadata(): void
+    public function setting_json_metadata_on_empty_soft_deleted_stream_recreates_stream_not_overriding_metadata(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'setting_json_metadata_on_empty_soft_deleted_stream_recreates_stream_not_overriding_metadata';
 
             yield $this->conn->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, false);
@@ -617,11 +598,10 @@ class soft_delete extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function setting_json_metadata_on_nonempty_soft_deleted_stream_recreates_stream_not_overriding_metadata(): void
+    public function setting_json_metadata_on_nonempty_soft_deleted_stream_recreates_stream_not_overriding_metadata(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'setting_json_metadata_on_nonempty_soft_deleted_stream_recreates_stream_not_overriding_metadata';
 
             $result = yield $this->conn->appendToStreamAsync(
@@ -680,11 +660,10 @@ class soft_delete extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function setting_nonjson_metadata_on_empty_soft_deleted_stream_recreates_stream_keeping_original_metadata(): void
+    public function setting_nonjson_metadata_on_empty_soft_deleted_stream_recreates_stream_keeping_original_metadata(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'setting_nonjson_metadata_on_empty_soft_deleted_stream_recreates_stream_overriding_metadata';
             $metadata = \random_bytes(256);
 
@@ -714,11 +693,10 @@ class soft_delete extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function setting_nonjson_metadata_on_nonempty_soft_deleted_stream_recreates_stream_keeping_original_metadata(): void
+    public function setting_nonjson_metadata_on_nonempty_soft_deleted_stream_recreates_stream_keeping_original_metadata(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'setting_nonjson_metadata_on_nonempty_soft_deleted_stream_recreates_stream_overriding_metadata';
             $metadata = \random_bytes(256);
 

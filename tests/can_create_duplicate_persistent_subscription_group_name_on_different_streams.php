@@ -13,13 +13,12 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class can_create_duplicate_persistent_subscription_group_name_on_different_streams extends TestCase
+class can_create_duplicate_persistent_subscription_group_name_on_different_streams extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -28,6 +27,8 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->stream = Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
@@ -48,11 +49,10 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
     /**
      * @test
      * @doesNotPerformAssertions
-     * @throws Throwable
      */
-    public function the_completion_succeeds(): void
+    public function the_completion_succeeds(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             yield $this->conn->createPersistentSubscriptionAsync(
                 'someother' . $this->stream,
                 'group3211',

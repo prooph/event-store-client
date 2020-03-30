@@ -13,21 +13,20 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
+use Generator;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\UserCommandFailed;
 use Prooph\EventStore\UserCredentials;
 use ProophTest\EventStoreClient\DefaultData;
-use Throwable;
 
 class enable_disable_user extends TestWithUser
 {
     /**
      * @test
-     * @throws Throwable
      */
-    public function disable_empty_username_throws(): void
+    public function disable_empty_username_throws(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
 
             yield $this->manager->disableAsync('', DefaultData::adminCredentials());
@@ -36,11 +35,10 @@ class enable_disable_user extends TestWithUser
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function enable_empty_username_throws(): void
+    public function enable_empty_username_throws(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
 
             yield $this->manager->enableAsync('', DefaultData::adminCredentials());
@@ -49,11 +47,10 @@ class enable_disable_user extends TestWithUser
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function can_enable_disable_user(): void
+    public function can_enable_disable_user(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             yield $this->manager->disableAsync($this->username, DefaultData::adminCredentials());
 
             $thrown = false;

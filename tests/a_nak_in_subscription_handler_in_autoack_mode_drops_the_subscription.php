@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\Deferred;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\TimeoutException;
 use Closure;
 use Exception;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\Async\PersistentSubscriptionDropped;
@@ -32,7 +32,7 @@ use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\Util\Guid;
 use Throwable;
 
-class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription extends TestCase
+class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -45,6 +45,8 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->stream = '$' . Guid::generateString();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
@@ -120,11 +122,10 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_subscription_gets_dropped(): void
+    public function the_subscription_gets_dropped(): Generator
     {
-        $this->execute(function (): Generator {
+        yield $this->execute(function (): Generator {
             try {
                 $result = yield Promise\timeout($this->resetEvent->promise(), 5000);
 

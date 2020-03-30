@@ -13,12 +13,11 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class when_updating_a_projection_query extends TestCase
+class when_updating_a_projection_query extends AsyncTestCase
 {
     use ProjectionSpecification;
 
@@ -58,11 +57,10 @@ class when_updating_a_projection_query extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_update_the_projection_query(): void
+    public function should_update_the_projection_query(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $query = yield $this->projectionsManager->getQueryAsync(
                 $this->projectionName,
                 $this->credentials

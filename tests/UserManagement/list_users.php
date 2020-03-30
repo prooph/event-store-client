@@ -13,22 +13,21 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
+use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserManagement\UserDetails;
 use Prooph\EventStoreClient\UserManagement\UsersManager;
 use ProophTest\EventStoreClient\DefaultData;
-use Throwable;
 
 class list_users extends TestWithNode
 {
     /**
      * @test
-     * @throws Throwable
      */
-    public function list_all_users_works(): void
+    public function list_all_users_works(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             yield $this->manager->createUserAsync('ouro', 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
 
             $users = yield $this->manager->listAllAsync(DefaultData::adminCredentials());
@@ -62,11 +61,10 @@ class list_users extends TestWithNode
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function list_all_users_falls_back_to_default_credentials(): void
+    public function list_all_users_falls_back_to_default_credentials(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $manager = new UsersManager(
                 new EndPoint(
                     (string) \getenv('ES_HOST'),

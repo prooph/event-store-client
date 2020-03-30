@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Throwable;
 
-class create_persistent_subscription_on_all_stream extends TestCase
+class create_persistent_subscription_on_all_stream extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -29,6 +29,8 @@ class create_persistent_subscription_on_all_stream extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()
@@ -42,11 +44,10 @@ class create_persistent_subscription_on_all_stream extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_completion_fails_with_invalid_stream(): void
+    public function the_completion_fails_with_invalid_stream(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             try {
                 yield $this->conn->createPersistentSubscriptionAsync(
                     '$all',

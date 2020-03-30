@@ -13,22 +13,21 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
+use Generator;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\UserCommandFailed;
 use Prooph\EventStore\Transport\Http\HttpStatusCode;
 use Prooph\EventStore\UserCredentials;
 use ProophTest\EventStoreClient\DefaultData;
-use Throwable;
 
 class reset_password extends TestWithUser
 {
     /**
      * @test
-     * @throws Throwable
      */
-    public function empty_username_throws(): void
+    public function empty_username_throws(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
 
             yield $this->manager->resetPasswordAsync('', 'foo', DefaultData::adminCredentials());
@@ -37,11 +36,10 @@ class reset_password extends TestWithUser
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function empty_password_throws(): void
+    public function empty_password_throws(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
 
             yield $this->manager->resetPasswordAsync($this->username, '', DefaultData::adminCredentials());
@@ -50,11 +48,10 @@ class reset_password extends TestWithUser
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function can_reset_password(): void
+    public function can_reset_password(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             yield $this->manager->resetPasswordAsync(
                 $this->username,
                 'foo',

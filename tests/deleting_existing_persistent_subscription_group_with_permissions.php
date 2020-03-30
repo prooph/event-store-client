@@ -13,13 +13,12 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class deleting_existing_persistent_subscription_group_with_permissions extends TestCase
+class deleting_existing_persistent_subscription_group_with_permissions extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -28,6 +27,8 @@ class deleting_existing_persistent_subscription_group_with_permissions extends T
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->stream = Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
@@ -48,11 +49,10 @@ class deleting_existing_persistent_subscription_group_with_permissions extends T
     /**
      * @test
      * @doesNotPerformAssertions
-     * @throws Throwable
      */
-    public function the_delete_of_group_succeeds(): void
+    public function the_delete_of_group_succeeds(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             yield $this->conn->deletePersistentSubscriptionAsync(
                 $this->stream,
                 'groupname123',

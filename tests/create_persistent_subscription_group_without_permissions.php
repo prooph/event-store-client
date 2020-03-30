@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
 use Throwable;
 
-class create_persistent_subscription_group_without_permissions extends TestCase
+class create_persistent_subscription_group_without_permissions extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -30,6 +30,8 @@ class create_persistent_subscription_group_without_permissions extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->stream = Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
@@ -44,11 +46,10 @@ class create_persistent_subscription_group_without_permissions extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_completion_succeeds(): void
+    public function the_completion_succeeds(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             try {
                 yield $this->conn->createPersistentSubscriptionAsync(
                     $this->stream,

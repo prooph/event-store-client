@@ -15,10 +15,10 @@ namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
 use Amp\Parallel\Worker\DefaultPool;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Closure;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Async\EventStoreTransaction;
 use Prooph\EventStore\EventData;
@@ -30,18 +30,14 @@ use Prooph\EventStore\WriteResult;
 use ProophTest\EventStoreClient\Helper\ParallelTransactionTask;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
-use Throwable;
 
-class transaction extends TestCase
+class transaction extends AsyncTestCase
 {
     private EventStoreConnection $conn;
 
-    /**
-     * @throws Throwable
-     */
-    private function execute(Closure $function): void
+    private function execute(Closure $function): Promise
     {
-        Promise\wait(call(function () use ($function): Generator {
+        return call(function () use ($function): Generator {
             $this->conn = TestConnection::create();
 
             yield $this->conn->connectAsync();
@@ -49,16 +45,15 @@ class transaction extends TestCase
             yield from $function();
 
             $this->conn->close();
-        }));
+        });
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_start_on_non_existing_stream_with_correct_exp_ver_and_create_stream_on_commit(): void
+    public function should_start_on_non_existing_stream_with_correct_exp_ver_and_create_stream_on_commit(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'should_start_on_non_existing_stream_with_correct_exp_ver_and_create_stream_on_commit';
 
             $transaction = yield $this->conn->startTransactionAsync(
@@ -78,11 +73,10 @@ class transaction extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_start_on_non_existing_stream_with_exp_ver_any_and_create_stream_on_commit(): void
+    public function should_start_on_non_existing_stream_with_exp_ver_any_and_create_stream_on_commit(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'should_start_on_non_existing_stream_with_exp_ver_any_and_create_stream_on_commit';
 
             $transaction = yield $this->conn->startTransactionAsync(
@@ -102,11 +96,10 @@ class transaction extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_fail_to_commit_non_existing_stream_with_wrong_exp_ver(): void
+    public function should_fail_to_commit_non_existing_stream_with_wrong_exp_ver(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'should_fail_to_commit_non_existing_stream_with_wrong_exp_ver';
 
             $transaction = yield $this->conn->startTransactionAsync(
@@ -125,11 +118,10 @@ class transaction extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_do_nothing_if_commits_no_events_to_empty_stream(): void
+    public function should_do_nothing_if_commits_no_events_to_empty_stream(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'should_do_nothing_if_commits_no_events_to_empty_stream';
 
             $transaction = yield $this->conn->startTransactionAsync(
@@ -157,11 +149,10 @@ class transaction extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_do_nothing_if_transactionally_writing_no_events_to_empty_stream(): void
+    public function should_do_nothing_if_transactionally_writing_no_events_to_empty_stream(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'should_do_nothing_if_transactionally_writing_no_events_to_empty_stream';
 
             $transaction = yield $this->conn->startTransactionAsync(
@@ -191,11 +182,10 @@ class transaction extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_validate_expectations_on_commit(): void
+    public function should_validate_expectations_on_commit(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'should_validate_expectations_on_commit';
 
             $transaction = yield $this->conn->startTransactionAsync(
@@ -214,11 +204,10 @@ class transaction extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_commit_when_writing_with_exp_ver_any_even_while_someone_is_writing_in_parallel(): void
+    public function should_commit_when_writing_with_exp_ver_any_even_while_someone_is_writing_in_parallel(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'should_commit_when_writing_with_exp_ver_any_even_while_someone_is_writing_in_parallel';
 
             $task1 = new ParallelTransactionTask($stream, 'trans write');
@@ -268,11 +257,10 @@ class transaction extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_fail_to_commit_if_started_with_correct_ver_but_committing_with_bad(): void
+    public function should_fail_to_commit_if_started_with_correct_ver_but_committing_with_bad(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'should_fail_to_commit_if_started_with_correct_ver_but_committing_with_bad';
 
             $transaction = yield $this->conn->startTransactionAsync(
@@ -293,11 +281,10 @@ class transaction extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_not_fail_to_commit_if_started_with_wrong_ver_but_committing_with_correct_ver(): void
+    public function should_not_fail_to_commit_if_started_with_wrong_ver_but_committing_with_correct_ver(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'should_not_fail_to_commit_if_started_with_wrong_ver_but_committing_with_correct_ver';
 
             $transaction = yield $this->conn->startTransactionAsync(
@@ -319,11 +306,10 @@ class transaction extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_fail_to_commit_if_started_with_correct_ver_but_on_commit_stream_was_deleted(): void
+    public function should_fail_to_commit_if_started_with_correct_ver_but_on_commit_stream_was_deleted(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'should_fail_to_commit_if_started_with_correct_ver_but_on_commit_stream_was_deleted';
 
             $transaction = yield $this->conn->startTransactionAsync(
@@ -344,11 +330,10 @@ class transaction extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function idempotency_is_correct_for_explicit_transactions_with_expected_version_any(): void
+    public function idempotency_is_correct_for_explicit_transactions_with_expected_version_any(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'idempotency_is_correct_for_explicit_transactions_with_expected_version_any';
 
             $event = new EventData(null, 'SomethingHappened', true, '{Value:42}');

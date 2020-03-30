@@ -13,13 +13,12 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\StreamEventsSlice;
-use Throwable;
 
-class read_all_events_forward_with_linkto_passed_max_count extends TestCase
+class read_all_events_forward_with_linkto_passed_max_count extends AsyncTestCase
 {
     use SpecificationWithLinkToToMaxCountDeletedEvents;
 
@@ -32,11 +31,10 @@ class read_all_events_forward_with_linkto_passed_max_count extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function one_event_is_read(): void
+    public function one_event_is_read(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->assertCount(1, $this->read->events());
 
             yield new Success();

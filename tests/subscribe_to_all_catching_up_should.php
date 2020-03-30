@@ -15,12 +15,12 @@ namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
 use Amp\Delayed;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Closure;
 use Exception;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\AllEventsSlice;
 use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
 use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
@@ -44,7 +44,7 @@ use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 
-class subscribe_to_all_catching_up_should extends TestCase
+class subscribe_to_all_catching_up_should extends AsyncTestCase
 {
     private const TIMEOUT = 10000;
 
@@ -53,9 +53,9 @@ class subscribe_to_all_catching_up_should extends TestCase
     /**
      * @throws Throwable
      */
-    private function execute(Closure $function): void
+    private function execute(Closure $function): Promise
     {
-        Promise\wait(call(function () use ($function): Generator {
+        return call(function () use ($function): Generator {
             $this->conn = TestConnection::create();
 
             yield $this->conn->connectAsync();
@@ -75,18 +75,15 @@ class subscribe_to_all_catching_up_should extends TestCase
                 StreamMetadata::create()->build(),
                 new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
             );
-
-            $this->conn->close();
-        }));
+        });
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function call_dropped_callback_after_stop_method_call(): void
+    public function call_dropped_callback_after_stop_method_call(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $store = TestConnection::create();
 
             yield $store->connectAsync();
@@ -132,11 +129,10 @@ class subscribe_to_all_catching_up_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function call_dropped_callback_when_an_error_occurs_while_processing_an_event(): void
+    public function call_dropped_callback_when_an_error_occurs_while_processing_an_event(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'all_call_dropped_callback_when_an_error_occurs_while_processing_an_event';
 
             $store = TestConnection::create();
@@ -192,12 +188,11 @@ class subscribe_to_all_catching_up_should extends TestCase
      * No way to guarantee an empty db
      *
      * @test
-     * @throws Throwable
      * @group ignore
      */
-    public function be_able_to_subscribe_to_empty_db(): void
+    public function be_able_to_subscribe_to_empty_db(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $store = TestConnection::create();
 
             yield $store->connectAsync();
@@ -274,11 +269,10 @@ class subscribe_to_all_catching_up_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function read_all_existing_events_and_keep_listening_to_new_ones(): void
+    public function read_all_existing_events_and_keep_listening_to_new_ones(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $store = TestConnection::create();
 
             yield $store->connectAsync();
@@ -375,12 +369,11 @@ class subscribe_to_all_catching_up_should extends TestCase
      * Not working against single db
      *
      * @test
-     * @throws Throwable
      * @group ignore
      */
-    public function filter_events_and_keep_listening_to_new_ones(): void
+    public function filter_events_and_keep_listening_to_new_ones(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $store = TestConnection::create();
 
             yield $store->connectAsync();
@@ -482,12 +475,11 @@ class subscribe_to_all_catching_up_should extends TestCase
      * Not working against single db
      *
      * @test
-     * @throws Throwable
      * @group ignore
      */
-    public function filter_events_and_work_if_nothing_was_written_after_subscription(): void
+    public function filter_events_and_work_if_nothing_was_written_after_subscription(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $store = TestConnection::create();
 
             yield $store->connectAsync();

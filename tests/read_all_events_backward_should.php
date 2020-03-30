@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\AllEventsSlice;
 use Prooph\EventStore\Common\SystemRoles;
 use Prooph\EventStore\EventData;
@@ -30,9 +30,8 @@ use Prooph\EventStore\Util\Guid;
 use Prooph\EventStore\WriteResult;
 use ProophTest\EventStoreClient\Helper\EventDataComparer;
 use ProophTest\EventStoreClient\Helper\TestEvent;
-use Throwable;
 
-class read_all_events_backward_should extends TestCase
+class read_all_events_backward_should extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -98,11 +97,10 @@ class read_all_events_backward_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function return_empty_slice_if_asked_to_read_from_start(): void
+    public function return_empty_slice_if_asked_to_read_from_start(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $read = yield $this->conn->readAllEventsBackwardAsync(Position::start(), 1, false);
             \assert($read instanceof AllEventsSlice);
 
@@ -113,11 +111,10 @@ class read_all_events_backward_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function return_events_in_reversed_order_compared_to_written(): void
+    public function return_events_in_reversed_order_compared_to_written(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $read = yield $this->conn->readAllEventsBackwardAsync($this->endOfEvents, \count($this->testEvents), false);
             \assert($read instanceof AllEventsSlice);
 
@@ -138,11 +135,10 @@ class read_all_events_backward_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function be_able_to_read_all_one_by_one_until_end_of_stream(): void
+    public function be_able_to_read_all_one_by_one_until_end_of_stream(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $all = [];
             $position = $this->endOfEvents;
 
@@ -166,11 +162,10 @@ class read_all_events_backward_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function be_able_to_read_events_slice_at_time(): void
+    public function be_able_to_read_events_slice_at_time(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $all = [];
             $position = $this->endOfEvents;
 
@@ -193,11 +188,10 @@ class read_all_events_backward_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function throw_when_got_int_max_value_as_maxcount(): void
+    public function throw_when_got_int_max_value_as_maxcount(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
 
             yield $this->conn->readAllEventsBackwardAsync(Position::start(), \PHP_INT_MAX, false);

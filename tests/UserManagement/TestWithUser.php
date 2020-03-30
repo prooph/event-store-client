@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient\UserManagement;
 
 use function Amp\call;
-use function Amp\Promise\wait;
+use Amp\Promise;
 use Closure;
 use Generator;
 use Prooph\EventStore\Util\Guid;
@@ -33,9 +33,9 @@ abstract class TestWithUser extends TestWithNode
     }
 
     /** @throws Throwable */
-    protected function execute(Closure $function): void
+    protected function execute(Closure $function): Promise
     {
-        wait(call(function () use ($function): Generator {
+        return call(function () use ($function): Generator {
             yield $this->manager->createUserAsync(
                 $this->username,
                 'name',
@@ -45,6 +45,6 @@ abstract class TestWithUser extends TestWithNode
             );
 
             yield from $function();
-        }));
+        });
     }
 }

@@ -13,12 +13,11 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class when_disabling_projections extends TestCase
+class when_disabling_projections extends AsyncTestCase
 {
     use ProjectionSpecification;
 
@@ -56,11 +55,10 @@ class when_disabling_projections extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_stop_the_projection(): void
+    public function should_stop_the_projection(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $projectionStatus = \json_decode(
                 yield $this->projectionsManager->getStatusAsync(
                     $this->projectionName,

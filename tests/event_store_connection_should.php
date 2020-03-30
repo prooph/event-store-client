@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
-use function Amp\Promise\wait;
 use Amp\Success;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\Exception\InvalidOperationException;
@@ -27,7 +25,7 @@ use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 
-class event_store_connection_should extends TestCase
+class event_store_connection_should extends AsyncTestCase
 {
     /**
      * @test
@@ -52,101 +50,98 @@ class event_store_connection_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function throw_invalid_operation_on_every_api_call_if_connect_was_not_called(): void
+    public function throw_invalid_operation_on_every_api_call_if_connect_was_not_called(): \Generator
     {
-        wait(call(function () {
-            $connection = TestConnection::create();
+        $connection = TestConnection::create();
 
-            $s = 'stream';
-            $events = TestEvent::newAmount(1);
+        $s = 'stream';
+        $events = TestEvent::newAmount(1);
 
-            try {
-                yield $connection->deleteStreamAsync($s, 0);
-                $this->fail('No exception thrown on DeleteStreamAsync');
-            } catch (Throwable $e) {
-                $this->assertInstanceOf(InvalidOperationException::class, $e);
-            }
+        try {
+            yield $connection->deleteStreamAsync($s, 0);
+            $this->fail('No exception thrown on DeleteStreamAsync');
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(InvalidOperationException::class, $e);
+        }
 
-            try {
-                yield $connection->appendToStreamAsync($s, 0, $events);
-                $this->fail('No exception thrown on AppendToStreamAsync');
-            } catch (Throwable $e) {
-                $this->assertInstanceOf(InvalidOperationException::class, $e);
-            }
+        try {
+            yield $connection->appendToStreamAsync($s, 0, $events);
+            $this->fail('No exception thrown on AppendToStreamAsync');
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(InvalidOperationException::class, $e);
+        }
 
-            try {
-                yield $connection->readStreamEventsForwardAsync($s, 0, 1);
-                $this->fail('No exception thrown on ReadStreamEventsForwardAsync');
-            } catch (Throwable $e) {
-                $this->assertInstanceOf(InvalidOperationException::class, $e);
-            }
+        try {
+            yield $connection->readStreamEventsForwardAsync($s, 0, 1);
+            $this->fail('No exception thrown on ReadStreamEventsForwardAsync');
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(InvalidOperationException::class, $e);
+        }
 
-            try {
-                yield $connection->readStreamEventsBackwardAsync($s, 0, 1);
-                $this->fail('No exception thrown on ReadStreamEventsBackwardAsync');
-            } catch (Throwable $e) {
-                $this->assertInstanceOf(InvalidOperationException::class, $e);
-            }
+        try {
+            yield $connection->readStreamEventsBackwardAsync($s, 0, 1);
+            $this->fail('No exception thrown on ReadStreamEventsBackwardAsync');
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(InvalidOperationException::class, $e);
+        }
 
-            try {
-                yield $connection->readAllEventsForwardAsync(Position::start(), 1);
-                $this->fail('No exception thrown on ReadAllEventsForwardAsync');
-            } catch (Throwable $e) {
-                $this->assertInstanceOf(InvalidOperationException::class, $e);
-            }
+        try {
+            yield $connection->readAllEventsForwardAsync(Position::start(), 1);
+            $this->fail('No exception thrown on ReadAllEventsForwardAsync');
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(InvalidOperationException::class, $e);
+        }
 
-            try {
-                yield $connection->readAllEventsBackwardAsync(Position::end(), 1);
-                $this->fail('No exception thrown on ReadAllEventsBackwardAsync');
-            } catch (Throwable $e) {
-                $this->assertInstanceOf(InvalidOperationException::class, $e);
-            }
+        try {
+            yield $connection->readAllEventsBackwardAsync(Position::end(), 1);
+            $this->fail('No exception thrown on ReadAllEventsBackwardAsync');
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(InvalidOperationException::class, $e);
+        }
 
-            try {
-                yield $connection->startTransactionAsync($s, 0);
-                $this->fail('No exception thrown on StartTransactionAsync');
-            } catch (Throwable $e) {
-                $this->assertInstanceOf(InvalidOperationException::class, $e);
-            }
+        try {
+            yield $connection->startTransactionAsync($s, 0);
+            $this->fail('No exception thrown on StartTransactionAsync');
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(InvalidOperationException::class, $e);
+        }
 
-            try {
-                yield $connection->subscribeToStreamAsync(
-                    $s,
-                    false,
-                    new class() implements EventAppearedOnSubscription {
-                        public function __invoke(
-                            EventStoreSubscription $subscription,
-                            ResolvedEvent $resolvedEvent
-                        ): Promise {
-                            return new Success();
-                        }
+        try {
+            yield $connection->subscribeToStreamAsync(
+                $s,
+                false,
+                new class() implements EventAppearedOnSubscription {
+                    public function __invoke(
+                        EventStoreSubscription $subscription,
+                        ResolvedEvent $resolvedEvent
+                    ): Promise {
+                        return new Success();
                     }
-                );
+                }
+            );
 
-                $this->fail('No exception thrown on SubscribeToStreamAsync');
-            } catch (Throwable $e) {
-                $this->assertInstanceOf(InvalidOperationException::class, $e);
-            }
+            $this->fail('No exception thrown on SubscribeToStreamAsync');
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(InvalidOperationException::class, $e);
+        }
 
-            try {
-                yield $connection->subscribeToAllAsync(
-                    false,
-                    new class() implements EventAppearedOnSubscription {
-                        public function __invoke(
-                            EventStoreSubscription $subscription,
-                            ResolvedEvent $resolvedEvent
-                        ): Promise {
-                            return new Success();
-                        }
+        try {
+            yield $connection->subscribeToAllAsync(
+                false,
+                new class() implements EventAppearedOnSubscription {
+                    public function __invoke(
+                        EventStoreSubscription $subscription,
+                        ResolvedEvent $resolvedEvent
+                    ): Promise {
+                        return new Success();
                     }
-                );
+                }
+            );
 
-                $this->fail('No exception thrown on SubscribeToAllAsync');
-            } catch (Throwable $e) {
-                $this->assertInstanceOf(InvalidOperationException::class, $e);
-            }
-        }));
+            $this->fail('No exception thrown on SubscribeToAllAsync');
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(InvalidOperationException::class, $e);
+        }
     }
 }

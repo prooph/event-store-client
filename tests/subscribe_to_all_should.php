@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
 use Closure;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Common\SystemRoles;
 use Prooph\EventStore\EventStoreSubscription;
@@ -33,16 +33,13 @@ use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 
-class subscribe_to_all_should extends TestCase
+class subscribe_to_all_should extends AsyncTestCase
 {
     private const TIMEOUT = 10000;
 
-    /**
-     * @throws Throwable
-     */
-    private function execute(Closure $function): void
+    private function execute(Closure $function): Promise
     {
-        Promise\wait(call(function () use ($function): Generator {
+        return call(function () use ($function): Generator {
             $connection = TestConnection::create();
 
             yield $connection->connectAsync();
@@ -65,16 +62,15 @@ class subscribe_to_all_should extends TestCase
             );
 
             $connection->close();
-        }));
+        });
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function allow_multiple_subscriptions(): void
+    public function allow_multiple_subscriptions(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'subscribe_to_all_should_allow_multiple_subscriptions';
 
             $store = TestConnection::create();
@@ -116,11 +112,10 @@ class subscribe_to_all_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function catch_deleted_events_as_well(): void
+    public function catch_deleted_events_as_well(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $stream = 'subscribe_to_all_should_catch_created_and_deleted_events_as_well';
 
             $store = TestConnection::create();
