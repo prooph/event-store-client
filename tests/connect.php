@@ -15,6 +15,7 @@ namespace ProophTest\EventStoreClient;
 
 use Amp\Deferred;
 use Amp\Delayed;
+use Amp\Loop;
 use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\TimeoutException;
@@ -74,6 +75,10 @@ class connect extends AsyncTestCase
             $closed->resolve(true);
         });
 
+        // Need a watcher to keep the loop running after connection is closed.
+        $watcher = Loop::delay(180000, function (): void {
+        });
+
         yield $connection->connectAsync();
 
         try {
@@ -85,6 +90,8 @@ class connect extends AsyncTestCase
         $this->expectException(InvalidOperationException::class);
 
         yield $connection->connectAsync();
+
+        Loop::cancel($watcher);
     }
 
     /** @test */

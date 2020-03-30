@@ -88,7 +88,7 @@ class EventStoreConnectionLogicHandler
     private bool $wasConnected = false;
     private int $packageNumber = 0;
     private int $lastTimeoutsTimeStamp;
-    private \SplObjectStorage $currentMessagePromises;
+    private \SplObjectStorage $currentPromises;
 
     public function __construct(EventStoreConnection $connection, ConnectionSettings $settings)
     {
@@ -103,7 +103,7 @@ class EventStoreConnectionLogicHandler
         $this->stopWatch = StopWatch::startNew();
         // this allows first connection to connect quick
         $this->lastTimeoutsTimeStamp = -$this->settings->operationTimeoutCheckPeriod();
-        $this->currentMessagePromises = new \SplObjectStorage();
+        $this->currentPromises = new \SplObjectStorage();
 
         $this->handler->registerHandler(
             StartConnectionMessage::class,
@@ -180,23 +180,28 @@ class EventStoreConnectionLogicHandler
 
         $promise = $message->getPromise();
         if ($promise !== null) {
-            if ($this->connection) {
-                $this->connection->reference();
-            }
-
-            $this->currentMessagePromises->attach($promise);
-            $promise->onResolve(
-                function () use ($promise) {
-                    $this->currentMessagePromises->detach($promise);
-
-                    if ($this->connection && $this->currentMessagePromises->count() === 0) {
-                        $this->connection->unreference();
-                    }
-                }
-            );
+            $this->keepLoopAlive($promise);
         }
 
         $this->handler->handle($message);
+    }
+
+    private function keepLoopAlive(Promise $promise): void
+    {
+        if ($this->connection) {
+            $this->connection->reference();
+        }
+
+        $this->currentPromises->attach($promise);
+        $promise->onResolve(
+            function () use ($promise): void {
+                $this->currentPromises->detach($promise);
+
+                if ($this->connection && $this->currentPromises->count() === 0) {
+                    $this->connection->unreference();
+                }
+            }
+        );
     }
 
     private function startConnection(Deferred $deferred, EndPointDiscoverer $endPointDiscoverer): void
@@ -355,7 +360,7 @@ class EventStoreConnectionLogicHandler
 
             yield $this->connection->connectAsync();
 
-            if ($this->currentMessagePromises->count() === 0) {
+            if ($this->currentPromises->count() === 0) {
                 $this->connection->unreference();
             }
 
