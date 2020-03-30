@@ -33,6 +33,7 @@ use Prooph\EventStore\WriteResult;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
+use function Amp\call;
 
 class soft_delete extends AsyncTestCase
 {
