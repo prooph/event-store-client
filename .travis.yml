@@ -21,7 +21,6 @@ cache:
     - $HOME/.local
 
 before_script:
-  - pecl install -f uv-beta
   - echo downloading EventStore 5.0.5
   - wget https://eventstore.org/downloads/ubuntu/EventStore-OSS-Linux-Ubuntu-16.04-v5.0.5.tar.gz
   - echo extracting event-store
