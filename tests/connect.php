@@ -13,15 +13,13 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Deferred;
 use Amp\Delayed;
 use Amp\Loop;
 use Amp\Promise;
-use function Amp\Promise\wait;
 use Amp\TimeoutException;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\ClientClosedEventArgs;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\EndPoint;
@@ -30,14 +28,15 @@ use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\EventStoreConnectionFactory;
 use ProophTest\EventStoreClient\Helper\TestEvent;
-use Throwable;
 
-class connect extends TestCase
+class connect extends AsyncTestCase
 {
     private EndPoint $blackhole;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->blackhole = new EndPoint('localhost', 9999);
     }
 
