@@ -27,36 +27,34 @@ class list_users extends TestWithNode
      */
     public function list_all_users_works(): Generator
     {
-        yield $this->execute(function (): Generator {
-            yield $this->manager->createUserAsync('ouro', 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
+        yield $this->manager->createUserAsync('ouro', 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
 
-            $users = yield $this->manager->listAllAsync(DefaultData::adminCredentials());
-            /** @var UserDetails[] $users */
+        $users = yield $this->manager->listAllAsync(DefaultData::adminCredentials());
+        /** @var UserDetails[] $users */
 
-            $this->assertGreaterThanOrEqual(3, \count($users));
+        $this->assertGreaterThanOrEqual(3, \count($users));
 
-            $foundAdmin = false;
-            $foundOps = false;
-            $foundOuro = false;
+        $foundAdmin = false;
+        $foundOps = false;
+        $foundOuro = false;
 
-            foreach ($users as $user) {
-                if ($user->loginName() === 'admin') {
-                    $foundAdmin = true;
-                }
-
-                if ($user->loginName() === 'ops') {
-                    $foundOps = true;
-                }
-
-                if ($user->loginName() === 'ouro') {
-                    $foundOuro = true;
-                }
+        foreach ($users as $user) {
+            if ($user->loginName() === 'admin') {
+                $foundAdmin = true;
             }
 
-            $this->assertTrue($foundAdmin);
-            $this->assertTrue($foundOps);
-            $this->assertTrue($foundOuro);
-        });
+            if ($user->loginName() === 'ops') {
+                $foundOps = true;
+            }
+
+            if ($user->loginName() === 'ouro') {
+                $foundOuro = true;
+            }
+        }
+
+        $this->assertTrue($foundAdmin);
+        $this->assertTrue($foundOps);
+        $this->assertTrue($foundOuro);
     }
 
     /**
@@ -64,45 +62,43 @@ class list_users extends TestWithNode
      */
     public function list_all_users_falls_back_to_default_credentials(): Generator
     {
-        yield $this->execute(function (): Generator {
-            $manager = new UsersManager(
-                new EndPoint(
-                    (string) \getenv('ES_HOST'),
-                    (int) \getenv('ES_HTTP_PORT')
-                ),
-                5000,
-                EndpointExtensions::HTTP_SCHEMA,
-                DefaultData::adminCredentials()
-            );
+        $manager = new UsersManager(
+            new EndPoint(
+                (string) \getenv('ES_HOST'),
+                (int) \getenv('ES_HTTP_PORT')
+            ),
+            5000,
+            EndpointExtensions::HTTP_SCHEMA,
+            DefaultData::adminCredentials()
+        );
 
-            yield $manager->createUserAsync('ouro2', 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
+        yield $manager->createUserAsync('ouro2', 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
 
-            /** @var UserDetails[] $users */
-            $users = yield $manager->listAllAsync();
+        /** @var UserDetails[] $users */
+        $users = yield $manager->listAllAsync();
 
-            $this->assertGreaterThanOrEqual(3, $users);
+        $this->assertGreaterThanOrEqual(3, $users);
 
-            $foundAdmin = false;
-            $foundOps = false;
-            $foundOuro = false;
+        $foundAdmin = false;
+        $foundOps = false;
+        $foundOuro = false;
 
-            foreach ($users as $user) {
-                if ($user->loginName() === 'admin') {
-                    $foundAdmin = true;
-                }
-
-                if ($user->loginName() === 'ops') {
-                    $foundOps = true;
-                }
-
-                if ($user->loginName() === 'ouro2') {
-                    $foundOuro = true;
-                }
+        foreach ($users as $user) {
+            if ($user->loginName() === 'admin') {
+                $foundAdmin = true;
             }
 
-            $this->assertTrue($foundAdmin);
-            $this->assertTrue($foundOps);
-            $this->assertTrue($foundOuro);
-        });
+            if ($user->loginName() === 'ops') {
+                $foundOps = true;
+            }
+
+            if ($user->loginName() === 'ouro2') {
+                $foundOuro = true;
+            }
+        }
+
+        $this->assertTrue($foundAdmin);
+        $this->assertTrue($foundOps);
+        $this->assertTrue($foundOuro);
     }
 }

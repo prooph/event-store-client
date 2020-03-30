@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\PHPUnit\AsyncTestCase;
 use Amp\Deferred;
 use Amp\Delayed;
 use Amp\Loop;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\TimeoutException;
 use Generator;

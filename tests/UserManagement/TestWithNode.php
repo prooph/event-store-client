@@ -13,11 +13,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use function Amp\call;
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Closure;
-use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStoreClient\UserManagement\UsersManager;
 
@@ -36,12 +32,5 @@ abstract class TestWithNode extends AsyncTestCase
             ),
             5000
         );
-    }
-
-    protected function execute(Closure $function): Promise
-    {
-        return call(function () use ($function): Generator {
-            yield from $function();
-        });
     }
 }

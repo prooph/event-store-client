@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use function Amp\call;
 use Amp\Delayed;
 use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
-use Closure;
 use Generator;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\EventData;
@@ -33,7 +33,6 @@ use Prooph\EventStore\WriteResult;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
-use function Amp\call;
 
 class soft_delete extends AsyncTestCase
 {

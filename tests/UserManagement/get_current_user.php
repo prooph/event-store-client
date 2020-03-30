@@ -24,12 +24,10 @@ class get_current_user extends TestWithNode
      */
     public function returns_the_current_user(): Generator
     {
-        yield $this->execute(function (): Generator {
-            $user = yield $this->manager->getCurrentUserAsync(DefaultData::adminCredentials());
-            \assert($user instanceof UserDetails);
+        $user = yield $this->manager->getCurrentUserAsync(DefaultData::adminCredentials());
+        \assert($user instanceof UserDetails);
 
-            $this->assertSame('admin', $user->loginName());
-            $this->assertSame('Event Store Administrator', $user->fullName());
-        });
+        $this->assertSame('admin', $user->loginName());
+        $this->assertSame('Event Store Administrator', $user->fullName());
     }
 }
