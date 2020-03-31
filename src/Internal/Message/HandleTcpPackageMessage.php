@@ -39,7 +39,7 @@ class HandleTcpPackageMessage implements Message
         return $this->tcpPackage;
     }
 
-    public function getPromise(): ?Promise
+    public function promise(): ?Promise
     {
         return null;
     }

@@ -31,7 +31,7 @@ class TcpConnectionEstablishedMessage implements Message
         return $this->tcpPackageConnection;
     }
 
-    public function getPromise(): ?Promise
+    public function promise(): ?Promise
     {
         return null;
     }

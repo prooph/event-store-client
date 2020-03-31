@@ -31,7 +31,7 @@ class EstablishTcpConnectionMessage implements Message
         return $this->nodeEndPoints;
     }
 
-    public function getPromise(): ?Promise
+    public function promise(): ?Promise
     {
         return null;
     }

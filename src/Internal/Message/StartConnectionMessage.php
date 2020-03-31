@@ -39,7 +39,7 @@ class StartConnectionMessage implements Message
         return $this->endPointDiscoverer;
     }
 
-    public function getPromise(): ?Promise
+    public function promise(): ?Promise
     {
         return $this->deferred->promise();
     }

@@ -39,7 +39,7 @@ class TcpConnectionErrorMessage implements Message
         return $this->exception;
     }
 
-    public function getPromise(): ?Promise
+    public function promise(): ?Promise
     {
         return null;
     }

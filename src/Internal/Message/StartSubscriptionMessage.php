@@ -91,7 +91,7 @@ class StartSubscriptionMessage implements Message
         return $this->timeout;
     }
 
-    public function getPromise(): ?Promise
+    public function promise(): ?Promise
     {
         return $this->deferred->promise();
     }

@@ -174,7 +174,7 @@ class EventStoreConnectionLogicHandler
     {
         $this->logDebug(\sprintf('enqueuing message %s', (string) $message));
 
-        $promise = $message->getPromise();
+        $promise = $message->promise();
         if ($promise !== null) {
             $this->keepLoopAlive($promise);
         }

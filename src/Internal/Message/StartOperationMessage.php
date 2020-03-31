@@ -45,7 +45,7 @@ class StartOperationMessage implements Message
         return $this->timeout;
     }
 
-    public function getPromise(): ?Promise
+    public function promise(): ?Promise
     {
         return $this->operation->promise();
     }
