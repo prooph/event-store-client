@@ -49,7 +49,7 @@ class StartOperationMessage implements Message
     }
 
     /** @psalm-pure */
-    public function getPromise(): ?Promise
+    public function promise(): ?Promise
     {
         return $this->operation->promise();
     }

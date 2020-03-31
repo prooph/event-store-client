@@ -119,7 +119,7 @@ class StartSubscriptionMessage implements Message
     }
 
     /** @psalm-pure */
-    public function getPromise(): ?Promise
+    public function promise(): ?Promise
     {
         return $this->deferred->promise();
     }

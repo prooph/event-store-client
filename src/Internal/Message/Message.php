@@ -18,7 +18,7 @@ use Amp\Promise;
 /** @internal */
 interface Message
 {
-    public function getPromise(): ?Promise;
+    public function promise(): ?Promise;
 
     public function __toString(): string;
 }

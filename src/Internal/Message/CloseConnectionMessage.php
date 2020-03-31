@@ -41,7 +41,7 @@ class CloseConnectionMessage implements Message
     }
 
     /** @psalm-pure */
-    public function getPromise(): ?Promise
+    public function promise(): ?Promise
     {
         return null;
     }
