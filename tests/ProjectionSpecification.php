@@ -54,13 +54,27 @@ trait ProjectionSpecification
 
             yield from $this->given();
             yield from $this->when();
-            yield from $test();
+
+            try {
+                $result = yield from $test();
+            } catch (\Throwable $e) {
+                // we throw after end()
+            }
+
             yield from $this->end();
+
+            if (isset($e)) {
+                throw $e;
+            }
+
+            return $result;
         });
     }
 
     protected function end(): Generator
     {
+        $this->connection->close();
+
         yield new Success();
     }
 

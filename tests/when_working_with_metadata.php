@@ -13,31 +13,26 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\PHPUnit\AsyncTestCase;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\RawStreamMetadataResult;
-use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 
-class when_working_with_metadata extends AsyncTestCase
+class when_working_with_metadata extends EventStoreConnectionTestCase
 {
     /**
      * @test
      */
     public function when_getting_metadata_for_an_existing_stream_and_no_metadata_exists(): \Generator
     {
-        $connection = TestConnection::create();
-        yield $connection->connectAsync();
-
         $stream = 'when_getting_metadata_for_an_existing_stream_and_no_metadata_exists';
 
-        yield $connection->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $stream,
             ExpectedVersion::NO_STREAM,
             [TestEvent::newTestEvent()]
         );
 
-        $meta = yield $connection->getRawStreamMetadataAsync($stream);
+        $meta = yield $this->connection->getRawStreamMetadataAsync($stream);
         \assert($meta instanceof RawStreamMetadataResult);
 
         $this->assertSame($stream, $meta->stream());

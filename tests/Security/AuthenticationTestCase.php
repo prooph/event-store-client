@@ -15,13 +15,11 @@ namespace ProophTest\EventStoreClient\Security;
 
 use function Amp\call;
 use Amp\Deferred;
-use Amp\Delayed;
 use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Closure;
 use Generator;
-use PHPUnit\Framework\Constraint\Exception as ExceptionConstraint;
 use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Async\EventStoreTransaction;
@@ -155,10 +153,11 @@ abstract class AuthenticationTestCase extends AsyncTestCase
                 new UserCredentials('adm', 'admpa$$')
             );
 
-            $this->connection = TestConnection::create($this->userCredentials);
-            yield $this->connection->connectAsync();
+            $connection->close();
 
-            yield new Delayed(100);
+            $this->connection = TestConnection::create($this->userCredentials);
+
+            yield $this->connection->connectAsync();
         });
     }
 
@@ -166,7 +165,6 @@ abstract class AuthenticationTestCase extends AsyncTestCase
     {
         $this->userCredentials = null;
         $this->connection->close();
-        $this->connection = null;
 
         return call(function (): Generator {
             $manager = new UsersManager(
@@ -201,6 +199,8 @@ abstract class AuthenticationTestCase extends AsyncTestCase
                 new SystemSettings(),
                 $this->adminUser()
             );
+
+            $connection->close();
         });
     }
 
@@ -408,21 +408,11 @@ abstract class AuthenticationTestCase extends AsyncTestCase
 
     protected function expectExceptionFromCallback(string $expectedException, Closure $callback): Promise
     {
-        $deferred = new Deferred();
+        return call(function () use ($expectedException, $callback): Generator {
+            $this->expectException($expectedException);
 
-        $promise = $callback();
-        $promise->onResolve(function ($e, $r) use ($deferred, $expectedException): void {
-            $this->assertThat(
-                $e,
-                new ExceptionConstraint(
-                    $expectedException
-                )
-            );
-
-            $deferred->resolve($r);
+            yield $callback();
         });
-
-        return $deferred->promise();
     }
 
     protected function expectNoExceptionFromCallback(Closure $callback): Promise

@@ -42,18 +42,28 @@ trait SpecificationWithConnection
 
             yield $this->conn->connectAsync();
 
-            yield from $this->given();
+            try {
+                yield from $this->given();
 
-            yield from $this->when();
+                yield from $this->when();
 
-            yield from $test();
+                yield from $test();
+            } catch (\Throwable $e) {
+                // we throw after end()
+            }
 
             yield from $this->end();
+
+            if (isset($e)) {
+                throw $e;
+            }
         });
     }
 
     protected function end(): Generator
     {
+        $this->conn->close();
+
         yield new Success();
     }
 }

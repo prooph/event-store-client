@@ -54,6 +54,8 @@ class ParallelTransactionTask implements Task
 
         yield $transaction->commitAsync();
 
+        $store->close();
+
         return true;
     }
 }

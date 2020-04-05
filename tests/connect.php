@@ -15,8 +15,8 @@ namespace ProophTest\EventStoreClient;
 
 use Amp\Deferred;
 use Amp\Delayed;
-use Amp\Promise;
 use Amp\PHPUnit\AsyncTestCase;
+use Amp\Promise;
 use Amp\TimeoutException;
 use Generator;
 use Prooph\EventStore\Async\ClientClosedEventArgs;
@@ -76,7 +76,7 @@ class connect extends AsyncTestCase
             $closed->resolve(true);
         });
 
-            yield $connection->connectAsync();
+        yield $connection->connectAsync();
 
         try {
             yield Promise\timeout($closed->promise(), 120000);

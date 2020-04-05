@@ -73,5 +73,7 @@ class not_connected_tests extends AsyncTestCase
         } catch (TimeoutException $e) {
             $this->fail('Connection timeout took too long');
         }
+
+        $connection->close();
     }
 }

@@ -14,11 +14,9 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
-use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
-use Closure;
 use Generator;
 use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Common\SystemRoles;
@@ -29,37 +27,39 @@ use Prooph\EventStore\StreamMetadata;
 use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
-use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 
-class subscribe_to_all_should extends AsyncTestCase
+class subscribe_to_all_should extends EventStoreConnectionTestCase
 {
     private const TIMEOUT = 10000;
 
-    private function execute(Closure $function): Promise
+    protected function setUpAsync(): Promise
     {
-        return call(function () use ($function): Generator {
-            $connection = TestConnection::create();
+        return call(function (): Generator {
+            yield parent::setUpAsync();
 
-            yield $connection->connectAsync();
-
-            yield $connection->setStreamMetadataAsync(
+            yield $this->connection->setStreamMetadataAsync(
                 '$all',
                 ExpectedVersion::ANY,
                 StreamMetadata::create()->setReadRoles(SystemRoles::ALL)->build(),
                 new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
             );
+        });
+    }
 
-            yield from $function();
-
-            yield $connection->setStreamMetadataAsync(
+    protected function tearDownAsync(): Promise
+    {
+        return call(function (): Generator {
+            yield $this->connection->setStreamMetadataAsync(
                 '$all',
                 ExpectedVersion::ANY,
                 new StreamMetadata(),
                 new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
 
             );
+
+            yield parent::tearDownAsync();
         });
     }
 
@@ -68,44 +68,38 @@ class subscribe_to_all_should extends AsyncTestCase
      */
     public function allow_multiple_subscriptions(): Generator
     {
-        yield $this->execute(function (): Generator {
-            $stream = 'subscribe_to_all_should_allow_multiple_subscriptions';
+        $stream = 'subscribe_to_all_should_allow_multiple_subscriptions';
 
-            $store = TestConnection::create();
+        $appeared = new CountdownEvent(2);
+        $dropped = new CountdownEvent(2);
 
-            yield $store->connectAsync();
+        yield $this->connection->subscribeToAllAsync(
+            false,
+            $this->appearedWithCountdown($appeared),
+            $this->droppedWithCountdown($dropped)
+        );
 
-            $appeared = new CountdownEvent(2);
-            $dropped = new CountdownEvent(2);
+        yield $this->connection->subscribeToAllAsync(
+            false,
+            $this->appearedWithCountdown($appeared),
+            $this->droppedWithCountdown($dropped)
+        );
 
-            yield $store->subscribeToAllAsync(
-                false,
-                $this->appearedWithCountdown($appeared),
-                $this->droppedWithCountdown($dropped)
-            );
+        $create = $this->connection->appendToStreamAsync(
+            $stream,
+            ExpectedVersion::NO_STREAM,
+            [TestEvent::newTestEvent()]
+        );
 
-            yield $store->subscribeToAllAsync(
-                false,
-                $this->appearedWithCountdown($appeared),
-                $this->droppedWithCountdown($dropped)
-            );
+        try {
+            yield Promise\timeout($create, self::TIMEOUT);
+        } catch (TimeoutException $e) {
+            $this->fail('StreamCreateAsync timed out');
 
-            $create = $store->appendToStreamAsync(
-                $stream,
-                ExpectedVersion::NO_STREAM,
-                [TestEvent::newTestEvent()]
-            );
+            return;
+        }
 
-            try {
-                yield Promise\timeout($create, self::TIMEOUT);
-            } catch (TimeoutException $e) {
-                $this->fail('StreamCreateAsync timed out');
-
-                return;
-            }
-
-            $this->assertTrue(yield $appeared->wait(self::TIMEOUT), 'Appeared countdown event timed out');
-        });
+        $this->assertTrue(yield $appeared->wait(self::TIMEOUT), 'Appeared countdown event timed out');
     }
 
     /**
@@ -113,34 +107,28 @@ class subscribe_to_all_should extends AsyncTestCase
      */
     public function catch_deleted_events_as_well(): Generator
     {
-        yield $this->execute(function (): Generator {
-            $stream = 'subscribe_to_all_should_catch_created_and_deleted_events_as_well';
+        $stream = 'subscribe_to_all_should_catch_created_and_deleted_events_as_well';
 
-            $store = TestConnection::create();
+        $appeared = new CountdownEvent(1);
+        $dropped = new CountdownEvent(1);
 
-            yield $store->connectAsync();
+        yield $this->connection->subscribeToAllAsync(
+            false,
+            $this->appearedWithCountdown($appeared),
+            $this->droppedWithCountdown($dropped)
+        );
 
-            $appeared = new CountdownEvent(1);
-            $dropped = new CountdownEvent(1);
+        $delete = $this->connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
 
-            yield $store->subscribeToAllAsync(
-                false,
-                $this->appearedWithCountdown($appeared),
-                $this->droppedWithCountdown($dropped)
-            );
+        try {
+            yield Promise\timeout($delete, self::TIMEOUT);
+        } catch (TimeoutException $e) {
+            $this->fail('DeleteStreamAsync timed out');
 
-            $delete = $store->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
+            return;
+        }
 
-            try {
-                yield Promise\timeout($delete, self::TIMEOUT);
-            } catch (TimeoutException $e) {
-                $this->fail('DeleteStreamAsync timed out');
-
-                return;
-            }
-
-            $this->assertTrue(yield $appeared->wait(self::TIMEOUT), 'Appeared countdown event didn\'t fire in time');
-        });
+        $this->assertTrue(yield $appeared->wait(self::TIMEOUT), 'Appeared countdown event didn\'t fire in time');
     }
 
     private function appearedWithCountdown(CountdownEvent $appeared): EventAppearedOnSubscription

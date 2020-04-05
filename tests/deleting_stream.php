@@ -13,16 +13,14 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\PHPUnit\AsyncTestCase;
 use Generator;
 use Prooph\EventStore\DeleteResult;
 use Prooph\EventStore\Exception\StreamDeleted;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
-use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 
-class deleting_stream extends AsyncTestCase
+class deleting_stream extends EventStoreConnectionTestCase
 {
     /**
      * @test
@@ -32,11 +30,7 @@ class deleting_stream extends AsyncTestCase
     {
         $stream = 'which_already_exists_should_success_when_passed_empty_stream_expected_version';
 
-        $connection = TestConnection::create();
-
-        yield $connection->connectAsync();
-
-        yield $connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
+        yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
     }
 
     /**
@@ -47,11 +41,7 @@ class deleting_stream extends AsyncTestCase
     {
         $stream = 'which_already_exists_should_success_when_passed_any_for_expected_version';
 
-        $connection = TestConnection::create();
-
-        yield $connection->connectAsync();
-
-        yield $connection->deleteStreamAsync($stream, ExpectedVersion::ANY, true);
+        yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::ANY, true);
     }
 
     /**
@@ -61,12 +51,8 @@ class deleting_stream extends AsyncTestCase
     {
         $stream = 'with_invalid_expected_version_should_fail';
 
-        $connection = TestConnection::create();
-
-        yield $connection->connectAsync();
-
         $this->expectException(WrongExpectedVersion::class);
-        yield $connection->deleteStreamAsync($stream, 1, true);
+        yield $this->connection->deleteStreamAsync($stream, 1, true);
     }
 
     /**
@@ -76,13 +62,9 @@ class deleting_stream extends AsyncTestCase
     {
         $stream = 'delete_should_return_log_position_when_writing';
 
-        $connection = TestConnection::create();
+        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
 
-        yield $connection->connectAsync();
-
-        yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
-
-        $delete = yield $connection->deleteStreamAsync($stream, 0, true);
+        $delete = yield $this->connection->deleteStreamAsync($stream, 0, true);
         \assert($delete instanceof DeleteResult);
 
         $this->assertGreaterThan(0, $delete->logPosition()->preparePosition());
@@ -96,13 +78,9 @@ class deleting_stream extends AsyncTestCase
     {
         $stream = 'which_was_allready_deleted_should_fail';
 
-        $connection = TestConnection::create();
-
-        yield $connection->connectAsync();
-
-        yield $connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
+        yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
 
         $this->expectException(StreamDeleted::class);
-        yield $connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
+        yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
     }
 }

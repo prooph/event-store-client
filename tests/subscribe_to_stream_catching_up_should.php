@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\Delayed;
-use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
@@ -22,7 +21,6 @@ use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
 use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
 use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
-use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventStoreSubscription;
@@ -31,22 +29,12 @@ use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStoreClient\Internal\EventStoreStreamCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\ManualResetEventSlim;
-use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 
-class subscribe_to_stream_catching_up_should extends AsyncTestCase
+class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCase
 {
     private const TIMEOUT = 5000;
-
-    private EventStoreConnection $conn;
-
-    protected function setUpAsync(): Promise
-    {
-        $this->conn = TestConnection::create();
-
-        return $this->conn->connectAsync();
-    }
 
     /**
      * @test
@@ -58,7 +46,7 @@ class subscribe_to_stream_catching_up_should extends AsyncTestCase
         $appeared = new ManualResetEventSlim(false);
         $dropped = new CountdownEvent(1);
 
-        $subscription = yield $this->conn->subscribeToStreamFromAsync(
+        $subscription = yield $this->connection->subscribeToStreamFromAsync(
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
@@ -70,7 +58,7 @@ class subscribe_to_stream_catching_up_should extends AsyncTestCase
 
         yield new Delayed(self::TIMEOUT); // give time for first pull phase
 
-        yield $this->conn->subscribeToStreamAsync(
+        yield $this->connection->subscribeToStreamAsync(
             $stream,
             false,
             new class() implements EventAppearedOnSubscription {
@@ -103,7 +91,7 @@ class subscribe_to_stream_catching_up_should extends AsyncTestCase
         $appeared = new CountdownEvent(1);
         $dropped = new CountdownEvent(1);
 
-        $subscription = yield $this->conn->subscribeToStreamFromAsync(
+        $subscription = yield $this->connection->subscribeToStreamFromAsync(
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
@@ -113,7 +101,7 @@ class subscribe_to_stream_catching_up_should extends AsyncTestCase
         );
         \assert($subscription instanceof EventStoreStreamCatchUpSubscription);
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $stream,
             ExpectedVersion::NO_STREAM,
             [TestEvent::newTestEvent()]
@@ -142,7 +130,7 @@ class subscribe_to_stream_catching_up_should extends AsyncTestCase
         $dropped1 = new ManualResetEventSlim(false);
         $dropped2 = new ManualResetEventSlim(false);
 
-        $sub1 = yield $this->conn->subscribeToStreamFromAsync(
+        $sub1 = yield $this->connection->subscribeToStreamFromAsync(
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
@@ -152,7 +140,7 @@ class subscribe_to_stream_catching_up_should extends AsyncTestCase
         );
         \assert($sub1 instanceof EventStoreStreamCatchUpSubscription);
 
-        $sub2 = yield $this->conn->subscribeToStreamFromAsync(
+        $sub2 = yield $this->connection->subscribeToStreamFromAsync(
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
@@ -162,7 +150,7 @@ class subscribe_to_stream_catching_up_should extends AsyncTestCase
         );
         \assert($sub2 instanceof EventStoreStreamCatchUpSubscription);
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $stream,
             ExpectedVersion::NO_STREAM,
             [TestEvent::newTestEvent()]
@@ -194,7 +182,7 @@ class subscribe_to_stream_catching_up_should extends AsyncTestCase
 
         $dropped = new CountdownEvent(1);
 
-        $subscription = yield $this->conn->subscribeToStreamFromAsync(
+        $subscription = yield $this->connection->subscribeToStreamFromAsync(
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
@@ -223,7 +211,7 @@ class subscribe_to_stream_catching_up_should extends AsyncTestCase
     {
         $stream = 'call_dropped_callback_when_an_error_occurs_while_processing_an_event';
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $stream,
             ExpectedVersion::ANY,
             [new EventData(null, 'event', false)]
@@ -231,7 +219,7 @@ class subscribe_to_stream_catching_up_should extends AsyncTestCase
 
         $dropped = new CountdownEvent(1);
 
-        yield $this->conn->subscribeToStreamFromAsync(
+        yield $this->connection->subscribeToStreamFromAsync(
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
@@ -263,14 +251,14 @@ class subscribe_to_stream_catching_up_should extends AsyncTestCase
         $dropped = new CountdownEvent(1);
 
         for ($i = 0; $i < 10; $i++) {
-            yield $this->conn->appendToStreamAsync(
+            yield $this->connection->appendToStreamAsync(
                 $stream,
                 $i - 1,
                 [new EventData(null, 'et-' . $i, false)]
             );
         }
 
-        $subscription = yield $this->conn->subscribeToStreamFromAsync(
+        $subscription = yield $this->connection->subscribeToStreamFromAsync(
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
@@ -281,7 +269,7 @@ class subscribe_to_stream_catching_up_should extends AsyncTestCase
         \assert($subscription instanceof EventStoreStreamCatchUpSubscription);
 
         for ($i = 10; $i < 20; $i++) {
-            yield $this->conn->appendToStreamAsync(
+            yield $this->connection->appendToStreamAsync(
                 $stream,
                 $i - 1,
                 [new EventData(null, 'et-' . $i, false)]
@@ -319,14 +307,14 @@ class subscribe_to_stream_catching_up_should extends AsyncTestCase
         $dropped = new CountdownEvent(1);
 
         for ($i = 0; $i < 20; $i++) {
-            yield $this->conn->appendToStreamAsync(
+            yield $this->connection->appendToStreamAsync(
                 $stream,
                 $i - 1,
                 [new EventData(null, 'et-' . $i, false)]
             );
         }
 
-        $subscription = yield $this->conn->subscribeToStreamFromAsync(
+        $subscription = yield $this->connection->subscribeToStreamFromAsync(
             $stream,
             9,
             CatchUpSubscriptionSettings::default(),
@@ -337,7 +325,7 @@ class subscribe_to_stream_catching_up_should extends AsyncTestCase
         \assert($subscription instanceof EventStoreStreamCatchUpSubscription);
 
         for ($i = 20; $i < 30; $i++) {
-            yield $this->conn->appendToStreamAsync(
+            yield $this->connection->appendToStreamAsync(
                 $stream,
                 $i - 1,
                 [new EventData(null, 'et-' . $i, false)]
@@ -379,14 +367,14 @@ class subscribe_to_stream_catching_up_should extends AsyncTestCase
         $dropped = new CountdownEvent(1);
 
         for ($i = 0; $i < 20; $i++) {
-            yield $this->conn->appendToStreamAsync(
+            yield $this->connection->appendToStreamAsync(
                 $stream,
                 $i - 1,
                 [new EventData(null, 'et-' . $i, false)]
             );
         }
 
-        $subscription = yield $this->conn->subscribeToStreamFromAsync(
+        $subscription = yield $this->connection->subscribeToStreamFromAsync(
             $stream,
             9,
             CatchUpSubscriptionSettings::default(),

@@ -59,6 +59,13 @@ class catch_up_subscription_handles_small_batch_sizes extends AsyncTestCase
         });
     }
 
+    protected function tearDownAsync(): Promise
+    {
+        $this->connection->close();
+
+        return parent::tearDownAsync();
+    }
+
     /** @return EventData[] */
     private function createOneHundredEvents(): array
     {

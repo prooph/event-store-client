@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\PHPUnit\AsyncTestCase;
 use Generator;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\ExpectedVersion;
@@ -23,10 +22,9 @@ use Prooph\EventStore\SliceReadStatus;
 use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\StreamPosition;
 use ProophTest\EventStoreClient\Helper\EventDataComparer;
-use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 
-class read_event_stream_forward_should extends AsyncTestCase
+class read_event_stream_forward_should extends EventStoreConnectionTestCase
 {
     /**
      * @test
@@ -35,12 +33,9 @@ class read_event_stream_forward_should extends AsyncTestCase
     {
         $stream = 'read_event_stream_forward_should_throw_if_count_le_zero';
 
-        $store = TestConnection::create();
-        yield $store->connectAsync();
-
         $this->expectException(InvalidArgumentException::class);
 
-        $store->readStreamEventsForwardAsync(
+        $this->connection->readStreamEventsForwardAsync(
             $stream,
             0,
             0,
@@ -55,12 +50,9 @@ class read_event_stream_forward_should extends AsyncTestCase
     {
         $stream = 'read_event_stream_forward_should_throw_if_start_lt_zero';
 
-        $store = TestConnection::create();
-        yield $store->connectAsync();
-
         $this->expectException(InvalidArgumentException::class);
 
-        $store->readStreamEventsForwardAsync(
+        $this->connection->readStreamEventsForwardAsync(
             $stream,
             -1,
             1,
@@ -75,10 +67,7 @@ class read_event_stream_forward_should extends AsyncTestCase
     {
         $stream = 'read_event_stream_forward_should_notify_using_status_code_if_stream_not_found';
 
-        $store = TestConnection::create();
-        yield $store->connectAsync();
-
-        $read = yield $store->readStreamEventsForwardAsync(
+        $read = yield $this->connection->readStreamEventsForwardAsync(
             $stream,
             StreamPosition::START,
             1,
@@ -96,11 +85,9 @@ class read_event_stream_forward_should extends AsyncTestCase
     {
         $stream = 'read_event_stream_forward_should_notify_using_status_code_if_stream_was_deleted';
 
-        $store = TestConnection::create();
-        yield $store->connectAsync();
-        yield $store->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
+        yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
 
-        $read = yield $store->readStreamEventsForwardAsync(
+        $read = yield $this->connection->readStreamEventsForwardAsync(
             $stream,
             StreamPosition::START,
             1,
@@ -118,10 +105,7 @@ class read_event_stream_forward_should extends AsyncTestCase
     {
         $stream = 'read_event_stream_forward_should_return_single_event_when_called_on_empty_stream';
 
-        $store = TestConnection::create();
-        yield $store->connectAsync();
-
-        $read = yield $store->readStreamEventsForwardAsync(
+        $read = yield $this->connection->readStreamEventsForwardAsync(
             $stream,
             StreamPosition::START,
             1,
@@ -139,17 +123,14 @@ class read_event_stream_forward_should extends AsyncTestCase
     {
         $stream = 'read_event_stream_forward_should_return_empty_slice_when_called_on_non_existing_range';
 
-        $store = TestConnection::create();
-        yield $store->connectAsync();
-
         $testEvents = TestEvent::newAmount(10);
-        yield $store->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $stream,
             ExpectedVersion::NO_STREAM,
             $testEvents
         );
 
-        $read = yield $store->readStreamEventsForwardAsync(
+        $read = yield $this->connection->readStreamEventsForwardAsync(
             $stream,
             11,
             5,
@@ -167,17 +148,14 @@ class read_event_stream_forward_should extends AsyncTestCase
     {
         $stream = 'read_event_stream_forward_should_return_partial_slice_if_no_enough_events_in_stream';
 
-        $store = TestConnection::create();
-        yield $store->connectAsync();
-
         $testEvents = TestEvent::newAmount(10);
-        yield $store->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $stream,
             ExpectedVersion::NO_STREAM,
             $testEvents
         );
 
-        $read = yield $store->readStreamEventsForwardAsync(
+        $read = yield $this->connection->readStreamEventsForwardAsync(
             $stream,
             9,
             5,
@@ -193,12 +171,9 @@ class read_event_stream_forward_should extends AsyncTestCase
      */
     public function throw_when_got_int_max_value_as_max_count(): Generator
     {
-        $store = TestConnection::create();
-        yield $store->connectAsync();
-
         $this->expectException(InvalidArgumentException::class);
 
-        yield $store->readStreamEventsForwardAsync(
+        yield $this->connection->readStreamEventsForwardAsync(
             'foo',
             StreamPosition::START,
             \PHP_INT_MAX,
@@ -213,17 +188,14 @@ class read_event_stream_forward_should extends AsyncTestCase
     {
         $stream = 'read_event_stream_forward_should_return_events_in_same_order_as_written';
 
-        $store = TestConnection::create();
-        yield $store->connectAsync();
-
         $testEvents = TestEvent::newAmount(10);
-        yield $store->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $stream,
             ExpectedVersion::NO_STREAM,
             $testEvents
         );
 
-        $read = yield $store->readStreamEventsForwardAsync(
+        $read = yield $this->connection->readStreamEventsForwardAsync(
             $stream,
             StreamPosition::START,
             10,
@@ -246,17 +218,14 @@ class read_event_stream_forward_should extends AsyncTestCase
     {
         $stream = 'read_event_stream_forward_should_be_able_to_read_slice_from_arbitrary_position';
 
-        $store = TestConnection::create();
-        yield $store->connectAsync();
-
         $testEvents = TestEvent::newAmount(10);
-        yield $store->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $stream,
             ExpectedVersion::NO_STREAM,
             $testEvents
         );
 
-        $read = yield $store->readStreamEventsForwardAsync(
+        $read = yield $this->connection->readStreamEventsForwardAsync(
             $stream,
             5,
             2,
