@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\Deferred;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\Async\PersistentSubscriptionDropped;
@@ -29,7 +29,7 @@ use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\Util\Guid;
 use Throwable;
 
-class update_existing_persistent_subscription_with_subscribers extends TestCase
+class update_existing_persistent_subscription_with_subscribers extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -114,11 +114,10 @@ class update_existing_persistent_subscription_with_subscribers extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_completion_succeeds(): void
+    public function the_completion_succeeds(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->assertNull($this->caught);
 
             yield new Success();
@@ -127,11 +126,10 @@ class update_existing_persistent_subscription_with_subscribers extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function existing_subscriptions_are_dropped(): void
+    public function existing_subscriptions_are_dropped(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->assertTrue(yield Promise\timeout($this->dropped->promise(), 5000));
             $this->assertInstanceOf(SubscriptionDropReason::class, $this->reason);
             $this->assertTrue($this->reason->equals(SubscriptionDropReason::userInitiated()));

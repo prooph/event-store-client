@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\Deferred;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EventData;
@@ -27,9 +27,8 @@ use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
+class happy_case_catching_up_to_normal_events_auto_ack extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -44,6 +43,8 @@ class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->streamName = Guid::generateAsHex();
         $this->groupName = Guid::generateAsHex();
         $this->eventsReceived = new Deferred();
@@ -56,11 +57,10 @@ class happy_case_catching_up_to_normal_events_auto_ack extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function test(): void
+    public function test(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $settings = PersistentSubscriptionSettings::create()
                 ->startFromBeginning()
                 ->resolveLinkTos()

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\EventReadResult;
@@ -22,9 +22,8 @@ use Prooph\EventStore\EventReadStatus;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\OutOfRangeException;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class read_event_should extends TestCase
+class read_event_should extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -50,11 +49,10 @@ class read_event_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function throw_if_stream_id_is_empty(): void
+    public function throw_if_stream_id_is_empty(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
             $this->conn->readEventAsync('', 0, false);
         });
@@ -62,11 +60,10 @@ class read_event_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function throw_if_event_number_is_less_than_minus_one(): void
+    public function throw_if_event_number_is_less_than_minus_one(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(OutOfRangeException::class);
             $this->conn->readEventAsync('stream', -2, false);
         });
@@ -74,11 +71,10 @@ class read_event_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function notify_using_status_code_if_stream_not_found(): void
+    public function notify_using_status_code_if_stream_not_found(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $res = yield $this->conn->readEventAsync('unexisting-stream', 5, false);
             \assert($res instanceof EventReadResult);
 
@@ -91,11 +87,10 @@ class read_event_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function return_no_stream_if_requested_last_event_in_empty_stream(): void
+    public function return_no_stream_if_requested_last_event_in_empty_stream(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $res = yield $this->conn->readEventAsync('some-really-empty-stream', -1, false);
             \assert($res instanceof EventReadResult);
 
@@ -105,11 +100,10 @@ class read_event_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function notify_using_status_code_if_stream_was_deleted(): void
+    public function notify_using_status_code_if_stream_was_deleted(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $res = yield $this->conn->readEventAsync($this->deletedStream, 5, false);
             \assert($res instanceof EventReadResult);
 
@@ -122,11 +116,10 @@ class read_event_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function notify_using_status_code_if_stream_does_not_have_event(): void
+    public function notify_using_status_code_if_stream_does_not_have_event(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $res = yield $this->conn->readEventAsync($this->testStream, 5, false);
             \assert($res instanceof EventReadResult);
 
@@ -139,11 +132,10 @@ class read_event_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function return_existing_event(): void
+    public function return_existing_event(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $res = yield $this->conn->readEventAsync($this->testStream, 0, false);
             \assert($res instanceof EventReadResult);
 
@@ -157,11 +149,10 @@ class read_event_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function retrieve_the_is_json_flag_properly(): void
+    public function retrieve_the_is_json_flag_properly(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $res = yield $this->conn->readEventAsync($this->testStream, 1, false);
             \assert($res instanceof EventReadResult);
 
@@ -173,11 +164,10 @@ class read_event_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function return_last_event_in_stream_if_event_number_is_minus_one(): void
+    public function return_last_event_in_stream_if_event_number_is_minus_one(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $res = yield $this->conn->readEventAsync($this->testStream, -1, false);
             \assert($res instanceof EventReadResult);
 

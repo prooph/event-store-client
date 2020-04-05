@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Common\SystemEventTypes;
 use Prooph\EventStore\Common\SystemRoles;
 use Prooph\EventStore\EventData;
@@ -24,9 +24,8 @@ use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\StreamMetadata;
 use Prooph\EventStore\Util\Json;
 use ProophTest\EventStoreClient\Helper\TestEvent;
-use Throwable;
 
-class read_all_events_forward_with_soft_deleted_stream_should extends TestCase
+class read_all_events_forward_with_soft_deleted_stream_should extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -42,8 +41,6 @@ class read_all_events_forward_with_soft_deleted_stream_should extends TestCase
             StreamMetadata::create()->build(),
             DefaultData::adminCredentials()
         );
-
-        $this->conn->close();
     }
 
     protected function when(): Generator
@@ -71,11 +68,10 @@ class read_all_events_forward_with_soft_deleted_stream_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function ensure_deleted_stream(): void
+    public function ensure_deleted_stream(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $res = yield $this->conn->readStreamEventsForwardAsync($this->streamName, 0, 100, false);
             \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::streamNotFound()));
@@ -86,11 +82,10 @@ class read_all_events_forward_with_soft_deleted_stream_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function returns_all_events_including_tombstone(): void
+    public function returns_all_events_including_tombstone(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $metadataEvents = yield $this->conn->readStreamEventsBackwardAsync(
                 '$$' . $this->streamName,
                 -1,

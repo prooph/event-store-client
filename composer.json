@@ -32,6 +32,7 @@
   },
   "require-dev": {
     "amphp/log": "^1.0",
+    "amphp/phpunit-util": "dev-alt-13",
     "doctrine/instantiator": "^1.1",
     "php-coveralls/php-coveralls": "^2.1",
     "phpspec/prophecy": "^1.7.2",

@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\ResolvedEvent;
 use Throwable;
 
-class connect_to_non_existing_persistent_subscription_with_permissions extends TestCase
+class connect_to_non_existing_persistent_subscription_with_permissions extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -54,11 +54,10 @@ class connect_to_non_existing_persistent_subscription_with_permissions extends T
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_subscription_fails_to_connect_with_invalid_argument_exception(): void
+    public function the_subscription_fails_to_connect_with_invalid_argument_exception(): Generator
     {
-        $this->execute(function (): Generator {
+        yield $this->execute(function (): Generator {
             $this->assertNotNull($this->exception);
             $this->assertInstanceOf(InvalidArgumentException::class, $this->exception);
 

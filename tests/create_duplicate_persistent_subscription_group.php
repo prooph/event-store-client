@@ -13,14 +13,13 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class create_duplicate_persistent_subscription_group extends TestCase
+class create_duplicate_persistent_subscription_group extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -29,6 +28,8 @@ class create_duplicate_persistent_subscription_group extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->stream = Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
@@ -48,11 +49,10 @@ class create_duplicate_persistent_subscription_group extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_completion_fails_with_invalid_operation_exception(): void
+    public function the_completion_fails_with_invalid_operation_exception(): Generator
     {
-        $this->execute(function (): Generator {
+        yield $this->execute(function (): Generator {
             $this->expectException(InvalidOperationException::class);
 
             yield $this->conn->createPersistentSubscriptionAsync(

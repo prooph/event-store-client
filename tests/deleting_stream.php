@@ -13,127 +13,96 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
-use function Amp\Promise\wait;
-use PHPUnit\Framework\TestCase;
+use Amp\PHPUnit\AsyncTestCase;
+use Generator;
 use Prooph\EventStore\DeleteResult;
 use Prooph\EventStore\Exception\StreamDeleted;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
-use Throwable;
 
-class deleting_stream extends TestCase
+class deleting_stream extends AsyncTestCase
 {
     /**
      * @test
-     * @throws Throwable
      * @doesNotPerformAssertions
      */
-    public function which_doesnt_exists_should_success_when_passed_empty_stream_expected_version(): void
+    public function which_doesnt_exists_should_success_when_passed_empty_stream_expected_version(): Generator
     {
-        wait(call(function () {
-            $stream = 'which_already_exists_should_success_when_passed_empty_stream_expected_version';
+        $stream = 'which_already_exists_should_success_when_passed_empty_stream_expected_version';
 
-            $connection = TestConnection::create();
+        $connection = TestConnection::create();
 
-            yield $connection->connectAsync();
+        yield $connection->connectAsync();
 
-            yield $connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
-
-            $connection->close();
-        }));
+        yield $connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
     }
 
     /**
      * @test
-     * @throws Throwable
      * @doesNotPerformAssertions
      */
-    public function which_doesnt_exists_should_success_when_passed_any_for_expected_version(): void
+    public function which_doesnt_exists_should_success_when_passed_any_for_expected_version(): Generator
     {
-        wait(call(function () {
-            $stream = 'which_already_exists_should_success_when_passed_any_for_expected_version';
+        $stream = 'which_already_exists_should_success_when_passed_any_for_expected_version';
 
-            $connection = TestConnection::create();
+        $connection = TestConnection::create();
 
-            yield $connection->connectAsync();
+        yield $connection->connectAsync();
 
-            yield $connection->deleteStreamAsync($stream, ExpectedVersion::ANY, true);
-
-            $connection->close();
-        }));
+        yield $connection->deleteStreamAsync($stream, ExpectedVersion::ANY, true);
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function with_invalid_expected_version_should_fail(): void
+    public function with_invalid_expected_version_should_fail(): Generator
     {
-        wait(call(function () {
-            $stream = 'with_invalid_expected_version_should_fail';
+        $stream = 'with_invalid_expected_version_should_fail';
 
-            $connection = TestConnection::create();
+        $connection = TestConnection::create();
 
-            yield $connection->connectAsync();
+        yield $connection->connectAsync();
 
-            try {
-                $this->expectException(WrongExpectedVersion::class);
-                yield $connection->deleteStreamAsync($stream, 1, true);
-            } finally {
-                $connection->close();
-            }
-        }));
+        $this->expectException(WrongExpectedVersion::class);
+        yield $connection->deleteStreamAsync($stream, 1, true);
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_return_log_position_when_writing(): void
+    public function should_return_log_position_when_writing(): Generator
     {
-        wait(call(function () {
-            $stream = 'delete_should_return_log_position_when_writing';
+        $stream = 'delete_should_return_log_position_when_writing';
 
-            $connection = TestConnection::create();
+        $connection = TestConnection::create();
 
-            yield $connection->connectAsync();
+        yield $connection->connectAsync();
 
-            yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
+        yield $connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
 
-            $delete = yield $connection->deleteStreamAsync($stream, 0, true);
-            \assert($delete instanceof DeleteResult);
+        $delete = yield $connection->deleteStreamAsync($stream, 0, true);
+        \assert($delete instanceof DeleteResult);
 
-            $this->assertGreaterThan(0, $delete->logPosition()->preparePosition());
-            $this->assertGreaterThan(0, $delete->logPosition()->commitPosition());
-
-            $connection->close();
-        }));
+        $this->assertGreaterThan(0, $delete->logPosition()->preparePosition());
+        $this->assertGreaterThan(0, $delete->logPosition()->commitPosition());
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function which_was_already_deleted_should_fail(): void
+    public function which_was_already_deleted_should_fail(): Generator
     {
-        wait(call(function () {
-            $stream = 'which_was_allready_deleted_should_fail';
+        $stream = 'which_was_allready_deleted_should_fail';
 
-            $connection = TestConnection::create();
+        $connection = TestConnection::create();
 
-            yield $connection->connectAsync();
+        yield $connection->connectAsync();
 
-            yield $connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
+        yield $connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
 
-            try {
-                $this->expectException(StreamDeleted::class);
-                yield $connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
-            } finally {
-                $connection->close();
-            }
-        }));
+        $this->expectException(StreamDeleted::class);
+        yield $connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
     }
 }

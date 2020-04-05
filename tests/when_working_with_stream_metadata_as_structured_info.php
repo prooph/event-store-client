@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
-use function Amp\Promise\wait;
+use Amp\PHPUnit\AsyncTestCase;
+use Amp\Promise;
 use Closure;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Exception\RuntimeException;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
@@ -27,34 +27,29 @@ use Prooph\EventStore\StreamMetadata;
 use Prooph\EventStore\StreamMetadataResult;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
-use Throwable;
 
-class when_working_with_stream_metadata_as_structured_info extends TestCase
+class when_working_with_stream_metadata_as_structured_info extends AsyncTestCase
 {
     private string $stream;
     private EventStoreConnection $conn;
 
-    /** @throws Throwable */
-    private function execute(Closure $function): void
+    private function execute(Closure $function): Promise
     {
-        wait(call(function () use ($function): Generator {
+        return call(function () use ($function): Generator {
             $this->stream = self::class . '\\' . $this->getName();
             $this->conn = TestConnection::create(DefaultData::adminCredentials());
             yield $this->conn->connectAsync();
 
             yield from $function();
-
-            $this->conn->close();
-        }));
+        });
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function setting_empty_metadata_works(): void
+    public function setting_empty_metadata_works(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             yield $this->conn->setStreamMetadataAsync(
                 $this->stream,
                 ExpectedVersion::ANY,
@@ -73,11 +68,10 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function setting_metadata_few_times_returns_last_metadata_info(): void
+    public function setting_metadata_few_times_returns_last_metadata_info(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $metadata = new StreamMetadata(17, 0xDEADBEEF, 10, 0xABACABA);
 
             yield $this->conn->setStreamMetadataAsync(
@@ -124,11 +118,10 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function trying_to_set_metadata_with_wrong_expected_version_fails(): void
+    public function trying_to_set_metadata_with_wrong_expected_version_fails(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(WrongExpectedVersion::class);
 
             yield $this->conn->setStreamMetadataAsync(
@@ -141,11 +134,10 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function setting_metadata_with_expected_version_any_works(): void
+    public function setting_metadata_with_expected_version_any_works(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $metadata = new StreamMetadata(17, 0xDEADBEEF, 10, 0xABACABA);
 
             yield $this->conn->setStreamMetadataAsync(
@@ -188,11 +180,10 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function setting_metadata_for_not_existing_stream_works(): void
+    public function setting_metadata_for_not_existing_stream_works(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $metadata = new StreamMetadata(17, 0xDEADBEEF, 10, 0xABACABA);
 
             yield $this->conn->setStreamMetadataAsync(
@@ -216,11 +207,10 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function setting_metadata_for_existing_stream_works(): void
+    public function setting_metadata_for_existing_stream_works(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             yield $this->conn->appendToStreamAsync(
                 $this->stream,
                 ExpectedVersion::NO_STREAM,
@@ -250,11 +240,10 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function getting_metadata_for_nonexisting_stream_returns_empty_stream_metadata(): void
+    public function getting_metadata_for_nonexisting_stream_returns_empty_stream_metadata(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $meta = yield $this->conn->getStreamMetadataAsync($this->stream);
             \assert($meta instanceof StreamMetadataResult);
 
@@ -270,11 +259,10 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function getting_metadata_for_deleted_stream_returns_empty_stream_metadata_and_signals_stream_deletion(): void
+    public function getting_metadata_for_deleted_stream_returns_empty_stream_metadata_and_signals_stream_deletion(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $metadata = new StreamMetadata(17, 0xDEADBEEF, 10, 0xABACABA);
 
             yield $this->conn->setStreamMetadataAsync(
@@ -305,11 +293,10 @@ class when_working_with_stream_metadata_as_structured_info extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function setting_correctly_formatted_metadata_as_raw_allows_to_read_it_as_structured_metadata(): void
+    public function setting_correctly_formatted_metadata_as_raw_allows_to_read_it_as_structured_metadata(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $metadata = <<<END
 {
    "\$maxCount": 17,
@@ -372,11 +359,10 @@ END;
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function setting_structured_metadata_with_custom_properties_returns_them_untouched(): void
+    public function setting_structured_metadata_with_custom_properties_returns_them_untouched(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $metadata = StreamMetadata::create()
                 ->setMaxCount(17)
                 ->setMaxAge(123321)
@@ -434,11 +420,10 @@ END;
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function setting_structured_metadata_with_multiple_roles_can_be_read_back(): void
+    public function setting_structured_metadata_with_multiple_roles_can_be_read_back(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $metadata = StreamMetadata::create()
                 ->setReadRoles('r1', 'r2', 'r3')
                 ->setWriteRoles('w1', 'w2')
@@ -469,11 +454,10 @@ END;
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function setting_correct_metadata_with_multiple_roles_in_acl_allows_to_read_it_as_structured_metadata(): void
+    public function setting_correct_metadata_with_multiple_roles_in_acl_allows_to_read_it_as_structured_metadata(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $metadata = <<<END
 {
    "\$acl": {

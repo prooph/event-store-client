@@ -13,19 +13,18 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class connect_to_existing_persistent_subscription_without_permissions extends TestCase
+class connect_to_existing_persistent_subscription_without_permissions extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -34,6 +33,8 @@ class connect_to_existing_persistent_subscription_without_permissions extends Te
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->stream = '$' . Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
@@ -67,13 +68,12 @@ class connect_to_existing_persistent_subscription_without_permissions extends Te
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_subscription_fails_to_connect_with_access_denied_exception(): void
+    public function the_subscription_fails_to_connect_with_access_denied_exception(): Generator
     {
         $this->expectException(AccessDenied::class);
 
-        $this->execute(function (): Generator {
+        yield $this->execute(function (): Generator {
             yield new Success();
         });
     }

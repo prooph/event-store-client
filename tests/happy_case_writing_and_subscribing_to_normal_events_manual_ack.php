@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\Deferred;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use function Amp\Promise\timeout;
 use Amp\Success;
 use Amp\TimeoutException;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EventData;
@@ -27,9 +27,8 @@ use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class happy_case_writing_and_subscribing_to_normal_events_manual_ack extends TestCase
+class happy_case_writing_and_subscribing_to_normal_events_manual_ack extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -45,6 +44,8 @@ class happy_case_writing_and_subscribing_to_normal_events_manual_ack extends Tes
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->streamName = Guid::generateAsHex();
         $this->groupName = Guid::generateAsHex();
         $this->eventsReceived = new Deferred();
@@ -57,11 +58,10 @@ class happy_case_writing_and_subscribing_to_normal_events_manual_ack extends Tes
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function test(): void
+    public function test(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $settings = PersistentSubscriptionSettings::default();
 
             yield $this->conn->createPersistentSubscriptionAsync(

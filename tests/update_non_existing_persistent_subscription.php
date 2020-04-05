@@ -13,15 +13,14 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class update_non_existing_persistent_subscription extends TestCase
+class update_non_existing_persistent_subscription extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -41,11 +40,10 @@ class update_non_existing_persistent_subscription extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_completion_fails_with_not_found(): void
+    public function the_completion_fails_with_not_found(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(InvalidOperationException::class);
 
             yield $this->conn->updatePersistentSubscriptionAsync(

@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Closure;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
@@ -26,19 +26,17 @@ use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\StreamMetadata;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
-use Throwable;
 
-class when_having_max_count_set_for_stream extends TestCase
+class when_having_max_count_set_for_stream extends AsyncTestCase
 {
     private string $stream = 'max-count-test-stream';
     private EventStoreConnection $conn;
     /** @var EventData[] */
     private array $testEvents = [];
 
-    /** @throws Throwable */
-    private function execute(Closure $function): void
+    private function execute(Closure $function): Promise
     {
-        Promise\wait(call(function () use ($function): Generator {
+        return call(function () use ($function): Generator {
             $this->conn = TestConnection::create();
 
             yield $this->conn->connectAsync();
@@ -61,18 +59,15 @@ class when_having_max_count_set_for_stream extends TestCase
             );
 
             yield from $function();
-
-            $this->conn->close();
-        }));
+        });
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function read_stream_forward_respects_max_count(): void
+    public function read_stream_forward_respects_max_count(): Generator
     {
-        $this->execute(function (): Generator {
+        yield $this->execute(function (): Generator {
             $res = yield $this->conn->readStreamEventsForwardAsync(
                 $this->stream,
                 0,
@@ -96,11 +91,10 @@ class when_having_max_count_set_for_stream extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function read_stream_backward_respects_max_count(): void
+    public function read_stream_backward_respects_max_count(): Generator
     {
-        $this->execute(function (): Generator {
+        yield $this->execute(function (): Generator {
             $res = yield $this->conn->readStreamEventsBackwardAsync(
                 $this->stream,
                 -1,
@@ -124,11 +118,10 @@ class when_having_max_count_set_for_stream extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function after_setting_less_strict_max_count_read_stream_forward_reads_more_events(): void
+    public function after_setting_less_strict_max_count_read_stream_forward_reads_more_events(): Generator
     {
-        $this->execute(function (): Generator {
+        yield $this->execute(function (): Generator {
             $res = yield $this->conn->readStreamEventsForwardAsync(
                 $this->stream,
                 0,
@@ -178,11 +171,10 @@ class when_having_max_count_set_for_stream extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function after_setting_more_strict_max_count_read_stream_forward_reads_less_events(): void
+    public function after_setting_more_strict_max_count_read_stream_forward_reads_less_events(): Generator
     {
-        $this->execute(function (): Generator {
+        yield $this->execute(function (): Generator {
             $res = yield $this->conn->readStreamEventsForwardAsync(
                 $this->stream,
                 0,
@@ -232,11 +224,10 @@ class when_having_max_count_set_for_stream extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function after_setting_less_strict_max_count_read_stream_backward_reads_more_events(): void
+    public function after_setting_less_strict_max_count_read_stream_backward_reads_more_events(): Generator
     {
-        $this->execute(function (): Generator {
+        yield $this->execute(function (): Generator {
             $res = yield $this->conn->readStreamEventsBackwardAsync(
                 $this->stream,
                 -1,
@@ -286,11 +277,10 @@ class when_having_max_count_set_for_stream extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function after_setting_more_strict_max_count_read_stream_backward_reads_less_events(): void
+    public function after_setting_more_strict_max_count_read_stream_backward_reads_less_events(): Generator
     {
-        $this->execute(function (): Generator {
+        yield $this->execute(function (): Generator {
             $res = yield $this->conn->readStreamEventsBackwardAsync(
                 $this->stream,
                 -1,

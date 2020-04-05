@@ -13,62 +13,53 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
+use Generator;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\UserCommandFailed;
 use Prooph\EventStore\UserCredentials;
 use ProophTest\EventStoreClient\DefaultData;
-use Throwable;
 
 class enable_disable_user extends TestWithUser
 {
     /**
      * @test
-     * @throws Throwable
      */
-    public function disable_empty_username_throws(): void
+    public function disable_empty_username_throws(): Generator
     {
-        $this->execute(function () {
-            $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
-            yield $this->manager->disableAsync('', DefaultData::adminCredentials());
-        });
+        yield $this->manager->disableAsync('', DefaultData::adminCredentials());
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function enable_empty_username_throws(): void
+    public function enable_empty_username_throws(): Generator
     {
-        $this->execute(function () {
-            $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
-            yield $this->manager->enableAsync('', DefaultData::adminCredentials());
-        });
+        yield $this->manager->enableAsync('', DefaultData::adminCredentials());
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function can_enable_disable_user(): void
+    public function can_enable_disable_user(): Generator
     {
-        $this->execute(function () {
-            yield $this->manager->disableAsync($this->username, DefaultData::adminCredentials());
+        yield $this->manager->disableAsync($this->username, DefaultData::adminCredentials());
 
-            $thrown = false;
+        $thrown = false;
 
-            try {
-                yield $this->manager->disableAsync('foo', DefaultData::adminCredentials());
-            } catch (UserCommandFailed $e) {
-                $thrown = true;
-            }
+        try {
+            yield $this->manager->disableAsync('foo', DefaultData::adminCredentials());
+        } catch (UserCommandFailed $e) {
+            $thrown = true;
+        }
 
-            $this->assertTrue($thrown, UserCommandFailed::class . ' was expected');
+        $this->assertTrue($thrown, UserCommandFailed::class . ' was expected');
 
-            yield $this->manager->enableAsync($this->username, DefaultData::adminCredentials());
+        yield $this->manager->enableAsync($this->username, DefaultData::adminCredentials());
 
-            yield $this->manager->getCurrentUserAsync(new UserCredentials($this->username, 'password'));
-        });
+        yield $this->manager->getCurrentUserAsync(new UserCredentials($this->username, 'password'));
     }
 }

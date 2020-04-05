@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\Deferred;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\Async\PersistentSubscriptionDropped;
@@ -27,7 +27,7 @@ use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\Util\Guid;
 use Throwable;
 
-class deleting_existing_persistent_subscription_with_subscriber extends TestCase
+class deleting_existing_persistent_subscription_with_subscriber extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -37,6 +37,8 @@ class deleting_existing_persistent_subscription_with_subscriber extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->stream = Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
@@ -96,11 +98,10 @@ class deleting_existing_persistent_subscription_with_subscriber extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_subscription_is_dropped(): void
+    public function the_subscription_is_dropped(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $value = yield Promise\timeout($this->called->promise(), 5000);
             $this->assertTrue($value);
         });

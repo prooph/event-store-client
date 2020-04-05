@@ -13,14 +13,13 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\EventReadResult;
 use Prooph\EventStore\Projections\ProjectionDetails;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class when_creating_continuous_projection extends TestCase
+class when_creating_continuous_projection extends AsyncTestCase
 {
     use ProjectionSpecification;
 
@@ -56,11 +55,10 @@ class when_creating_continuous_projection extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_create_projection(): string
+    public function should_create_projection(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             /** @var ProjectionDetails[] $allProjections */
             $allProjections = yield $this->projectionsManager->listContinuousAsync($this->credentials);
 
@@ -83,12 +81,11 @@ class when_creating_continuous_projection extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      * @depends should_create_projection
      */
-    public function should_have_turn_on_emit_to_stream(string $projectionId): void
+    public function should_have_turn_on_emit_to_stream(string $projectionId): Generator
     {
-        $this->execute(function () use ($projectionId): Generator {
+        yield $this->execute(function () use ($projectionId): Generator {
             $event = yield $this->connection->readEventAsync(
                 '$projections-' . $projectionId,
                 0,

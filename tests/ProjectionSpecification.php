@@ -15,7 +15,6 @@ namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
 use Amp\Promise;
-use function Amp\Promise\wait;
 use Amp\Success;
 use Closure;
 use Generator;
@@ -26,7 +25,6 @@ use Prooph\EventStore\UserCredentials;
 use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\Projections\ProjectionsManager;
 use ProophTest\EventStoreClient\Helper\TestConnection;
-use Throwable;
 
 trait ProjectionSpecification
 {
@@ -41,10 +39,9 @@ trait ProjectionSpecification
 
     abstract protected function when(): Generator;
 
-    /** @throws Throwable */
-    protected function execute(Closure $test): void
+    protected function execute(Closure $test): Promise
     {
-        wait(call(function () use ($test): Generator {
+        return call(function () use ($test): Generator {
             $this->credentials = DefaultData::adminCredentials();
             $this->connection = TestConnection::create();
 
@@ -59,13 +56,11 @@ trait ProjectionSpecification
             yield from $this->when();
             yield from $test();
             yield from $this->end();
-        }));
+        });
     }
 
     protected function end(): Generator
     {
-        $this->connection->close();
-
         yield new Success();
     }
 
