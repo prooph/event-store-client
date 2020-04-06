@@ -11,7 +11,6 @@
 
 declare(strict_types=1);
 
-
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
