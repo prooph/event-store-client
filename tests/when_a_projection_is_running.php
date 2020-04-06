@@ -89,7 +89,7 @@ class when_a_projection_is_running extends AsyncTestCase
                 $this->credentials
             );
 
-            $this->assertEquals('{"count":1}', $result);
+            $this->assertSame('{"count":1}', $result);
         });
     }
 

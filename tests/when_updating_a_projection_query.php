@@ -66,7 +66,7 @@ class when_updating_a_projection_query extends AsyncTestCase
                 $this->credentials
             );
 
-            $this->assertEquals($this->newQuery, $query);
+            $this->assertSame($this->newQuery, $query);
         });
     }
 }
