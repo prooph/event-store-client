@@ -36,7 +36,6 @@ class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnecti
 
     private string $streamName = 'TestStream';
     private CatchUpSubscriptionSettings $settings;
-    private EventStoreConnection $connection;
 
     protected function setUpAsync(): Promise
     {
