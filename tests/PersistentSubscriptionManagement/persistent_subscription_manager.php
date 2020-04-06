@@ -110,11 +110,11 @@ class persistent_subscription_manager extends AsyncTestCase
             $details = yield $this->manager->describe($this->stream, 'existing');
             \assert($details instanceof PersistentSubscriptionDetails);
 
-            $this->assertEquals($this->stream, $details->eventStreamId());
-            $this->assertEquals('existing', $details->groupName());
-            $this->assertEquals(2, $details->totalItemsProcessed());
-            $this->assertEquals('Live', $details->status());
-            $this->assertEquals(1, $details->lastKnownEventNumber());
+            $this->assertSame($this->stream, $details->eventStreamId());
+            $this->assertSame('existing', $details->groupName());
+            $this->assertSame(2, $details->totalItemsProcessed());
+            $this->assertSame('Live', $details->status());
+            $this->assertSame(1, $details->lastKnownEventNumber());
         });
     }
 
@@ -198,7 +198,7 @@ class persistent_subscription_manager extends AsyncTestCase
             foreach ($list as $details) {
                 \assert($details instanceof PersistentSubscriptionDetails);
 
-                $this->assertEquals($this->stream, $details->eventStreamId());
+                $this->assertSame($this->stream, $details->eventStreamId());
 
                 if ($details->groupName() === 'existing') {
                     $found = true;

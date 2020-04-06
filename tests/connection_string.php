@@ -22,7 +22,7 @@ class connection_string extends TestCase
     public function can_set_string_value(): void
     {
         $settings = ConnectionString::getConnectionSettings('targethost=testtest');
-        $this->assertEquals('testtest', $settings->targetHost());
+        $this->assertSame('testtest', $settings->targetHost());
     }
 
     /** @test */
@@ -72,7 +72,7 @@ class connection_string extends TestCase
     public function can_set_user_credentials(): void
     {
         $settings = ConnectionString::getConnectionSettings('DefaultUserCredentials=foo:bar');
-        $this->assertEquals('foo', $settings->defaultUserCredentials()->username());
-        $this->assertEquals('bar', $settings->defaultUserCredentials()->password());
+        $this->assertSame('foo', $settings->defaultUserCredentials()->username());
+        $this->assertSame('bar', $settings->defaultUserCredentials()->password());
     }
 }

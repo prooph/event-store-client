@@ -68,6 +68,6 @@ class updating_a_user extends TestWithNode
 
         $this->assertSame($name, $user->loginName());
         $this->assertSame('something', $user->fullName());
-        $this->assertEquals(['bar', 'baz'], $user->groups());
+        $this->assertSame(['bar', 'baz'], $user->groups());
     }
 }

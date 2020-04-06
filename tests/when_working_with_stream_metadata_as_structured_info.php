@@ -48,10 +48,10 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
         \assert($meta instanceof RawStreamMetadataResult);
 
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(0, $meta->metastreamVersion());
-        $this->assertEquals('{}', $meta->streamMetadata());
+        $this->assertSame(0, $meta->metastreamVersion());
+        $this->assertSame('{}', $meta->streamMetadata());
     }
 
     /**
@@ -70,14 +70,14 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $meta = yield $this->connection->getStreamMetadataAsync($this->stream);
         \assert($meta instanceof StreamMetadataResult);
 
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(0, $meta->metastreamVersion());
+        $this->assertSame(0, $meta->metastreamVersion());
         $this->assertEmpty($meta->streamMetadata()->customMetadata());
-        $this->assertEquals($metadata->maxCount(), $meta->streamMetadata()->maxCount());
-        $this->assertEquals($metadata->maxAge(), $meta->streamMetadata()->maxAge());
-        $this->assertEquals($metadata->truncateBefore(), $meta->streamMetadata()->truncateBefore());
-        $this->assertEquals($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
+        $this->assertSame($metadata->maxCount(), $meta->streamMetadata()->maxCount());
+        $this->assertSame($metadata->maxAge(), $meta->streamMetadata()->maxAge());
+        $this->assertSame($metadata->truncateBefore(), $meta->streamMetadata()->truncateBefore());
+        $this->assertSame($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
 
         $metadata = new StreamMetadata(37, 0xBEEFDEAD, 24, 0xDABACABAD);
 
@@ -90,13 +90,13 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $meta = yield $this->connection->getStreamMetadataAsync($this->stream);
         \assert($meta instanceof StreamMetadataResult);
 
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(1, $meta->metastreamVersion());
-        $this->assertEquals($metadata->maxCount(), $meta->streamMetadata()->maxCount());
-        $this->assertEquals($metadata->maxAge(), $meta->streamMetadata()->maxAge());
-        $this->assertEquals($metadata->truncateBefore(), $meta->streamMetadata()->truncateBefore());
-        $this->assertEquals($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
+        $this->assertSame(1, $meta->metastreamVersion());
+        $this->assertSame($metadata->maxCount(), $meta->streamMetadata()->maxCount());
+        $this->assertSame($metadata->maxAge(), $meta->streamMetadata()->maxAge());
+        $this->assertSame($metadata->truncateBefore(), $meta->streamMetadata()->truncateBefore());
+        $this->assertSame($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
 
         $this->expectException(RuntimeException::class);
         $meta->streamMetadata()->getValue('unknown');
@@ -132,13 +132,13 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $meta = yield $this->connection->getStreamMetadataAsync($this->stream);
         \assert($meta instanceof StreamMetadataResult);
 
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(0, $meta->metastreamVersion());
-        $this->assertEquals($metadata->maxCount(), $meta->streamMetadata()->maxCount());
-        $this->assertEquals($metadata->maxAge(), $meta->streamMetadata()->maxAge());
-        $this->assertEquals($metadata->truncateBefore(), $meta->streamMetadata()->truncateBefore());
-        $this->assertEquals($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
+        $this->assertSame(0, $meta->metastreamVersion());
+        $this->assertSame($metadata->maxCount(), $meta->streamMetadata()->maxCount());
+        $this->assertSame($metadata->maxAge(), $meta->streamMetadata()->maxAge());
+        $this->assertSame($metadata->truncateBefore(), $meta->streamMetadata()->truncateBefore());
+        $this->assertSame($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
 
         $metadata = new StreamMetadata(37, 0xBEEFDEAD, 24, 0xDABACABAD);
 
@@ -151,13 +151,13 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $meta = yield $this->connection->getStreamMetadataAsync($this->stream);
         \assert($meta instanceof StreamMetadataResult);
 
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(1, $meta->metastreamVersion());
-        $this->assertEquals($metadata->maxCount(), $meta->streamMetadata()->maxCount());
-        $this->assertEquals($metadata->maxAge(), $meta->streamMetadata()->maxAge());
-        $this->assertEquals($metadata->truncateBefore(), $meta->streamMetadata()->truncateBefore());
-        $this->assertEquals($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
+        $this->assertSame(1, $meta->metastreamVersion());
+        $this->assertSame($metadata->maxCount(), $meta->streamMetadata()->maxCount());
+        $this->assertSame($metadata->maxAge(), $meta->streamMetadata()->maxAge());
+        $this->assertSame($metadata->truncateBefore(), $meta->streamMetadata()->truncateBefore());
+        $this->assertSame($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
     }
 
     /**
@@ -176,13 +176,13 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $meta = yield $this->connection->getStreamMetadataAsync($this->stream);
         \assert($meta instanceof StreamMetadataResult);
 
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(0, $meta->metastreamVersion());
-        $this->assertEquals($metadata->maxCount(), $meta->streamMetadata()->maxCount());
-        $this->assertEquals($metadata->maxAge(), $meta->streamMetadata()->maxAge());
-        $this->assertEquals($metadata->truncateBefore(), $meta->streamMetadata()->truncateBefore());
-        $this->assertEquals($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
+        $this->assertSame(0, $meta->metastreamVersion());
+        $this->assertSame($metadata->maxCount(), $meta->streamMetadata()->maxCount());
+        $this->assertSame($metadata->maxAge(), $meta->streamMetadata()->maxAge());
+        $this->assertSame($metadata->truncateBefore(), $meta->streamMetadata()->truncateBefore());
+        $this->assertSame($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
     }
 
     /**
@@ -207,13 +207,13 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $meta = yield $this->connection->getStreamMetadataAsync($this->stream);
         \assert($meta instanceof StreamMetadataResult);
 
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(0, $meta->metastreamVersion());
-        $this->assertEquals($metadata->maxCount(), $meta->streamMetadata()->maxCount());
-        $this->assertEquals($metadata->maxAge(), $meta->streamMetadata()->maxAge());
-        $this->assertEquals($metadata->truncateBefore(), $meta->streamMetadata()->truncateBefore());
-        $this->assertEquals($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
+        $this->assertSame(0, $meta->metastreamVersion());
+        $this->assertSame($metadata->maxCount(), $meta->streamMetadata()->maxCount());
+        $this->assertSame($metadata->maxAge(), $meta->streamMetadata()->maxAge());
+        $this->assertSame($metadata->truncateBefore(), $meta->streamMetadata()->truncateBefore());
+        $this->assertSame($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
     }
 
     /**
@@ -224,9 +224,9 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $meta = yield $this->connection->getStreamMetadataAsync($this->stream);
         \assert($meta instanceof StreamMetadataResult);
 
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(-1, $meta->metastreamVersion());
+        $this->assertSame(-1, $meta->metastreamVersion());
         $this->assertNull($meta->streamMetadata()->maxCount());
         $this->assertNull($meta->streamMetadata()->maxAge());
         $this->assertNull($meta->streamMetadata()->truncateBefore());
@@ -255,9 +255,9 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $meta = yield $this->connection->getStreamMetadataAsync($this->stream);
         \assert($meta instanceof StreamMetadataResult);
 
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertTrue($meta->isStreamDeleted());
-        $this->assertEquals(EventNumber::DELETED_STREAM, $meta->metastreamVersion());
+        $this->assertSame(EventNumber::DELETED_STREAM, $meta->metastreamVersion());
         $this->assertNull($meta->streamMetadata()->maxCount());
         $this->assertNull($meta->streamMetadata()->maxAge());
         $this->assertNull($meta->streamMetadata()->truncateBefore());
@@ -303,30 +303,30 @@ END;
         $meta = yield $this->connection->getStreamMetadataAsync($this->stream);
         \assert($meta instanceof StreamMetadataResult);
 
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(0, $meta->metastreamVersion());
-        $this->assertEquals(17, $meta->streamMetadata()->maxCount());
-        $this->assertEquals(123321, $meta->streamMetadata()->maxAge());
-        $this->assertEquals(23, $meta->streamMetadata()->truncateBefore());
-        $this->assertEquals(7654321, $meta->streamMetadata()->cacheControl());
+        $this->assertSame(0, $meta->metastreamVersion());
+        $this->assertSame(17, $meta->streamMetadata()->maxCount());
+        $this->assertSame(123321, $meta->streamMetadata()->maxAge());
+        $this->assertSame(23, $meta->streamMetadata()->truncateBefore());
+        $this->assertSame(7654321, $meta->streamMetadata()->cacheControl());
 
         $this->assertNotNull($meta->streamMetadata()->acl());
-        $this->assertEquals('readRole', $meta->streamMetadata()->acl()->readRoles()[0]);
-        $this->assertEquals('writeRole', $meta->streamMetadata()->acl()->writeRoles()[0]);
-        $this->assertEquals('deleteRole', $meta->streamMetadata()->acl()->deleteRoles()[0]);
+        $this->assertSame('readRole', $meta->streamMetadata()->acl()->readRoles()[0]);
+        $this->assertSame('writeRole', $meta->streamMetadata()->acl()->writeRoles()[0]);
+        $this->assertSame('deleteRole', $meta->streamMetadata()->acl()->deleteRoles()[0]);
 
         // meta role removed to allow reading
-        // $this->assertEquals('metaReadRole', $meta->streamMetadata()->acl()->metaReadRoles()[0]);
-        $this->assertEquals('metaWriteRole', $meta->streamMetadata()->acl()->metaWriteRoles()[0]);
+        // $this->assertSame('metaReadRole', $meta->streamMetadata()->acl()->metaReadRoles()[0]);
+        $this->assertSame('metaWriteRole', $meta->streamMetadata()->acl()->metaWriteRoles()[0]);
 
-        $this->assertEquals('a string', $meta->streamMetadata()->getValue('customString'));
-        $this->assertEquals(-179, $meta->streamMetadata()->getValue('customInt'));
-        $this->assertEquals(1.7, $meta->streamMetadata()->getValue('customDouble'));
-        $this->assertEquals(123123123123123123, $meta->streamMetadata()->getValue('customLong'));
+        $this->assertSame('a string', $meta->streamMetadata()->getValue('customString'));
+        $this->assertSame(-179, $meta->streamMetadata()->getValue('customInt'));
+        $this->assertSame(1.7, $meta->streamMetadata()->getValue('customDouble'));
+        $this->assertSame(123123123123123123, $meta->streamMetadata()->getValue('customLong'));
         $this->assertTrue($meta->streamMetadata()->getValue('customBool'));
         $this->assertNull($meta->streamMetadata()->getValue('customNullable'));
-        $this->assertEquals(['subProperty' => 999], $meta->streamMetadata()->getValue('customRawJson'));
+        $this->assertSame(['subProperty' => 999], $meta->streamMetadata()->getValue('customRawJson'));
     }
 
     /**
@@ -362,30 +362,30 @@ END;
         $meta = yield $this->connection->getStreamMetadataAsync($this->stream);
         \assert($meta instanceof StreamMetadataResult);
 
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(0, $meta->metastreamVersion());
-        $this->assertEquals(17, $meta->streamMetadata()->maxCount());
-        $this->assertEquals(123321, $meta->streamMetadata()->maxAge());
-        $this->assertEquals(23, $meta->streamMetadata()->truncateBefore());
-        $this->assertEquals(7654321, $meta->streamMetadata()->cacheControl());
+        $this->assertSame(0, $meta->metastreamVersion());
+        $this->assertSame(17, $meta->streamMetadata()->maxCount());
+        $this->assertSame(123321, $meta->streamMetadata()->maxAge());
+        $this->assertSame(23, $meta->streamMetadata()->truncateBefore());
+        $this->assertSame(7654321, $meta->streamMetadata()->cacheControl());
 
         $this->assertNotNull($meta->streamMetadata()->acl());
-        $this->assertEquals('readRole', $meta->streamMetadata()->acl()->readRoles()[0]);
-        $this->assertEquals('writeRole', $meta->streamMetadata()->acl()->writeRoles()[0]);
-        $this->assertEquals('deleteRole', $meta->streamMetadata()->acl()->deleteRoles()[0]);
+        $this->assertSame('readRole', $meta->streamMetadata()->acl()->readRoles()[0]);
+        $this->assertSame('writeRole', $meta->streamMetadata()->acl()->writeRoles()[0]);
+        $this->assertSame('deleteRole', $meta->streamMetadata()->acl()->deleteRoles()[0]);
 
         // meta role removed to allow reading
-        // $this->assertEquals('metaReadRole', $meta->streamMetadata()->acl()->metaReadRoles()[0]);
-        $this->assertEquals('metaWriteRole', $meta->streamMetadata()->acl()->metaWriteRoles()[0]);
+        // $this->assertSame('metaReadRole', $meta->streamMetadata()->acl()->metaReadRoles()[0]);
+        $this->assertSame('metaWriteRole', $meta->streamMetadata()->acl()->metaWriteRoles()[0]);
 
-        $this->assertEquals('a string', $meta->streamMetadata()->getValue('customString'));
-        $this->assertEquals(-179, $meta->streamMetadata()->getValue('customInt'));
-        $this->assertEquals(1.7, $meta->streamMetadata()->getValue('customDouble'));
-        $this->assertEquals(123123123123123123, $meta->streamMetadata()->getValue('customLong'));
+        $this->assertSame('a string', $meta->streamMetadata()->getValue('customString'));
+        $this->assertSame(-179, $meta->streamMetadata()->getValue('customInt'));
+        $this->assertSame(1.7, $meta->streamMetadata()->getValue('customDouble'));
+        $this->assertSame(123123123123123123, $meta->streamMetadata()->getValue('customLong'));
         $this->assertTrue($meta->streamMetadata()->getValue('customBool'));
         $this->assertNull($meta->streamMetadata()->getValue('customNullable'));
-        $this->assertEquals('{"subProperty": 999}', $meta->streamMetadata()->getValue('customRawJson'));
+        $this->assertSame('{"subProperty": 999}', $meta->streamMetadata()->getValue('customRawJson'));
     }
 
     /**
@@ -409,15 +409,15 @@ END;
         $meta = yield $this->connection->getStreamMetadataAsync($this->stream);
         \assert($meta instanceof StreamMetadataResult);
 
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(0, $meta->metastreamVersion());
+        $this->assertSame(0, $meta->metastreamVersion());
         $this->assertNotNull($meta->streamMetadata()->acl());
 
-        $this->assertEquals(['r1', 'r2', 'r3'], $meta->streamMetadata()->acl()->readRoles());
-        $this->assertEquals(['w1', 'w2'], $meta->streamMetadata()->acl()->writeRoles());
-        $this->assertEquals(['d1', 'd2', 'd3', 'd4'], $meta->streamMetadata()->acl()->deleteRoles());
-        $this->assertEquals(['mw1', 'mw2'], $meta->streamMetadata()->acl()->metaWriteRoles());
+        $this->assertSame(['r1', 'r2', 'r3'], $meta->streamMetadata()->acl()->readRoles());
+        $this->assertSame(['w1', 'w2'], $meta->streamMetadata()->acl()->writeRoles());
+        $this->assertSame(['d1', 'd2', 'd3', 'd4'], $meta->streamMetadata()->acl()->deleteRoles());
+        $this->assertSame(['mw1', 'mw2'], $meta->streamMetadata()->acl()->metaWriteRoles());
     }
 
     /**
@@ -445,14 +445,14 @@ END;
         $meta = yield $this->connection->getStreamMetadataAsync($this->stream);
         \assert($meta instanceof StreamMetadataResult);
 
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(0, $meta->metastreamVersion());
+        $this->assertSame(0, $meta->metastreamVersion());
         $this->assertNotNull($meta->streamMetadata()->acl());
 
-        $this->assertEquals(['r1', 'r2', 'r3'], $meta->streamMetadata()->acl()->readRoles());
-        $this->assertEquals(['w1', 'w2'], $meta->streamMetadata()->acl()->writeRoles());
-        $this->assertEquals(['d1', 'd2', 'd3', 'd4'], $meta->streamMetadata()->acl()->deleteRoles());
-        $this->assertEquals(['mw1', 'mw2'], $meta->streamMetadata()->acl()->metaWriteRoles());
+        $this->assertSame(['r1', 'r2', 'r3'], $meta->streamMetadata()->acl()->readRoles());
+        $this->assertSame(['w1', 'w2'], $meta->streamMetadata()->acl()->writeRoles());
+        $this->assertSame(['d1', 'd2', 'd3', 'd4'], $meta->streamMetadata()->acl()->deleteRoles());
+        $this->assertSame(['mw1', 'mw2'], $meta->streamMetadata()->acl()->metaWriteRoles());
     }
 }

@@ -97,25 +97,25 @@ class creating_a_user extends TestWithNode
 
         $this->assertSame($login, $user->loginName());
         $this->assertSame('ourofull', $user->fullName());
-        $this->assertEquals(['foo', 'bar'], $user->groups());
+        $this->assertSame(['foo', 'bar'], $user->groups());
         $this->assertCount(5, $user->links());
         $this->assertNull($user->dateLastUpdated());
         $this->assertFalse($user->disabled());
 
         $this->assertStringEndsWith('/users/' . $login . '/command/reset-password', $user->links()[0]->href());
-        $this->assertEquals('reset-password', $user->links()[0]->rel());
+        $this->assertSame('reset-password', $user->links()[0]->rel());
 
         $this->assertStringEndsWith('/users/' . $login . '/command/change-password', $user->links()[1]->href());
-        $this->assertEquals('change-password', $user->links()[1]->rel());
+        $this->assertSame('change-password', $user->links()[1]->rel());
 
         $this->assertStringEndsWith('/users/' . $login, $user->links()[2]->href());
-        $this->assertEquals('edit', $user->links()[2]->rel());
+        $this->assertSame('edit', $user->links()[2]->rel());
 
         $this->assertStringEndsWith('/users/' . $login, $user->links()[3]->href());
-        $this->assertEquals('delete', $user->links()[3]->rel());
+        $this->assertSame('delete', $user->links()[3]->rel());
 
         $this->assertStringEndsWith('/users/' . $login . '/command/disable', $user->links()[4]->href());
-        $this->assertEquals('disable', $user->links()[4]->rel());
+        $this->assertSame('disable', $user->links()[4]->rel());
 
         $href = $user->getRelLink('disable');
         $this->assertStringEndsWith('/users/' . $login . '/command/disable', $href);

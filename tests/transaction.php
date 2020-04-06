@@ -302,7 +302,7 @@ class transaction extends EventStoreConnectionTestCase
         yield $transaction1->writeAsync([$event]);
         $result1 = yield $transaction1->commitAsync();
         \assert($result1 instanceof WriteResult);
-        $this->assertEquals(0, $result1->nextExpectedVersion());
+        $this->assertSame(0, $result1->nextExpectedVersion());
 
         $transaction2 = yield $this->connection->startTransactionAsync(
             $stream,
@@ -312,7 +312,7 @@ class transaction extends EventStoreConnectionTestCase
         yield $transaction2->writeAsync([$event]);
         $result2 = yield $transaction2->commitAsync();
         \assert($result2 instanceof WriteResult);
-        $this->assertEquals(0, $result2->nextExpectedVersion());
+        $this->assertSame(0, $result2->nextExpectedVersion());
 
         $result = yield $this->connection->readStreamEventsForwardAsync(
             $stream,

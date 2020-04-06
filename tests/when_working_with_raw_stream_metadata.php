@@ -43,10 +43,10 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
 
         $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
         \assert($meta instanceof RawStreamMetadataResult);
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(0, $meta->metastreamVersion());
-        $this->assertEquals('', $meta->streamMetadata());
+        $this->assertSame(0, $meta->metastreamVersion());
+        $this->assertSame('', $meta->streamMetadata());
     }
 
     /**
@@ -61,10 +61,10 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
 
         $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
         \assert($meta instanceof RawStreamMetadataResult);
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(0, $meta->metastreamVersion());
-        $this->assertEquals('', $meta->streamMetadata());
+        $this->assertSame(0, $meta->metastreamVersion());
+        $this->assertSame('', $meta->streamMetadata());
 
         yield $this->connection->setStreamMetadataAsync(
             $this->stream,
@@ -104,10 +104,10 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
 
         $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
         \assert($meta instanceof RawStreamMetadataResult);
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(0, $meta->metastreamVersion());
-        $this->assertEquals('', $meta->streamMetadata());
+        $this->assertSame(0, $meta->metastreamVersion());
+        $this->assertSame('', $meta->streamMetadata());
 
         yield $this->connection->setStreamMetadataAsync(
             $this->stream,
@@ -116,10 +116,10 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
 
         $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
         \assert($meta instanceof RawStreamMetadataResult);
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(1, $meta->metastreamVersion());
-        $this->assertEquals('', $meta->streamMetadata());
+        $this->assertSame(1, $meta->metastreamVersion());
+        $this->assertSame('', $meta->streamMetadata());
     }
 
     /**
@@ -134,10 +134,10 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
 
         $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
         \assert($meta instanceof RawStreamMetadataResult);
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(0, $meta->metastreamVersion());
-        $this->assertEquals('', $meta->streamMetadata());
+        $this->assertSame(0, $meta->metastreamVersion());
+        $this->assertSame('', $meta->streamMetadata());
     }
 
     /**
@@ -158,10 +158,10 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
 
         $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
         \assert($meta instanceof RawStreamMetadataResult);
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(0, $meta->metastreamVersion());
-        $this->assertEquals('', $meta->streamMetadata());
+        $this->assertSame(0, $meta->metastreamVersion());
+        $this->assertSame('', $meta->streamMetadata());
     }
 
     /**
@@ -190,10 +190,10 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
     {
         $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
         \assert($meta instanceof RawStreamMetadataResult);
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(-1, $meta->metastreamVersion());
-        $this->assertEquals('', $meta->streamMetadata());
+        $this->assertSame(-1, $meta->metastreamVersion());
+        $this->assertSame('', $meta->streamMetadata());
     }
 
     /**
@@ -207,9 +207,9 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
 
         $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
         \assert($meta instanceof RawStreamMetadataResult);
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertTrue($meta->isStreamDeleted());
-        $this->assertEquals(EventNumber::DELETED_STREAM, $meta->metastreamVersion());
-        $this->assertEquals('', $meta->streamMetadata());
+        $this->assertSame(EventNumber::DELETED_STREAM, $meta->metastreamVersion());
+        $this->assertSame('', $meta->streamMetadata());
     }
 }

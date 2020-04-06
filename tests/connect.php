@@ -109,7 +109,7 @@ class connect extends AsyncTestCase
 
         $connection->onClosed(function (ClientClosedEventArgs $args) use ($closed): void {
             $this->assertInstanceOf(EventStoreConnection::class, $args->connection());
-            $this->assertEquals('Reconnection limit reached', $args->reason());
+            $this->assertSame('Reconnection limit reached', $args->reason());
 
             $closed->resolve(true);
         });

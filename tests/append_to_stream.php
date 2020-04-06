@@ -66,9 +66,9 @@ class append_to_stream extends EventStoreConnectionTestCase
         $slice = yield $this->connection->readStreamEventsForwardAsync($stream1, 0, 2, false);
         \assert($slice instanceof StreamEventsSlice);
         $this->assertCount(0, $slice->events());
-        $this->assertEquals($stream1, $slice->stream());
-        $this->assertEquals(0, $slice->fromEventNumber());
-        $this->assertEquals($slice->readDirection()->name(), ReadDirection::forward()->name());
+        $this->assertSame($stream1, $slice->stream());
+        $this->assertSame(0, $slice->fromEventNumber());
+        $this->assertSame($slice->readDirection()->name(), ReadDirection::forward()->name());
 
         $result = yield $this->connection->appendToStreamAsync($stream2, ExpectedVersion::NO_STREAM, []);
         $this->assertSame(-1, $result->nextExpectedVersion());
@@ -450,7 +450,7 @@ class append_to_stream extends EventStoreConnectionTestCase
 
         $this->connection->close();
 
-        $this->assertEquals($event->eventId()->toString(), $readEvent->eventId()->toString());
+        $this->assertSame($event->eventId()->toString(), $readEvent->eventId()->toString());
 
         $url = \sprintf(
             'http://%s:%s/streams/%s/head/backward/1?embed=body',
@@ -485,6 +485,6 @@ class append_to_stream extends EventStoreConnectionTestCase
 
         $eventId = $json['entries'][0]['eventId'];
 
-        $this->assertEquals($event->eventId()->toString(), $eventId);
+        $this->assertSame($event->eventId()->toString(), $eventId);
     }
 }
