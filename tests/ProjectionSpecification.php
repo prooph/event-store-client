@@ -57,14 +57,8 @@ trait ProjectionSpecification
 
             try {
                 $result = yield from $test();
-            } catch (\Throwable $e) {
-                // we throw after end()
-            }
-
-            yield from $this->end();
-
-            if (isset($e)) {
-                throw $e;
+            } finally {
+                yield from $this->end();
             }
 
             return $result;
