@@ -22,7 +22,6 @@ use Amp\TimeoutException;
 use Generator;
 use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
 use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
-use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EventData;
