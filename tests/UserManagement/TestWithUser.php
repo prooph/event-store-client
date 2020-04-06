@@ -13,13 +13,9 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use function Amp\call;
-use function Amp\Promise\wait;
-use Closure;
-use Generator;
+use Amp\Promise;
 use Prooph\EventStore\Util\Guid;
 use ProophTest\EventStoreClient\DefaultData;
-use Throwable;
 
 abstract class TestWithUser extends TestWithNode
 {
@@ -32,19 +28,14 @@ abstract class TestWithUser extends TestWithNode
         $this->username = Guid::generateString();
     }
 
-    /** @throws Throwable */
-    protected function execute(Closure $function): void
+    protected function setUpAsync(): Promise
     {
-        wait(call(function () use ($function): Generator {
-            yield $this->manager->createUserAsync(
-                $this->username,
-                'name',
-                ['foo', 'admins'],
-                'password',
-                DefaultData::adminCredentials()
-            );
-
-            yield from $function();
-        }));
+        return $this->manager->createUserAsync(
+            $this->username,
+            'name',
+            ['foo', 'admins'],
+            'password',
+            DefaultData::adminCredentials()
+        );
     }
 }

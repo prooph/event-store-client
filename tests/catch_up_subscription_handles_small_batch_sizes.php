@@ -17,35 +17,29 @@ use function Amp\call;
 use Amp\Deferred;
 use Amp\Promise;
 use function Amp\Promise\timeout;
-use function Amp\Promise\wait;
 use Amp\Success;
 use Amp\TimeoutException;
-use PHPUnit\Framework\TestCase;
+use Generator;
 use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
 use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
-use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\ResolvedEvent;
-use ProophTest\EventStoreClient\Helper\TestConnection;
-use Throwable;
 
-class catchup_subscription_handles_small_batch_sizes extends TestCase
+class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnectionTestCase
 {
     private const TIMEOUT = 10000;
 
     private string $streamName = 'TestStream';
     private CatchUpSubscriptionSettings $settings;
-    private EventStoreConnection $connection;
 
-    private function setUpTestCase(): Promise
+    protected function setUpAsync(): Promise
     {
-        return call(function () {
-            $this->connection = TestConnection::create();
-            yield $this->connection->connectAsync();
+        return call(function (): Generator {
+            yield parent::setUpAsync();
 
             //Create 500 events
             for ($i = 0; $i < 5; $i++) {
@@ -72,74 +66,55 @@ class catchup_subscription_handles_small_batch_sizes extends TestCase
         return $events;
     }
 
-    private function tearDownTestCase(): void
+    /**
+     * @test
+     */
+    public function catchupSubscriptionToAllHandlesManyEventsWithSmallBatchSize(): Generator
     {
-        $this->connection->close();
+        $deferred = new Deferred();
+
+        yield $this->connection->subscribeToAllFromAsync(
+            null,
+            $this->settings,
+            $this->eventAppearedResolver(),
+            $this->liveProcessingStartedResolver($deferred),
+            null,
+            DefaultData::adminCredentials()
+        );
+
+        try {
+            $result = yield timeout($deferred->promise(), self::TIMEOUT);
+
+            $this->assertTrue($result);
+        } catch (TimeoutException $e) {
+            $this->fail('Timed out waiting for test to complete');
+        }
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function catchupSubscriptionToAllHandlesManyEventsWithSmallBatchSize(): void
+    public function catchupSubscriptionToStreamHandlesManyEventsWithSmallBatchSize(): Generator
     {
-        wait(call(function () {
-            yield $this->setUpTestCase();
+        $deferred = new Deferred();
 
-            $deferred = new Deferred();
+        yield $this->connection->subscribeToStreamFromAsync(
+            $this->streamName,
+            null,
+            $this->settings,
+            $this->eventAppearedResolver(),
+            $this->liveProcessingStartedResolver($deferred),
+            null,
+            DefaultData::adminCredentials()
+        );
 
-            yield $this->connection->subscribeToAllFromAsync(
-                null,
-                $this->settings,
-                $this->eventAppearedResolver(),
-                $this->liveProcessingStartedResolver($deferred),
-                null,
-                DefaultData::adminCredentials()
-            );
+        try {
+            $result = yield timeout($deferred->promise(), self::TIMEOUT);
 
-            try {
-                $result = yield timeout($deferred->promise(), self::TIMEOUT);
-
-                $this->assertTrue($result);
-            } catch (TimeoutException $e) {
-                $this->fail('Timed out waiting for test to complete');
-            }
-
-            $this->tearDownTestCase();
-        }));
-    }
-
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function catchupSubscriptionToStreamHandlesManyEventsWithSmallBatchSize(): void
-    {
-        wait(call(function () {
-            yield $this->setUpTestCase();
-
-            $deferred = new Deferred();
-
-            yield $this->connection->subscribeToStreamFromAsync(
-                $this->streamName,
-                null,
-                $this->settings,
-                $this->eventAppearedResolver(),
-                $this->liveProcessingStartedResolver($deferred),
-                null,
-                DefaultData::adminCredentials()
-            );
-
-            try {
-                $result = yield timeout($deferred->promise(), self::TIMEOUT);
-
-                $this->assertTrue($result);
-            } catch (TimeoutException $e) {
-                $this->fail('Timed out waiting for test to complete');
-            }
-
-            $this->tearDownTestCase();
-        }));
+            $this->assertTrue($result);
+        } catch (TimeoutException $e) {
+            $this->fail('Timed out waiting for test to complete');
+        }
     }
 
     private function eventAppearedResolver(): EventAppearedOnCatchupSubscription

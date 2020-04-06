@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\Deferred;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EventData;
@@ -26,9 +26,8 @@ use Prooph\EventStore\PersistentSubscriptionNakEventAction;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class when_writing_and_subscribing_to_normal_events_manual_nack extends TestCase
+class when_writing_and_subscribing_to_normal_events_manual_nack extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -43,6 +42,8 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->streamName = Guid::generateAsHex();
         $this->groupName = Guid::generateAsHex();
         $this->eventsReceived = new Deferred();
@@ -55,24 +56,23 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends TestCase
 
     /**
      * @doesNotPerformAssertions
-     * @throws Throwable
      */
-    public function test(): void
+    public function test(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $settings = PersistentSubscriptionSettings::create()
                 ->startFromCurrent()
                 ->resolveLinkTos()
                 ->build();
 
-            yield $this->conn->createPersistentSubscriptionAsync(
+            yield $this->connection->createPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 $settings,
                 DefaultData::adminCredentials()
             );
 
-            yield $this->conn->connectToPersistentSubscriptionAsync(
+            yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 new class($this->eventReceivedCount, $this->eventsReceived) implements EventAppearedOnPersistentSubscription {
@@ -108,7 +108,7 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends TestCase
             for ($i = 0; $i < self::EVENT_WRITE_COUNT; $i++) {
                 $eventData = new EventData(null, 'SomeEvent', false);
 
-                yield $this->conn->appendToStreamAsync(
+                yield $this->connection->appendToStreamAsync(
                     $this->streamName,
                     ExpectedVersion::ANY,
                     [$eventData],

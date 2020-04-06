@@ -13,69 +13,67 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
 use Amp\Deferred;
+use Amp\PHPUnit\AsyncTestCase;
 use function Amp\Promise\timeout;
-use function Amp\Promise\wait;
 use Amp\TimeoutException;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStoreClient\ConnectionSettingsBuilder;
 use Prooph\EventStoreClient\EventStoreConnectionFactory;
 
-class not_connected_tests extends TestCase
+class not_connected_tests extends AsyncTestCase
 {
     /**
      * @test
      * @doesNotPerformAssertions
      */
-    public function should_timeout_connection_after_configured_amount_time_on_connect(): void
+    public function should_timeout_connection_after_configured_amount_time_on_connect(): \Generator
     {
-        wait(call(function () {
-            $settingsBuilder = (new ConnectionSettingsBuilder())
-                ->limitReconnectionsTo(0)
-                ->setReconnectionDelayTo(0)
-                ->failOnNoServerResponse()
-                ->withConnectionTimeoutOf(1000);
+        $settingsBuilder = (new ConnectionSettingsBuilder())
+            ->limitReconnectionsTo(0)
+            ->setReconnectionDelayTo(0)
+            ->failOnNoServerResponse()
+            ->withConnectionTimeoutOf(1000);
 
-            $ip = '8.8.8.8'; //NOTE: This relies on Google DNS server being configured to swallow nonsense traffic
-            $port = 4567;
+        $ip = '8.8.8.8'; //NOTE: This relies on Google DNS server being configured to swallow nonsense traffic
+        $port = 4567;
 
-            $connection = EventStoreConnectionFactory::createFromEndPoint(
-                new EndPoint($ip, $port),
-                $settingsBuilder->build(),
-                'test-connection'
-            );
+        $connection = EventStoreConnectionFactory::createFromEndPoint(
+            new EndPoint($ip, $port),
+            $settingsBuilder->build(),
+            'test-connection'
+        );
 
-            $deferred = new Deferred();
+        $deferred = new Deferred();
 
-            $connection->onConnected(function () {
-                \var_dump('connected');
-            });
+        $connection->onConnected(function (): void {
+            \var_dump('connected');
+        });
 
-            $connection->onReconnecting(function () {
-                \var_dump('reconnecting');
-            });
+        $connection->onReconnecting(function (): void {
+            \var_dump('reconnecting');
+        });
 
-            $connection->onDisconnected(function () {
-                \var_dump('disconnected');
-            });
+        $connection->onDisconnected(function (): void {
+            \var_dump('disconnected');
+        });
 
-            $connection->onErrorOccurred(function () {
-                \var_dump('error');
-            });
+        $connection->onErrorOccurred(function (): void {
+            \var_dump('error');
+        });
 
-            $connection->onClosed(function () use ($deferred): void {
-                $deferred->resolve();
-            });
+        $connection->onClosed(function () use ($deferred): void {
+            $deferred->resolve();
+        });
 
-            yield $connection->connectAsync();
+        yield $connection->connectAsync();
 
-            try {
-                yield timeout($deferred->promise(), 5000);
-            } catch (TimeoutException $e) {
-                $this->fail('Connection timeout took too long');
-            }
-        }));
+        try {
+            yield timeout($deferred->promise(), 5000);
+        } catch (TimeoutException $e) {
+            $this->fail('Connection timeout took too long');
+        }
+
+        $connection->close();
     }
 }

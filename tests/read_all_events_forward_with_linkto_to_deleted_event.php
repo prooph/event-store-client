@@ -13,13 +13,12 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\StreamEventsSlice;
-use Throwable;
 
-class read_all_events_forward_with_linkto_to_deleted_event extends TestCase
+class read_all_events_forward_with_linkto_to_deleted_event extends AsyncTestCase
 {
     use SpecificationWithLinkToToDeletedEvents;
 
@@ -27,7 +26,7 @@ class read_all_events_forward_with_linkto_to_deleted_event extends TestCase
 
     protected function when(): Generator
     {
-        $this->read = yield $this->conn->readStreamEventsForwardAsync(
+        $this->read = yield $this->connection->readStreamEventsForwardAsync(
             $this->linkedStreamName,
             0,
             1
@@ -36,11 +35,10 @@ class read_all_events_forward_with_linkto_to_deleted_event extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function one_event_is_read(): void
+    public function one_event_is_read(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->assertCount(1, $this->read->events());
 
             yield new Success();
@@ -49,11 +47,10 @@ class read_all_events_forward_with_linkto_to_deleted_event extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_linked_event_is_not_resolved(): void
+    public function the_linked_event_is_not_resolved(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->assertNull($this->read->events()[0]->event());
 
             yield new Success();
@@ -62,11 +59,10 @@ class read_all_events_forward_with_linkto_to_deleted_event extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_link_event_is_included(): void
+    public function the_link_event_is_included(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->assertNotNull($this->read->events()[0]->originalEvent());
 
             yield new Success();
@@ -75,11 +71,10 @@ class read_all_events_forward_with_linkto_to_deleted_event extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_event_is_not_resolved(): void
+    public function the_event_is_not_resolved(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->assertFalse($this->read->events()[0]->isResolved());
 
             yield new Success();

@@ -13,14 +13,13 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class deleting_persistent_subscription_group_without_permissions extends TestCase
+class deleting_persistent_subscription_group_without_permissions extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -28,6 +27,8 @@ class deleting_persistent_subscription_group_without_permissions extends TestCas
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->stream = Guid::generateAsHex();
     }
 
@@ -38,14 +39,13 @@ class deleting_persistent_subscription_group_without_permissions extends TestCas
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_delete_fails_with_access_denied(): void
+    public function the_delete_fails_with_access_denied(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(AccessDenied::class);
 
-            yield $this->conn->deletePersistentSubscriptionAsync(
+            yield $this->connection->deletePersistentSubscriptionAsync(
                 $this->stream,
                 Guid::generateAsHex()
             );

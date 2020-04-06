@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
-use function Amp\Promise\wait;
+use Amp\PHPUnit\AsyncTestCase;
+use Amp\Promise;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Async\EventStoreTransaction;
 use Prooph\EventStore\EventData;
@@ -28,172 +28,152 @@ use Prooph\EventStore\Util\Guid;
 use Prooph\EventStore\WriteResult;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
-use Throwable;
 
-class when_committing_empty_transaction extends TestCase
+class when_committing_empty_transaction extends AsyncTestCase
 {
     private EventStoreConnection $connection;
     private EventData $firstEvent;
     private string $stream;
 
-    protected function setUp(): void
+    protected function setUpAsync(): Promise
     {
-        $this->firstEvent = TestEvent::newTestEvent();
-        $this->connection = TestConnection::create();
-        $this->stream = Guid::generateAsHex();
+        return call(function (): Generator {
+            $this->firstEvent = TestEvent::newTestEvent();
+            $this->connection = TestConnection::create();
+            $this->stream = Guid::generateAsHex();
+
+            yield $this->connection->connectAsync();
+
+            $result = yield $this->connection->appendToStreamAsync(
+                $this->stream,
+                ExpectedVersion::NO_STREAM,
+                [$this->firstEvent, TestEvent::newTestEvent(), TestEvent::newTestEvent()]
+            );
+            \assert($result instanceof WriteResult);
+
+            $this->assertSame(2, $result->nextExpectedVersion());
+
+            $transaction = yield $this->connection->startTransactionAsync(
+                $this->stream,
+                2
+            );
+            \assert($transaction instanceof EventStoreTransaction);
+
+            $result = yield $transaction->commitAsync();
+            \assert($result instanceof WriteResult);
+
+            $this->assertSame(2, $result->nextExpectedVersion());
+        });
     }
 
-    private function bootstrap(): Generator
+    protected function tearDownAsync(): Promise
     {
-        yield $this->connection->connectAsync();
+        $this->connection->close();
 
+        return parent::tearDownAsync();
+    }
+
+    /**
+     * @test
+     */
+    public function following_append_with_correct_expected_version_are_commited_correctly(): Generator
+    {
+        $result = yield $this->connection->appendToStreamAsync(
+            $this->stream,
+            2,
+            TestEvent::newAmount(2)
+        );
+        \assert($result instanceof WriteResult);
+
+        $this->assertSame(4, $result->nextExpectedVersion());
+
+        $result = yield $this->connection->readStreamEventsForwardAsync(
+            $this->stream,
+            0,
+            100,
+            false
+        );
+        \assert($result instanceof StreamEventsSlice);
+
+        $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
+        $this->assertCount(5, $result->events());
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->assertSame($i, $result->events()[$i]->originalEventNumber());
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function following_append_with_expected_version_any_are_commited_correctly(): Generator
+    {
+        $result = yield $this->connection->appendToStreamAsync(
+            $this->stream,
+            ExpectedVersion::ANY,
+            TestEvent::newAmount(2)
+        );
+        \assert($result instanceof WriteResult);
+
+        $this->assertSame(4, $result->nextExpectedVersion());
+
+        $result = yield $this->connection->readStreamEventsForwardAsync(
+            $this->stream,
+            0,
+            100,
+            false
+        );
+        \assert($result instanceof StreamEventsSlice);
+
+        $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
+        $this->assertCount(5, $result->events());
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->assertSame($i, $result->events()[$i]->originalEventNumber());
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function committing_first_event_with_expected_version_no_stream_is_idempotent(): Generator
+    {
         $result = yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::NO_STREAM,
-            [$this->firstEvent, TestEvent::newTestEvent(), TestEvent::newTestEvent()]
+            [$this->firstEvent]
         );
         \assert($result instanceof WriteResult);
 
-        $this->assertSame(2, $result->nextExpectedVersion());
+        $this->assertSame(0, $result->nextExpectedVersion());
 
-        $transaction = yield $this->connection->startTransactionAsync(
+        $result = yield $this->connection->readStreamEventsForwardAsync(
             $this->stream,
-            2
+            0,
+            100,
+            false
         );
-        \assert($transaction instanceof EventStoreTransaction);
+        \assert($result instanceof StreamEventsSlice);
 
-        $result = yield $transaction->commitAsync();
-        \assert($result instanceof WriteResult);
+        $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
+        $this->assertCount(3, $result->events());
 
-        $this->assertSame(2, $result->nextExpectedVersion());
-    }
-
-    protected function tearDown(): void
-    {
-        $this->connection->close();
+        for ($i = 0; $i < 3; $i++) {
+            $this->assertSame($i, $result->events()[$i]->originalEventNumber());
+        }
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function following_append_with_correct_expected_version_are_commited_correctly(): void
+    public function trying_to_append_new_events_with_expected_version_no_stream_fails(): Generator
     {
-        wait(call(function () {
-            yield from $this->bootstrap();
+        $this->expectException(WrongExpectedVersion::class);
 
-            $result = yield $this->connection->appendToStreamAsync(
-                $this->stream,
-                2,
-                TestEvent::newAmount(2)
-            );
-            \assert($result instanceof WriteResult);
-
-            $this->assertSame(4, $result->nextExpectedVersion());
-
-            $result = yield $this->connection->readStreamEventsForwardAsync(
-                $this->stream,
-                0,
-                100,
-                false
-            );
-            \assert($result instanceof StreamEventsSlice);
-
-            $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
-            $this->assertCount(5, $result->events());
-
-            for ($i = 0; $i < 5; $i++) {
-                $this->assertSame($i, $result->events()[$i]->originalEventNumber());
-            }
-        }));
-    }
-
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function following_append_with_expected_version_any_are_commited_correctly(): void
-    {
-        wait(call(function () {
-            yield from $this->bootstrap();
-
-            $result = yield $this->connection->appendToStreamAsync(
-                $this->stream,
-                ExpectedVersion::ANY,
-                TestEvent::newAmount(2)
-            );
-            \assert($result instanceof WriteResult);
-
-            $this->assertSame(4, $result->nextExpectedVersion());
-
-            $result = yield $this->connection->readStreamEventsForwardAsync(
-                $this->stream,
-                0,
-                100,
-                false
-            );
-            \assert($result instanceof StreamEventsSlice);
-
-            $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
-            $this->assertCount(5, $result->events());
-
-            for ($i = 0; $i < 5; $i++) {
-                $this->assertSame($i, $result->events()[$i]->originalEventNumber());
-            }
-        }));
-    }
-
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function committing_first_event_with_expected_version_no_stream_is_idempotent(): void
-    {
-        wait(call(function () {
-            yield from $this->bootstrap();
-
-            $result = yield $this->connection->appendToStreamAsync(
-                $this->stream,
-                ExpectedVersion::NO_STREAM,
-                [$this->firstEvent]
-            );
-            \assert($result instanceof WriteResult);
-
-            $this->assertSame(0, $result->nextExpectedVersion());
-
-            $result = yield $this->connection->readStreamEventsForwardAsync(
-                $this->stream,
-                0,
-                100,
-                false
-            );
-            \assert($result instanceof StreamEventsSlice);
-
-            $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
-            $this->assertCount(3, $result->events());
-
-            for ($i = 0; $i < 3; $i++) {
-                $this->assertSame($i, $result->events()[$i]->originalEventNumber());
-            }
-        }));
-    }
-
-    /**
-     * @test
-     * @throws Throwable
-     */
-    public function trying_to_append_new_events_with_expected_version_no_stream_fails(): void
-    {
-        wait(call(function () {
-            yield from $this->bootstrap();
-
-            $this->expectException(WrongExpectedVersion::class);
-
-            yield $this->connection->appendToStreamAsync(
-                $this->stream,
-                ExpectedVersion::NO_STREAM,
-                [TestEvent::newTestEvent()]
-            );
-        }));
+        yield $this->connection->appendToStreamAsync(
+            $this->stream,
+            ExpectedVersion::NO_STREAM,
+            [TestEvent::newTestEvent()]
+        );
     }
 }

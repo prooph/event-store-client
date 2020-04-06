@@ -13,13 +13,12 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Projections\ProjectionDetails;
-use Throwable;
 
-class when_listing_one_time_projections extends TestCase
+class when_listing_one_time_projections extends AsyncTestCase
 {
     use ProjectionSpecification;
 
@@ -38,11 +37,10 @@ class when_listing_one_time_projections extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_return_continuous_projections(): void
+    public function should_return_continuous_projections(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->assertNotEmpty($this->result);
 
             yield new Success();

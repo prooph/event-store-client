@@ -13,18 +13,17 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class connect_to_existing_persistent_subscription_with_permissions extends TestCase
+class connect_to_existing_persistent_subscription_with_permissions extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -34,6 +33,8 @@ class connect_to_existing_persistent_subscription_with_permissions extends TestC
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->stream = Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
@@ -43,14 +44,14 @@ class connect_to_existing_persistent_subscription_with_permissions extends TestC
 
     protected function when(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             'agroupname17',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        $this->sub = $this->conn->connectToPersistentSubscriptionAsync(
+        $this->sub = $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             'agroupname17',
             new class() implements EventAppearedOnPersistentSubscription {
@@ -67,11 +68,10 @@ class connect_to_existing_persistent_subscription_with_permissions extends TestC
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_subscription_suceeds(): void
+    public function the_subscription_suceeds(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->assertNotNull(yield $this->sub);
         });
     }

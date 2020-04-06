@@ -15,13 +15,11 @@ namespace ProophTest\EventStoreClient\Security;
 
 use function Amp\call;
 use Amp\Deferred;
-use Amp\Delayed;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Closure;
 use Generator;
-use PHPUnit\Framework\Constraint\Exception as ExceptionConstraint;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Async\EventStoreTransaction;
@@ -37,17 +35,15 @@ use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\UserManagement\UsersManager;
 use ProophTest\EventStoreClient\Helper\TestConnection;
-use Throwable;
 
-abstract class AuthenticationTestCase extends TestCase
+abstract class AuthenticationTestCase extends AsyncTestCase
 {
     protected ?EventStoreConnection $connection;
     protected ?UserCredentials $userCredentials = null;
 
-    /** @throws Throwable */
-    protected function setUp(): void
+    protected function setUpAsync(): Promise
     {
-        Promise\wait(call(function (): Generator {
+        return call(function (): Generator {
             $manager = new UsersManager(
                 TestConnection::httpEndPoint(),
                 5000,
@@ -157,21 +153,20 @@ abstract class AuthenticationTestCase extends TestCase
                 new UserCredentials('adm', 'admpa$$')
             );
 
-            $this->connection = TestConnection::create($this->userCredentials);
-            yield $this->connection->connectAsync();
+            $connection->close();
 
-            yield new Delayed(100);
-        }));
+            $this->connection = TestConnection::create($this->userCredentials);
+
+            yield $this->connection->connectAsync();
+        });
     }
 
-    /** @throws Throwable */
-    protected function tearDown(): void
+    protected function tearDownAsync(): Promise
     {
         $this->userCredentials = null;
         $this->connection->close();
-        $this->connection = null;
 
-        Promise\wait(call(function (): Generator {
+        return call(function (): Generator {
             $manager = new UsersManager(
                 TestConnection::httpEndPoint(),
                 5000,
@@ -204,7 +199,9 @@ abstract class AuthenticationTestCase extends TestCase
                 new SystemSettings(),
                 $this->adminUser()
             );
-        }));
+
+            $connection->close();
+        });
     }
 
     protected function readEvent(string $streamId, ?string $login, ?string $password): Promise
@@ -411,21 +408,11 @@ abstract class AuthenticationTestCase extends TestCase
 
     protected function expectExceptionFromCallback(string $expectedException, Closure $callback): Promise
     {
-        $deferred = new Deferred();
+        return call(function () use ($expectedException, $callback): Generator {
+            $this->expectException($expectedException);
 
-        $promise = $callback();
-        $promise->onResolve(function ($e, $r) use ($deferred, $expectedException): void {
-            $this->assertThat(
-                $e,
-                new ExceptionConstraint(
-                    $expectedException
-                )
-            );
-
-            $deferred->resolve($r);
+            yield $callback();
         });
-
-        return $deferred->promise();
     }
 
     protected function expectNoExceptionFromCallback(Closure $callback): Promise

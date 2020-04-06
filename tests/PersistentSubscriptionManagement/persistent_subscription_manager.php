@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient\PersistentSubscriptionManagement;
 
 use Amp\Delayed;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EndPoint;
@@ -34,9 +34,8 @@ use Prooph\EventStoreClient\PersistentSubscriptions\PersistentSubscriptionsManag
 use ProophTest\EventStoreClient\CountdownEvent;
 use ProophTest\EventStoreClient\DefaultData;
 use ProophTest\EventStoreClient\SpecificationWithConnection;
-use Throwable;
 
-class persistent_subscription_manager extends TestCase
+class persistent_subscription_manager extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -47,6 +46,8 @@ class persistent_subscription_manager extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->manager = new PersistentSubscriptionsManager(
             new EndPoint(
                 (string) \getenv('ES_HOST'),
@@ -65,14 +66,14 @@ class persistent_subscription_manager extends TestCase
 
     protected function when(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             'existing',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        $this->sub = yield $this->conn->connectToPersistentSubscriptionAsync(
+        $this->sub = yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             'existing',
             new class() implements EventAppearedOnPersistentSubscription {
@@ -90,7 +91,7 @@ class persistent_subscription_manager extends TestCase
             DefaultData::adminCredentials()
         );
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::ANY,
             [
@@ -102,11 +103,10 @@ class persistent_subscription_manager extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function can_describe_persistent_subscription(): void
+    public function can_describe_persistent_subscription(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $details = yield $this->manager->describe($this->stream, 'existing');
             \assert($details instanceof PersistentSubscriptionDetails);
 
@@ -120,11 +120,10 @@ class persistent_subscription_manager extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function cannot_describe_persistent_subscription_with_empty_stream_name(): void
+    public function cannot_describe_persistent_subscription_with_empty_stream_name(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
             yield $this->manager->describe('', 'existing');
         });
@@ -132,11 +131,10 @@ class persistent_subscription_manager extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function cannot_describe_persistent_subscription_with_empty_group_name(): void
+    public function cannot_describe_persistent_subscription_with_empty_group_name(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
             yield $this->manager->describe($this->stream, '');
         });
@@ -144,11 +142,10 @@ class persistent_subscription_manager extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function can_list_all_persistent_subscriptions(): void
+    public function can_list_all_persistent_subscriptions(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $list = yield $this->manager->list();
 
             $found = false;
@@ -168,11 +165,10 @@ class persistent_subscription_manager extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function can_list_all_persistent_subscriptions_using_empty_string(): void
+    public function can_list_all_persistent_subscriptions_using_empty_string(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $list = yield $this->manager->list('');
 
             $found = false;
@@ -192,11 +188,10 @@ class persistent_subscription_manager extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function can_list_persistent_subscriptions_for_stream(): void
+    public function can_list_persistent_subscriptions_for_stream(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $list = yield $this->manager->list($this->stream);
 
             $found = false;
@@ -217,14 +212,13 @@ class persistent_subscription_manager extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function can_replay_parked_messages(): void
+    public function can_replay_parked_messages(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             yield $this->sub->stop();
 
-            $this->sub = yield $this->conn->connectToPersistentSubscriptionAsync(
+            $this->sub = yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->stream,
                 'existing',
                 new class() implements EventAppearedOnPersistentSubscription {
@@ -248,7 +242,7 @@ class persistent_subscription_manager extends TestCase
                 DefaultData::adminCredentials()
             );
 
-            yield $this->conn->appendToStreamAsync(
+            yield $this->connection->appendToStreamAsync(
                 $this->stream,
                 ExpectedVersion::ANY,
                 [
@@ -265,7 +259,7 @@ class persistent_subscription_manager extends TestCase
 
             $event = new CountdownEvent(2);
 
-            yield $this->conn->connectToPersistentSubscriptionAsync(
+            yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->stream,
                 'existing',
                 new class($event) implements EventAppearedOnPersistentSubscription {
@@ -304,11 +298,10 @@ class persistent_subscription_manager extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function cannot_replay_parked_with_empty_stream_name(): void
+    public function cannot_replay_parked_with_empty_stream_name(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
             yield $this->manager->replayParkedMessages('', 'existing');
         });
@@ -316,11 +309,10 @@ class persistent_subscription_manager extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function cannot_replay_parked_with_empty_group_name(): void
+    public function cannot_replay_parked_with_empty_group_name(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
             yield $this->manager->replayParkedMessages($this->stream, '');
         });

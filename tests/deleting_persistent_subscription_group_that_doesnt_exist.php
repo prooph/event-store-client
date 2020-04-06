@@ -13,14 +13,13 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class deleting_persistent_subscription_group_that_doesnt_exist extends TestCase
+class deleting_persistent_subscription_group_that_doesnt_exist extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -28,6 +27,8 @@ class deleting_persistent_subscription_group_that_doesnt_exist extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->stream = Guid::generateAsHex();
     }
 
@@ -38,14 +39,13 @@ class deleting_persistent_subscription_group_that_doesnt_exist extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_delete_fails_with_argument_exception(): void
+    public function the_delete_fails_with_argument_exception(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(InvalidOperationException::class);
 
-            yield $this->conn->deletePersistentSubscriptionAsync(
+            yield $this->connection->deletePersistentSubscriptionAsync(
                 $this->stream,
                 Guid::generateAsHex(),
                 DefaultData::adminCredentials()

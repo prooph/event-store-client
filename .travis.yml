@@ -21,11 +21,11 @@ cache:
     - $HOME/.local
 
 before_script:
-  - echo downloading EventStore 5.0.5
-  - wget https://eventstore.org/downloads/ubuntu/EventStore-OSS-Linux-Ubuntu-16.04-v5.0.5.tar.gz
+  - echo downloading EventStore 5.0.8
+  - wget https://eventstore.org/downloads/ubuntu/EventStore-OSS-Linux-Ubuntu-16.04-v5.0.8.tar.gz
   - echo extracting event-store
-  - tar xf EventStore-OSS-Linux-Ubuntu-16.04-v5.0.5.tar.gz
-  - cd EventStore-OSS-Linux-Ubuntu-16.04-v5.0.5
+  - tar xf EventStore-OSS-Linux-Ubuntu-16.04-v5.0.8.tar.gz
+  - cd EventStore-OSS-Linux-Ubuntu-16.04-v5.0.8
   - echo starting event-store
   - ./run-node.sh --run-projections=all --mem-db --ext-tcp-heartbeat-interval 5000 --ext-tcp-heartbeat-timeout 1500 > /dev/null &
   - cd ..

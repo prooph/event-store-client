@@ -15,10 +15,10 @@ namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
 use Amp\Deferred;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EventData;
@@ -27,9 +27,8 @@ use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class connect_to_existing_persistent_subscription_with_start_from_beginning_and_no_stream extends TestCase
+class connect_to_existing_persistent_subscription_with_start_from_beginning_and_no_stream extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -43,6 +42,8 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->stream = '$' . Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
@@ -53,14 +54,14 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
 
     protected function given(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        yield $this->conn->connectToPersistentSubscriptionAsync(
+        yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             new class($this->set, $this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
@@ -102,7 +103,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
             for ($i = 0; $i < 10; $i++) {
                 $this->ids[$i] = EventId::generate();
 
-                yield $this->conn->appendToStreamAsync(
+                yield $this->connection->appendToStreamAsync(
                     $this->stream,
                     ExpectedVersion::ANY,
                     [new EventData($this->ids[$i], 'test', true, '{"foo":"bar"}')],
@@ -119,11 +120,10 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_subscription_gets_event_zero_as_its_first_event(): void
+    public function the_subscription_gets_event_zero_as_its_first_event(): Generator
     {
-        $this->execute(function (): Generator {
+        yield $this->execute(function (): Generator {
             $value = yield Promise\timeout($this->resetEvent->promise(), 10000);
             $this->assertTrue($value);
             $this->assertSame(0, $this->firstEvent->originalEventNumber());

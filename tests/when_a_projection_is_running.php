@@ -13,12 +13,11 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class when_a_projection_is_running extends TestCase
+class when_a_projection_is_running extends AsyncTestCase
 {
     use ProjectionSpecification;
 
@@ -51,11 +50,10 @@ class when_a_projection_is_running extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_be_able_to_get_the_projection_state(): void
+    public function should_be_able_to_get_the_projection_state(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $state = yield $this->projectionsManager->getStateAsync(
                 $this->projectionName,
                 $this->credentials
@@ -67,11 +65,10 @@ class when_a_projection_is_running extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_be_able_to_get_the_projection_status(): void
+    public function should_be_able_to_get_the_projection_status(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $status = yield $this->projectionsManager->getStatusAsync(
                 $this->projectionName,
                 $this->credentials
@@ -83,11 +80,10 @@ class when_a_projection_is_running extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_be_able_to_get_the_projection_result(): void
+    public function should_be_able_to_get_the_projection_result(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $result = yield $this->projectionsManager->getResultAsync(
                 $this->projectionName,
                 $this->credentials
@@ -99,11 +95,10 @@ class when_a_projection_is_running extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_be_able_to_get_the_projection_query(): void
+    public function should_be_able_to_get_the_projection_query(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $query = yield $this->projectionsManager->getQueryAsync(
                 $this->projectionName,
                 $this->credentials

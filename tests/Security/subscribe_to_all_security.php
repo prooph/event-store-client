@@ -13,66 +13,49 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\Security;
 
-use function Amp\call;
-use function Amp\Promise\wait;
+use Generator;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\NotAuthenticated;
-use Throwable;
 
 class subscribe_to_all_security extends AuthenticationTestCase
 {
     /**
      * @test
-     * @throws Throwable
      */
-    public function subscribing_to_all_with_not_existing_credentials_is_not_authenticated(): void
+    public function subscribing_to_all_with_not_existing_credentials_is_not_authenticated(): Generator
     {
-        wait(call(function () {
-            yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->subscribeToAll('badlogin', 'badpass'));
-        }));
+        yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->subscribeToAll('badlogin', 'badpass'));
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function subscribing_to_all_with_no_credentials_is_denied(): void
+    public function subscribing_to_all_with_no_credentials_is_denied(): Generator
     {
-        wait(call(function () {
-            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->subscribeToAll(null, null));
-        }));
+        yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->subscribeToAll(null, null));
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function subscribing_to_all_with_not_authorized_user_credentials_is_denied(): void
+    public function subscribing_to_all_with_not_authorized_user_credentials_is_denied(): Generator
     {
-        wait(call(function () {
-            yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->subscribeToAll('user2', 'pa$$2'));
-        }));
+        yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->subscribeToAll('user2', 'pa$$2'));
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function subscribing_to_all_with_authorized_user_credentials_succeeds(): void
+    public function subscribing_to_all_with_authorized_user_credentials_succeeds(): Generator
     {
-        wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(fn () => $this->subscribeToAll('user1', 'pa$$1'));
-        }));
+        yield $this->expectNoExceptionFromCallback(fn () => $this->subscribeToAll('user1', 'pa$$1'));
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function subscribing_to_all_with_admin_user_credentials_succeeds(): void
+    public function subscribing_to_all_with_admin_user_credentials_succeeds(): Generator
     {
-        wait(call(function () {
-            yield $this->expectNoExceptionFromCallback(fn () => $this->subscribeToAll('adm', 'admpa$$'));
-        }));
+        yield $this->expectNoExceptionFromCallback(fn () => $this->subscribeToAll('adm', 'admpa$$'));
     }
 }

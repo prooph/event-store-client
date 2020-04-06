@@ -13,82 +13,70 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
+use Generator;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\UserCommandFailed;
 use Prooph\EventStore\Transport\Http\HttpStatusCode;
 use Prooph\EventStore\UserCredentials;
 use ProophTest\EventStoreClient\DefaultData;
-use Throwable;
 
 class change_password extends TestWithUser
 {
     /**
      * @test
-     * @throws Throwable
      */
-    public function empty_username_throws(): void
+    public function empty_username_throws(): Generator
     {
-        $this->execute(function () {
-            $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
-            yield $this->manager->changePasswordAsync('', 'oldPassword', 'newPassword', DefaultData::adminCredentials());
-        });
+        yield $this->manager->changePasswordAsync('', 'oldPassword', 'newPassword', DefaultData::adminCredentials());
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function empty_current_password_throws(): void
+    public function empty_current_password_throws(): Generator
     {
-        $this->execute(function () {
-            $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
-            yield $this->manager->changePasswordAsync($this->username, '', 'newPassword', DefaultData::adminCredentials());
-        });
+        yield $this->manager->changePasswordAsync($this->username, '', 'newPassword', DefaultData::adminCredentials());
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function empty_new_password_throws(): void
+    public function empty_new_password_throws(): Generator
     {
-        $this->execute(function () {
-            $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
-            yield $this->manager->changePasswordAsync($this->username, 'oldPassword', '', DefaultData::adminCredentials());
-        });
+        yield $this->manager->changePasswordAsync($this->username, 'oldPassword', '', DefaultData::adminCredentials());
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function can_change_password(): void
+    public function can_change_password(): Generator
     {
-        $this->execute(function () {
+        yield $this->manager->changePasswordAsync(
+            $this->username,
+            'password',
+            'fubar',
+            new UserCredentials($this->username, 'password')
+        );
+
+        $this->expectException(UserCommandFailed::class);
+
+        try {
             yield $this->manager->changePasswordAsync(
                 $this->username,
                 'password',
-                'fubar',
+                'foobar',
                 new UserCredentials($this->username, 'password')
             );
+        } catch (UserCommandFailed $e) {
+            $this->assertSame(HttpStatusCode::UNAUTHORIZED, $e->httpStatusCode());
 
-            $this->expectException(UserCommandFailed::class);
-
-            try {
-                yield $this->manager->changePasswordAsync(
-                    $this->username,
-                    'password',
-                    'foobar',
-                    new UserCredentials($this->username, 'password')
-                );
-            } catch (UserCommandFailed $e) {
-                $this->assertSame(HttpStatusCode::UNAUTHORIZED, $e->httpStatusCode());
-
-                throw $e;
-            }
-        });
+            throw $e;
+        }
     }
 }

@@ -14,17 +14,16 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
-use function Amp\Promise\wait;
+use Amp\Promise;
 use Amp\Success;
 use Closure;
 use Generator;
 use Prooph\EventStore\Async\EventStoreConnection;
 use ProophTest\EventStoreClient\Helper\TestConnection;
-use Throwable;
 
 trait SpecificationWithConnection
 {
-    protected EventStoreConnection $conn;
+    protected EventStoreConnection $connection;
 
     protected function given(): Generator
     {
@@ -36,27 +35,28 @@ trait SpecificationWithConnection
         yield new Success();
     }
 
-    /** @throws Throwable */
-    protected function execute(Closure $test): void
+    protected function execute(Closure $test): Promise
     {
-        wait(call(function () use ($test): Generator {
-            $this->conn = TestConnection::create();
+        return call(function () use ($test): Generator {
+            $this->connection = TestConnection::create();
 
-            yield $this->conn->connectAsync();
+            yield $this->connection->connectAsync();
 
-            yield from $this->given();
+            try {
+                yield from $this->given();
 
-            yield from $this->when();
+                yield from $this->when();
 
-            yield from $test();
-
-            yield from $this->end();
-        }));
+                yield from $test();
+            } finally {
+                yield from $this->end();
+            }
+        });
     }
 
     protected function end(): Generator
     {
-        $this->conn->close();
+        $this->connection->close();
 
         yield new Success();
     }

@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\Deferred;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\Common\SystemEventTypes;
@@ -28,9 +28,8 @@ use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class happy_case_catching_up_to_link_to_events_auto_ack extends TestCase
+class happy_case_catching_up_to_link_to_events_auto_ack extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -45,6 +44,8 @@ class happy_case_catching_up_to_link_to_events_auto_ack extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->streamName = Guid::generateAsHex();
         $this->groupName = Guid::generateAsHex();
         $this->eventsReceived = new Deferred();
@@ -57,11 +58,10 @@ class happy_case_catching_up_to_link_to_events_auto_ack extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function test(): void
+    public function test(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $settings = PersistentSubscriptionSettings::create()
                 ->startFromBeginning()
                 ->resolveLinkTos()
@@ -70,7 +70,7 @@ class happy_case_catching_up_to_link_to_events_auto_ack extends TestCase
             for ($i = 0; $i < self::EVENT_WRITE_COUNT; $i++) {
                 $eventData = new EventData(EventId::generate(), 'SomeEvent', false, '', '');
 
-                yield $this->conn->appendToStreamAsync(
+                yield $this->connection->appendToStreamAsync(
                     $this->streamName . 'original',
                     ExpectedVersion::ANY,
                     [$eventData],
@@ -78,14 +78,14 @@ class happy_case_catching_up_to_link_to_events_auto_ack extends TestCase
                 );
             }
 
-            yield $this->conn->createPersistentSubscriptionAsync(
+            yield $this->connection->createPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 $settings,
                 DefaultData::adminCredentials()
             );
 
-            yield $this->conn->connectToPersistentSubscriptionAsync(
+            yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 new class($this->eventsReceived, $this->eventReceivedCount, self::EVENT_WRITE_COUNT) implements EventAppearedOnPersistentSubscription {
@@ -128,7 +128,7 @@ class happy_case_catching_up_to_link_to_events_auto_ack extends TestCase
                     $i . '@' . $this->streamName . 'original'
                 );
 
-                yield $this->conn->appendToStreamAsync(
+                yield $this->connection->appendToStreamAsync(
                     $this->streamName,
                     ExpectedVersion::ANY,
                     [$eventData],

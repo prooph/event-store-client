@@ -13,12 +13,11 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class when_creating_one_time_projection extends TestCase
+class when_creating_one_time_projection extends AsyncTestCase
 {
     use ProjectionSpecification;
 
@@ -47,11 +46,10 @@ class when_creating_one_time_projection extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function should_create_projection(): void
+    public function should_create_projection(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $projections = yield $this->projectionsManager->listOneTimeAsync(
                 $this->credentials
             );

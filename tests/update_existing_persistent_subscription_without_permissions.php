@@ -13,16 +13,15 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class update_existing_persistent_subscription_without_permissions extends TestCase
+class update_existing_persistent_subscription_without_permissions extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -37,13 +36,13 @@ class update_existing_persistent_subscription_without_permissions extends TestCa
             ->startFromCurrent()
             ->build();
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::ANY,
             [new EventData(null, 'whatever', true, '{"foo":2}')]
         );
 
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             'existing',
             $this->settings,
@@ -53,14 +52,13 @@ class update_existing_persistent_subscription_without_permissions extends TestCa
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_completion_fails_with_access_denied(): void
+    public function the_completion_fails_with_access_denied(): Generator
     {
-        $this->execute(function () {
+        yield $this->execute(function (): Generator {
             $this->expectException(AccessDenied::class);
 
-            yield $this->conn->updatePersistentSubscriptionAsync(
+            yield $this->connection->updatePersistentSubscriptionAsync(
                 $this->stream,
                 'existing',
                 $this->settings

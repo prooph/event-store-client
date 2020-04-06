@@ -32,21 +32,21 @@ trait SpecificationWithLinkToToDeletedEvents
         $this->linkedStreamName = Guid::generateAsHex();
         $this->deletedStreamName = Guid::generateAsHex();
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->deletedStreamName,
             ExpectedVersion::ANY,
             [new EventData(null, 'testing', true, '{"foo":"bar"}')],
             $creds
         );
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->linkedStreamName,
             ExpectedVersion::ANY,
             [new EventData(null, SystemEventTypes::LINK_TO, false, '0@' . $this->deletedStreamName)],
             $creds
         );
 
-        yield $this->conn->deleteStreamAsync(
+        yield $this->connection->deleteStreamAsync(
             $this->deletedStreamName,
             ExpectedVersion::ANY
         );

@@ -13,14 +13,13 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class create_persistent_subscription_on_non_existing_stream extends TestCase
+class create_persistent_subscription_on_non_existing_stream extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -29,6 +28,8 @@ class create_persistent_subscription_on_non_existing_stream extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->stream = Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
@@ -44,12 +45,11 @@ class create_persistent_subscription_on_non_existing_stream extends TestCase
     /**
      * @test
      * @doesNotPerformAssertions
-     * @throws Throwable
      */
-    public function the_completion_succeeds(): void
+    public function the_completion_succeeds(): Generator
     {
-        $this->execute(function () {
-            yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->execute(function (): Generator {
+            yield $this->connection->createPersistentSubscriptionAsync(
                 $this->stream,
                 'nonexistinggroup',
                 $this->settings,

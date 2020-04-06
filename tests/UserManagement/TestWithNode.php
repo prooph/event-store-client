@@ -13,21 +13,18 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use function Amp\call;
-use function Amp\Promise\wait;
-use Closure;
-use Generator;
-use PHPUnit\Framework\TestCase;
+use Amp\PHPUnit\AsyncTestCase;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStoreClient\UserManagement\UsersManager;
-use Throwable;
 
-abstract class TestWithNode extends TestCase
+abstract class TestWithNode extends AsyncTestCase
 {
     protected UsersManager $manager;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->manager = new UsersManager(
             new EndPoint(
                 (string) \getenv('ES_HOST'),
@@ -35,13 +32,5 @@ abstract class TestWithNode extends TestCase
             ),
             5000
         );
-    }
-
-    /** @throws Throwable */
-    protected function execute(Closure $function): void
-    {
-        wait(call(function () use ($function): Generator {
-            yield from $function();
-        }));
     }
 }

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\AllEventsSlice;
 use Prooph\EventStore\Common\SystemEventTypes;
 use Prooph\EventStore\Common\SystemRoles;
@@ -28,9 +28,8 @@ use Prooph\EventStore\StreamMetadata;
 use Prooph\EventStore\UserCredentials;
 use ProophTest\EventStoreClient\Helper\EventDataComparer;
 use ProophTest\EventStoreClient\Helper\TestEvent;
-use Throwable;
 
-class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
+class read_all_events_forward_with_hard_deleted_stream_should extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -43,7 +42,7 @@ class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
     {
         $this->streamName = 'read_all_events_forward_with_hard_deleted_stream_should' . $this->getName();
 
-        yield $this->conn->setStreamMetadataAsync(
+        yield $this->connection->setStreamMetadataAsync(
             '$all',
             ExpectedVersion::ANY,
             new StreamMetadata(
@@ -58,20 +57,20 @@ class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
             new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
         );
 
-        $result = yield $this->conn->readAllEventsBackwardAsync(Position::end(), 1, false);
+        $result = yield $this->connection->readAllEventsBackwardAsync(Position::end(), 1, false);
         \assert($result instanceof AllEventsSlice);
 
         $this->from = $result->nextPosition();
 
         $this->testEvents = TestEvent::newAmount(20);
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->streamName,
             ExpectedVersion::NO_STREAM,
             $this->testEvents
         );
 
-        yield $this->conn->deleteStreamAsync(
+        yield $this->connection->deleteStreamAsync(
             $this->streamName,
             ExpectedVersion::ANY,
             true
@@ -80,12 +79,11 @@ class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function ensure_deleted_stream(): void
+    public function ensure_deleted_stream(): Generator
     {
-        $this->execute(function () {
-            $res = yield $this->conn->readStreamEventsForwardAsync($this->streamName, 0, 100, false);
+        yield $this->execute(function (): Generator {
+            $res = yield $this->connection->readStreamEventsForwardAsync($this->streamName, 0, 100, false);
             \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::streamDeleted()));
             $this->assertCount(0, $res->events());
@@ -94,12 +92,11 @@ class read_all_events_forward_with_hard_deleted_stream_should extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function returns_all_events_including_tombstone(): void
+    public function returns_all_events_including_tombstone(): Generator
     {
-        $this->execute(function () {
-            $read = yield $this->conn->readAllEventsForwardAsync($this->from, \count($this->testEvents) + 10, false);
+        yield $this->execute(function (): Generator {
+            $read = yield $this->connection->readAllEventsForwardAsync($this->from, \count($this->testEvents) + 10, false);
             \assert($read instanceof AllEventsSlice);
 
             $events = [];

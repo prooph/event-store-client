@@ -15,11 +15,11 @@ namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
 use Amp\Deferred;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EventData;
@@ -27,9 +27,8 @@ use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class connect_to_existing_persistent_subscription_with_start_from_beginning_not_set_and_events_in_it extends TestCase
+class connect_to_existing_persistent_subscription_with_start_from_beginning_not_set_and_events_in_it extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -40,6 +39,8 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->stream = '$' . Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
@@ -52,7 +53,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
     {
         yield $this->writeEvents();
 
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             $this->settings,
@@ -61,7 +62,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
 
         $deferred = $this->resetEvent;
 
-        yield $this->conn->connectToPersistentSubscriptionAsync(
+        yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             new class($deferred) implements EventAppearedOnPersistentSubscription {
@@ -95,7 +96,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
     {
         return call(function (): Generator {
             for ($i = 0; $i < 10; $i++) {
-                yield $this->conn->appendToStreamAsync(
+                yield $this->connection->appendToStreamAsync(
                     $this->stream,
                     ExpectedVersion::ANY,
                     [new EventData(null, 'test', true, '{"foo":"bar"}')],
@@ -112,11 +113,10 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_subscription_gets_no_events(): void
+    public function the_subscription_gets_no_events(): Generator
     {
-        $this->execute(function (): Generator {
+        yield $this->execute(function (): Generator {
             $this->expectException(TimeoutException::class);
             yield Promise\timeout($this->resetEvent->promise(), 1000);
         });

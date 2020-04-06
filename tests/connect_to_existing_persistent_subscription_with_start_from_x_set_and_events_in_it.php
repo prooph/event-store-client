@@ -15,10 +15,10 @@ namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
 use Amp\Deferred;
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EventData;
@@ -27,9 +27,8 @@ use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
-use Throwable;
 
-class connect_to_existing_persistent_subscription_with_start_from_x_set_and_events_in_it extends TestCase
+class connect_to_existing_persistent_subscription_with_start_from_x_set_and_events_in_it extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -42,6 +41,8 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->stream = '$' . Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
@@ -54,14 +55,14 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
     {
         yield $this->writeEvents();
 
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        yield $this->conn->connectToPersistentSubscriptionAsync(
+        yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             new class($this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
@@ -102,7 +103,7 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
             for ($i = 0; $i < 10; $i++) {
                 $id = EventId::generate();
 
-                yield $this->conn->appendToStreamAsync(
+                yield $this->connection->appendToStreamAsync(
                     $this->stream,
                     ExpectedVersion::ANY,
                     [new EventData($id, 'test', true, '{"foo":"bar"}')],
@@ -118,7 +119,7 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
 
     protected function when(): Generator
     {
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::ANY,
             [new EventData($this->eventId, 'test', true, '{"foo":"bar"}')],
@@ -128,11 +129,10 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function the_subscription_gets_the_written_event_as_its_first_event(): void
+    public function the_subscription_gets_the_written_event_as_its_first_event(): Generator
     {
-        $this->execute(function (): Generator {
+        yield $this->execute(function (): Generator {
             $value = yield Promise\timeout($this->resetEvent->promise(), 10000);
             $this->assertTrue($value);
             $this->assertNotNull($this->firstEvent);

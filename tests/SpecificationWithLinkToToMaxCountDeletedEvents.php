@@ -35,7 +35,7 @@ trait SpecificationWithLinkToToMaxCountDeletedEvents
         $this->deletedStreamName = Guid::generateAsHex();
         $this->linkedStreamName = Guid::generateAsHex();
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->deletedStreamName,
             ExpectedVersion::ANY,
             [
@@ -44,13 +44,13 @@ trait SpecificationWithLinkToToMaxCountDeletedEvents
             $creds
         );
 
-        yield $this->conn->setStreamMetadataAsync(
+        yield $this->connection->setStreamMetadataAsync(
             $this->deletedStreamName,
             ExpectedVersion::ANY,
             new StreamMetadata(2)
         );
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->deletedStreamName,
             ExpectedVersion::ANY,
             [
@@ -58,7 +58,7 @@ trait SpecificationWithLinkToToMaxCountDeletedEvents
             ]
         );
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->deletedStreamName,
             ExpectedVersion::ANY,
             [
@@ -66,7 +66,7 @@ trait SpecificationWithLinkToToMaxCountDeletedEvents
             ]
         );
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->linkedStreamName,
             ExpectedVersion::ANY,
             [

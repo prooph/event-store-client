@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Common\SystemEventTypes;
 use Prooph\EventStore\Common\SystemRoles;
 use Prooph\EventStore\EventData;
@@ -23,9 +23,8 @@ use Prooph\EventStore\SliceReadStatus;
 use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\StreamMetadata;
 use ProophTest\EventStoreClient\Helper\TestEvent;
-use Throwable;
 
-class read_stream_events_with_unresolved_linkto extends TestCase
+class read_stream_events_with_unresolved_linkto extends AsyncTestCase
 {
     use SpecificationWithConnection;
 
@@ -36,7 +35,7 @@ class read_stream_events_with_unresolved_linkto extends TestCase
 
     protected function when(): Generator
     {
-        yield $this->conn->setStreamMetadataAsync(
+        yield $this->connection->setStreamMetadataAsync(
             '$all',
             ExpectedVersion::ANY,
             StreamMetadata::create()->setReadRoles(SystemRoles::ALL)->build(),
@@ -45,32 +44,31 @@ class read_stream_events_with_unresolved_linkto extends TestCase
 
         $this->testEvents = TestEvent::newAmount(20);
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::NO_STREAM,
             $this->testEvents
         );
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->links,
             ExpectedVersion::NO_STREAM,
             [new EventData(null, SystemEventTypes::LINK_TO, false, '0@read_stream_events_with_unresolved_linkto')]
         );
 
-        yield $this->conn->deleteStreamAsync($this->stream, ExpectedVersion::ANY);
+        yield $this->connection->deleteStreamAsync($this->stream, ExpectedVersion::ANY);
     }
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function ensure_deleted_stream(): void
+    public function ensure_deleted_stream(): Generator
     {
         $this->stream = 'read_stream_events_with_unresolved_linkto_1';
         $this->links = 'read_stream_events_with_unresolved_linkto_links_1';
 
-        $this->execute(function () {
-            $res = yield $this->conn->readStreamEventsForwardAsync(
+        yield $this->execute(function (): Generator {
+            $res = yield $this->connection->readStreamEventsForwardAsync(
                 $this->stream,
                 0,
                 100,
@@ -85,15 +83,14 @@ class read_stream_events_with_unresolved_linkto extends TestCase
 
     /**
      * @test
-     * @throws Throwable
      */
-    public function returns_unresolved_linkto(): void
+    public function returns_unresolved_linkto(): Generator
     {
         $this->stream = 'read_stream_events_with_unresolved_linkto_2';
         $this->links = 'read_stream_events_with_unresolved_linkto_links_2';
 
-        $this->execute(function () {
-            $read = yield $this->conn->readStreamEventsForwardAsync(
+        yield $this->execute(function (): Generator {
+            $read = yield $this->connection->readStreamEventsForwardAsync(
                 $this->links,
                 0,
                 1,
