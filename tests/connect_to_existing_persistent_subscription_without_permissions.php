@@ -44,14 +44,14 @@ class connect_to_existing_persistent_subscription_without_permissions extends As
 
     protected function when(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             'agroupname55',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        yield $this->conn->connectToPersistentSubscriptionAsync(
+        yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             'agroupname55',
             new class() implements EventAppearedOnPersistentSubscription {

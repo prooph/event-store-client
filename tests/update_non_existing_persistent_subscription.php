@@ -46,7 +46,7 @@ class update_non_existing_persistent_subscription extends AsyncTestCase
         yield $this->execute(function (): Generator {
             $this->expectException(InvalidOperationException::class);
 
-            yield $this->conn->updatePersistentSubscriptionAsync(
+            yield $this->connection->updatePersistentSubscriptionAsync(
                 $this->stream,
                 'existing',
                 $this->settings,

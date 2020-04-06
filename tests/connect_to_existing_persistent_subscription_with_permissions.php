@@ -44,14 +44,14 @@ class connect_to_existing_persistent_subscription_with_permissions extends Async
 
     protected function when(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             'agroupname17',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        $this->sub = $this->conn->connectToPersistentSubscriptionAsync(
+        $this->sub = $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             'agroupname17',
             new class() implements EventAppearedOnPersistentSubscription {

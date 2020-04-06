@@ -35,7 +35,7 @@ class read_all_events_forward_with_soft_deleted_stream_should extends AsyncTestC
 
     private function cleanUp(): Generator
     {
-        yield $this->conn->setStreamMetadataAsync(
+        yield $this->connection->setStreamMetadataAsync(
             '$all',
             ExpectedVersion::ANY,
             StreamMetadata::create()->build(),
@@ -45,7 +45,7 @@ class read_all_events_forward_with_soft_deleted_stream_should extends AsyncTestC
 
     protected function when(): Generator
     {
-        yield $this->conn->setStreamMetadataAsync(
+        yield $this->connection->setStreamMetadataAsync(
             '$all',
             ExpectedVersion::ANY,
             StreamMetadata::create()->setReadRoles(SystemRoles::ALL)->build(),
@@ -54,13 +54,13 @@ class read_all_events_forward_with_soft_deleted_stream_should extends AsyncTestC
 
         $this->testEvents = TestEvent::newAmount(20);
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->streamName,
             ExpectedVersion::ANY,
             $this->testEvents
         );
 
-        yield $this->conn->deleteStreamAsync(
+        yield $this->connection->deleteStreamAsync(
             $this->streamName,
             ExpectedVersion::ANY
         );
@@ -72,7 +72,7 @@ class read_all_events_forward_with_soft_deleted_stream_should extends AsyncTestC
     public function ensure_deleted_stream(): Generator
     {
         yield $this->execute(function (): Generator {
-            $res = yield $this->conn->readStreamEventsForwardAsync($this->streamName, 0, 100, false);
+            $res = yield $this->connection->readStreamEventsForwardAsync($this->streamName, 0, 100, false);
             \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::streamNotFound()));
             $this->assertCount(0, $res->events());
@@ -86,7 +86,7 @@ class read_all_events_forward_with_soft_deleted_stream_should extends AsyncTestC
     public function returns_all_events_including_tombstone(): Generator
     {
         yield $this->execute(function (): Generator {
-            $metadataEvents = yield $this->conn->readStreamEventsBackwardAsync(
+            $metadataEvents = yield $this->connection->readStreamEventsBackwardAsync(
                 '$$' . $this->streamName,
                 -1,
                 1,

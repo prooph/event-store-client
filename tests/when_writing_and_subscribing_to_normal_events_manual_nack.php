@@ -65,14 +65,14 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends AsyncTes
                 ->resolveLinkTos()
                 ->build();
 
-            yield $this->conn->createPersistentSubscriptionAsync(
+            yield $this->connection->createPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 $settings,
                 DefaultData::adminCredentials()
             );
 
-            yield $this->conn->connectToPersistentSubscriptionAsync(
+            yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 new class($this->eventReceivedCount, $this->eventsReceived) implements EventAppearedOnPersistentSubscription {
@@ -108,7 +108,7 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends AsyncTes
             for ($i = 0; $i < self::EVENT_WRITE_COUNT; $i++) {
                 $eventData = new EventData(null, 'SomeEvent', false);
 
-                yield $this->conn->appendToStreamAsync(
+                yield $this->connection->appendToStreamAsync(
                     $this->streamName,
                     ExpectedVersion::ANY,
                     [$eventData],

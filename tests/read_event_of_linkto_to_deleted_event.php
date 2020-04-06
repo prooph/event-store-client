@@ -27,7 +27,7 @@ class read_event_of_linkto_to_deleted_event extends AsyncTestCase
 
     protected function when(): Generator
     {
-        $this->read = yield $this->conn->readEventAsync(
+        $this->read = yield $this->connection->readEventAsync(
             $this->linkedStreamName,
             0,
             true

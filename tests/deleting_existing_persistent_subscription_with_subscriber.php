@@ -49,14 +49,14 @@ class deleting_existing_persistent_subscription_with_subscriber extends AsyncTes
 
     protected function given(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             'groupname123',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        yield $this->conn->connectToPersistentSubscriptionAsync(
+        yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             'groupname123',
             new class() implements EventAppearedOnPersistentSubscription {
@@ -89,7 +89,7 @@ class deleting_existing_persistent_subscription_with_subscriber extends AsyncTes
 
     protected function when(): Generator
     {
-        yield $this->conn->deletePersistentSubscriptionAsync(
+        yield $this->connection->deletePersistentSubscriptionAsync(
             $this->stream,
             'groupname123',
             DefaultData::adminCredentials()

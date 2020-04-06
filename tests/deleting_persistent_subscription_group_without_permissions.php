@@ -45,7 +45,7 @@ class deleting_persistent_subscription_group_without_permissions extends AsyncTe
         yield $this->execute(function (): Generator {
             $this->expectException(AccessDenied::class);
 
-            yield $this->conn->deletePersistentSubscriptionAsync(
+            yield $this->connection->deletePersistentSubscriptionAsync(
                 $this->stream,
                 Guid::generateAsHex()
             );

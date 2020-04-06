@@ -48,20 +48,20 @@ class update_existing_persistent_subscription_with_subscribers extends AsyncTest
             ->startFromCurrent()->build();
         $this->dropped = new Deferred();
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::ANY,
             [new EventData(null, 'whatever', true, '{"foo": 2}')]
         );
 
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             'existing',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        yield $this->conn->connectToPersistentSubscriptionAsync(
+        yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             'existing',
             new class() implements EventAppearedOnPersistentSubscription {
@@ -101,7 +101,7 @@ class update_existing_persistent_subscription_with_subscribers extends AsyncTest
     protected function when(): Generator
     {
         try {
-            yield $this->conn->updatePersistentSubscriptionAsync(
+            yield $this->connection->updatePersistentSubscriptionAsync(
                 $this->stream,
                 'existing',
                 $this->settings,

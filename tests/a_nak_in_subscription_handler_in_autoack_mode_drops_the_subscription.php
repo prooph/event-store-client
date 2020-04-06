@@ -58,7 +58,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
 
     protected function given(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             $this->settings,
@@ -74,7 +74,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
             $this->resetEvent->resolve(true);
         };
 
-        yield $this->conn->connectToPersistentSubscriptionAsync(
+        yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             new class() implements EventAppearedOnPersistentSubscription {
@@ -110,7 +110,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
 
     protected function when(): Generator
     {
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::ANY,
             [

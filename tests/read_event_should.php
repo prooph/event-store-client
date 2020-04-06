@@ -39,12 +39,12 @@ class read_event_should extends AsyncTestCase
         $this->testStream = 'test-stream-' . Guid::generateAsHex();
         $this->deletedStream = 'deleted-stream' . Guid::generateAsHex();
 
-        yield $this->conn->appendToStreamAsync($this->testStream, -1, [
+        yield $this->connection->appendToStreamAsync($this->testStream, -1, [
             new EventData($this->eventId0, 'event0', false, '123', '456'),
             new EventData($this->eventId1, 'event1', true, '{"foo":"bar"}', '{"meta":"data"}'),
         ]);
 
-        yield $this->conn->deleteStreamAsync($this->deletedStream, -1, true);
+        yield $this->connection->deleteStreamAsync($this->deletedStream, -1, true);
     }
 
     /**
@@ -54,7 +54,7 @@ class read_event_should extends AsyncTestCase
     {
         yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
-            $this->conn->readEventAsync('', 0, false);
+            $this->connection->readEventAsync('', 0, false);
         });
     }
 
@@ -65,7 +65,7 @@ class read_event_should extends AsyncTestCase
     {
         yield $this->execute(function (): Generator {
             $this->expectException(OutOfRangeException::class);
-            $this->conn->readEventAsync('stream', -2, false);
+            $this->connection->readEventAsync('stream', -2, false);
         });
     }
 
@@ -75,7 +75,7 @@ class read_event_should extends AsyncTestCase
     public function notify_using_status_code_if_stream_not_found(): Generator
     {
         yield $this->execute(function (): Generator {
-            $res = yield $this->conn->readEventAsync('unexisting-stream', 5, false);
+            $res = yield $this->connection->readEventAsync('unexisting-stream', 5, false);
             \assert($res instanceof EventReadResult);
 
             $this->assertTrue($res->status()->equals(EventReadStatus::noStream()));
@@ -91,7 +91,7 @@ class read_event_should extends AsyncTestCase
     public function return_no_stream_if_requested_last_event_in_empty_stream(): Generator
     {
         yield $this->execute(function (): Generator {
-            $res = yield $this->conn->readEventAsync('some-really-empty-stream', -1, false);
+            $res = yield $this->connection->readEventAsync('some-really-empty-stream', -1, false);
             \assert($res instanceof EventReadResult);
 
             $this->assertTrue($res->status()->equals(EventReadStatus::noStream()));
@@ -104,7 +104,7 @@ class read_event_should extends AsyncTestCase
     public function notify_using_status_code_if_stream_was_deleted(): Generator
     {
         yield $this->execute(function (): Generator {
-            $res = yield $this->conn->readEventAsync($this->deletedStream, 5, false);
+            $res = yield $this->connection->readEventAsync($this->deletedStream, 5, false);
             \assert($res instanceof EventReadResult);
 
             $this->assertTrue($res->status()->equals(EventReadStatus::streamDeleted()));
@@ -120,7 +120,7 @@ class read_event_should extends AsyncTestCase
     public function notify_using_status_code_if_stream_does_not_have_event(): Generator
     {
         yield $this->execute(function (): Generator {
-            $res = yield $this->conn->readEventAsync($this->testStream, 5, false);
+            $res = yield $this->connection->readEventAsync($this->testStream, 5, false);
             \assert($res instanceof EventReadResult);
 
             $this->assertTrue($res->status()->equals(EventReadStatus::notFound()));
@@ -136,7 +136,7 @@ class read_event_should extends AsyncTestCase
     public function return_existing_event(): Generator
     {
         yield $this->execute(function (): Generator {
-            $res = yield $this->conn->readEventAsync($this->testStream, 0, false);
+            $res = yield $this->connection->readEventAsync($this->testStream, 0, false);
             \assert($res instanceof EventReadResult);
 
             $this->assertTrue($res->status()->equals(EventReadStatus::success()));
@@ -153,7 +153,7 @@ class read_event_should extends AsyncTestCase
     public function retrieve_the_is_json_flag_properly(): Generator
     {
         yield $this->execute(function (): Generator {
-            $res = yield $this->conn->readEventAsync($this->testStream, 1, false);
+            $res = yield $this->connection->readEventAsync($this->testStream, 1, false);
             \assert($res instanceof EventReadResult);
 
             $this->assertTrue($res->status()->equals(EventReadStatus::success()));
@@ -168,7 +168,7 @@ class read_event_should extends AsyncTestCase
     public function return_last_event_in_stream_if_event_number_is_minus_one(): Generator
     {
         yield $this->execute(function (): Generator {
-            $res = yield $this->conn->readEventAsync($this->testStream, -1, false);
+            $res = yield $this->connection->readEventAsync($this->testStream, -1, false);
             \assert($res instanceof EventReadResult);
 
             $this->assertTrue($res->status()->equals(EventReadStatus::success()));

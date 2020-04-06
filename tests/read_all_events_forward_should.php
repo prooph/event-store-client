@@ -41,7 +41,7 @@ class read_all_events_forward_should extends AsyncTestCase
 
     protected function when(): Generator
     {
-        yield $this->conn->setStreamMetadataAsync(
+        yield $this->connection->setStreamMetadataAsync(
             '$all',
             ExpectedVersion::ANY,
             new StreamMetadata(
@@ -60,26 +60,26 @@ class read_all_events_forward_should extends AsyncTestCase
             DefaultData::adminCredentials()
         );
 
-        $result = yield $this->conn->readAllEventsBackwardAsync(Position::end(), 1, false);
+        $result = yield $this->connection->readAllEventsBackwardAsync(Position::end(), 1, false);
         \assert($result instanceof AllEventsSlice);
 
         $this->from = $result->nextPosition();
         $this->testEvents = TestEvent::newAmount(20);
         $this->stream = 'read_all_events_forward_should-' . Guid::generateAsHex();
 
-        yield $this->conn->appendToStreamAsync($this->stream, ExpectedVersion::NO_STREAM, $this->testEvents);
+        yield $this->connection->appendToStreamAsync($this->stream, ExpectedVersion::NO_STREAM, $this->testEvents);
     }
 
     protected function end(): Generator
     {
-        yield $this->conn->setStreamMetadataAsync(
+        yield $this->connection->setStreamMetadataAsync(
             '$all',
             ExpectedVersion::ANY,
             new StreamMetadata(),
             DefaultData::adminCredentials()
         );
 
-        $this->conn->close();
+        $this->connection->close();
     }
 
     /**
@@ -88,7 +88,7 @@ class read_all_events_forward_should extends AsyncTestCase
     public function return_empty_slice_if_asked_to_read_from_end(): Generator
     {
         yield $this->execute(function (): Generator {
-            $read = yield $this->conn->readAllEventsForwardAsync(Position::end(), 1, false);
+            $read = yield $this->connection->readAllEventsForwardAsync(Position::end(), 1, false);
             \assert($read instanceof AllEventsSlice);
 
             $this->assertTrue($read->isEndOfStream());
@@ -102,7 +102,7 @@ class read_all_events_forward_should extends AsyncTestCase
     public function return_events_in_same_order_as_written(): Generator
     {
         yield $this->execute(function (): Generator {
-            $read = yield $this->conn->readAllEventsForwardAsync($this->from, \count($this->testEvents) + 10, false);
+            $read = yield $this->connection->readAllEventsForwardAsync($this->from, \count($this->testEvents) + 10, false);
             \assert($read instanceof AllEventsSlice);
 
             $events = \array_map(
@@ -126,7 +126,7 @@ class read_all_events_forward_should extends AsyncTestCase
             $slice = null;
 
             while (true) {
-                $slice = yield $this->conn->readAllEventsForwardAsync($position, 1, false);
+                $slice = yield $this->connection->readAllEventsForwardAsync($position, 1, false);
                 \assert($slice instanceof AllEventsSlice);
 
                 if ($slice->isEndOfStream()) {
@@ -154,7 +154,7 @@ class read_all_events_forward_should extends AsyncTestCase
             $position = $this->from;
 
             do {
-                $slice = yield $this->conn->readAllEventsForwardAsync($position, 5, false);
+                $slice = yield $this->connection->readAllEventsForwardAsync($position, 5, false);
                 \assert($slice instanceof AllEventsSlice);
 
                 foreach ($slice->events() as $event) {
@@ -176,7 +176,7 @@ class read_all_events_forward_should extends AsyncTestCase
     public function return_partial_slice_if_not_enough_events(): Generator
     {
         yield $this->execute(function (): Generator {
-            $read = yield $this->conn->readAllEventsForwardAsync($this->from, 30, false);
+            $read = yield $this->connection->readAllEventsForwardAsync($this->from, 30, false);
             \assert($read instanceof AllEventsSlice);
 
             $this->assertLessThan(30, \count($read->events()));
@@ -198,7 +198,7 @@ class read_all_events_forward_should extends AsyncTestCase
         yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
 
-            yield $this->conn->readAllEventsForwardAsync(Position::start(), \PHP_INT_MAX, false);
+            yield $this->connection->readAllEventsForwardAsync(Position::start(), \PHP_INT_MAX, false);
         });
     }
 }

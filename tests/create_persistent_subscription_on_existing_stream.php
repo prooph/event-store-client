@@ -40,7 +40,7 @@ class create_persistent_subscription_on_existing_stream extends AsyncTestCase
 
     protected function when(): Generator
     {
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::ANY,
             [new EventData(null, 'whatever', true, '{"foo":"bar"}')]
@@ -54,7 +54,7 @@ class create_persistent_subscription_on_existing_stream extends AsyncTestCase
     public function the_completion_succeeds(): Generator
     {
         yield $this->execute(function (): Generator {
-            yield $this->conn->createPersistentSubscriptionAsync(
+            yield $this->connection->createPersistentSubscriptionAsync(
                 $this->stream,
                 'existing',
                 $this->settings,

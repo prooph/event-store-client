@@ -36,13 +36,13 @@ class update_existing_persistent_subscription_without_permissions extends AsyncT
             ->startFromCurrent()
             ->build();
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::ANY,
             [new EventData(null, 'whatever', true, '{"foo":2}')]
         );
 
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             'existing',
             $this->settings,
@@ -58,7 +58,7 @@ class update_existing_persistent_subscription_without_permissions extends AsyncT
         yield $this->execute(function (): Generator {
             $this->expectException(AccessDenied::class);
 
-            yield $this->conn->updatePersistentSubscriptionAsync(
+            yield $this->connection->updatePersistentSubscriptionAsync(
                 $this->stream,
                 'existing',
                 $this->settings

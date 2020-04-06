@@ -49,14 +49,14 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends As
 
     protected function given(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        $this->firstSubscription = yield $this->conn->connectToPersistentSubscriptionAsync(
+        $this->firstSubscription = yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             new class() implements EventAppearedOnPersistentSubscription {
@@ -80,7 +80,7 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends As
     protected function when(): Generator
     {
         try {
-            yield $this->conn->connectToPersistentSubscriptionAsync(
+            yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->stream,
                 $this->group,
                 new class() implements EventAppearedOnPersistentSubscription {

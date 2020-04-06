@@ -45,7 +45,7 @@ class deleting_persistent_subscription_group_that_doesnt_exist extends AsyncTest
         yield $this->execute(function (): Generator {
             $this->expectException(InvalidOperationException::class);
 
-            yield $this->conn->deletePersistentSubscriptionAsync(
+            yield $this->connection->deletePersistentSubscriptionAsync(
                 $this->stream,
                 Guid::generateAsHex(),
                 DefaultData::adminCredentials()

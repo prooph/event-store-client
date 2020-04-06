@@ -49,7 +49,7 @@ class create_persistent_subscription_on_non_existing_stream extends AsyncTestCas
     public function the_completion_succeeds(): Generator
     {
         yield $this->execute(function (): Generator {
-            yield $this->conn->createPersistentSubscriptionAsync(
+            yield $this->connection->createPersistentSubscriptionAsync(
                 $this->stream,
                 'nonexistinggroup',
                 $this->settings,

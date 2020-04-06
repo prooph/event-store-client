@@ -56,7 +56,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
     {
         yield $this->writeEvents();
 
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             $this->settings,
@@ -70,7 +70,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
             for ($i = 0; $i < 10; $i++) {
                 $this->ids[$i] = EventId::generate();
 
-                yield $this->conn->appendToStreamAsync(
+                yield $this->connection->appendToStreamAsync(
                     $this->stream,
                     ExpectedVersion::ANY,
                     [new EventData($this->ids[$i], 'test', true, '{"foo":"bar"}')],
@@ -82,7 +82,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
 
     protected function when(): Generator
     {
-        yield $this->conn->connectToPersistentSubscriptionAsync(
+        yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             new class($this->set, $this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {

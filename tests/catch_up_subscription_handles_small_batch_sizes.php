@@ -15,7 +15,6 @@ namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
 use Amp\Deferred;
-use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use function Amp\Promise\timeout;
 use Amp\Success;
@@ -30,9 +29,8 @@ use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\ResolvedEvent;
-use ProophTest\EventStoreClient\Helper\TestConnection;
 
-class catch_up_subscription_handles_small_batch_sizes extends AsyncTestCase
+class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnectionTestCase
 {
     private const TIMEOUT = 10000;
 
@@ -43,8 +41,7 @@ class catch_up_subscription_handles_small_batch_sizes extends AsyncTestCase
     protected function setUpAsync(): Promise
     {
         return call(function (): Generator {
-            $this->connection = TestConnection::create();
-            yield $this->connection->connectAsync();
+            yield parent::setUpAsync();
 
             //Create 500 events
             for ($i = 0; $i < 5; $i++) {
@@ -57,13 +54,6 @@ class catch_up_subscription_handles_small_batch_sizes extends AsyncTestCase
 
             $this->settings = new CatchUpSubscriptionSettings(100, 1, false, true);
         });
-    }
-
-    protected function tearDownAsync(): Promise
-    {
-        $this->connection->close();
-
-        return parent::tearDownAsync();
     }
 
     /** @return EventData[] */

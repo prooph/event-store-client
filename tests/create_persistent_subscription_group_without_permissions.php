@@ -51,7 +51,7 @@ class create_persistent_subscription_group_without_permissions extends AsyncTest
     {
         yield $this->execute(function (): Generator {
             try {
-                yield $this->conn->createPersistentSubscriptionAsync(
+                yield $this->connection->createPersistentSubscriptionAsync(
                     $this->stream,
                     'nonexistinggroup',
                     $this->settings

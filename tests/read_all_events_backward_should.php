@@ -42,7 +42,7 @@ class read_all_events_backward_should extends AsyncTestCase
 
     protected function when(): Generator
     {
-        yield $this->conn->setStreamMetadataAsync(
+        yield $this->connection->setStreamMetadataAsync(
             '$all',
             ExpectedVersion::ANY,
             new StreamMetadata(
@@ -63,16 +63,16 @@ class read_all_events_backward_should extends AsyncTestCase
 
         $this->testEvents = TestEvent::newAmount(20);
 
-        yield $this->conn->appendToStreamAsync('stream-' . Guid::generateAsHex(), ExpectedVersion::NO_STREAM, $this->testEvents);
+        yield $this->connection->appendToStreamAsync('stream-' . Guid::generateAsHex(), ExpectedVersion::NO_STREAM, $this->testEvents);
 
-        $result = yield $this->conn->appendToStreamAsync('stream-' . Guid::generateAsHex(), ExpectedVersion::NO_STREAM, $this->testEvents);
+        $result = yield $this->connection->appendToStreamAsync('stream-' . Guid::generateAsHex(), ExpectedVersion::NO_STREAM, $this->testEvents);
         \assert($result instanceof WriteResult);
 
         $lastId = $this->testEvents[19]->eventId();
         $this->endOfEvents = $result->logPosition();
 
         do {
-            $slice = yield $this->conn->readAllEventsBackwardAsync($this->endOfEvents, 1, false);
+            $slice = yield $this->connection->readAllEventsBackwardAsync($this->endOfEvents, 1, false);
             \assert($slice instanceof AllEventsSlice);
 
             if ($slice->events()[0]->event()->eventId()->equals($lastId)) {
@@ -85,14 +85,14 @@ class read_all_events_backward_should extends AsyncTestCase
 
     protected function end(): Generator
     {
-        yield $this->conn->setStreamMetadataAsync(
+        yield $this->connection->setStreamMetadataAsync(
             '$all',
             ExpectedVersion::ANY,
             new StreamMetadata(),
             DefaultData::adminCredentials()
         );
 
-        $this->conn->close();
+        $this->connection->close();
     }
 
     /**
@@ -101,7 +101,7 @@ class read_all_events_backward_should extends AsyncTestCase
     public function return_empty_slice_if_asked_to_read_from_start(): Generator
     {
         yield $this->execute(function (): Generator {
-            $read = yield $this->conn->readAllEventsBackwardAsync(Position::start(), 1, false);
+            $read = yield $this->connection->readAllEventsBackwardAsync(Position::start(), 1, false);
             \assert($read instanceof AllEventsSlice);
 
             $this->assertTrue($read->isEndOfStream());
@@ -115,7 +115,7 @@ class read_all_events_backward_should extends AsyncTestCase
     public function return_events_in_reversed_order_compared_to_written(): Generator
     {
         yield $this->execute(function (): Generator {
-            $read = yield $this->conn->readAllEventsBackwardAsync($this->endOfEvents, \count($this->testEvents), false);
+            $read = yield $this->connection->readAllEventsBackwardAsync($this->endOfEvents, \count($this->testEvents), false);
             \assert($read instanceof AllEventsSlice);
 
             $readEvents = \array_map(
@@ -143,7 +143,7 @@ class read_all_events_backward_should extends AsyncTestCase
             $position = $this->endOfEvents;
 
             while (true) {
-                $slice = yield $this->conn->readAllEventsBackwardAsync($position, 1, false);
+                $slice = yield $this->connection->readAllEventsBackwardAsync($position, 1, false);
                 \assert($slice instanceof AllEventsSlice);
 
                 if ($slice->isEndOfStream()) {
@@ -170,7 +170,7 @@ class read_all_events_backward_should extends AsyncTestCase
             $position = $this->endOfEvents;
 
             do {
-                $slice = yield $this->conn->readAllEventsBackwardAsync($position, 5, false);
+                $slice = yield $this->connection->readAllEventsBackwardAsync($position, 5, false);
                 \assert($slice instanceof AllEventsSlice);
 
                 foreach ($slice->events() as $event) {
@@ -194,7 +194,7 @@ class read_all_events_backward_should extends AsyncTestCase
         yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
 
-            yield $this->conn->readAllEventsBackwardAsync(Position::start(), \PHP_INT_MAX, false);
+            yield $this->connection->readAllEventsBackwardAsync(Position::start(), \PHP_INT_MAX, false);
         });
     }
 }

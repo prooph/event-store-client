@@ -40,7 +40,7 @@ class create_persistent_subscription_after_deleting_the_same extends AsyncTestCa
 
     protected function when(): Generator
     {
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::ANY,
             [
@@ -48,14 +48,14 @@ class create_persistent_subscription_after_deleting_the_same extends AsyncTestCa
             ]
         );
 
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             'existing',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        yield $this->conn->deletePersistentSubscriptionAsync(
+        yield $this->connection->deletePersistentSubscriptionAsync(
             $this->stream,
             'existing',
             DefaultData::adminCredentials()
@@ -69,7 +69,7 @@ class create_persistent_subscription_after_deleting_the_same extends AsyncTestCa
     public function the_completion_succeeds(): Generator
     {
         yield $this->execute(function (): Generator {
-            yield $this->conn->createPersistentSubscriptionAsync(
+            yield $this->connection->createPersistentSubscriptionAsync(
                 $this->stream,
                 'existing',
                 $this->settings,

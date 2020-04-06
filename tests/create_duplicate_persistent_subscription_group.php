@@ -39,7 +39,7 @@ class create_duplicate_persistent_subscription_group extends AsyncTestCase
 
     protected function when(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             'group32',
             $this->settings,
@@ -55,7 +55,7 @@ class create_duplicate_persistent_subscription_group extends AsyncTestCase
         yield $this->execute(function (): Generator {
             $this->expectException(InvalidOperationException::class);
 
-            yield $this->conn->createPersistentSubscriptionAsync(
+            yield $this->connection->createPersistentSubscriptionAsync(
                 $this->stream,
                 'group32',
                 $this->settings,

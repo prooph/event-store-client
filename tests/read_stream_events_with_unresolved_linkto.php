@@ -35,7 +35,7 @@ class read_stream_events_with_unresolved_linkto extends AsyncTestCase
 
     protected function when(): Generator
     {
-        yield $this->conn->setStreamMetadataAsync(
+        yield $this->connection->setStreamMetadataAsync(
             '$all',
             ExpectedVersion::ANY,
             StreamMetadata::create()->setReadRoles(SystemRoles::ALL)->build(),
@@ -44,19 +44,19 @@ class read_stream_events_with_unresolved_linkto extends AsyncTestCase
 
         $this->testEvents = TestEvent::newAmount(20);
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::NO_STREAM,
             $this->testEvents
         );
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->links,
             ExpectedVersion::NO_STREAM,
             [new EventData(null, SystemEventTypes::LINK_TO, false, '0@read_stream_events_with_unresolved_linkto')]
         );
 
-        yield $this->conn->deleteStreamAsync($this->stream, ExpectedVersion::ANY);
+        yield $this->connection->deleteStreamAsync($this->stream, ExpectedVersion::ANY);
     }
 
     /**
@@ -68,7 +68,7 @@ class read_stream_events_with_unresolved_linkto extends AsyncTestCase
         $this->links = 'read_stream_events_with_unresolved_linkto_links_1';
 
         yield $this->execute(function (): Generator {
-            $res = yield $this->conn->readStreamEventsForwardAsync(
+            $res = yield $this->connection->readStreamEventsForwardAsync(
                 $this->stream,
                 0,
                 100,
@@ -90,7 +90,7 @@ class read_stream_events_with_unresolved_linkto extends AsyncTestCase
         $this->links = 'read_stream_events_with_unresolved_linkto_links_2';
 
         yield $this->execute(function (): Generator {
-            $read = yield $this->conn->readStreamEventsForwardAsync(
+            $read = yield $this->connection->readStreamEventsForwardAsync(
                 $this->links,
                 0,
                 1,

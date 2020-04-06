@@ -54,14 +54,14 @@ class connect_to_existing_persistent_subscription_with_start_from_two_and_no_str
 
     protected function given(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        yield $this->conn->connectToPersistentSubscriptionAsync(
+        yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             new class($this->set, $this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
@@ -99,21 +99,21 @@ class connect_to_existing_persistent_subscription_with_start_from_two_and_no_str
 
     protected function when(): Generator
     {
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::ANY,
             [new EventData(null, 'test', true, '{"foo":"bar"}')],
             DefaultData::adminCredentials()
         );
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::ANY,
             [new EventData(null, 'test', true, '{"foo":"bar"}')],
             DefaultData::adminCredentials()
         );
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::ANY,
             [new EventData($this->eventId, 'test', true, '{"foo":"bar"}')],

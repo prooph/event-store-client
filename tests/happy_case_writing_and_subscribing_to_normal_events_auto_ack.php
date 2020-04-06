@@ -64,14 +64,14 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends Async
         yield $this->execute(function (): Generator {
             $settings = PersistentSubscriptionSettings::default();
 
-            yield $this->conn->createPersistentSubscriptionAsync(
+            yield $this->connection->createPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 $settings,
                 DefaultData::adminCredentials()
             );
 
-            yield $this->conn->connectToPersistentSubscriptionAsync(
+            yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 new class($this->eventsReceived, $this->eventReceivedCount, self::EVENT_WRITE_COUNT) implements EventAppearedOnPersistentSubscription {
@@ -103,7 +103,7 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends Async
             for ($i = 0; $i < self::EVENT_WRITE_COUNT; $i++) {
                 $eventData = new EventData(null, 'SomeEvent', false);
 
-                yield $this->conn->appendToStreamAsync(
+                yield $this->connection->appendToStreamAsync(
                     $this->streamName,
                     ExpectedVersion::ANY,
                     [$eventData],

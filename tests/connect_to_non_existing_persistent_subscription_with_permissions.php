@@ -32,7 +32,7 @@ class connect_to_non_existing_persistent_subscription_with_permissions extends A
     protected function when(): Generator
     {
         try {
-            yield $this->conn->connectToPersistentSubscriptionAsync(
+            yield $this->connection->connectToPersistentSubscriptionAsync(
                 'nonexisting2',
                 'foo',
                 new class() implements EventAppearedOnPersistentSubscription {

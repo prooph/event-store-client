@@ -53,7 +53,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
     {
         yield $this->writeEvents();
 
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             $this->settings,
@@ -62,7 +62,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
 
         $deferred = $this->resetEvent;
 
-        yield $this->conn->connectToPersistentSubscriptionAsync(
+        yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             new class($deferred) implements EventAppearedOnPersistentSubscription {
@@ -96,7 +96,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
     {
         return call(function (): Generator {
             for ($i = 0; $i < 10; $i++) {
-                yield $this->conn->appendToStreamAsync(
+                yield $this->connection->appendToStreamAsync(
                     $this->stream,
                     ExpectedVersion::ANY,
                     [new EventData(null, 'test', true, '{"foo":"bar"}')],

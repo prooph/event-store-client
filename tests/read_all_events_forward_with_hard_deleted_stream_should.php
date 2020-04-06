@@ -42,7 +42,7 @@ class read_all_events_forward_with_hard_deleted_stream_should extends AsyncTestC
     {
         $this->streamName = 'read_all_events_forward_with_hard_deleted_stream_should' . $this->getName();
 
-        yield $this->conn->setStreamMetadataAsync(
+        yield $this->connection->setStreamMetadataAsync(
             '$all',
             ExpectedVersion::ANY,
             new StreamMetadata(
@@ -57,20 +57,20 @@ class read_all_events_forward_with_hard_deleted_stream_should extends AsyncTestC
             new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
         );
 
-        $result = yield $this->conn->readAllEventsBackwardAsync(Position::end(), 1, false);
+        $result = yield $this->connection->readAllEventsBackwardAsync(Position::end(), 1, false);
         \assert($result instanceof AllEventsSlice);
 
         $this->from = $result->nextPosition();
 
         $this->testEvents = TestEvent::newAmount(20);
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->streamName,
             ExpectedVersion::NO_STREAM,
             $this->testEvents
         );
 
-        yield $this->conn->deleteStreamAsync(
+        yield $this->connection->deleteStreamAsync(
             $this->streamName,
             ExpectedVersion::ANY,
             true
@@ -83,7 +83,7 @@ class read_all_events_forward_with_hard_deleted_stream_should extends AsyncTestC
     public function ensure_deleted_stream(): Generator
     {
         yield $this->execute(function (): Generator {
-            $res = yield $this->conn->readStreamEventsForwardAsync($this->streamName, 0, 100, false);
+            $res = yield $this->connection->readStreamEventsForwardAsync($this->streamName, 0, 100, false);
             \assert($res instanceof StreamEventsSlice);
             $this->assertTrue($res->status()->equals(SliceReadStatus::streamDeleted()));
             $this->assertCount(0, $res->events());
@@ -96,7 +96,7 @@ class read_all_events_forward_with_hard_deleted_stream_should extends AsyncTestC
     public function returns_all_events_including_tombstone(): Generator
     {
         yield $this->execute(function (): Generator {
-            $read = yield $this->conn->readAllEventsForwardAsync($this->from, \count($this->testEvents) + 10, false);
+            $read = yield $this->connection->readAllEventsForwardAsync($this->from, \count($this->testEvents) + 10, false);
             \assert($read instanceof AllEventsSlice);
 
             $events = [];

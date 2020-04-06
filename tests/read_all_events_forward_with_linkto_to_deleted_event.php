@@ -26,7 +26,7 @@ class read_all_events_forward_with_linkto_to_deleted_event extends AsyncTestCase
 
     protected function when(): Generator
     {
-        $this->read = yield $this->conn->readStreamEventsForwardAsync(
+        $this->read = yield $this->connection->readStreamEventsForwardAsync(
             $this->linkedStreamName,
             0,
             1

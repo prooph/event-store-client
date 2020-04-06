@@ -66,14 +66,14 @@ class persistent_subscription_manager extends AsyncTestCase
 
     protected function when(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             'existing',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        $this->sub = yield $this->conn->connectToPersistentSubscriptionAsync(
+        $this->sub = yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             'existing',
             new class() implements EventAppearedOnPersistentSubscription {
@@ -91,7 +91,7 @@ class persistent_subscription_manager extends AsyncTestCase
             DefaultData::adminCredentials()
         );
 
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::ANY,
             [
@@ -218,7 +218,7 @@ class persistent_subscription_manager extends AsyncTestCase
         yield $this->execute(function (): Generator {
             yield $this->sub->stop();
 
-            $this->sub = yield $this->conn->connectToPersistentSubscriptionAsync(
+            $this->sub = yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->stream,
                 'existing',
                 new class() implements EventAppearedOnPersistentSubscription {
@@ -242,7 +242,7 @@ class persistent_subscription_manager extends AsyncTestCase
                 DefaultData::adminCredentials()
             );
 
-            yield $this->conn->appendToStreamAsync(
+            yield $this->connection->appendToStreamAsync(
                 $this->stream,
                 ExpectedVersion::ANY,
                 [
@@ -259,7 +259,7 @@ class persistent_subscription_manager extends AsyncTestCase
 
             $event = new CountdownEvent(2);
 
-            yield $this->conn->connectToPersistentSubscriptionAsync(
+            yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->stream,
                 'existing',
                 new class($event) implements EventAppearedOnPersistentSubscription {

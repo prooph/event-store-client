@@ -54,14 +54,14 @@ class connect_to_persistent_subscription_with_retries extends AsyncTestCase
 
     protected function given(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             'agroupname55',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        yield $this->conn->connectToPersistentSubscriptionAsync(
+        yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             'agroupname55',
             new class($this->retryCount, $this->resetEvent) implements EventAppearedOnPersistentSubscription {
@@ -103,7 +103,7 @@ class connect_to_persistent_subscription_with_retries extends AsyncTestCase
 
     protected function when(): Generator
     {
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::ANY,
             [new EventData($this->eventId, 'test', true, '{"foo":"bar"}')],

@@ -38,7 +38,7 @@ class deleting_existing_persistent_subscription_group_with_permissions extends A
 
     protected function when(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             'groupname123',
             $this->settings,
@@ -53,7 +53,7 @@ class deleting_existing_persistent_subscription_group_with_permissions extends A
     public function the_delete_of_group_succeeds(): Generator
     {
         yield $this->execute(function (): Generator {
-            yield $this->conn->deletePersistentSubscriptionAsync(
+            yield $this->connection->deletePersistentSubscriptionAsync(
                 $this->stream,
                 'groupname123',
                 DefaultData::adminCredentials()

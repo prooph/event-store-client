@@ -55,14 +55,14 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
     {
         yield $this->writeEvents();
 
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        yield $this->conn->connectToPersistentSubscriptionAsync(
+        yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             new class($this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
@@ -103,7 +103,7 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
             for ($i = 0; $i < 10; $i++) {
                 $id = EventId::generate();
 
-                yield $this->conn->appendToStreamAsync(
+                yield $this->connection->appendToStreamAsync(
                     $this->stream,
                     ExpectedVersion::ANY,
                     [new EventData($id, 'test', true, '{"foo":"bar"}')],
@@ -119,7 +119,7 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
 
     protected function when(): Generator
     {
-        yield $this->conn->appendToStreamAsync(
+        yield $this->connection->appendToStreamAsync(
             $this->stream,
             ExpectedVersion::ANY,
             [new EventData($this->eventId, 'test', true, '{"foo":"bar"}')],

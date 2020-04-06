@@ -73,10 +73,10 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
 
         $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
         \assert($meta instanceof RawStreamMetadataResult);
-        $this->assertEquals($this->stream, $meta->stream());
+        $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
-        $this->assertEquals(1, $meta->metastreamVersion());
-        $this->assertEquals('', $meta->streamMetadata());
+        $this->assertSame(1, $meta->metastreamVersion());
+        $this->assertSame('', $meta->streamMetadata());
     }
 
     /**

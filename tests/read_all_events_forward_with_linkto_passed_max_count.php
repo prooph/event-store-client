@@ -26,7 +26,7 @@ class read_all_events_forward_with_linkto_passed_max_count extends AsyncTestCase
 
     protected function when(): Generator
     {
-        $this->read = yield $this->conn->readStreamEventsForwardAsync($this->linkedStreamName, 0, 1, true);
+        $this->read = yield $this->connection->readStreamEventsForwardAsync($this->linkedStreamName, 0, 1, true);
     }
 
     /**

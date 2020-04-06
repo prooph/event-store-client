@@ -23,7 +23,7 @@ use ProophTest\EventStoreClient\Helper\TestConnection;
 
 trait SpecificationWithConnection
 {
-    protected EventStoreConnection $conn;
+    protected EventStoreConnection $connection;
 
     protected function given(): Generator
     {
@@ -38,9 +38,9 @@ trait SpecificationWithConnection
     protected function execute(Closure $test): Promise
     {
         return call(function () use ($test): Generator {
-            $this->conn = TestConnection::create();
+            $this->connection = TestConnection::create();
 
-            yield $this->conn->connectAsync();
+            yield $this->connection->connectAsync();
 
             try {
                 yield from $this->given();
@@ -56,7 +56,7 @@ trait SpecificationWithConnection
 
     protected function end(): Generator
     {
-        $this->conn->close();
+        $this->connection->close();
 
         yield new Success();
     }

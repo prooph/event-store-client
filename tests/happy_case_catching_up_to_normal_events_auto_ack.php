@@ -69,7 +69,7 @@ class happy_case_catching_up_to_normal_events_auto_ack extends AsyncTestCase
             for ($i = 0; $i < self::EVENT_WRITE_COUNT; $i++) {
                 $eventData = new EventData(EventId::generate(), 'SomeEvent', false, '', '');
 
-                yield $this->conn->appendToStreamAsync(
+                yield $this->connection->appendToStreamAsync(
                     $this->streamName,
                     ExpectedVersion::ANY,
                     [$eventData],
@@ -77,14 +77,14 @@ class happy_case_catching_up_to_normal_events_auto_ack extends AsyncTestCase
                 );
             }
 
-            yield $this->conn->createPersistentSubscriptionAsync(
+            yield $this->connection->createPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 $settings,
                 DefaultData::adminCredentials()
             );
 
-            yield $this->conn->connectToPersistentSubscriptionAsync(
+            yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 new class($this->eventsReceived, $this->eventReceivedCount, self::EVENT_WRITE_COUNT) implements EventAppearedOnPersistentSubscription {

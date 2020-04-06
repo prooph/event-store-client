@@ -49,7 +49,7 @@ class create_persistent_subscription_on_all_stream extends AsyncTestCase
     {
         yield $this->execute(function (): Generator {
             try {
-                yield $this->conn->createPersistentSubscriptionAsync(
+                yield $this->connection->createPersistentSubscriptionAsync(
                     '$all',
                     'shitbird',
                     $this->settings

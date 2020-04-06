@@ -58,7 +58,7 @@ class create_persistent_subscription_with_dont_timeout extends AsyncTestCase
     public function the_subscription_is_created_without_error(): Generator
     {
         yield $this->execute(function (): Generator {
-            yield $this->conn->createPersistentSubscriptionAsync(
+            yield $this->connection->createPersistentSubscriptionAsync(
                 $this->stream,
                 'dont-timeout',
                 $this->settings,

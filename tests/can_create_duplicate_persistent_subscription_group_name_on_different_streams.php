@@ -38,7 +38,7 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
 
     protected function when(): Generator
     {
-        yield $this->conn->createPersistentSubscriptionAsync(
+        yield $this->connection->createPersistentSubscriptionAsync(
             $this->stream,
             'group3211',
             $this->settings,
@@ -53,7 +53,7 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
     public function the_completion_succeeds(): Generator
     {
         yield $this->execute(function (): Generator {
-            yield $this->conn->createPersistentSubscriptionAsync(
+            yield $this->connection->createPersistentSubscriptionAsync(
                 'someother' . $this->stream,
                 'group3211',
                 $this->settings,
