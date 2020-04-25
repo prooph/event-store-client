@@ -48,9 +48,7 @@ class event_store_connection_should extends AsyncTestCase
         $connection->close();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function throw_invalid_operation_on_every_api_call_if_connect_was_not_called(): \Generator
     {
         $connection = TestConnection::create();

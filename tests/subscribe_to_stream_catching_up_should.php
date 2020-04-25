@@ -36,9 +36,7 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
 {
     private const TIMEOUT = 5000;
 
-    /**
-     * @test
-     */
+    /** @test */
     public function be_able_to_subscribe_to_non_existing_stream(): Generator
     {
         $stream = 'be_able_to_subscribe_to_non_existing_stream';
@@ -81,9 +79,7 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         $this->assertTrue(yield $dropped->wait(0));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function be_able_to_subscribe_to_non_existing_stream_and_then_catch_event(): Generator
     {
         $stream = 'be_able_to_subscribe_to_non_existing_stream_and_then_catch_event';
@@ -119,9 +115,7 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function allow_multiple_subscriptions_to_same_stream(): Generator
     {
         $stream = 'allow_multiple_subscriptions_to_same_stream';
@@ -173,9 +167,7 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         $this->assertTrue(yield $dropped2->wait(self::TIMEOUT));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function call_dropped_callback_after_stop_method_call(): Generator
     {
         $stream = 'call_dropped_callback_after_stop_method_call';
@@ -204,9 +196,7 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function call_dropped_callback_when_an_error_occurs_while_processing_an_event(): Generator
     {
         $stream = 'call_dropped_callback_when_an_error_occurs_while_processing_an_event';
@@ -238,9 +228,7 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function read_all_existing_events_and_keep_listening_to_new_ones(): Generator
     {
         $stream = 'read_all_existing_events_and_keep_listening_to_new_ones';
@@ -294,9 +282,7 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function filter_events_and_keep_listening_to_new_ones(): Generator
     {
         $stream = 'filter_events_and_keep_listening_to_new_ones';
@@ -354,9 +340,7 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         yield $subscription->stop(0);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function filter_events_and_work_if_nothing_was_written_after_subscription(): Generator
     {
         $stream = 'filter_events_and_work_if_nothing_was_written_after_subscription';

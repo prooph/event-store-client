@@ -38,9 +38,7 @@ class update_non_existing_persistent_subscription extends AsyncTestCase
         yield new Success();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_completion_fails_with_not_found(): Generator
     {
         yield $this->execute(function (): Generator {

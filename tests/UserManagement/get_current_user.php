@@ -19,9 +19,7 @@ use ProophTest\EventStoreClient\DefaultData;
 
 class get_current_user extends TestWithNode
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function returns_the_current_user(): Generator
     {
         $user = yield $this->manager->getCurrentUserAsync(DefaultData::adminCredentials());

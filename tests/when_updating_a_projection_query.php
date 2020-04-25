@@ -55,9 +55,7 @@ class when_updating_a_projection_query extends AsyncTestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_update_the_projection_query(): Generator
     {
         yield $this->execute(function (): Generator {

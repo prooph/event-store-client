@@ -66,9 +66,7 @@ class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnecti
         return $events;
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function catchupSubscriptionToAllHandlesManyEventsWithSmallBatchSize(): Generator
     {
         $deferred = new Deferred();
@@ -91,9 +89,7 @@ class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnecti
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function catchupSubscriptionToStreamHandlesManyEventsWithSmallBatchSize(): Generator
     {
         $deferred = new Deferred();

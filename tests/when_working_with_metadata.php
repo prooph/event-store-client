@@ -19,9 +19,7 @@ use ProophTest\EventStoreClient\Helper\TestEvent;
 
 class when_working_with_metadata extends EventStoreConnectionTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function when_getting_metadata_for_an_existing_stream_and_no_metadata_exists(): \Generator
     {
         $stream = 'when_getting_metadata_for_an_existing_stream_and_no_metadata_exists';

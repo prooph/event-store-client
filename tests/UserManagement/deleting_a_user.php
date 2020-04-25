@@ -23,9 +23,7 @@ use ProophTest\EventStoreClient\DefaultData;
 
 class deleting_a_user extends TestWithNode
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_non_existing_user_throws(): Generator
     {
         $this->expectException(UserCommandFailed::class);
@@ -51,9 +49,7 @@ class deleting_a_user extends TestWithNode
         yield $this->manager->deleteUserAsync($user, DefaultData::adminCredentials());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_empty_user_throws(): Generator
     {
         $this->expectException(InvalidArgumentException::class);
@@ -61,9 +57,7 @@ class deleting_a_user extends TestWithNode
         yield $this->manager->deleteUserAsync('', DefaultData::adminCredentials());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function can_delete_a_user(): Generator
     {
         $name = Guid::generateString();

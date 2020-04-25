@@ -63,9 +63,7 @@ class subscribe_to_all_should extends EventStoreConnectionTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function allow_multiple_subscriptions(): Generator
     {
         $stream = 'subscribe_to_all_should_allow_multiple_subscriptions';
@@ -102,9 +100,7 @@ class subscribe_to_all_should extends EventStoreConnectionTestCase
         $this->assertTrue(yield $appeared->wait(self::TIMEOUT), 'Appeared countdown event timed out');
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function catch_deleted_events_as_well(): Generator
     {
         $stream = 'subscribe_to_all_should_catch_created_and_deleted_events_as_well';

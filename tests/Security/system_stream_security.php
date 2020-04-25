@@ -22,9 +22,7 @@ use Prooph\EventStore\UserCredentials;
 
 class system_stream_security extends AuthenticationTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_system_stream_with_no_acl_set_fail_for_non_admin(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readEvent('$system-no-acl', 'user1', 'pa$$1'));
@@ -47,9 +45,7 @@ class system_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->subscribeToStream('$system-no-acl', 'user1', 'pa$$1'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_system_stream_with_no_acl_set_succeed_for_admin(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -74,9 +70,7 @@ class system_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_system_stream_with_acl_set_to_usual_user_fail_for_not_authorized_user(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readEvent('$system-no-acl', 'user2', 'pa$$2'));
@@ -99,9 +93,7 @@ class system_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->subscribeToStream('$system-no-acl', 'user2', 'pa$$2'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_system_stream_with_acl_set_to_usual_user_succeed_for_that_user(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -126,9 +118,7 @@ class system_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_system_stream_with_acl_set_to_usual_user_succeed_for_admin(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -153,9 +143,7 @@ class system_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_system_stream_with_acl_set_to_admins_fail_for_usual_user(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readEvent('$system-adm', 'user1', 'pa$$1'));
@@ -178,9 +166,7 @@ class system_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->subscribeToStream('$system-adm', 'user1', 'pa$$1'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_system_stream_with_acl_set_to_admins_succeed_for_admin(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -205,9 +191,7 @@ class system_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_system_stream_with_acl_set_to_all_succeed_for_not_authenticated_user(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -232,9 +216,7 @@ class system_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_system_stream_with_acl_set_to_all_succeed_for_usual_user(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -259,9 +241,7 @@ class system_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_system_stream_with_acl_set_to_all_succeed_for_admin(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {

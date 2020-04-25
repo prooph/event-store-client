@@ -28,9 +28,7 @@ use ProophTest\EventStoreClient\Helper\TestEvent;
 
 class transaction extends EventStoreConnectionTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function should_start_on_non_existing_stream_with_correct_exp_ver_and_create_stream_on_commit(): Generator
     {
         $stream = 'should_start_on_non_existing_stream_with_correct_exp_ver_and_create_stream_on_commit';
@@ -49,9 +47,7 @@ class transaction extends EventStoreConnectionTestCase
         $this->assertSame(0, $result->nextExpectedVersion());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_start_on_non_existing_stream_with_exp_ver_any_and_create_stream_on_commit(): Generator
     {
         $stream = 'should_start_on_non_existing_stream_with_exp_ver_any_and_create_stream_on_commit';
@@ -70,9 +66,7 @@ class transaction extends EventStoreConnectionTestCase
         $this->assertSame(0, $result->nextExpectedVersion());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_fail_to_commit_non_existing_stream_with_wrong_exp_ver(): Generator
     {
         $stream = 'should_fail_to_commit_non_existing_stream_with_wrong_exp_ver';
@@ -90,9 +84,7 @@ class transaction extends EventStoreConnectionTestCase
         yield $transaction->commitAsync();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_do_nothing_if_commits_no_events_to_empty_stream(): Generator
     {
         $stream = 'should_do_nothing_if_commits_no_events_to_empty_stream';
@@ -119,9 +111,7 @@ class transaction extends EventStoreConnectionTestCase
         $this->assertCount(0, $result->events());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_do_nothing_if_transactionally_writing_no_events_to_empty_stream(): Generator
     {
         $stream = 'should_do_nothing_if_transactionally_writing_no_events_to_empty_stream';
@@ -150,9 +140,7 @@ class transaction extends EventStoreConnectionTestCase
         $this->assertCount(0, $result->events());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_validate_expectations_on_commit(): Generator
     {
         $stream = 'should_validate_expectations_on_commit';
@@ -170,9 +158,7 @@ class transaction extends EventStoreConnectionTestCase
         yield $transaction->commitAsync();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_commit_when_writing_with_exp_ver_any_even_while_someone_is_writing_in_parallel(): Generator
     {
         $stream = 'should_commit_when_writing_with_exp_ver_any_even_while_someone_is_writing_in_parallel';
@@ -218,9 +204,7 @@ class transaction extends EventStoreConnectionTestCase
         $this->assertSame(250, $totalPlainWrites);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_fail_to_commit_if_started_with_correct_ver_but_committing_with_bad(): Generator
     {
         $stream = 'should_fail_to_commit_if_started_with_correct_ver_but_committing_with_bad';
@@ -240,9 +224,7 @@ class transaction extends EventStoreConnectionTestCase
         yield $transaction->commitAsync();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_not_fail_to_commit_if_started_with_wrong_ver_but_committing_with_correct_ver(): Generator
     {
         $stream = 'should_not_fail_to_commit_if_started_with_wrong_ver_but_committing_with_correct_ver';
@@ -263,9 +245,7 @@ class transaction extends EventStoreConnectionTestCase
         $this->assertSame(1, $result->nextExpectedVersion());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_fail_to_commit_if_started_with_correct_ver_but_on_commit_stream_was_deleted(): Generator
     {
         $stream = 'should_fail_to_commit_if_started_with_correct_ver_but_on_commit_stream_was_deleted';
@@ -285,9 +265,7 @@ class transaction extends EventStoreConnectionTestCase
         yield $transaction->commitAsync();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function idempotency_is_correct_for_explicit_transactions_with_expected_version_any(): Generator
     {
         $stream = 'idempotency_is_correct_for_explicit_transactions_with_expected_version_any';

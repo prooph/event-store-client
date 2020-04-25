@@ -19,9 +19,7 @@ use Prooph\EventStore\PersistentSubscriptionSettings;
 
 class create_persistent_subscription_with_too_big_message_timeout extends TestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function the_build_fails_with_argument_exception(): void
     {
         $this->expectException(InvalidArgumentException::class);

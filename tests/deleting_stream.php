@@ -44,9 +44,7 @@ class deleting_stream extends EventStoreConnectionTestCase
         yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::ANY, true);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function with_invalid_expected_version_should_fail(): Generator
     {
         $stream = 'with_invalid_expected_version_should_fail';
@@ -55,9 +53,7 @@ class deleting_stream extends EventStoreConnectionTestCase
         yield $this->connection->deleteStreamAsync($stream, 1, true);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_return_log_position_when_writing(): Generator
     {
         $stream = 'delete_should_return_log_position_when_writing';
@@ -71,9 +67,7 @@ class deleting_stream extends EventStoreConnectionTestCase
         $this->assertGreaterThan(0, $delete->logPosition()->commitPosition());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function which_was_already_deleted_should_fail(): Generator
     {
         $stream = 'which_was_allready_deleted_should_fail';

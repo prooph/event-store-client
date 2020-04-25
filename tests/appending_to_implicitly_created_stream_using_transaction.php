@@ -24,9 +24,7 @@ use ProophTest\EventStoreClient\Helper\TransactionalWriter;
 
 class appending_to_implicitly_created_stream_using_transaction extends EventStoreConnectionTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0em1_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0em1_idempotent';
@@ -54,9 +52,7 @@ class appending_to_implicitly_created_stream_using_transaction extends EventStor
         $this->assertSame(\count($events), $total);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0any_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0any_idempotent';
@@ -86,9 +82,7 @@ class appending_to_implicitly_created_stream_using_transaction extends EventStor
         $this->assertSame(\count($events), $total);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e5_non_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e5_non_idempotent';
@@ -118,9 +112,7 @@ class appending_to_implicitly_created_stream_using_transaction extends EventStor
         $this->assertSame(\count($events) + 1, $total);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e6_wev(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e6_wev';
@@ -147,9 +139,7 @@ class appending_to_implicitly_created_stream_using_transaction extends EventStor
         yield $ongoingTransaction->commitAsync();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e4_wev(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e4_wev';
@@ -176,9 +166,7 @@ class appending_to_implicitly_created_stream_using_transaction extends EventStor
         yield $ongoingTransaction->commitAsync();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_0e0_non_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_0e0_non_idempotent';
@@ -208,9 +196,7 @@ class appending_to_implicitly_created_stream_using_transaction extends EventStor
         $this->assertSame(\count($events) + 1, $total);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_0any_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_0any_idempotent';
@@ -240,9 +226,7 @@ class appending_to_implicitly_created_stream_using_transaction extends EventStor
         $this->assertSame(\count($events), $total);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_0em1_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_0em1_idempotent';
@@ -272,9 +256,7 @@ class appending_to_implicitly_created_stream_using_transaction extends EventStor
         $this->assertSame(\count($events), $total);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_1e0_2e1_1any_1any_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_0em1_1e0_2e1_1any_1any_idempotent';
@@ -304,9 +286,7 @@ class appending_to_implicitly_created_stream_using_transaction extends EventStor
         $this->assertSame(\count($events), $total);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_S_0em1_1em1_E_S_0em1_1em1_2em1_E_idempotancy_fail(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_using_transaction_sequence_S_0em1_1em1_E_S_0em1_1em1_2em1_E_idempotancy_fail';

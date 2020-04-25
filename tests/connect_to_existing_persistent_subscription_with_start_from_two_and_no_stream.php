@@ -121,9 +121,7 @@ class connect_to_existing_persistent_subscription_with_start_from_two_and_no_str
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_subscription_gets_event_two_as_its_first_event(): Generator
     {
         yield $this->execute(function (): Generator {

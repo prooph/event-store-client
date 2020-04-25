@@ -47,9 +47,7 @@ class create_duplicate_persistent_subscription_group extends AsyncTestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_completion_fails_with_invalid_operation_exception(): Generator
     {
         yield $this->execute(function (): Generator {

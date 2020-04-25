@@ -109,9 +109,7 @@ class stream_security_inheritance extends AuthenticationTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function acl_inheritance_is_working_properly_on_user_streams(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('user-no-acl', null, null));
@@ -150,9 +148,7 @@ class stream_security_inheritance extends AuthenticationTestCase
         yield $this->readEvent('user-r-restricted', 'adm', 'admpa$$');
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function acl_inheritance_is_working_properly_on_system_streams(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('$sys-no-acl', null, null));

@@ -23,9 +23,7 @@ use ProophTest\EventStoreClient\Helper\TestEvent;
 
 class appending_to_implicitly_created_stream extends EventStoreConnectionTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0em1_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0em1_idempotent';
@@ -43,9 +41,7 @@ class appending_to_implicitly_created_stream extends EventStoreConnectionTestCas
         $this->assertCount($total, $events);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_1e0_2e1_3e2_4e3_4e4_0any_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_4e4_0any_idempotent';
@@ -63,9 +59,7 @@ class appending_to_implicitly_created_stream extends EventStoreConnectionTestCas
         $this->assertCount($total, $events);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e5_non_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e5_non_idempotent';
@@ -82,9 +76,7 @@ class appending_to_implicitly_created_stream extends EventStoreConnectionTestCas
         yield $first6->then($events[0], 6);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e4_wev(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e4_wev';
@@ -101,9 +93,7 @@ class appending_to_implicitly_created_stream extends EventStoreConnectionTestCas
         yield $first6->then($events[0], 4);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_0e0_non_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_0e0_non_idempotent';
@@ -122,9 +112,7 @@ class appending_to_implicitly_created_stream extends EventStoreConnectionTestCas
         $this->assertCount($total - 1, $events);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_0any_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_0any_idempotent';
@@ -143,9 +131,7 @@ class appending_to_implicitly_created_stream extends EventStoreConnectionTestCas
         $this->assertCount($total, $events);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_0em1_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_0em1_idempotent';
@@ -164,9 +150,7 @@ class appending_to_implicitly_created_stream extends EventStoreConnectionTestCas
         $this->assertCount($total, $events);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_0em1_1e0_2e1_1any_1any_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_1any_1any_idempotent';
@@ -187,9 +171,7 @@ class appending_to_implicitly_created_stream extends EventStoreConnectionTestCas
         $this->assertCount($total, $events);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_S_0em1_1em1_E_S_0em1_E_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_0em1_E_idempotent';
@@ -204,9 +186,7 @@ class appending_to_implicitly_created_stream extends EventStoreConnectionTestCas
         $this->assertCount($total, $events);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_S_0em1_1em1_E_S_0any_E_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_0any_E_idempotent';
@@ -221,9 +201,7 @@ class appending_to_implicitly_created_stream extends EventStoreConnectionTestCas
         $this->assertCount($total, $events);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_S_0em1_1em1_E_S_1e0_E_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_1e0_E_idempotent';
@@ -238,9 +216,7 @@ class appending_to_implicitly_created_stream extends EventStoreConnectionTestCas
         $this->assertCount($total, $events);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_S_0em1_1em1_E_S_1any_E_idempotent(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_1any_E_idempotent';
@@ -255,9 +231,7 @@ class appending_to_implicitly_created_stream extends EventStoreConnectionTestCas
         $this->assertCount($total, $events);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function sequence_S_0em1_1em1_E_S_0em1_1em1_2em1_E_idempotancy_fail(): Generator
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_0em1_1em1_2em1_E_idempotancy_fail';

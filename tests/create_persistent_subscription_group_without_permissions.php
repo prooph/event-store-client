@@ -44,9 +44,7 @@ class create_persistent_subscription_group_without_permissions extends AsyncTest
         yield new Success();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_completion_succeeds(): Generator
     {
         yield $this->execute(function (): Generator {

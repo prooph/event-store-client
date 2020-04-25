@@ -22,9 +22,7 @@ use ProophTest\EventStoreClient\DefaultData;
 
 class creating_a_user extends TestWithNode
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function creating_a_user_with_empty_username_throws(): Generator
     {
         $this->expectException(InvalidArgumentException::class);
@@ -37,9 +35,7 @@ class creating_a_user extends TestWithNode
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function creating_a_user_with_empty_name_throws(): Generator
     {
         $this->expectException(InvalidArgumentException::class);
@@ -52,9 +48,7 @@ class creating_a_user extends TestWithNode
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function creating_a_user_with_empty_password_throws(): Generator
     {
         $this->expectException(InvalidArgumentException::class);
@@ -67,9 +61,7 @@ class creating_a_user extends TestWithNode
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function fetching_user_with_empty_name_throws(): Generator
     {
         $this->expectException(InvalidArgumentException::class);
@@ -77,9 +69,7 @@ class creating_a_user extends TestWithNode
         yield $this->manager->getUserAsync('', DefaultData::adminCredentials());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function creating_a_user_with_parameters_can_be_read(): Generator
     {
         $login = Guid::generateString();

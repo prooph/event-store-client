@@ -52,9 +52,7 @@ class connect_to_non_existing_persistent_subscription_with_permissions extends A
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_subscription_fails_to_connect_with_invalid_argument_exception(): Generator
     {
         yield $this->execute(function (): Generator {

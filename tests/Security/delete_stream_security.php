@@ -21,9 +21,7 @@ use Prooph\EventStore\StreamMetadata;
 
 class delete_stream_security extends AuthenticationTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function delete_of_all_is_never_allowed(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream('$all', null, null));
@@ -31,9 +29,7 @@ class delete_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream('$all', 'adm', 'admpa$$'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_normal_no_acl_stream_with_no_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -43,9 +39,7 @@ class delete_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_normal_no_acl_stream_with_existing_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -55,9 +49,7 @@ class delete_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_normal_no_acl_stream_with_admin_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -67,9 +59,7 @@ class delete_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_normal_user_stream_with_no_user_is_not_allowed(): Generator
     {
         $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
@@ -80,9 +70,7 @@ class delete_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, null, null));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_normal_user_stream_with_not_authorized_user_is_not_allowed(): Generator
     {
         $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
@@ -93,9 +81,7 @@ class delete_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, 'user2', 'pa$$2'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_normal_user_stream_with_authorized_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -108,9 +94,7 @@ class delete_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_normal_user_stream_with_admin_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -123,9 +107,7 @@ class delete_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_normal_admin_stream_with_no_user_is_not_allowed(): Generator
     {
         $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
@@ -136,9 +118,7 @@ class delete_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, null, null));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_normal_admin_stream_with_existing_user_is_not_allowed(): Generator
     {
         $streamId = yield $this->createStreamWithMeta(StreamMetadata::create()
@@ -149,9 +129,7 @@ class delete_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, 'user1', 'pa$$1'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_normal_admin_stream_with_admin_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -164,9 +142,7 @@ class delete_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_normal_all_stream_with_no_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -179,9 +155,7 @@ class delete_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_normal_all_stream_with_existing_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -194,9 +168,7 @@ class delete_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_normal_all_stream_with_admin_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -211,9 +183,7 @@ class delete_stream_security extends AuthenticationTestCase
 
     // $-stream
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_system_no_acl_stream_with_no_user_is_not_allowed(): Generator
     {
         $streamId = yield $this->createStreamWithMeta(
@@ -224,9 +194,7 @@ class delete_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, null, null));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_system_no_acl_stream_with_existing_user_is_not_allowed(): Generator
     {
         $streamId = yield $this->createStreamWithMeta(
@@ -237,9 +205,7 @@ class delete_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, 'user1', 'pa$$1'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_system_no_acl_stream_with_admin_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -252,9 +218,7 @@ class delete_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_system_user_stream_with_no_user_is_not_allowed(): Generator
     {
         $streamId = yield $this->createStreamWithMeta(
@@ -267,9 +231,7 @@ class delete_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, null, null));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_system_user_stream_with_not_authorized_user_is_not_allowed(): Generator
     {
         $streamId = yield $this->createStreamWithMeta(
@@ -282,9 +244,7 @@ class delete_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, 'user2', 'pa$$2'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_system_user_stream_with_authorized_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -299,9 +259,7 @@ class delete_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_system_user_stream_with_admin_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -316,9 +274,7 @@ class delete_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_system_admin_stream_with_no_user_is_not_allowed(): Generator
     {
         $streamId = yield $this->createStreamWithMeta(
@@ -331,9 +287,7 @@ class delete_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, null, null));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_system_admin_stream_with_existing_user_is_not_allowed(): Generator
     {
         $streamId = yield $this->createStreamWithMeta(
@@ -346,9 +300,7 @@ class delete_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($streamId, 'user1', 'pa$$1'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_system_admin_stream_with_admin_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -363,9 +315,7 @@ class delete_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_system_all_stream_with_no_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -380,9 +330,7 @@ class delete_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_system_all_stream_with_existing_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -397,9 +345,7 @@ class delete_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function deleting_system_all_stream_with_admin_user_is_allowed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {

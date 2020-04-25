@@ -66,9 +66,7 @@ class connect_to_existing_persistent_subscription_with_permissions extends Async
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_subscription_suceeds(): Generator
     {
         yield $this->execute(function (): Generator {

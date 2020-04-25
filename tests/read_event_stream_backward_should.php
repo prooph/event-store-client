@@ -26,9 +26,7 @@ use ProophTest\EventStoreClient\Helper\TestEvent;
 
 class read_event_stream_backward_should extends EventStoreConnectionTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function throw_if_count_le_zero(): Generator
     {
         $stream = 'read_event_stream_backward_should_throw_if_count_le_zero';
@@ -43,9 +41,7 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function notify_using_status_code_if_stream_not_found(): Generator
     {
         $stream = 'read_event_stream_backward_should_notify_using_status_code_if_stream_not_found';
@@ -61,9 +57,7 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
         $this->assertTrue(SliceReadStatus::streamNotFound()->equals($read->status()));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function notify_using_status_code_if_stream_was_deleted(): Generator
     {
         $stream = 'read_event_stream_backward_should_notify_using_status_code_if_stream_was_deleted';
@@ -81,9 +75,7 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
         $this->assertTrue(SliceReadStatus::streamDeleted()->equals($read->status()));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function return_no_events_when_called_on_empty_stream(): Generator
     {
         $stream = 'read_event_stream_backward_should_return_single_event_when_called_on_empty_stream';
@@ -99,9 +91,7 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
         $this->assertCount(0, $read->events());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function return_partial_slice_if_no_enough_events_in_stream(): Generator
     {
         $stream = 'read_event_stream_backward_should_return_partial_slice_if_no_enough_events_in_stream';
@@ -124,9 +114,7 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
         $this->assertCount(2, $read->events());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function return_events_reversed_compared_to_written(): Generator
     {
         $stream = 'read_event_stream_backward_should_return_events_reversed_compared_to_written';
@@ -154,9 +142,7 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
         $this->assertTrue(EventDataComparer::allEqual($testEvents, $events));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function be_able_to_read_single_event_from_arbitrary_position(): Generator
     {
         $stream = 'read_event_stream_backward_should_be_able_to_read_single_event_from_arbitrary_position';
@@ -179,9 +165,7 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
         $this->assertTrue(EventDataComparer::equal($testEvents[7], $read->events()[0]->event()));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function be_able_to_read_first_event(): Generator
     {
         $stream = 'read_event_stream_backward_should_be_able_to_read_first_event';
@@ -204,9 +188,7 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
         $this->assertCount(1, $read->events());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function be_able_to_read_last_event(): Generator
     {
         $stream = 'read_event_stream_backward_should_be_able_to_read_last_event';
@@ -229,9 +211,7 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
         $this->assertTrue(EventDataComparer::equal($testEvents[9], $read->events()[0]->event()));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function be_able_to_read_slice_from_arbitrary_position(): Generator
     {
         $stream = 'read_event_stream_backward_should_be_able_to_read_slice_from_arbitrary_position';
@@ -262,9 +242,7 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
         ));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function throw_when_got_int_max_value_as_maxcount(): Generator
     {
         $this->expectException(InvalidArgumentException::class);

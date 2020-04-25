@@ -56,9 +56,7 @@ class happy_case_catching_up_to_link_to_events_manual_ack extends AsyncTestCase
         yield new Success();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function test(): Generator
     {
         yield $this->execute(function (): Generator {

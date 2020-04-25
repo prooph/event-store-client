@@ -29,9 +29,7 @@ class authorized_default_credentials_security extends AuthenticationTestCase
         $this->userCredentials = new UserCredentials('user1', 'pa$$1');
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function all_operations_succeeds_when_passing_no_explicit_credentials(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -57,9 +55,7 @@ class authorized_default_credentials_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function all_operations_are_not_authenticated_when_overriden_with_not_existing_credentials(): Generator
     {
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->readAllForward('badlogin', 'badpass'));
@@ -88,9 +84,7 @@ class authorized_default_credentials_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->subscribeToAll('badlogin', 'badpass'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function all_operations_are_not_authorized_when_overriden_with_not_authorized_credentials(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readAllForward('user2', 'pa$$2'));

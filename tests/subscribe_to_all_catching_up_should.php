@@ -72,9 +72,7 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function call_dropped_callback_after_stop_method_call(): Generator
     {
         $dropped = new CountdownEvent(1);
@@ -115,9 +113,7 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
         $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function call_dropped_callback_when_an_error_occurs_while_processing_an_event(): Generator
     {
         $stream = 'all_call_dropped_callback_when_an_error_occurs_while_processing_an_event';
@@ -243,9 +239,7 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
         $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function read_all_existing_events_and_keep_listening_to_new_ones(): Generator
     {
         $result = yield $this->connection->readAllEventsBackwardAsync(Position::end(), 1, false);

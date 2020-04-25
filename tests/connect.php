@@ -54,9 +54,7 @@ class connect extends AsyncTestCase
         yield new Delayed(50); // wait for loop to finish
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_throw_exception_when_trying_to_reopen_closed_connection(): Generator
     {
         $closed = new Deferred();
@@ -89,9 +87,7 @@ class connect extends AsyncTestCase
         yield $connection->connectAsync();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_close_connection_after_configured_amount_of_failed_reconnections(): Generator
     {
         $closed = new Deferred();

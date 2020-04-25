@@ -82,9 +82,7 @@ class read_all_events_forward_should extends AsyncTestCase
         $this->connection->close();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function return_empty_slice_if_asked_to_read_from_end(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -96,9 +94,7 @@ class read_all_events_forward_should extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function return_events_in_same_order_as_written(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -115,9 +111,7 @@ class read_all_events_forward_should extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function be_able_to_read_all_one_by_one_until_end_of_stream(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -144,9 +138,7 @@ class read_all_events_forward_should extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function be_able_to_read_events_slice_at_time(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -170,9 +162,7 @@ class read_all_events_forward_should extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function return_partial_slice_if_not_enough_events(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -190,9 +180,7 @@ class read_all_events_forward_should extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function throw_when_got_int_max_value_as_maxcount(): Generator
     {
         yield $this->execute(function (): Generator {

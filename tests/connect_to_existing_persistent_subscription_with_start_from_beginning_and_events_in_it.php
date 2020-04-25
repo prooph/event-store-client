@@ -118,9 +118,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_subscription_gets_event_zero_as_its_first_event(): Generator
     {
         yield $this->execute(function (): Generator {

@@ -21,65 +21,49 @@ use Prooph\EventStore\Exception\NotAuthenticated;
 
 class write_stream_meta_security extends AuthenticationTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_meta_with_not_existing_credentials_is_not_authenticated(): Generator
     {
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->writeMeta('metawrite-stream', 'badlogin', 'badpass', 'user1'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_meta_to_stream_with_no_credentials_is_denied(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeMeta('metawrite-stream', null, null, 'user1'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_meta_to_stream_with_not_authorized_user_credentials_is_denied(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeMeta('metawrite-stream', 'user2', 'pa$$2', 'user1'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_meta_to_stream_with_authorized_user_credentials_succeeds(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => $this->writeMeta('metawrite-stream', 'user1', 'pa$$1', 'user1'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_meta_to_stream_with_admin_user_credentials_succeeds(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => $this->writeMeta('metawrite-stream', 'adm', 'admpa$$', 'user1'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_meta_to_no_acl_stream_succeeds_when_no_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => $this->writeMeta('noacl-stream', null, null, null));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_meta_to_no_acl_stream_is_not_authenticated_when_not_existing_credentials_are_passed(): Generator
     {
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->writeMeta('noacl-stream', 'badlogin', 'badpass', null));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_meta_to_no_acl_stream_succeeds_when_any_existing_user_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -88,33 +72,25 @@ class write_stream_meta_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_meta_to_no_acl_stream_succeeds_when_admin_user_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => $this->writeMeta('noacl-stream', 'adm', 'admpa$$', null));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_meta_to_all_access_normal_stream_succeeds_when_no_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => $this->writeMeta('normal-all', null, null, SystemRoles::ALL));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_meta_to_all_access_normal_stream_is_not_authenticated_when_not_existing_credentials_are_passed(): Generator
     {
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->writeMeta('normal-all', 'badlogin', 'badpass', SystemRoles::ALL));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_meta_to_all_access_normal_stream_succeeds_when_any_existing_user_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -123,9 +99,7 @@ class write_stream_meta_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_meta_to_all_access_normal_stream_succeeds_when_admin_user_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => $this->writeMeta('normal-all', 'adm', 'admpa$$', SystemRoles::ALL));
