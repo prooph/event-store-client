@@ -1,7 +1,11 @@
 <?php
 
 $config = new Prooph\CS\Config\Prooph();
-$config->getFinder()->in(__DIR__);
+$config
+    ->getFinder()
+    ->in(__DIR__)
+    ->exclude('GPBMetadata')
+    ->exclude('src/Messages/ClientMessages');
 
 $cacheDir = getenv('TRAVIS') ? getenv('HOME') . '/.php-cs-fixer' : __DIR__;
 

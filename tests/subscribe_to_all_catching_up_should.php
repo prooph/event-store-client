@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Deferred;
 use function Amp\call;
+use Amp\Deferred;
 use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
