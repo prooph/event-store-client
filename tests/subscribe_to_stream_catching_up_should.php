@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
+use Amp\Deferred;
 use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
@@ -28,7 +29,6 @@ use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStoreClient\Internal\EventStoreStreamCatchUpSubscription;
-use Prooph\EventStoreClient\Internal\ManualResetEventSlim;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 
@@ -43,7 +43,7 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
     {
         $stream = 'be_able_to_subscribe_to_non_existing_stream';
 
-        $appeared = new ManualResetEventSlim(false);
+        $appeared = new Deferred();
         $dropped = new CountdownEvent(1);
 
         $subscription = yield $this->connection->subscribeToStreamFromAsync(
@@ -73,7 +73,7 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
 
         yield new Delayed(self::TIMEOUT);
 
-        $this->assertFalse(yield $appeared->wait(0), 'Some event appeared');
+        $this->assertFalse(yield Promise\timeoutWithDefault($appeared->promise(), 0, false), 'Some event appeared');
         $this->assertFalse(yield $dropped->wait(0), 'Subscription was dropped prematurely');
 
         yield $subscription->stop(self::TIMEOUT);
@@ -127,8 +127,8 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         $stream = 'allow_multiple_subscriptions_to_same_stream';
 
         $appeared = new CountdownEvent(2);
-        $dropped1 = new ManualResetEventSlim(false);
-        $dropped2 = new ManualResetEventSlim(false);
+        $dropped1 = new Deferred();
+        $dropped2 = new Deferred();
 
         $sub1 = yield $this->connection->subscribeToStreamFromAsync(
             $stream,
@@ -157,20 +157,20 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         );
 
         if (! yield $appeared->wait(self::TIMEOUT)) {
-            $this->assertFalse(yield $dropped1->wait(0), 'Subscription1 was dropped prematurely');
-            $this->assertFalse(yield $dropped2->wait(0), 'Subscription2 was dropped prematurely');
+            $this->assertFalse(yield Promise\timeoutWithDefault($dropped1->promise(), 0, false), 'Subscription1 was dropped prematurely');
+            $this->assertFalse(yield Promise\timeoutWithDefault($dropped2->promise(), 0, false), 'Subscription2 was dropped prematurely');
             $this->fail('Could not wait for all events');
 
             return;
         }
 
-        $this->assertFalse(yield $dropped1->wait(0));
+        $this->assertFalse(yield Promise\timeoutWithDefault($dropped1->promise(), 0, false));
         yield $sub1->stop(self::TIMEOUT);
-        $this->assertTrue(yield $dropped1->wait(self::TIMEOUT));
+        $this->assertTrue(yield Promise\timeoutWithDefault($dropped1->promise(), self::TIMEOUT, false));
 
-        $this->assertFalse(yield $dropped2->wait(0));
+        $this->assertFalse(yield Promise\timeoutWithDefault($dropped2->promise(), 0, false));
         yield $sub2->stop(self::TIMEOUT);
-        $this->assertTrue(yield $dropped2->wait(self::TIMEOUT));
+        $this->assertTrue(yield Promise\timeoutWithDefault($dropped2->promise(), self::TIMEOUT, false));
     }
 
     /**
@@ -449,12 +449,12 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         };
     }
 
-    private function appearedWithResetEvent(ManualResetEventSlim $appeared): EventAppearedOnCatchupSubscription
+    private function appearedWithResetEvent(Deferred $appeared): EventAppearedOnCatchupSubscription
     {
         return new class($appeared) implements EventAppearedOnCatchupSubscription {
-            private ManualResetEventSlim $appeared;
+            private Deferred $appeared;
 
-            public function __construct(ManualResetEventSlim $appeared)
+            public function __construct(Deferred $appeared)
             {
                 $this->appeared = $appeared;
             }
@@ -463,7 +463,7 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
                 EventStoreCatchUpSubscription $subscription,
                 ResolvedEvent $resolvedEvent
             ): Promise {
-                $this->appeared->set();
+                $this->appeared->resolve(true);
 
                 return new Success();
             }
@@ -490,12 +490,12 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         };
     }
 
-    private function droppedWithResetEvent(ManualResetEventSlim $dropped): CatchUpSubscriptionDropped
+    private function droppedWithResetEvent(Deferred $dropped): CatchUpSubscriptionDropped
     {
         return new class($dropped) implements CatchUpSubscriptionDropped {
-            private ManualResetEventSlim $dropped;
+            private Deferred $dropped;
 
-            public function __construct(ManualResetEventSlim $dropped)
+            public function __construct(Deferred $dropped)
             {
                 $this->dropped = $dropped;
             }
@@ -505,7 +505,7 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
                 SubscriptionDropReason $reason,
                 ?Throwable $exception = null
             ): void {
-                $this->dropped->set();
+                $this->dropped->resolve(true);
             }
         };
     }

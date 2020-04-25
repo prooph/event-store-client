@@ -60,7 +60,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
     private ?DropData $dropData = null;
     private bool $isDropped = false;
     private int $bufferSize;
-    private ManualResetEventSlim $stopped;
+    private Deferred $stopped;
 
     /** @internal  */
     public function __construct(
@@ -91,7 +91,8 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
         $this->bufferSize = $bufferSize;
         $this->autoAck = $autoAck;
         $this->queue = new SplQueue();
-        $this->stopped = new ManualResetEventSlim(true);
+        $this->stopped = new Deferred();
+        $this->stopped->resolve(true);
         $this->handler = $handler;
     }
 
@@ -129,7 +130,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
      */
     public function start(): Promise
     {
-        $this->stopped->reset();
+        $this->stopped = new Deferred();
 
         $eventAppeared = fn (PersistentEventStoreSubscription $subscription, PersistentSubscriptionResolvedEvent $resolvedEvent): Promise => $this->onEventAppeared($resolvedEvent);
 
@@ -284,7 +285,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
             return new Success();
         }
 
-        return $this->stopped->wait($timeout);
+        return Promise\timeoutWithDefault($this->stopped->promise(), $timeout, false);
     }
 
     private function enqueueSubscriptionDropNotification(
@@ -413,7 +414,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
                 ($this->subscriptionDropped)($this, $reason, $error);
             }
 
-            $this->stopped->set();
+            $this->stopped->resolve(true);
         }
     }
 }
