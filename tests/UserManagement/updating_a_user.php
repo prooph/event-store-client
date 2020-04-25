@@ -22,9 +22,7 @@ use ProophTest\EventStoreClient\DefaultData;
 
 class updating_a_user extends TestWithNode
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function updating_a_user_with_empty_username_throws(): Generator
     {
         $this->expectException(InvalidArgumentException::class);
@@ -32,9 +30,7 @@ class updating_a_user extends TestWithNode
         yield $this->manager->updateUserAsync('', 'sascha', ['foo', 'bar'], DefaultData::adminCredentials());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function updating_a_user_with_empty_name_throws(): Generator
     {
         $this->expectException(InvalidArgumentException::class);
@@ -42,9 +38,7 @@ class updating_a_user extends TestWithNode
         yield $this->manager->updateUserAsync('sascha', '', ['foo', 'bar'], DefaultData::adminCredentials());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function updating_non_existing_user_throws(): Generator
     {
         $this->expectException(UserCommandFailed::class);
@@ -52,9 +46,7 @@ class updating_a_user extends TestWithNode
         yield $this->manager->updateUserAsync(Guid::generateString(), 'bar', ['foo'], DefaultData::adminCredentials());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function updating_a_user_with_parameters_can_be_read(): Generator
     {
         $name = Guid::generateString();

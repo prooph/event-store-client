@@ -50,9 +50,7 @@ class update_existing_persistent_subscription_without_permissions extends AsyncT
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_completion_fails_with_access_denied(): Generator
     {
         yield $this->execute(function (): Generator {

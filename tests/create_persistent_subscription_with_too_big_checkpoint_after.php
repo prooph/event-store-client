@@ -20,9 +20,7 @@ use Prooph\EventStore\PersistentSubscriptionSettings;
 
 class create_persistent_subscription_with_too_big_checkpoint_after extends TestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function the_build_fails_with_argument_exception(): Generator
     {
         $this->expectException(InvalidArgumentException::class);

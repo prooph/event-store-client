@@ -31,9 +31,7 @@ use Throwable;
 
 class soft_delete extends EventStoreConnectionTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function soft_deleted_stream_returns_no_stream_and_no_events_on_read(): Generator
     {
         $stream = 'soft_deleted_stream_returns_no_stream_and_no_events_on_read';
@@ -62,9 +60,7 @@ class soft_delete extends EventStoreConnectionTestCase
         $this->assertSame(1, $result->lastEventNumber());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function soft_deleted_stream_allows_recreation_when_expver_any(): Generator
     {
         $stream = 'soft_deleted_stream_allows_recreation_when_expver_any';
@@ -128,9 +124,7 @@ class soft_delete extends EventStoreConnectionTestCase
         $this->assertSame(1, $meta->metastreamVersion());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function soft_deleted_stream_allows_recreation_when_expver_no_stream(): Generator
     {
         $stream = 'soft_deleted_stream_allows_recreation_when_expver_no_stream';
@@ -194,9 +188,7 @@ class soft_delete extends EventStoreConnectionTestCase
         $this->assertSame(1, $meta->metastreamVersion());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function soft_deleted_stream_allows_recreation_when_expver_is_exact(): Generator
     {
         $stream = 'soft_deleted_stream_allows_recreation_when_expver_is_exact';
@@ -260,9 +252,7 @@ class soft_delete extends EventStoreConnectionTestCase
         $this->assertSame(1, $meta->metastreamVersion());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function soft_deleted_stream_when_recreated_preserves_metadata_except_truncatebefore(): Generator
     {
         $stream = 'soft_deleted_stream_when_recreated_preserves_metadata_except_truncatebefore';
@@ -336,9 +326,7 @@ class soft_delete extends EventStoreConnectionTestCase
         $this->assertSame('some value', $meta->streamMetadata()->getValue('key3'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function soft_deleted_stream_can_be_hard_deleted(): Generator
     {
         $stream = 'soft_deleted_stream_can_be_deleted';
@@ -379,9 +367,7 @@ class soft_delete extends EventStoreConnectionTestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function soft_deleted_stream_allows_recreation_only_for_first_write(): Generator
     {
         $stream = 'soft_deleted_stream_allows_recreation_only_for_first_write';
@@ -444,9 +430,7 @@ class soft_delete extends EventStoreConnectionTestCase
         $this->assertSame(1, $meta->metastreamVersion());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function soft_deleted_stream_appends_both_concurrent_writes_when_expver_any(): Generator
     {
         $stream = 'soft_deleted_stream_appends_both_concurrent_writes_when_expver_any';
@@ -506,9 +490,7 @@ class soft_delete extends EventStoreConnectionTestCase
         $this->assertSame(1, $meta->metastreamVersion());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_json_metadata_on_empty_soft_deleted_stream_recreates_stream_not_overriding_metadata(): Generator
     {
         $stream = 'setting_json_metadata_on_empty_soft_deleted_stream_recreates_stream_not_overriding_metadata';
@@ -557,9 +539,7 @@ class soft_delete extends EventStoreConnectionTestCase
         $this->assertSame('some value', $meta->streamMetadata()->getValue('key3'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_json_metadata_on_nonempty_soft_deleted_stream_recreates_stream_not_overriding_metadata(): Generator
     {
         $stream = 'setting_json_metadata_on_nonempty_soft_deleted_stream_recreates_stream_not_overriding_metadata';
@@ -617,9 +597,7 @@ class soft_delete extends EventStoreConnectionTestCase
         $this->assertSame('some value', $meta->streamMetadata()->getValue('key3'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_nonjson_metadata_on_empty_soft_deleted_stream_recreates_stream_keeping_original_metadata(): Generator
     {
         $stream = 'setting_nonjson_metadata_on_empty_soft_deleted_stream_recreates_stream_overriding_metadata';
@@ -648,9 +626,7 @@ class soft_delete extends EventStoreConnectionTestCase
         $this->assertSame($metadata, $meta->streamMetadata());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_nonjson_metadata_on_nonempty_soft_deleted_stream_recreates_stream_keeping_original_metadata(): Generator
     {
         $stream = 'setting_nonjson_metadata_on_nonempty_soft_deleted_stream_recreates_stream_overriding_metadata';

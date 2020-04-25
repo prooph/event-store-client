@@ -96,9 +96,7 @@ class deleting_existing_persistent_subscription_with_subscriber extends AsyncTes
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_subscription_is_dropped(): Generator
     {
         yield $this->execute(function (): Generator {

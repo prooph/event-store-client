@@ -22,9 +22,7 @@ use Prooph\EventStore\UserCredentials;
 
 class multiple_role_security extends AuthenticationTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function multiple_roles_are_handled_correctly(): Generator
     {
         $settings = new SystemSettings(

@@ -111,9 +111,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
         yield $this->writeEvents();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_subscription_gets_no_events(): Generator
     {
         yield $this->execute(function (): Generator {

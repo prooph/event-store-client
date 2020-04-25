@@ -330,9 +330,7 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
         $this->assertCount(1, $this->raisedEvents);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function start_completes_onces_subscription_is_live(): Generator
     {
         $finalEvent = new Deferred();
@@ -374,9 +372,7 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
         $this->assertNotNull(yield Promise\timeout($promise, self::$timeoutMs));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function when_live_processing_and_disconnected_reconnect_keeps_events_ordered(): Generator
     {
         $callCount = 0;

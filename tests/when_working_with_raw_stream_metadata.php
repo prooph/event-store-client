@@ -31,9 +31,7 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
         $this->stream = self::class . '\\' . $this->getName();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_empty_metadata_works(): Generator
     {
         yield $this->connection->setStreamMetadataAsync(
@@ -49,9 +47,7 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
         $this->assertSame('', $meta->streamMetadata());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_metadata_few_times_returns_last_metadata(): Generator
     {
         yield $this->connection->setStreamMetadataAsync(
@@ -79,9 +75,7 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
         $this->assertSame('', $meta->streamMetadata());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function trying_to_set_metadata_with_wrong_expected_version_fails(): Generator
     {
         $this->expectException(WrongExpectedVersion::class);
@@ -92,9 +86,7 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_metadata_with_expected_version_any_works(): Generator
     {
         yield $this->connection->setStreamMetadataAsync(
@@ -122,9 +114,7 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
         $this->assertSame('', $meta->streamMetadata());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_metadata_for_not_existing_stream_works(): Generator
     {
         yield $this->connection->setStreamMetadataAsync(
@@ -140,9 +130,7 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
         $this->assertSame('', $meta->streamMetadata());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_metadata_for_existing_stream_works(): Generator
     {
         yield $this->connection->appendToStreamAsync(
@@ -164,9 +152,7 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
         $this->assertSame('', $meta->streamMetadata());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_metadata_for_deleted_stream_throws_stream_deleted_exception(): Generator
     {
         yield $this->connection->deleteStreamAsync(
@@ -183,9 +169,7 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function getting_metadata_for_nonexisting_stream_returns_empty_string(): Generator
     {
         $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
@@ -196,9 +180,7 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
         $this->assertSame('', $meta->streamMetadata());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function getting_metadata_for_deleted_stream_returns_empty_string_and_signals_stream_deletion(): Generator
     {
         yield $this->connection->setStreamMetadataAsync($this->stream, ExpectedVersion::NO_STREAM);

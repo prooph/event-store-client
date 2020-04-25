@@ -54,9 +54,7 @@ class when_resetting_projections extends AsyncTestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_reset_the_projection(): Generator
     {
         yield $this->execute(function (): Generator {

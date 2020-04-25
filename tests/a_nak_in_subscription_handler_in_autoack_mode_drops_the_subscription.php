@@ -120,9 +120,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_subscription_gets_dropped(): Generator
     {
         yield $this->execute(function (): Generator {

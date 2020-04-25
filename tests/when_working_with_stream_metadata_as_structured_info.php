@@ -34,9 +34,7 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         return parent::setUpAsync();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_empty_metadata_works(): Generator
     {
         yield $this->connection->setStreamMetadataAsync(
@@ -54,9 +52,7 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $this->assertSame('{}', $meta->streamMetadata());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_metadata_few_times_returns_last_metadata_info(): Generator
     {
         $metadata = new StreamMetadata(17, 0xDEADBEEF, 10, 0xABACABA);
@@ -102,9 +98,7 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $meta->streamMetadata()->getValue('unknown');
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function trying_to_set_metadata_with_wrong_expected_version_fails(): Generator
     {
         $this->expectException(WrongExpectedVersion::class);
@@ -116,9 +110,7 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_metadata_with_expected_version_any_works(): Generator
     {
         $metadata = new StreamMetadata(17, 0xDEADBEEF, 10, 0xABACABA);
@@ -160,9 +152,7 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $this->assertSame($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_metadata_for_not_existing_stream_works(): Generator
     {
         $metadata = new StreamMetadata(17, 0xDEADBEEF, 10, 0xABACABA);
@@ -185,9 +175,7 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $this->assertSame($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_metadata_for_existing_stream_works(): Generator
     {
         yield $this->connection->appendToStreamAsync(
@@ -216,9 +204,7 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $this->assertSame($metadata->cacheControl(), $meta->streamMetadata()->cacheControl());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function getting_metadata_for_nonexisting_stream_returns_empty_stream_metadata(): Generator
     {
         $meta = yield $this->connection->getStreamMetadataAsync($this->stream);
@@ -233,9 +219,7 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $this->assertNull($meta->streamMetadata()->cacheControl());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function getting_metadata_for_deleted_stream_returns_empty_stream_metadata_and_signals_stream_deletion(): Generator
     {
         $metadata = new StreamMetadata(17, 0xDEADBEEF, 10, 0xABACABA);
@@ -265,9 +249,7 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
         $this->assertNull($meta->streamMetadata()->acl());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_correctly_formatted_metadata_as_raw_allows_to_read_it_as_structured_metadata(): Generator
     {
         $metadata = <<<END
@@ -329,9 +311,7 @@ END;
         $this->assertSame(['subProperty' => 999], $meta->streamMetadata()->getValue('customRawJson'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_structured_metadata_with_custom_properties_returns_them_untouched(): Generator
     {
         $metadata = StreamMetadata::create()
@@ -388,9 +368,7 @@ END;
         $this->assertSame('{"subProperty": 999}', $meta->streamMetadata()->getValue('customRawJson'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_structured_metadata_with_multiple_roles_can_be_read_back(): Generator
     {
         $metadata = StreamMetadata::create()
@@ -420,9 +398,7 @@ END;
         $this->assertSame(['mw1', 'mw2'], $meta->streamMetadata()->acl()->metaWriteRoles());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function setting_correct_metadata_with_multiple_roles_in_acl_allows_to_read_it_as_structured_metadata(): Generator
     {
         $metadata = <<<END

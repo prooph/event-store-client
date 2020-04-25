@@ -73,9 +73,7 @@ class when_committing_empty_transaction extends AsyncTestCase
         return parent::tearDownAsync();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function following_append_with_correct_expected_version_are_commited_correctly(): Generator
     {
         $result = yield $this->connection->appendToStreamAsync(
@@ -103,9 +101,7 @@ class when_committing_empty_transaction extends AsyncTestCase
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function following_append_with_expected_version_any_are_commited_correctly(): Generator
     {
         $result = yield $this->connection->appendToStreamAsync(
@@ -133,9 +129,7 @@ class when_committing_empty_transaction extends AsyncTestCase
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function committing_first_event_with_expected_version_no_stream_is_idempotent(): Generator
     {
         $result = yield $this->connection->appendToStreamAsync(
@@ -163,9 +157,7 @@ class when_committing_empty_transaction extends AsyncTestCase
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function trying_to_append_new_events_with_expected_version_no_stream_fails(): Generator
     {
         $this->expectException(WrongExpectedVersion::class);

@@ -22,9 +22,7 @@ use ProophTest\EventStoreClient\DefaultData;
 
 class change_password extends TestWithUser
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function empty_username_throws(): Generator
     {
         $this->expectException(InvalidArgumentException::class);
@@ -32,9 +30,7 @@ class change_password extends TestWithUser
         yield $this->manager->changePasswordAsync('', 'oldPassword', 'newPassword', DefaultData::adminCredentials());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function empty_current_password_throws(): Generator
     {
         $this->expectException(InvalidArgumentException::class);
@@ -42,9 +38,7 @@ class change_password extends TestWithUser
         yield $this->manager->changePasswordAsync($this->username, '', 'newPassword', DefaultData::adminCredentials());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function empty_new_password_throws(): Generator
     {
         $this->expectException(InvalidArgumentException::class);
@@ -52,9 +46,7 @@ class change_password extends TestWithUser
         yield $this->manager->changePasswordAsync($this->username, 'oldPassword', '', DefaultData::adminCredentials());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function can_change_password(): Generator
     {
         yield $this->manager->changePasswordAsync(

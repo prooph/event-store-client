@@ -38,9 +38,7 @@ class overriden_system_stream_security_for_all extends AuthenticationTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_system_stream_succeeds_for_user(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -69,9 +67,7 @@ class overriden_system_stream_security_for_all extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_system_stream_fail_for_anonymous_user(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -100,9 +96,7 @@ class overriden_system_stream_security_for_all extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_system_stream_succeed_for_admin(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {

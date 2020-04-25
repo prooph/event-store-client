@@ -44,9 +44,7 @@ class when_creating_one_time_projection extends AsyncTestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_create_projection(): Generator
     {
         yield $this->execute(function (): Generator {

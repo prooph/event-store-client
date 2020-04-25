@@ -38,9 +38,7 @@ class when_listing_continuous_projections extends AsyncTestCase
         $this->result = yield $this->projectionsManager->listContinuousAsync($this->credentials);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_return_continuous_projections(): Generator
     {
         yield $this->execute(function (): Generator {

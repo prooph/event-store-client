@@ -20,9 +20,7 @@ use Prooph\EventStore\Exception\NotAuthenticated;
 
 class read_stream_security extends AuthenticationTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_stream_with_not_existing_credentials_is_not_authenticated(): Generator
     {
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->readEvent('read-stream', 'badlogin', 'badpass'));
@@ -30,9 +28,7 @@ class read_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->readStreamBackward('read-stream', 'badlogin', 'badpass'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_stream_with_no_credentials_is_denied(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readEvent('read-stream', null, null));
@@ -40,9 +36,7 @@ class read_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readStreamBackward('read-stream', null, null));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_stream_with_not_authorized_user_credentials_is_denied(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readEvent('read-stream', 'user2', 'pa$$2'));
@@ -50,9 +44,7 @@ class read_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readStreamBackward('read-stream', 'user2', 'pa$$2'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_stream_with_authorized_user_credentials_succeeds(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -62,9 +54,7 @@ class read_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_stream_with_admin_user_credentials_succeeds(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -74,9 +64,7 @@ class read_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_no_acl_stream_succeeds_when_no_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -86,9 +74,7 @@ class read_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_no_acl_stream_is_not_authenticated_when_not_existing_credentials_are_passed(): Generator
     {
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->readEvent('noacl-stream', 'badlogin', 'badpass'));
@@ -96,9 +82,7 @@ class read_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->readStreamBackward('noacl-stream', 'badlogin', 'badpass'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_no_acl_stream_succeeds_when_any_existing_user_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -112,9 +96,7 @@ class read_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_no_acl_stream_succeeds_when_admin_user_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -124,9 +106,7 @@ class read_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_all_access_normal_stream_succeeds_when_no_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -136,9 +116,7 @@ class read_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_all_access_normal_stream_is_not_authenticated_when_not_existing_credentials_are_passed(): Generator
     {
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->readEvent('normal-all', 'badlogin', 'badpass'));
@@ -146,9 +124,7 @@ class read_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->readStreamBackward('normal-all', 'badlogin', 'badpass'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_all_access_normal_stream_succeeds_when_any_existing_user_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -162,9 +138,7 @@ class read_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_all_access_normal_stream_succeeds_when_admin_user_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {

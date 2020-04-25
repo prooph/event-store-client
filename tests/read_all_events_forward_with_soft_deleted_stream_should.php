@@ -66,9 +66,7 @@ class read_all_events_forward_with_soft_deleted_stream_should extends AsyncTestC
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function ensure_deleted_stream(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -80,9 +78,7 @@ class read_all_events_forward_with_soft_deleted_stream_should extends AsyncTestC
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function returns_all_events_including_tombstone(): Generator
     {
         yield $this->execute(function (): Generator {

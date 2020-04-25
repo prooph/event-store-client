@@ -20,9 +20,7 @@ use Prooph\EventStore\Exception\NotAuthenticated;
 
 class write_stream_security extends AuthenticationTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_to_all_is_never_allowed(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('$all', null, null));
@@ -30,65 +28,49 @@ class write_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('$all', 'adm', 'admpa$$'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_with_not_existing_credentials_is_not_authenticated(): Generator
     {
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->writeStream('write-stream', 'badlogin', 'badpass'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_to_stream_with_no_credentials_is_denied(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('write-stream', null, null));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_to_stream_with_not_authorized_user_credentials_is_denied(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream('write-stream', 'user2', 'pa$$2'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_to_stream_with_authorized_user_credentials_succeeds(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => $this->writeStream('write-stream', 'user1', 'pa$$1'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_to_stream_with_admin_user_credentials_succeeds(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => $this->writeStream('write-stream', 'adm', 'admpa$$'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_to_no_acl_stream_succeeds_when_no_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => $this->writeStream('noacl-stream', null, null));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_to_no_acl_stream_is_not_authenticated_when_not_existing_credentials_are_passed(): Generator
     {
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->writeStream('noacl-stream', 'badlogin', 'badpass'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_to_no_acl_stream_succeeds_when_any_existing_user_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -97,33 +79,25 @@ class write_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_to_no_acl_stream_succeeds_when_any_admin_user_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => $this->writeStream('noacl-stream', 'adm', 'admpa$$'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_to_all_access_normal_stream_succeeds_when_no_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => $this->writeStream('normal-all', null, null));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_to_all_access_normal_stream_is_not_authenticated_when_not_existing_credentials_are_passed(): Generator
     {
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->writeStream('normal-all', 'badlogin', 'badpass'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_to_all_access_normal_stream_succeeds_when_any_existing_user_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -132,9 +106,7 @@ class write_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writing_to_all_access_normal_stream_succeeds_when_any_admin_user_credentials_are_passed(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => $this->writeStream('normal-all', 'adm', 'admpa$$'));

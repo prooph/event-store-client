@@ -19,41 +19,31 @@ use Prooph\EventStore\Exception\NotAuthenticated;
 
 class subscribe_to_all_security extends AuthenticationTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function subscribing_to_all_with_not_existing_credentials_is_not_authenticated(): Generator
     {
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->subscribeToAll('badlogin', 'badpass'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function subscribing_to_all_with_no_credentials_is_denied(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->subscribeToAll(null, null));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function subscribing_to_all_with_not_authorized_user_credentials_is_denied(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->subscribeToAll('user2', 'pa$$2'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function subscribing_to_all_with_authorized_user_credentials_succeeds(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => $this->subscribeToAll('user1', 'pa$$1'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function subscribing_to_all_with_admin_user_credentials_succeeds(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => $this->subscribeToAll('adm', 'admpa$$'));

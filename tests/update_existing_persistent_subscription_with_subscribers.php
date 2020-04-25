@@ -112,9 +112,7 @@ class update_existing_persistent_subscription_with_subscribers extends AsyncTest
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_completion_succeeds(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -124,9 +122,7 @@ class update_existing_persistent_subscription_with_subscribers extends AsyncTest
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function existing_subscriptions_are_dropped(): Generator
     {
         yield $this->execute(function (): Generator {

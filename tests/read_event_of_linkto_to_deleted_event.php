@@ -34,9 +34,7 @@ class read_event_of_linkto_to_deleted_event extends AsyncTestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_linked_event_is_returned(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -46,9 +44,7 @@ class read_event_of_linkto_to_deleted_event extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_deleted_event_is_not_resolved(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -58,9 +54,7 @@ class read_event_of_linkto_to_deleted_event extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_status_is_success(): Generator
     {
         yield $this->execute(function (): Generator {

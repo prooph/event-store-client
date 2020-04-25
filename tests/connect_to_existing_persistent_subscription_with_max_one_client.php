@@ -104,9 +104,7 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends As
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_first_subscription_connects_successfully(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -116,9 +114,7 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends As
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_second_subscription_throws_maximum_subscribers_reached_exception(): Generator
     {
         yield $this->execute(function (): Generator {

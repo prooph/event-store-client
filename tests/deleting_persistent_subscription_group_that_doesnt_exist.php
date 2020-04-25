@@ -37,9 +37,7 @@ class deleting_persistent_subscription_group_that_doesnt_exist extends AsyncTest
         yield new Success();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_delete_fails_with_argument_exception(): Generator
     {
         yield $this->execute(function (): Generator {

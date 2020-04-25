@@ -33,9 +33,7 @@ class read_all_events_forward_with_linkto_to_deleted_event extends AsyncTestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function one_event_is_read(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -45,9 +43,7 @@ class read_all_events_forward_with_linkto_to_deleted_event extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_linked_event_is_not_resolved(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -57,9 +53,7 @@ class read_all_events_forward_with_linkto_to_deleted_event extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_link_event_is_included(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -69,9 +63,7 @@ class read_all_events_forward_with_linkto_to_deleted_event extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_event_is_not_resolved(): Generator
     {
         yield $this->execute(function (): Generator {

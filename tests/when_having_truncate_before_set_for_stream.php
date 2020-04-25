@@ -77,9 +77,7 @@ class when_having_truncate_before_set_for_stream extends AsyncTestCase
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function read_event_respects_truncatebefore(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -103,9 +101,7 @@ class when_having_truncate_before_set_for_stream extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function read_stream_forward_respects_truncatebefore(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -127,9 +123,7 @@ class when_having_truncate_before_set_for_stream extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function read_stream_backward_respects_truncatebefore(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -151,9 +145,7 @@ class when_having_truncate_before_set_for_stream extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function after_setting_less_strict_truncatebefore_read_event_reads_more_events(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -192,9 +184,7 @@ class when_having_truncate_before_set_for_stream extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function after_setting_more_strict_truncatebefore_read_event_reads_less_events(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -233,9 +223,7 @@ class when_having_truncate_before_set_for_stream extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function less_strict_max_count_doesnt_change_anything_for_event_read(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -274,9 +262,7 @@ class when_having_truncate_before_set_for_stream extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function more_strict_max_count_gives_less_events_for_event_read(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -315,9 +301,7 @@ class when_having_truncate_before_set_for_stream extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function after_setting_less_strict_truncatebefore_read_stream_forward_reads_more_events(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -352,9 +336,7 @@ class when_having_truncate_before_set_for_stream extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function after_setting_more_strict_truncatebefore_read_stream_forward_reads_less_events(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -389,9 +371,7 @@ class when_having_truncate_before_set_for_stream extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function less_strict_max_count_doesnt_change_anything_for_stream_forward_read(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -426,9 +406,7 @@ class when_having_truncate_before_set_for_stream extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function more_strict_max_count_gives_less_events_for_stream_forward_read(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -463,9 +441,7 @@ class when_having_truncate_before_set_for_stream extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function after_setting_less_strict_truncatebefore_read_stream_backward_reads_more_events(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -500,9 +476,7 @@ class when_having_truncate_before_set_for_stream extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function after_setting_more_strict_truncatebefore_read_stream_backward_reads_less_events(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -537,9 +511,7 @@ class when_having_truncate_before_set_for_stream extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function less_strict_max_count_doesnt_change_anything_for_stream_backward_read(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -574,9 +546,7 @@ class when_having_truncate_before_set_for_stream extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function more_strict_max_count_gives_less_events_for_stream_backward_read(): Generator
     {
         yield $this->execute(function (): Generator {

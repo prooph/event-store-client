@@ -37,9 +37,7 @@ class deleting_persistent_subscription_group_without_permissions extends AsyncTe
         yield new Success();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_delete_fails_with_access_denied(): Generator
     {
         yield $this->execute(function (): Generator {

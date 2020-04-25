@@ -54,9 +54,7 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function read_stream_forward_respects_max_count(): Generator
     {
         $res = yield $this->connection->readStreamEventsForwardAsync(
@@ -79,9 +77,7 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function read_stream_backward_respects_max_count(): Generator
     {
         $res = yield $this->connection->readStreamEventsBackwardAsync(
@@ -104,9 +100,7 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function after_setting_less_strict_max_count_read_stream_forward_reads_more_events(): Generator
     {
         $res = yield $this->connection->readStreamEventsForwardAsync(
@@ -155,9 +149,7 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function after_setting_more_strict_max_count_read_stream_forward_reads_less_events(): Generator
     {
         $res = yield $this->connection->readStreamEventsForwardAsync(
@@ -206,9 +198,7 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function after_setting_less_strict_max_count_read_stream_backward_reads_more_events(): Generator
     {
         $res = yield $this->connection->readStreamEventsBackwardAsync(
@@ -257,9 +247,7 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function after_setting_more_strict_max_count_read_stream_backward_reads_less_events(): Generator
     {
         $res = yield $this->connection->readStreamEventsBackwardAsync(

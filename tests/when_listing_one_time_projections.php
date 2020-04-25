@@ -35,9 +35,7 @@ class when_listing_one_time_projections extends AsyncTestCase
         $this->result = yield $this->projectionsManager->listOneTimeAsync($this->credentials);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_return_continuous_projections(): Generator
     {
         yield $this->execute(function (): Generator {

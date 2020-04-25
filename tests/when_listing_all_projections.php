@@ -30,9 +30,7 @@ class when_listing_all_projections extends AsyncTestCase
         $this->result = yield $this->projectionsManager->listAllAsync($this->credentials);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_return_all_projections(): Generator
     {
         yield $this->execute(function (): Generator {

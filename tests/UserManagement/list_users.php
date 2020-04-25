@@ -22,9 +22,7 @@ use ProophTest\EventStoreClient\DefaultData;
 
 class list_users extends TestWithNode
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function list_all_users_works(): Generator
     {
         yield $this->manager->createUserAsync('ouro', 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
@@ -57,9 +55,7 @@ class list_users extends TestWithNode
         $this->assertTrue($foundOuro);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function list_all_users_falls_back_to_default_credentials(): Generator
     {
         $manager = new UsersManager(

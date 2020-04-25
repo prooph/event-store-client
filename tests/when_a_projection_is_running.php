@@ -48,9 +48,7 @@ class when_a_projection_is_running extends AsyncTestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_be_able_to_get_the_projection_state(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -63,9 +61,7 @@ class when_a_projection_is_running extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_be_able_to_get_the_projection_status(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -78,9 +74,7 @@ class when_a_projection_is_running extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_be_able_to_get_the_projection_result(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -93,9 +87,7 @@ class when_a_projection_is_running extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_be_able_to_get_the_projection_query(): Generator
     {
         yield $this->execute(function (): Generator {

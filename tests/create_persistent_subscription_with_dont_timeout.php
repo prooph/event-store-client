@@ -43,9 +43,7 @@ class create_persistent_subscription_with_dont_timeout extends AsyncTestCase
         yield new Success();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_message_timeout_should_be_zero(): void
     {
         $this->assertSame(0, $this->settings->messageTimeoutMilliseconds());

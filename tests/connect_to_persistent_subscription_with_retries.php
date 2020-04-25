@@ -111,9 +111,7 @@ class connect_to_persistent_subscription_with_retries extends AsyncTestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function events_are_retried_until_success(): Generator
     {
         yield $this->execute(function (): Generator {

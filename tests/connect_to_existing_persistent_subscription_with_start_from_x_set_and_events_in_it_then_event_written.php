@@ -121,9 +121,7 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_subscription_gets_the_written_event_as_its_first_event(): Generator
     {
         yield $this->execute(function (): Generator {

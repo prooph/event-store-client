@@ -20,36 +20,28 @@ use Prooph\EventStore\Exception\NotAuthenticated;
 
 class read_all_security extends AuthenticationTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_all_with_not_existing_credentials_is_not_authenticated(): Generator
     {
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->readAllForward('badlogin', 'badpass'));
         yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->readAllBackward('badlogin', 'badpass'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_all_with_no_credentials_is_denied(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readAllForward(null, null));
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readAllBackward(null, null));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_all_with_not_authorized_user_credentials_is_denied(): Generator
     {
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readAllForward('user2', 'pa$$2'));
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readAllBackward('user2', 'pa$$2'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_all_with_authorized_user_credentials_succeeds(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -58,9 +50,7 @@ class read_all_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function reading_all_with_admin_credentials_succeeds(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {

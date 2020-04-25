@@ -53,9 +53,7 @@ class when_disabling_projections extends AsyncTestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_stop_the_projection(): Generator
     {
         yield $this->execute(function (): Generator {

@@ -42,9 +42,7 @@ class create_persistent_subscription_on_all_stream extends AsyncTestCase
         yield new Success();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_completion_fails_with_invalid_stream(): Generator
     {
         yield $this->execute(function (): Generator {

@@ -33,18 +33,14 @@ use Throwable;
 
 class append_to_stream extends EventStoreConnectionTestCase
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function cannot_append_to_stream_without_name(): Generator
     {
         $this->expectException(InvalidArgumentException::class);
         yield $this->connection->appendToStreamAsync('', ExpectedVersion::ANY, []);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_allow_appending_zero_events_to_stream_with_no_problems(): Generator
     {
         $stream1 = 'should_allow_appending_zero_events_to_stream_with_no_problems1';
@@ -86,9 +82,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         $this->assertCount(0, $slice->events());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_create_stream_with_no_stream_exp_ver_on_first_write_if_does_not_exist(): Generator
     {
         $stream = 'should_create_stream_with_no_stream_exp_ver_on_first_write_if_does_not_exist';
@@ -103,9 +97,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         $this->assertCount(1, $slice->events());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_create_stream_with_any_exp_ver_on_first_write_if_does_not_exist(): Generator
     {
         $stream = 'should_create_stream_with_any_exp_ver_on_first_write_if_does_not_exist';
@@ -119,9 +111,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         $this->assertCount(1, $slice->events());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function multiple_idempotent_writes(): Generator
     {
         $stream = 'multiple_idempotent_writes';
@@ -136,9 +126,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         $this->assertSame(3, $result->nextExpectedVersion());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function multiple_idempotent_writes_with_same_id_bug_case(): Generator
     {
         $stream = 'multiple_idempotent_writes_with_same_id_bug_case';
@@ -151,9 +139,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         $this->assertSame(5, $result->nextExpectedVersion());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function in_wtf_multiple_case_of_multiple_writes_expected_version_any_per_all_same_id(): Generator
     {
         $stream = 'in_wtf_multiple_case_of_multiple_writes_expected_version_any_per_all_same_id';
@@ -170,9 +156,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         $this->assertSame(0, $f->nextExpectedVersion());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function in_slightly_reasonable_multiple_case_of_multiple_writes_with_expected_version_per_all_same_id(): Generator
     {
         $stream = 'in_slightly_reasonable_multiple_case_of_multiple_writes_with_expected_version_per_all_same_id';
@@ -189,9 +173,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         $this->assertSame(5, $f->nextExpectedVersion());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_fail_writing_with_correct_exp_ver_to_deleted_stream(): Generator
     {
         $stream = 'should_fail_writing_with_correct_exp_ver_to_deleted_stream';
@@ -203,9 +185,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_return_log_position_when_writing(): Generator
     {
         $stream = 'should_return_log_position_when_writing';
@@ -216,9 +196,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         $this->assertGreaterThan(0, $result->logPosition()->commitPosition());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_fail_writing_with_any_exp_ver_to_deleted_stream(): Generator
     {
         $stream = 'should_fail_writing_with_any_exp_ver_to_deleted_stream';
@@ -234,9 +212,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_fail_writing_with_invalid_exp_ver_to_deleted_stream(): Generator
     {
         $stream = 'should_fail_writing_with_invalid_exp_ver_to_deleted_stream';
@@ -259,9 +235,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_append_with_any_exp_ver_to_existing_stream(): Generator
     {
         $stream = 'should_append_with_any_exp_ver_to_existing_stream';
@@ -274,9 +248,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         $this->assertSame(1, $result->nextExpectedVersion());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_fail_appending_with_wrong_exp_ver_to_existing_stream(): Generator
     {
         $stream = 'should_fail_appending_with_wrong_exp_ver_to_existing_stream';
@@ -332,9 +304,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_fail_appending_with_stream_exists_exp_ver_and_stream_does_not_exist(): Generator
     {
         $stream = 'should_fail_appending_with_stream_exists_exp_ver_and_stream_does_not_exist';
@@ -344,9 +314,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_fail_appending_with_stream_exists_exp_ver_to_hard_deleted_stream(): Generator
     {
         $stream = 'should_fail_appending_with_stream_exists_exp_ver_and_stream_does_not_exist';
@@ -358,9 +326,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function should_fail_appending_with_stream_exists_exp_ver_to_soft_deleted_stream(): Generator
     {
         $stream = 'should_fail_appending_with_stream_exists_exp_ver_to_soft_deleted_stream';
@@ -372,9 +338,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function can_append_multiple_events_at_once(): Generator
     {
         $stream = 'can_append_multiple_events_at_once';
@@ -387,9 +351,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         $this->assertSame(99, $result->nextExpectedVersion());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function returns_failure_status_when_conditionally_appending_with_version_mismatch(): Generator
     {
         $stream = 'returns_failure_status_when_conditionally_appending_with_version_mismatch';
@@ -400,9 +362,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         $this->assertTrue($result->status()->equals(ConditionalWriteStatus::versionMismatch()));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function returns_success_status_when_conditionally_appending_with_matching_version(): Generator
     {
         $stream = 'returns_success_status_when_conditionally_appending_with_matching_version';
@@ -415,9 +375,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         $this->assertNotNull($result->nextExpectedVersion());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function returns_failure_status_when_conditionally_appending_to_a_deleted_stream(): Generator
     {
         $stream = 'returns_failure_status_when_conditionally_appending_to_a_deleted_stream';
@@ -432,9 +390,7 @@ class append_to_stream extends EventStoreConnectionTestCase
         $this->assertTrue($result->status()->equals(ConditionalWriteStatus::streamDeleted()));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function writes_predefined_event_id(): Generator
     {
         $stream = 'writes_predefined_event_id';

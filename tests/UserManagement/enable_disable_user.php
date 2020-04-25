@@ -21,9 +21,7 @@ use ProophTest\EventStoreClient\DefaultData;
 
 class enable_disable_user extends TestWithUser
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function disable_empty_username_throws(): Generator
     {
         $this->expectException(InvalidArgumentException::class);
@@ -31,9 +29,7 @@ class enable_disable_user extends TestWithUser
         yield $this->manager->disableAsync('', DefaultData::adminCredentials());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function enable_empty_username_throws(): Generator
     {
         $this->expectException(InvalidArgumentException::class);
@@ -41,9 +37,7 @@ class enable_disable_user extends TestWithUser
         yield $this->manager->enableAsync('', DefaultData::adminCredentials());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function can_enable_disable_user(): Generator
     {
         yield $this->manager->disableAsync($this->username, DefaultData::adminCredentials());

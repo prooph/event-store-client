@@ -66,9 +66,7 @@ class connect_to_existing_persistent_subscription_without_permissions extends As
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function the_subscription_fails_to_connect_with_access_denied_exception(): Generator
     {
         $this->expectException(AccessDenied::class);

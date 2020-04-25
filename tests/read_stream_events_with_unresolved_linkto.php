@@ -59,9 +59,7 @@ class read_stream_events_with_unresolved_linkto extends AsyncTestCase
         yield $this->connection->deleteStreamAsync($this->stream, ExpectedVersion::ANY);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function ensure_deleted_stream(): Generator
     {
         $this->stream = 'read_stream_events_with_unresolved_linkto_1';
@@ -81,9 +79,7 @@ class read_stream_events_with_unresolved_linkto extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function returns_unresolved_linkto(): Generator
     {
         $this->stream = 'read_stream_events_with_unresolved_linkto_2';

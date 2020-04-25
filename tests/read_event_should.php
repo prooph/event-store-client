@@ -47,9 +47,7 @@ class read_event_should extends AsyncTestCase
         yield $this->connection->deleteStreamAsync($this->deletedStream, -1, true);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function throw_if_stream_id_is_empty(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -58,9 +56,7 @@ class read_event_should extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function throw_if_event_number_is_less_than_minus_one(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -69,9 +65,7 @@ class read_event_should extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function notify_using_status_code_if_stream_not_found(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -85,9 +79,7 @@ class read_event_should extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function return_no_stream_if_requested_last_event_in_empty_stream(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -98,9 +90,7 @@ class read_event_should extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function notify_using_status_code_if_stream_was_deleted(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -114,9 +104,7 @@ class read_event_should extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function notify_using_status_code_if_stream_does_not_have_event(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -130,9 +118,7 @@ class read_event_should extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function return_existing_event(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -147,9 +133,7 @@ class read_event_should extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function retrieve_the_is_json_flag_properly(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -162,9 +146,7 @@ class read_event_should extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function return_last_event_in_stream_if_event_number_is_minus_one(): Generator
     {
         yield $this->execute(function (): Generator {

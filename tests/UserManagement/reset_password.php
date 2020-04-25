@@ -22,9 +22,7 @@ use ProophTest\EventStoreClient\DefaultData;
 
 class reset_password extends TestWithUser
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function empty_username_throws(): Generator
     {
         $this->expectException(InvalidArgumentException::class);
@@ -32,9 +30,7 @@ class reset_password extends TestWithUser
         yield $this->manager->resetPasswordAsync('', 'foo', DefaultData::adminCredentials());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function empty_password_throws(): Generator
     {
         $this->expectException(InvalidArgumentException::class);
@@ -42,9 +38,7 @@ class reset_password extends TestWithUser
         yield $this->manager->resetPasswordAsync($this->username, '', DefaultData::adminCredentials());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function can_reset_password(): Generator
     {
         yield $this->manager->resetPasswordAsync(

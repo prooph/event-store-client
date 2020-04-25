@@ -29,9 +29,7 @@ class read_all_events_forward_with_linkto_passed_max_count extends AsyncTestCase
         $this->read = yield $this->connection->readStreamEventsForwardAsync($this->linkedStreamName, 0, 1, true);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function one_event_is_read(): Generator
     {
         yield $this->execute(function (): Generator {

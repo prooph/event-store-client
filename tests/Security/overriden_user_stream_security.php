@@ -38,9 +38,7 @@ class overriden_user_stream_security extends AuthenticationTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_user_stream_succeeds_for_authorized_user(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
@@ -69,9 +67,7 @@ class overriden_user_stream_security extends AuthenticationTestCase
         }));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_user_stream_fail_for_not_authorized_user(): Generator
     {
         $stream = 'user-not-authorized';
@@ -98,9 +94,7 @@ class overriden_user_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($stream, 'user2', 'pa$$2'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_user_stream_fail_for_anonymous_user(): Generator
     {
         $stream = 'user-anonymous-user';
@@ -127,9 +121,7 @@ class overriden_user_stream_security extends AuthenticationTestCase
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->deleteStream($stream, null, null));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function operations_on_user_stream_succeed_for_admin(): Generator
     {
         yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {

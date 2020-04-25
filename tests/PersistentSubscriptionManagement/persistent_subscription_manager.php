@@ -101,9 +101,7 @@ class persistent_subscription_manager extends AsyncTestCase
         );
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function can_describe_persistent_subscription(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -118,9 +116,7 @@ class persistent_subscription_manager extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function cannot_describe_persistent_subscription_with_empty_stream_name(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -129,9 +125,7 @@ class persistent_subscription_manager extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function cannot_describe_persistent_subscription_with_empty_group_name(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -140,9 +134,7 @@ class persistent_subscription_manager extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function can_list_all_persistent_subscriptions(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -163,9 +155,7 @@ class persistent_subscription_manager extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function can_list_all_persistent_subscriptions_using_empty_string(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -186,9 +176,7 @@ class persistent_subscription_manager extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function can_list_persistent_subscriptions_for_stream(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -210,9 +198,7 @@ class persistent_subscription_manager extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function can_replay_parked_messages(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -296,9 +282,7 @@ class persistent_subscription_manager extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function cannot_replay_parked_with_empty_stream_name(): Generator
     {
         yield $this->execute(function (): Generator {
@@ -307,9 +291,7 @@ class persistent_subscription_manager extends AsyncTestCase
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function cannot_replay_parked_with_empty_group_name(): Generator
     {
         yield $this->execute(function (): Generator {
