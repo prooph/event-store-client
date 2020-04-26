@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Internal;
 
 use function Amp\call;
+use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
@@ -63,7 +64,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
     private bool $isProcessing = false;
     protected bool $shouldStop = false;
     private bool $isDropped = false;
-    private ManualResetEventSlim $stopped;
+    private Deferred $stopped;
     private ListenerHandler $connectListener;
 
     /** @internal */
@@ -97,7 +98,8 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
         $this->subscriptionName = $settings->subscriptionName() ?? '';
         $this->connectListener = new ListenerHandler(function (): void {
         });
-        $this->stopped = new ManualResetEventSlim(true);
+        $this->stopped = new Deferred();
+        $this->stopped->resolve(true);
     }
 
     public function isSubscribedToAll(): bool
@@ -169,7 +171,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
             ));
         }
 
-        return $this->stopped->wait($timeout);
+        return Promise\timeoutWithDefault($this->stopped->promise(), $timeout, false);
     }
 
     private function onReconnect(ClientConnectionEventArgs $clientConnectionEventArgs): void
@@ -209,7 +211,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
             ));
         }
 
-        $this->stopped->reset();
+        $this->stopped = new Deferred();
         $this->allowProcessing = false;
 
         return call(function (): Generator {
@@ -495,7 +497,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
                 ($this->subscriptionDropped)($this, $reason, $error);
             }
 
-            $this->stopped->set();
+            $this->stopped->resolve(true);
         }
     }
 }

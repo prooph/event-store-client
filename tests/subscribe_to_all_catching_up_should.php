@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use function Amp\call;
+use Amp\Deferred;
 use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
@@ -36,7 +37,6 @@ use Prooph\EventStore\StreamMetadata;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Internal\EventStoreAllCatchUpSubscription;
-use Prooph\EventStoreClient\Internal\ManualResetEventSlim;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 
@@ -170,16 +170,16 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
      */
     public function be_able_to_subscribe_to_empty_db(): Generator
     {
-        $appeared = new ManualResetEventSlim();
+        $appeared = new Deferred();
         $dropped = new CountdownEvent(1);
 
         $subscription = yield $this->connection->subscribeToAllFromAsync(
             null,
             CatchUpSubscriptionSettings::default(),
             new class($appeared) implements EventAppearedOnCatchupSubscription {
-                private ManualResetEventSlim $appeared;
+                private Deferred $appeared;
 
-                public function __construct(ManualResetEventSlim $appeared)
+                public function __construct(Deferred $appeared)
                 {
                     $this->appeared = $appeared;
                 }
@@ -189,7 +189,7 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
                     ResolvedEvent $resolvedEvent
                 ): Promise {
                     if (! SystemStreams::isSystemStream($resolvedEvent->originalEvent()->eventStreamId())) {
-                        $this->appeared->set();
+                        $this->appeared->resolve(true);
                     }
 
                     return new Success();
@@ -231,7 +231,7 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
 
         yield new Delayed(5000);
 
-        $this->assertFalse(yield $appeared->wait(0), 'Some event appeared');
+        $this->assertFalse(yield Promise\timeoutWithDefault($appeared->promise(), 0, false), 'Some event appeared');
         $this->assertFalse(yield $dropped->wait(0), 'Subscription was dropped prematurely');
 
         yield $subscription->stop(self::TIMEOUT);
