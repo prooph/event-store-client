@@ -30,6 +30,7 @@ class StartPersistentSubscriptionMessage implements Message
     private ?Closure $subscriptionDropped;
     private int $maxRetries;
     private int $timeout;
+    private Promise $stopped;
 
     public function __construct(
         Deferred $deferred,
@@ -40,7 +41,8 @@ class StartPersistentSubscriptionMessage implements Message
         Closure $eventAppeared,
         ?Closure $subscriptionDropped,
         int $maxRetries,
-        int $timeout
+        int $timeout,
+        Promise $stopped
     ) {
         $this->deferred = $deferred;
         $this->subscriptionId = $subscriptionId;
@@ -51,6 +53,7 @@ class StartPersistentSubscriptionMessage implements Message
         $this->subscriptionDropped = $subscriptionDropped;
         $this->maxRetries = $maxRetries;
         $this->timeout = $timeout;
+        $this->stopped = $stopped;
     }
 
     public function deferred(): Deferred
@@ -100,7 +103,7 @@ class StartPersistentSubscriptionMessage implements Message
 
     public function promise(): ?Promise
     {
-        return $this->deferred->promise();
+        return $this->stopped;
     }
 
     public function __toString(): string
