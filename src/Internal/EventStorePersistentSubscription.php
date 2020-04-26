@@ -114,7 +114,8 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
         ?UserCredentials $userCredentials,
         Closure $onEventAppeared,
         ?Closure $onSubscriptionDropped,
-        ConnectionSettings $settings
+        ConnectionSettings $settings,
+        Promise $stopped
     ): Promise {
         $deferred = new Deferred();
 
@@ -127,7 +128,8 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
             $onEventAppeared,
             $onSubscriptionDropped,
             $settings->maxRetries(),
-            $settings->operationTimeout()
+            $settings->operationTimeout(),
+            $stopped
         ));
 
         return $deferred->promise();
@@ -159,7 +161,8 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
             $this->userCredentials,
             $eventAppeared,
             $subscriptionDropped,
-            $this->settings
+            $this->settings,
+            $this->stopped->promise()
         );
 
         $deferred = new Deferred();
