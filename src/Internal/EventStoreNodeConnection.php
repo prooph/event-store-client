@@ -31,6 +31,7 @@ use Prooph\EventStore\Common\SystemStreams;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventReadResult;
 use Prooph\EventStore\EventReadStatus;
+use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\Exception\MaxQueueSizeLimitReached;
@@ -45,6 +46,7 @@ use Prooph\EventStore\RawStreamMetadataResult;
 use Prooph\EventStore\StreamMetadata;
 use Prooph\EventStore\StreamMetadataResult;
 use Prooph\EventStore\SubscriptionDropped;
+use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\SystemSettings;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStore\Util\Guid;
@@ -647,6 +649,32 @@ final class EventStoreNodeConnection implements
             throw new InvalidArgumentException('Stream cannot be empty');
         }
 
+        $stopped = new Deferred();
+
+        $subscriptionDropped = new class($subscriptionDropped, $stopped) implements SubscriptionDropped {
+            private ?SubscriptionDropped $callback;
+
+            private Deferred $stopped;
+
+            public function __construct(?SubscriptionDropped $callback, Deferred $stopped)
+            {
+                $this->callback = $callback;
+                $this->stopped = $stopped;
+            }
+
+            public function __invoke(
+                EventStoreSubscription $subscription,
+                SubscriptionDropReason $reason,
+                ?Throwable $exception = null
+            ): void {
+                if ($this->callback) {
+                    ($this->callback)($subscription, $reason, $exception);
+                }
+
+                $this->stopped->resolve();
+            }
+        };
+
         $deferred = new Deferred();
 
         $this->handler->enqueueMessage(new StartSubscriptionMessage(
@@ -657,7 +685,8 @@ final class EventStoreNodeConnection implements
             $eventAppeared,
             $subscriptionDropped,
             $this->settings->maxRetries(),
-            $this->settings->operationTimeout()
+            $this->settings->operationTimeout(),
+            $stopped->promise()
         ));
 
         return $deferred->promise();
@@ -705,6 +734,32 @@ final class EventStoreNodeConnection implements
         ?SubscriptionDropped $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
+        $stopped = new Deferred();
+
+        $subscriptionDropped = new class($subscriptionDropped, $stopped) implements SubscriptionDropped {
+            private ?SubscriptionDropped $callback;
+
+            private Deferred $stopped;
+
+            public function __construct(?SubscriptionDropped $callback, Deferred $stopped)
+            {
+                $this->callback = $callback;
+                $this->stopped = $stopped;
+            }
+
+            public function __invoke(
+                EventStoreSubscription $subscription,
+                SubscriptionDropReason $reason,
+                ?Throwable $exception = null
+            ): void {
+                if ($this->callback) {
+                    ($this->callback)($subscription, $reason, $exception);
+                }
+
+                $this->stopped->resolve();
+            }
+        };
+
         $deferred = new Deferred();
 
         $this->handler->enqueueMessage(new StartSubscriptionMessage(
@@ -715,7 +770,8 @@ final class EventStoreNodeConnection implements
             $eventAppeared,
             $subscriptionDropped,
             $this->settings->maxRetries(),
-            $this->settings->operationTimeout()
+            $this->settings->operationTimeout(),
+            $stopped->promise()
         ));
 
         return $deferred->promise();
