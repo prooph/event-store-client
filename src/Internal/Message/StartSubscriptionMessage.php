@@ -37,6 +37,7 @@ class StartSubscriptionMessage implements Message
     private ?Closure $subscriptionDropped;
     private int $maxRetries;
     private int $timeout;
+    private Promise $stopped;
 
     /**
      * @param Closure(EventStoreSubscription, ResolvedEvent): Promise $eventAppeared
@@ -50,7 +51,8 @@ class StartSubscriptionMessage implements Message
         Closure $eventAppeared,
         ?Closure $subscriptionDropped,
         int $maxRetries,
-        int $timeout
+        int $timeout,
+        Promise $stopped
     ) {
         $this->deferred = $deferred;
         $this->streamId = $streamId;
@@ -60,6 +62,7 @@ class StartSubscriptionMessage implements Message
         $this->subscriptionDropped = $subscriptionDropped;
         $this->maxRetries = $maxRetries;
         $this->timeout = $timeout;
+        $this->stopped = $stopped;
     }
 
     /** @psalm-pure */
@@ -121,7 +124,7 @@ class StartSubscriptionMessage implements Message
     /** @psalm-pure */
     public function promise(): ?Promise
     {
-        return $this->deferred->promise();
+        return $this->stopped;
     }
 
     /** @psalm-pure */
