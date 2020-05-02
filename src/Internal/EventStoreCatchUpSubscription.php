@@ -474,6 +474,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
         });
     }
 
+    /** @internal */
     public function dropSubscription(SubscriptionDropReason $reason, ?Throwable $error): void
     {
         if (! $this->isDropped) {
