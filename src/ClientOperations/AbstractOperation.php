@@ -183,7 +183,7 @@ abstract class AbstractOperation implements ClientOperation
             'Expected: %s, Actual: %s, Flags: %s, CorrelationId: %s',
             $expectedCommand->name(),
             $package->command()->name(),
-            $package->flags(),
+            (string) $package->flags(),
             $package->correlationId()
         ));
         $this->log->error(\sprintf(

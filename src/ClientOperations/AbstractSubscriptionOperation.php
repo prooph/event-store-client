@@ -263,7 +263,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
                     'Subscription %s to %s: closing subscription, reason: %s, exception: %s...',
                     $this->correlationId,
                     $this->streamId ? $this->streamId : '<all>',
-                    $reason,
+                    (string) $reason,
                     $exception ? $exception->getMessage() : '<none>'
                 ));
             }

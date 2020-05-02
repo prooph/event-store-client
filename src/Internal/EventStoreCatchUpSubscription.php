@@ -382,7 +382,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
                 $e->originalStreamName(),
                 $e->originalEventNumber(),
                 $e->originalEvent()->eventType(),
-                $e->originalPosition()
+                (string) $e->originalPosition()
             ));
         }
 

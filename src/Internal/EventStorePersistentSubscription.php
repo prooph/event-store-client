@@ -53,7 +53,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
     private bool $verbose;
     private ConnectionSettings $settings;
     private bool $autoAck;
-    private PersistentEventStoreSubscription $subscription;
+    private ?PersistentEventStoreSubscription $subscription;
     /** @var SplQueue */
     private $queue;
     private bool $isProcessing = false;
@@ -319,7 +319,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
 
     private function enqueue(PersistentSubscriptionResolvedEvent $resolvedEvent): void
     {
-        $this->queue[] = $resolvedEvent;
+        $this->queue->enqueue($resolvedEvent);
 
         if (! $this->isProcessing) {
             $this->isProcessing = true;

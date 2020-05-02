@@ -9,7 +9,9 @@
 >
     <projectFiles>
         <directory name="src" />
+        <directory name="examples" />
         <ignoreFiles>
+            <directory name="src/Messages/ClientMessages" />
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>

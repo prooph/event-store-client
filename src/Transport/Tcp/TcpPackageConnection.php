@@ -110,7 +110,7 @@ class TcpPackageConnection
                 $this->connection = yield connect($uri, $context);
 
                 if ($this->ssl) {
-                    $tlsContext = (new ClientTlsContext())->withPeerName($this->targetHost);
+                    $tlsContext = new ClientTlsContext($this->targetHost);
 
                     if ($this->validateServer) {
                         $tlsContext = $tlsContext->withPeerVerification();

@@ -51,6 +51,7 @@ Loop::run(function () {
             'test-persistent-subscription',
             new UserCredentials('admin', 'changeit')
         );
+        /** @psalm-suppress ForbiddenCode */
         \var_dump($result);
     } catch (InvalidOperationException $exception) {
         echo 'no such subscription exists (yet)' . PHP_EOL;
@@ -64,6 +65,7 @@ Loop::run(function () {
     );
     \assert($result instanceof PersistentSubscriptionCreateResult);
 
+    /** @psalm-suppress ForbiddenCode */
     \var_dump($result);
 
     yield $connection->connectToPersistentSubscriptionAsync(

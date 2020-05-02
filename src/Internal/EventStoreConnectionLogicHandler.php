@@ -165,7 +165,7 @@ class EventStoreConnectionLogicHandler
 
     public function totalOperationCount(): int
     {
-        return $this->operations ? $this->operations->totalOperationCount() : 0;
+        return $this->operations->totalOperationCount();
     }
 
     public function enqueueMessage(Message $message): void
@@ -588,7 +588,7 @@ class EventStoreConnectionLogicHandler
             $msg = \sprintf(
                 'EventStoreNodeConnection \'%s\': closing TCP connection [%s, %s] due to HEARTBEAT TIMEOUT at pkgNum %s',
                 $this->esConnection->connectionName(),
-                $this->connection->remoteEndPoint(),
+                (string) $this->connection->remoteEndPoint(),
                 $this->connection->connectionId(),
                 $this->packageNumber
             );
@@ -904,7 +904,7 @@ class EventStoreConnectionLogicHandler
             'EventStoreNodeConnection \'%s\': going to reconnect to [%s]. Current end point: [%s]',
             $this->esConnection->connectionName(),
             (string) $endPoint,
-            $this->connection->remoteEndPoint()
+            (string) $this->connection->remoteEndPoint()
         );
 
         if ($this->settings->verboseLogging()) {
