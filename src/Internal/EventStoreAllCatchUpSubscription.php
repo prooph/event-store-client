@@ -109,7 +109,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription imp
                     'Catch-up Subscription %s to %s: finished reading events, nextReadPosition = %s',
                     $this->subscriptionName(),
                     $this->isSubscribedToAll() ? '<all>' : $this->streamId(),
-                    $this->nextReadPosition ? $this->nextReadPosition->__toString() : '<null>'
+                    (string) $this->nextReadPosition
                 ));
             }
 

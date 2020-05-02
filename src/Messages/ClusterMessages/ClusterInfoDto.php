@@ -17,10 +17,10 @@ use Prooph\EventStore\Exception\InvalidArgumentException;
 
 class ClusterInfoDto
 {
-    /** @var MemberInfoDto[] */
+    /** @var array<int, MemberInfoDto> */
     private array $members = [];
 
-    /** @param MemberInfoDto[] */
+    /** @param array<int, MemberInfoDto> $members */
     public function __construct(array $members = [])
     {
         foreach ($members as $member) {
@@ -32,7 +32,7 @@ class ClusterInfoDto
         }
     }
 
-    /** @return MemberInfoDto[] */
+    /** @return array<int, MemberInfoDto> */
     public function members(): array
     {
         return $this->members;

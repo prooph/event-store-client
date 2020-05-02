@@ -95,7 +95,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
         $this->maxPushQueueSize = $settings->maxLiveQueueSize();
         $this->verbose = $settings->verboseLogging();
         $this->liveQueue = new SplQueue();
-        $this->subscriptionName = $settings->subscriptionName() ?? '';
+        $this->subscriptionName = $settings->subscriptionName();
         $this->connectListener = new ListenerHandler(function (): void {
         });
         $this->stopped = new Deferred();
