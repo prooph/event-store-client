@@ -26,87 +26,85 @@ use Prooph\EventStore\UserCredentials;
 
 class stream_security_inheritance extends AuthenticationTestCase
 {
-    protected function setUpAsync(): Promise
+    protected function setUpAsync(): Generator
     {
-        return call(function (): Generator {
-            yield parent::setUpAsync();
+        yield from parent::setUpAsync();
 
-            $settings = new SystemSettings(
-                new StreamAcl([], ['user1']),
-                new StreamAcl([], ['user1'])
-            );
+        $settings = new SystemSettings(
+            new StreamAcl([], ['user1']),
+            new StreamAcl([], ['user1'])
+        );
 
-            yield $this->connection->setSystemSettingsAsync($settings, new UserCredentials('adm', 'admpa$$'));
+        yield $this->connection->setSystemSettingsAsync($settings, new UserCredentials('adm', 'admpa$$'));
 
-            yield $this->connection->setStreamMetadataAsync(
-                'user-no-acl',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->build(),
-                new UserCredentials('adm', 'admpa$$')
-            );
-            yield $this->connection->setStreamMetadataAsync(
-                'user-w-diff',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setWriteRoles('user2')->build(),
-                new UserCredentials('adm', 'admpa$$')
-            );
-            yield $this->connection->setStreamMetadataAsync(
-                'user-w-multiple',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setWriteRoles('user1', 'user2')->build(),
-                new UserCredentials('adm', 'admpa$$')
-            );
-            yield $this->connection->setStreamMetadataAsync(
-                'user-w-restricted',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setWriteRoles('')->build(),
-                new UserCredentials('adm', 'admpa$$')
-            );
-            yield $this->connection->setStreamMetadataAsync(
-                'user-w-all',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setWriteRoles(SystemRoles::ALL)->build(),
-                new UserCredentials('adm', 'admpa$$')
-            );
+        yield $this->connection->setStreamMetadataAsync(
+            'user-no-acl',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->build(),
+            new UserCredentials('adm', 'admpa$$')
+        );
+        yield $this->connection->setStreamMetadataAsync(
+            'user-w-diff',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setWriteRoles('user2')->build(),
+            new UserCredentials('adm', 'admpa$$')
+        );
+        yield $this->connection->setStreamMetadataAsync(
+            'user-w-multiple',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setWriteRoles('user1', 'user2')->build(),
+            new UserCredentials('adm', 'admpa$$')
+        );
+        yield $this->connection->setStreamMetadataAsync(
+            'user-w-restricted',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setWriteRoles('')->build(),
+            new UserCredentials('adm', 'admpa$$')
+        );
+        yield $this->connection->setStreamMetadataAsync(
+            'user-w-all',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setWriteRoles(SystemRoles::ALL)->build(),
+            new UserCredentials('adm', 'admpa$$')
+        );
 
-            yield $this->connection->setStreamMetadataAsync(
-                'user-r-restricted',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setReadRoles('user1')->build(),
-                new UserCredentials('adm', 'admpa$$')
-            );
+        yield $this->connection->setStreamMetadataAsync(
+            'user-r-restricted',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setReadRoles('user1')->build(),
+            new UserCredentials('adm', 'admpa$$')
+        );
 
-            yield $this->connection->setStreamMetadataAsync(
-                '$sys-no-acl',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->build(),
-                new UserCredentials('adm', 'admpa$$')
-            );
-            yield $this->connection->setStreamMetadataAsync(
-                '$sys-w-diff',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setWriteRoles('user2')->build(),
-                new UserCredentials('adm', 'admpa$$')
-            );
-            yield $this->connection->setStreamMetadataAsync(
-                '$sys-w-multiple',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setWriteRoles('user1', 'user2')->build(),
-                new UserCredentials('adm', 'admpa$$')
-            );
-            yield $this->connection->setStreamMetadataAsync(
-                '$sys-w-restricted',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setWriteRoles('')->build(),
-                new UserCredentials('adm', 'admpa$$')
-            );
-            yield $this->connection->setStreamMetadataAsync(
-                '$sys-w-all',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setWriteRoles(SystemRoles::ALL)->build(),
-                new UserCredentials('adm', 'admpa$$')
-            );
-        });
+        yield $this->connection->setStreamMetadataAsync(
+            '$sys-no-acl',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->build(),
+            new UserCredentials('adm', 'admpa$$')
+        );
+        yield $this->connection->setStreamMetadataAsync(
+            '$sys-w-diff',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setWriteRoles('user2')->build(),
+            new UserCredentials('adm', 'admpa$$')
+        );
+        yield $this->connection->setStreamMetadataAsync(
+            '$sys-w-multiple',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setWriteRoles('user1', 'user2')->build(),
+            new UserCredentials('adm', 'admpa$$')
+        );
+        yield $this->connection->setStreamMetadataAsync(
+            '$sys-w-restricted',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setWriteRoles('')->build(),
+            new UserCredentials('adm', 'admpa$$')
+        );
+        yield $this->connection->setStreamMetadataAsync(
+            '$sys-w-all',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setWriteRoles(SystemRoles::ALL)->build(),
+            new UserCredentials('adm', 'admpa$$')
+        );
     }
 
     /** @test */

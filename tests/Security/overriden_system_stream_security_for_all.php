@@ -24,18 +24,16 @@ use Prooph\EventStore\UserCredentials;
 
 class overriden_system_stream_security_for_all extends AuthenticationTestCase
 {
-    protected function setUpAsync(): Promise
+    protected function setUpAsync(): Generator
     {
-        return call(function (): Generator {
-            yield parent::setUpAsync();
+        yield from parent::setUpAsync();
 
-            $settings = new SystemSettings(
-                null,
-                new StreamAcl([SystemRoles::ALL], [SystemRoles::ALL], [SystemRoles::ALL], [SystemRoles::ALL], [SystemRoles::ALL])
-            );
+        $settings = new SystemSettings(
+            null,
+            new StreamAcl([SystemRoles::ALL], [SystemRoles::ALL], [SystemRoles::ALL], [SystemRoles::ALL], [SystemRoles::ALL])
+        );
 
-            yield $this->connection->setSystemSettingsAsync($settings, new UserCredentials('adm', 'admpa$$'));
-        });
+        yield $this->connection->setSystemSettingsAsync($settings, new UserCredentials('adm', 'admpa$$'));
     }
 
     /** @test */

@@ -34,33 +34,27 @@ class subscribe_to_all_should extends EventStoreConnectionTestCase
 {
     private const TIMEOUT = 10000;
 
-    protected function setUpAsync(): Promise
+    protected function setUpAsync(): Generator
     {
-        return call(function (): Generator {
-            yield parent::setUpAsync();
+        yield from parent::setUpAsync();
 
-            yield $this->connection->setStreamMetadataAsync(
-                '$all',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setReadRoles(SystemRoles::ALL)->build(),
-                new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
-            );
-        });
+        yield $this->connection->setStreamMetadataAsync(
+            '$all',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setReadRoles(SystemRoles::ALL)->build(),
+            new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
+        );
     }
 
-    protected function tearDownAsync(): Promise
+    protected function tearDownAsync(): Generator
     {
-        return call(function (): Generator {
-            yield $this->connection->setStreamMetadataAsync(
-                '$all',
-                ExpectedVersion::ANY,
-                new StreamMetadata(),
-                new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
+        yield $this->connection->setStreamMetadataAsync(
+            '$all',
+            ExpectedVersion::ANY,
+            new StreamMetadata(),
+            new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
 
-            );
-
-            yield parent::tearDownAsync();
-        });
+        );
     }
 
     /** @test */

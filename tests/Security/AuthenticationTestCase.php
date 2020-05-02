@@ -41,167 +41,163 @@ abstract class AuthenticationTestCase extends AsyncTestCase
     protected ?EventStoreConnection $connection;
     protected ?UserCredentials $userCredentials = null;
 
-    protected function setUpAsync(): Promise
+    protected function setUpAsync(): Generator
     {
-        return call(function (): Generator {
-            $manager = new UsersManager(
-                TestConnection::httpEndPoint(),
-                5000,
-                EndpointExtensions::HTTP_SCHEMA,
-                $this->adminUser()
-            );
+        $manager = new UsersManager(
+            TestConnection::httpEndPoint(),
+            5000,
+            EndpointExtensions::HTTP_SCHEMA,
+            $this->adminUser()
+        );
 
-            yield $manager->createUserAsync(
-                'user1',
-                'Test User 1',
-                [],
-                'pa$$1'
-            );
+        yield $manager->createUserAsync(
+            'user1',
+            'Test User 1',
+            [],
+            'pa$$1'
+        );
 
-            yield $manager->createUserAsync(
-                'user2',
-                'Test User 2',
-                [],
-                'pa$$2'
-            );
+        yield $manager->createUserAsync(
+            'user2',
+            'Test User 2',
+            [],
+            'pa$$2'
+        );
 
-            yield $manager->createUserAsync(
-                'adm',
-                'Administrator User',
-                [SystemRoles::ADMINS],
-                'admpa$$'
-            );
+        yield $manager->createUserAsync(
+            'adm',
+            'Administrator User',
+            [SystemRoles::ADMINS],
+            'admpa$$'
+        );
 
-            $connection = TestConnection::create($this->adminUser());
-            yield $connection->connectAsync();
+        $connection = TestConnection::create($this->adminUser());
+        yield $connection->connectAsync();
 
-            yield $connection->setStreamMetadataAsync(
-                'noacl-stream',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->build()
-            );
-            yield $connection->setStreamMetadataAsync(
-                'read-stream',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setReadRoles('user1')->build()
-            );
-            yield $connection->setStreamMetadataAsync(
-                'write-stream',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setWriteRoles('user1')->build()
-            );
-            yield $connection->setStreamMetadataAsync(
-                'metaread-stream',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setMetadataReadRoles('user1')->build()
-            );
-            yield $connection->setStreamMetadataAsync(
-                'metawrite-stream',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setMetadataWriteRoles('user1')->build()
-            );
+        yield $connection->setStreamMetadataAsync(
+            'noacl-stream',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->build()
+        );
+        yield $connection->setStreamMetadataAsync(
+            'read-stream',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setReadRoles('user1')->build()
+        );
+        yield $connection->setStreamMetadataAsync(
+            'write-stream',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setWriteRoles('user1')->build()
+        );
+        yield $connection->setStreamMetadataAsync(
+            'metaread-stream',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setMetadataReadRoles('user1')->build()
+        );
+        yield $connection->setStreamMetadataAsync(
+            'metawrite-stream',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setMetadataWriteRoles('user1')->build()
+        );
 
-            yield $connection->setStreamMetadataAsync(
-                '$all',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setReadRoles('user1')->build(),
-                new UserCredentials('adm', 'admpa$$')
-            );
+        yield $connection->setStreamMetadataAsync(
+            '$all',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setReadRoles('user1')->build(),
+            new UserCredentials('adm', 'admpa$$')
+        );
 
-            yield $connection->setStreamMetadataAsync(
-                '$system-acl',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()
-                    ->setReadRoles('user1')
-                    ->setWriteRoles('user1')
-                    ->setMetadataReadRoles('user1')
-                    ->setMetadataWriteRoles('user1')
-                    ->build(),
-                new UserCredentials('adm', 'admpa$$')
-            );
-            yield $connection->setStreamMetadataAsync(
-                '$system-adm',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()
-                    ->setReadRoles(SystemRoles::ADMINS)
-                    ->setWriteRoles(SystemRoles::ADMINS)
-                    ->setMetadataReadRoles(SystemRoles::ADMINS)
-                    ->setMetadataWriteRoles(SystemRoles::ADMINS)
-                    ->build(),
-                new UserCredentials('adm', 'admpa$$')
-            );
+        yield $connection->setStreamMetadataAsync(
+            '$system-acl',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()
+                ->setReadRoles('user1')
+                ->setWriteRoles('user1')
+                ->setMetadataReadRoles('user1')
+                ->setMetadataWriteRoles('user1')
+                ->build(),
+            new UserCredentials('adm', 'admpa$$')
+        );
+        yield $connection->setStreamMetadataAsync(
+            '$system-adm',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()
+                ->setReadRoles(SystemRoles::ADMINS)
+                ->setWriteRoles(SystemRoles::ADMINS)
+                ->setMetadataReadRoles(SystemRoles::ADMINS)
+                ->setMetadataWriteRoles(SystemRoles::ADMINS)
+                ->build(),
+            new UserCredentials('adm', 'admpa$$')
+        );
 
-            yield $connection->setStreamMetadataAsync(
-                'normal-all',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()
-                    ->setReadRoles(SystemRoles::ALL)
-                    ->setWriteRoles(SystemRoles::ALL)
-                    ->setMetadataReadRoles(SystemRoles::ALL)
-                    ->setMetadataWriteRoles(SystemRoles::ALL)
-                    ->build()
-            );
-            yield $connection->setStreamMetadataAsync(
-                '$system-all',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()
-                    ->setReadRoles(SystemRoles::ALL)
-                    ->setWriteRoles(SystemRoles::ALL)
-                    ->setMetadataReadRoles(SystemRoles::ALL)
-                    ->setMetadataWriteRoles(SystemRoles::ALL)
-                    ->build(),
-                new UserCredentials('adm', 'admpa$$')
-            );
+        yield $connection->setStreamMetadataAsync(
+            'normal-all',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()
+                ->setReadRoles(SystemRoles::ALL)
+                ->setWriteRoles(SystemRoles::ALL)
+                ->setMetadataReadRoles(SystemRoles::ALL)
+                ->setMetadataWriteRoles(SystemRoles::ALL)
+                ->build()
+        );
+        yield $connection->setStreamMetadataAsync(
+            '$system-all',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()
+                ->setReadRoles(SystemRoles::ALL)
+                ->setWriteRoles(SystemRoles::ALL)
+                ->setMetadataReadRoles(SystemRoles::ALL)
+                ->setMetadataWriteRoles(SystemRoles::ALL)
+                ->build(),
+            new UserCredentials('adm', 'admpa$$')
+        );
 
-            $connection->close();
+        $connection->close();
 
-            $this->connection = TestConnection::create($this->userCredentials);
+        $this->connection = TestConnection::create($this->userCredentials);
 
-            yield $this->connection->connectAsync();
-        });
+        yield $this->connection->connectAsync();
     }
 
-    protected function tearDownAsync(): Promise
+    protected function tearDownAsync(): Generator
     {
         $this->userCredentials = null;
         $this->connection->close();
 
-        return call(function (): Generator {
-            $manager = new UsersManager(
-                TestConnection::httpEndPoint(),
-                5000,
-                EndpointExtensions::HTTP_SCHEMA,
-                $this->adminUser()
-            );
+        $manager = new UsersManager(
+            TestConnection::httpEndPoint(),
+            5000,
+            EndpointExtensions::HTTP_SCHEMA,
+            $this->adminUser()
+        );
 
-            yield $manager->deleteUserAsync('user1');
-            yield $manager->deleteUserAsync('user2');
-            yield $manager->deleteUserAsync('adm');
+        yield $manager->deleteUserAsync('user1');
+        yield $manager->deleteUserAsync('user2');
+        yield $manager->deleteUserAsync('adm');
 
-            $connection = TestConnection::create($this->adminUser());
-            yield $connection->connectAsync();
+        $connection = TestConnection::create($this->adminUser());
+        yield $connection->connectAsync();
 
-            yield $connection->setStreamMetadataAsync(
-                '$all',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->build(),
-                $this->adminUser()
-            );
+        yield $connection->setStreamMetadataAsync(
+            '$all',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->build(),
+            $this->adminUser()
+        );
 
-            yield $connection->setStreamMetadataAsync(
-                '$system-acl',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->build(),
-                $this->adminUser()
-            );
+        yield $connection->setStreamMetadataAsync(
+            '$system-acl',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->build(),
+            $this->adminUser()
+        );
 
-            yield $connection->setSystemSettingsAsync(
-                new SystemSettings(),
-                $this->adminUser()
-            );
+        yield $connection->setSystemSettingsAsync(
+            new SystemSettings(),
+            $this->adminUser()
+        );
 
-            $connection->close();
-        });
+        $connection->close();
     }
 
     protected function readEvent(string $streamId, ?string $login, ?string $password): Promise

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
 use Amp\Deferred;
 use Amp\Promise;
 use function Amp\Promise\timeout;
@@ -36,22 +35,20 @@ class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnecti
     private string $streamName = 'TestStream';
     private CatchUpSubscriptionSettings $settings;
 
-    protected function setUpAsync(): Promise
+    protected function setUpAsync(): Generator
     {
-        return call(function (): Generator {
-            yield parent::setUpAsync();
+        yield from parent::setUpAsync();
 
-            //Create 500 events
-            for ($i = 0; $i < 5; $i++) {
-                yield $this->connection->appendToStreamAsync(
-                    $this->streamName,
-                    ExpectedVersion::ANY,
-                    $this->createOneHundredEvents()
-                );
-            }
+        //Create 500 events
+        for ($i = 0; $i < 5; $i++) {
+            yield $this->connection->appendToStreamAsync(
+                $this->streamName,
+                ExpectedVersion::ANY,
+                $this->createOneHundredEvents()
+            );
+        }
 
-            $this->settings = new CatchUpSubscriptionSettings(100, 1, false, true);
-        });
+        $this->settings = new CatchUpSubscriptionSettings(100, 1, false, true);
     }
 
     /** @return EventData[] */
