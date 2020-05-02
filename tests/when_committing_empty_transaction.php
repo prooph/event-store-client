@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
 use Generator;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Async\EventStoreTransaction;
@@ -35,42 +33,38 @@ class when_committing_empty_transaction extends AsyncTestCase
     private EventData $firstEvent;
     private string $stream;
 
-    protected function setUpAsync(): Promise
+    protected function setUpAsync(): Generator
     {
-        return call(function (): Generator {
-            $this->firstEvent = TestEvent::newTestEvent();
-            $this->connection = TestConnection::create();
-            $this->stream = Guid::generateAsHex();
+        $this->firstEvent = TestEvent::newTestEvent();
+        $this->connection = TestConnection::create();
+        $this->stream = Guid::generateAsHex();
 
-            yield $this->connection->connectAsync();
+        yield $this->connection->connectAsync();
 
-            $result = yield $this->connection->appendToStreamAsync(
-                $this->stream,
-                ExpectedVersion::NO_STREAM,
-                [$this->firstEvent, TestEvent::newTestEvent(), TestEvent::newTestEvent()]
-            );
-            \assert($result instanceof WriteResult);
+        $result = yield $this->connection->appendToStreamAsync(
+            $this->stream,
+            ExpectedVersion::NO_STREAM,
+            [$this->firstEvent, TestEvent::newTestEvent(), TestEvent::newTestEvent()]
+        );
+        \assert($result instanceof WriteResult);
 
-            $this->assertSame(2, $result->nextExpectedVersion());
+        $this->assertSame(2, $result->nextExpectedVersion());
 
-            $transaction = yield $this->connection->startTransactionAsync(
-                $this->stream,
-                2
-            );
-            \assert($transaction instanceof EventStoreTransaction);
+        $transaction = yield $this->connection->startTransactionAsync(
+            $this->stream,
+            2
+        );
+        \assert($transaction instanceof EventStoreTransaction);
 
-            $result = yield $transaction->commitAsync();
-            \assert($result instanceof WriteResult);
+        $result = yield $transaction->commitAsync();
+        \assert($result instanceof WriteResult);
 
-            $this->assertSame(2, $result->nextExpectedVersion());
-        });
+        $this->assertSame(2, $result->nextExpectedVersion());
     }
 
-    protected function tearDownAsync(): Promise
+    protected function tearDownAsync()
     {
         $this->connection->close();
-
-        return parent::tearDownAsync();
     }
 
     /** @test */

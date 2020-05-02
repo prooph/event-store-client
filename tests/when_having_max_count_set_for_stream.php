@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
-use Amp\Promise;
 use Generator;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
@@ -29,29 +27,27 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
     /** @var EventData[] */
     private array $testEvents = [];
 
-    protected function setUpAsync(): Promise
+    protected function setUpAsync(): Generator
     {
-        return call(function (): Generator {
-            yield parent::setUpAsync();
+        yield from parent::setUpAsync();
 
-            yield $this->connection->setStreamMetadataAsync(
-                $this->stream,
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setMaxCount(3)->build(),
-                DefaultData::adminCredentials()
-            );
+        yield $this->connection->setStreamMetadataAsync(
+            $this->stream,
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setMaxCount(3)->build(),
+            DefaultData::adminCredentials()
+        );
 
-            for ($i = 0; $i < 5; $i++) {
-                $this->testEvents[] = TestEvent::newTestEvent(null, (string) $i);
-            }
+        for ($i = 0; $i < 5; $i++) {
+            $this->testEvents[] = TestEvent::newTestEvent(null, (string) $i);
+        }
 
-            yield $this->connection->appendToStreamAsync(
-                $this->stream,
-                ExpectedVersion::ANY,
-                $this->testEvents,
-                DefaultData::adminCredentials()
-            );
-        });
+        yield $this->connection->appendToStreamAsync(
+            $this->stream,
+            ExpectedVersion::ANY,
+            $this->testEvents,
+            DefaultData::adminCredentials()
+        );
     }
 
     /** @test */

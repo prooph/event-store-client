@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient\Security;
 
 use function Amp\call;
-use Amp\Promise;
 use Generator;
 use Prooph\EventStore\Async\EventStoreTransaction;
 use Prooph\EventStore\Exception\AccessDenied;
@@ -24,18 +23,16 @@ use Prooph\EventStore\UserCredentials;
 
 class overriden_system_stream_security extends AuthenticationTestCase
 {
-    protected function setUpAsync(): Promise
+    protected function setUpAsync(): Generator
     {
-        return call(function (): Generator {
-            yield parent::setUpAsync();
+        yield from parent::setUpAsync();
 
-            $settings = new SystemSettings(
-                null,
-                new StreamAcl(['user1'], ['user1'], ['user1'], ['user1'], ['user1'])
-            );
+        $settings = new SystemSettings(
+            null,
+            new StreamAcl(['user1'], ['user1'], ['user1'], ['user1'], ['user1'])
+        );
 
-            yield $this->connection->setSystemSettingsAsync($settings, new UserCredentials('adm', 'admpa$$'));
-        });
+        yield $this->connection->setSystemSettingsAsync($settings, new UserCredentials('adm', 'admpa$$'));
     }
 
     /** @test */

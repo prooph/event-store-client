@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
 use Amp\Deferred;
 use Amp\Delayed;
 use Amp\Promise;
@@ -44,32 +43,28 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
 {
     private const TIMEOUT = 10000;
 
-    protected function setUpAsync(): Promise
+    protected function setUpAsync(): Generator
     {
-        return call(function (): Generator {
-            parent::setUpAsync();
+        yield from parent::setUpAsync();
 
-            yield $this->connection->setStreamMetadataAsync(
-                '$all',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->setReadRoles(SystemRoles::ALL)->build(),
-                new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
-            );
-        });
+        yield $this->connection->setStreamMetadataAsync(
+            '$all',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->setReadRoles(SystemRoles::ALL)->build(),
+            new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
+        );
     }
 
-    protected function tearDownAsync(): Promise
+    protected function tearDownAsync(): Generator
     {
-        return call(function (): Generator {
-            yield $this->connection->setStreamMetadataAsync(
-                '$all',
-                ExpectedVersion::ANY,
-                StreamMetadata::create()->build(),
-                new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
-            );
+        yield $this->connection->setStreamMetadataAsync(
+            '$all',
+            ExpectedVersion::ANY,
+            StreamMetadata::create()->build(),
+            new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
+        );
 
-            yield parent::tearDownAsync();
-        });
+        yield from parent::tearDownAsync();
     }
 
     /** @test */

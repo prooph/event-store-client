@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Promise;
 use Generator;
 use Prooph\EventStore\Exception\RuntimeException;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
@@ -27,11 +26,11 @@ class when_working_with_stream_metadata_as_structured_info extends EventStoreCon
 {
     private string $stream;
 
-    protected function setUpAsync(): Promise
+    protected function setUp(): void
     {
-        $this->stream = self::class . '\\' . $this->getName();
+        parent::setUp();
 
-        return parent::setUpAsync();
+        $this->stream = self::class . '\\' . $this->getName();
     }
 
     /** @test */
