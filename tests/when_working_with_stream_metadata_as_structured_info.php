@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Promise;
 use Generator;
 use Prooph\EventStore\Exception\RuntimeException;
 use Prooph\EventStore\Exception\WrongExpectedVersion;

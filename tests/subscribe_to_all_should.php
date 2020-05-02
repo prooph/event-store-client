@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
 use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
@@ -53,8 +52,9 @@ class subscribe_to_all_should extends EventStoreConnectionTestCase
             ExpectedVersion::ANY,
             new StreamMetadata(),
             new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
-
         );
+
+        yield from parent::tearDownAsync();
     }
 
     /** @test */

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient\Security;
 
 use function Amp\call;
-use Amp\Promise;
 use Generator;
 use Prooph\EventStore\Async\EventStoreTransaction;
 use Prooph\EventStore\Common\SystemRoles;

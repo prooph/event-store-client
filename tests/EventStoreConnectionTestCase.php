@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
+use Amp\Success;
 use Generator;
 use Prooph\EventStore\Async\EventStoreConnection;
 use ProophTest\EventStoreClient\Helper\TestConnection;
@@ -28,8 +29,10 @@ abstract class EventStoreConnectionTestCase extends AsyncTestCase
         yield $this->connection->connectAsync();
     }
 
-    protected function tearDownAsync()
+    protected function tearDownAsync(): Generator
     {
         $this->connection->close();
+
+        yield new Success();
     }
 }

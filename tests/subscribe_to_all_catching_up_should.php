@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
 use Amp\Deferred;
 use Amp\Delayed;
 use Amp\Promise;
@@ -64,6 +63,8 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
             StreamMetadata::create()->build(),
             new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
         );
+
+        yield from parent::tearDownAsync();
     }
 
     /** @test */

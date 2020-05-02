@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
-use Amp\Promise;
 use Generator;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
