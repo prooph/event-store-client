@@ -31,7 +31,10 @@ use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Psr\Log\LoggerInterface as Logger;
 
-/** @internal */
+/**
+ * @internal
+ * @extends AbstractOperation<TransactionStartCompleted, EventStoreTransaction>
+ */
 class StartTransactionOperation extends AbstractOperation
 {
     private bool $requireMaster;
@@ -73,10 +76,12 @@ class StartTransactionOperation extends AbstractOperation
         return $message;
     }
 
+    /**
+     * @param TransactionStartCompleted $response
+     * @return InspectionResult
+     */
     protected function inspectResponse(Message $response): InspectionResult
     {
-        \assert($response instanceof TransactionStartCompleted);
-
         switch ($response->getResult()) {
             case OperationResult::Success:
                 $this->succeed($response);
@@ -114,8 +119,6 @@ class StartTransactionOperation extends AbstractOperation
 
     protected function transformResponse(Message $response): EventStoreTransaction
     {
-        \assert($response instanceof TransactionStartCompleted);
-
         return new EventStoreTransaction(
             $response->getTransactionId(),
             $this->credentials,

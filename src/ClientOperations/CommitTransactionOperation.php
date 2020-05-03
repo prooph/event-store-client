@@ -31,7 +31,10 @@ use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Psr\Log\LoggerInterface as Logger;
 
-/** @internal */
+/**
+ * @internal
+ * @extends AbstractOperation<TransactionCommitCompleted, WriteResult>
+ */
 class CommitTransactionOperation extends AbstractOperation
 {
     private bool $requireMaster;
@@ -66,10 +69,12 @@ class CommitTransactionOperation extends AbstractOperation
         return $message;
     }
 
+    /**
+     * @param TransactionCommitCompleted $response
+     * @return InspectionResult
+     */
     protected function inspectResponse(Message $response): InspectionResult
     {
-        \assert($response instanceof TransactionCommitCompleted);
-
         switch ($response->getResult()) {
             case OperationResult::Success:
                 $this->succeed($response);
@@ -106,10 +111,12 @@ class CommitTransactionOperation extends AbstractOperation
         }
     }
 
+    /**
+     * @param TransactionCommitCompleted $response
+     * @return WriteResult
+     */
     protected function transformResponse(Message $response): WriteResult
     {
-        \assert($response instanceof TransactionCommitCompleted);
-
         return new WriteResult(
             $response->getLastEventNumber(),
             new Position(

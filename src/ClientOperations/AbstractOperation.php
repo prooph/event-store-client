@@ -32,7 +32,11 @@ use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Psr\Log\LoggerInterface as Logger;
 use Throwable;
 
-/** @internal */
+/**
+ * @internal
+ * @template TResponse
+ * @template TResult
+ */
 abstract class AbstractOperation implements ClientOperation
 {
     private Logger $log;
@@ -60,9 +64,16 @@ abstract class AbstractOperation implements ClientOperation
 
     abstract protected function createRequestDto(): Message;
 
+    /**
+     * @param TResponse $response
+     * @return InspectionResult
+     */
     abstract protected function inspectResponse(Message $response): InspectionResult;
 
-    // we need generics
+    /**
+     * @param TResponse $response
+     * @return TResult
+     */
     abstract protected function transformResponse(Message $response);
 
     public function promise(): Promise

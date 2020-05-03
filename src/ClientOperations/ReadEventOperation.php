@@ -30,7 +30,10 @@ use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Psr\Log\LoggerInterface as Logger;
 
-/** @internal */
+/**
+ * @internal
+ * @extends AbstractOperation<ReadEventCompleted, EventReadResult>
+ */
 class ReadEventOperation extends AbstractOperation
 {
     private bool $requireMaster;
@@ -73,10 +76,12 @@ class ReadEventOperation extends AbstractOperation
         return $message;
     }
 
+    /**
+     * @param ReadEventCompleted $response
+     * @return InspectionResult
+     */
     protected function inspectResponse(Message $response): InspectionResult
     {
-        /** @var ReadEventCompleted $response */
-
         switch ($response->getResult()) {
             case ReadEventResult::Success:
                 $this->succeed($response);
@@ -107,9 +112,12 @@ class ReadEventOperation extends AbstractOperation
         }
     }
 
+    /**
+     * @param ReadEventCompleted $response
+     * @return EventReadResult
+     */
     protected function transformResponse(Message $response): EventReadResult
     {
-        /* @var ReadEventCompleted $response */
         $eventMessage = $response->getEvent();
 
         if ($event = $eventMessage->getEvent()) {
