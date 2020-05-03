@@ -87,7 +87,7 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
                 }
             },
             new class(Closure::fromCallable($dropBehaviour)) implements PersistentSubscriptionDropped {
-                private $callback;
+                private Closure $callback;
 
                 public function __construct(Closure $callback)
                 {

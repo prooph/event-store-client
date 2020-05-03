@@ -253,7 +253,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
                 }
 
                 $eventAppeared = new class(Closure::fromCallable([$this, 'enqueuePushedEvent'])) implements EventAppearedOnSubscription {
-                    private $callback;
+                    private Closure $callback;
 
                     public function __construct(Closure $callback)
                     {
@@ -269,7 +269,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
                 };
 
                 $subscriptionDropped = new class(Closure::fromCallable([$this, 'serverSubscriptionDropped'])) implements SubscriptionDropped {
-                    private $callback;
+                    private Closure $callback;
 
                     public function __construct(Closure $callback)
                     {
