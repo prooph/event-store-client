@@ -657,7 +657,10 @@ class EventStoreConnectionLogicHandler
                     $message->userCredentials(),
                     fn (EventStoreSubscription $subscription, ResolvedEvent $resolvedEvent): Promise => ($message->eventAppeared())($subscription, $resolvedEvent),
                     function (EventStoreSubscription $subscription, SubscriptionDropReason $reason, ?Throwable $exception = null) use ($message): void {
-                        ($message->subscriptionDropped())($subscription, $reason, $exception);
+                        $subscriptionDroppedHandler = $message->subscriptionDropped();
+                        if ($subscriptionDroppedHandler !== null) {
+                            $subscriptionDroppedHandler($subscription, $reason, $exception);
+                        }
                     },
                     $this->settings->verboseLogging(),
                     fn (): ?TcpPackageConnection => $this->connection
