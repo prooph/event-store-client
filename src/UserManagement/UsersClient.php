@@ -429,7 +429,7 @@ class UsersClient
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve(null);
+                    $deferred->resolve();
                 } elseif ($response->getStatus() === HttpStatusCode::CONFLICT) {
                     $deferred->fail(new UserCommandConflict($response->getStatus(), $response->getReason()));
                 } else {

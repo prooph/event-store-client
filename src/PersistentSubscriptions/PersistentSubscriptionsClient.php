@@ -40,11 +40,6 @@ class PersistentSubscriptionsClient
     }
 
     /**
-     * @param EndPoint $endPoint
-     * @param string $stream
-     * @param string $subscriptionName
-     * @param null|UserCredentials $userCredentials
-     * @param string $httpSchema
      * @return Promise<PersistentSubscriptionDetails>
      */
     public function describe(
@@ -90,10 +85,6 @@ class PersistentSubscriptionsClient
     }
 
     /**
-     * @param EndPoint $endPoint
-     * @param null|string $stream
-     * @param null|UserCredentials $userCredentials
-     * @param string $httpSchema
      * @return Promise<PersistentSubscriptionDetails[]>
      */
     public function list(
@@ -147,6 +138,7 @@ class PersistentSubscriptionsClient
         return $deferred->promise();
     }
 
+    /** @return Promise<void> */
     public function replayParkedMessages(
         EndPoint $endPoint,
         string $stream,
@@ -169,9 +161,6 @@ class PersistentSubscriptionsClient
     }
 
     /**
-     * @param string $
-     * @param UserCredentials $
-     * @param int $
      * @return Promise<string>
      */
     private function sendGet(string $url, ?UserCredentials $userCredentials, int $expectedCode): Promise
@@ -204,6 +193,7 @@ class PersistentSubscriptionsClient
         return $deferred->promise();
     }
 
+    /** @return Promise<void> */
     private function sendPost(
         string $url,
         string $content,

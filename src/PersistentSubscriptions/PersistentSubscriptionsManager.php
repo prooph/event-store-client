@@ -41,9 +41,6 @@ class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsMana
     }
 
     /**
-     * @param string $stream
-     * @param string $subscriptionName
-     * @param null|UserCredentials $userCredentials
      * @return Promise<PersistentSubscriptionDetails>
      */
     public function describe(
@@ -68,6 +65,7 @@ class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsMana
         );
     }
 
+    /** @return Promise<void> */
     public function replayParkedMessages(
         string $stream,
         string $subscriptionName,
@@ -91,9 +89,7 @@ class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsMana
     }
 
     /**
-     * @param null|string $stream
-     * @param null|UserCredentials $userCredentials
-     * @return Promise<PersistentSubscriptionDetails[]>
+     * @return Promise<list<PersistentSubscriptionDetails>>
      */
     public function list(?string $stream = null, ?UserCredentials $userCredentials = null): Promise
     {

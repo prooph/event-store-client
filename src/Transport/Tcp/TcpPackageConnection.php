@@ -89,11 +89,13 @@ class TcpPackageConnection
         });
     }
 
+    /** @psalm-pure */
     public function remoteEndPoint(): EndPoint
     {
         return $this->remoteEndPoint;
     }
 
+    /** @psalm-pure */
     public function connectionId(): string
     {
         return $this->connectionId;

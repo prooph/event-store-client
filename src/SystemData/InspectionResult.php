@@ -16,7 +16,11 @@ namespace Prooph\EventStoreClient\SystemData;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 class InspectionResult
 {
     private InspectionDecision $inspectionDecision;
@@ -44,21 +48,25 @@ class InspectionResult
         $this->secureTcpEndPoint = $secureTcpEndPoint;
     }
 
+    /** @psalm-pure */
     public function decision(): InspectionDecision
     {
         return $this->inspectionDecision;
     }
 
+    /** @psalm-pure */
     public function description(): string
     {
         return $this->description;
     }
 
+    /** @psalm-pure */
     public function tcpEndPoint(): ?EndPoint
     {
         return $this->tcpEndPoint;
     }
 
+    /** @psalm-pure */
     public function secureTcpEndPoint(): ?EndPoint
     {
         return $this->secureTcpEndPoint;

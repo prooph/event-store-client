@@ -15,7 +15,11 @@ namespace Prooph\EventStoreClient\Internal\Message;
 
 use Prooph\EventStoreClient\Internal\NodeEndPoints;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 class EstablishTcpConnectionMessage implements Message
 {
     private NodeEndPoints $nodeEndPoints;
@@ -25,11 +29,13 @@ class EstablishTcpConnectionMessage implements Message
         $this->nodeEndPoints = $nodeEndPoints;
     }
 
+    /** @psalm-pure */
     public function nodeEndPoints(): NodeEndPoints
     {
         return $this->nodeEndPoints;
     }
 
+    /** @psalm-pure */
     public function __toString(): string
     {
         return 'EstablishTcpConnectionMessage';

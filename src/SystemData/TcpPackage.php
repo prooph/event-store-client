@@ -15,7 +15,11 @@ namespace Prooph\EventStoreClient\SystemData;
 
 use Prooph\EventStore\Exception\InvalidArgumentException;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 class TcpPackage
 {
     public const COMMAND_OFFSET = 0;
@@ -99,12 +103,14 @@ class TcpPackage
         $this->password = $password;
     }
 
+    /** @psalm-pure */
     public function asBytes(): string
     {
         $dataLen = \strlen($this->data);
         $headerSize = self::MANDATORY_SIZE;
         $messageLen = $headerSize + $dataLen;
 
+        /** @psalm-suppress ImpureMethodCall */
         if ($this->flags->equals(TcpFlags::authenticated())) {
             $loginLen = \strlen($this->login);
             $passLen = \strlen($this->password);
@@ -147,31 +153,37 @@ class TcpPackage
         );
     }
 
+    /** @psalm-pure */
     public function command(): TcpCommand
     {
         return $this->command;
     }
 
+    /** @psalm-pure */
     public function flags(): TcpFlags
     {
         return $this->flags;
     }
 
+    /** @psalm-pure */
     public function correlationId(): string
     {
         return $this->correlationId;
     }
 
+    /** @psalm-pure */
     public function data(): string
     {
         return $this->data;
     }
 
+    /** @psalm-pure */
     public function login(): ?string
     {
         return $this->login;
     }
 
+    /** @psalm-pure */
     public function password(): ?string
     {
         return $this->password;

@@ -42,6 +42,8 @@ class ProjectionsManager implements AsyncProjectionsManager
 
     /**
      * Asynchronously enables a projection
+     *
+     * @return Promise<void>
      */
     public function enableAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
@@ -59,6 +61,8 @@ class ProjectionsManager implements AsyncProjectionsManager
 
     /**
      * Asynchronously aborts and disables a projection without writing a checkpoint
+     *
+     * @return Promise<void>
      */
     public function disableAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
@@ -76,6 +80,8 @@ class ProjectionsManager implements AsyncProjectionsManager
 
     /**
      * Asynchronously disables a projection
+     *
+     * @return Promise<void>
      */
     public function abortAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
@@ -93,6 +99,8 @@ class ProjectionsManager implements AsyncProjectionsManager
 
     /**
      * Asynchronously creates a one-time query
+     *
+     * @return Promise<void>
      */
     public function createOneTimeAsync(
         string $query,
@@ -114,6 +122,8 @@ class ProjectionsManager implements AsyncProjectionsManager
 
     /**
      * Asynchronously creates a one-time query
+     *
+     * @return Promise<void>
      */
     public function createTransientAsync(
         string $name,
@@ -141,6 +151,8 @@ class ProjectionsManager implements AsyncProjectionsManager
 
     /**
      * Asynchronously creates a continuous projection
+     *
+     * @return Promise<void>
      */
     public function createContinuousAsync(
         string $name,
@@ -171,7 +183,7 @@ class ProjectionsManager implements AsyncProjectionsManager
     /**
      * Asynchronously lists all projections
      *
-     * @return Promise<ProjectionDetails[]>
+     * @return Promise<list<ProjectionDetails>>
      */
     public function listAllAsync(?UserCredentials $userCredentials = null): Promise
     {
@@ -185,7 +197,7 @@ class ProjectionsManager implements AsyncProjectionsManager
     /**
      * Asynchronously lists all one-time projections
      *
-     * @return Promise<ProjectionDetails[]>
+     * @return Promise<list<ProjectionDetails>>
      */
     public function listOneTimeAsync(?UserCredentials $userCredentials = null): Promise
     {
@@ -199,7 +211,7 @@ class ProjectionsManager implements AsyncProjectionsManager
     /**
      * Asynchronously lists this status of all continuous projections
      *
-     * @return Promise<ProjectionDetails[]>
+     * @return Promise<list<ProjectionDetails>>
      */
     public function listContinuousAsync(?UserCredentials $userCredentials = null): Promise
     {
@@ -373,6 +385,8 @@ class ProjectionsManager implements AsyncProjectionsManager
 
     /**
      * Asynchronously updates the definition of a query
+     *
+     * @return Promise<void>
      */
     public function updateQueryAsync(
         string $name,
@@ -400,6 +414,8 @@ class ProjectionsManager implements AsyncProjectionsManager
 
     /**
      * Asynchronously deletes a projection
+     *
+     * @return Promise<void>
      */
     public function deleteAsync(
         string $name,
@@ -421,6 +437,8 @@ class ProjectionsManager implements AsyncProjectionsManager
 
     /**
      * Asynchronously resets a projection
+     *
+     * @return Promise<void>
      */
     public function resetAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {

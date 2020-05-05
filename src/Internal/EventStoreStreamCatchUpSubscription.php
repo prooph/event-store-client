@@ -16,12 +16,10 @@ namespace Prooph\EventStoreClient\Internal;
 use function Amp\call;
 use Amp\Delayed;
 use Amp\Promise;
+use Closure;
 use Generator;
-use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
-use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Async\EventStoreStreamCatchUpSubscription as AsyncEventStoreStreamCatchUpSubscription;
-use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\Exception\OutOfRangeException;
 use Prooph\EventStore\Exception\StreamDeleted;
@@ -39,6 +37,10 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription 
     private int $lastProcessedEventNumber;
 
     /**
+     * @param Closure(EventStoreCatchUpSubscription, ResolvedEvent): Promise $eventAppeared
+     * @param null|Closure(EventStoreCatchUpSubscription): void $liveProcessingStarted
+     * @param null|Closure(EventStoreCatchUpSubscription, SubscriptionDropReason, null|Throwable): void $subscriptionDropped
+     *
      * @internal
      */
     public function __construct(
@@ -47,9 +49,9 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription 
         string $streamId,
         ?int $fromEventNumberExclusive, // if null from the very beginning
         ?UserCredentials $userCredentials,
-        EventAppearedOnCatchupSubscription $eventAppeared,
-        ?LiveProcessingStartedOnCatchUpSubscription $liveProcessingStarted,
-        ?CatchUpSubscriptionDropped $subscriptionDropped,
+        Closure $eventAppeared,
+        ?Closure $liveProcessingStarted,
+        ?Closure $subscriptionDropped,
         CatchUpSubscriptionSettings $settings
     ) {
         parent::__construct(
@@ -166,6 +168,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription 
         });
     }
 
+    /** @return Promise<void> */
     protected function tryProcessAsync(ResolvedEvent $e): Promise
     {
         return call(function () use ($e): Generator {

@@ -20,6 +20,7 @@ use Prooph\EventStoreClient\Internal\Message\Message;
 /** @internal */
 class MessageHandler
 {
+    /** @var array<string, Closure> */
     private array $handlers = [];
 
     public function registerHandler(string $messageName, Closure $handler): void

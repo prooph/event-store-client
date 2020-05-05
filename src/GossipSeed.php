@@ -17,6 +17,8 @@ use Prooph\EventStore\EndPoint;
 
 /**
  * Represents a source of cluster gossip
+ *
+ * @psalm-immutable
  */
 class GossipSeed
 {
@@ -29,11 +31,13 @@ class GossipSeed
         $this->hostHeader = $hostHeader;
     }
 
+    /** @psalm-pure */
     public function endPoint(): EndPoint
     {
         return $this->endPoint;
     }
 
+    /** @psalm-pure */
     public function hostHeader(): string
     {
         return $this->hostHeader;

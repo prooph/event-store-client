@@ -15,4 +15,12 @@
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>
+
+    <issueHandlers>
+        <ForbiddenCode>
+            <errorLevel type="suppress">
+                <directory name="examples"/>
+            </errorLevel>
+        </ForbiddenCode>
+    </issueHandlers>
 </psalm>

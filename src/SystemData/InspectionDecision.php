@@ -13,7 +13,11 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\SystemData;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 final class InspectionDecision
 {
     public const OPTIONS = [
@@ -70,35 +74,39 @@ final class InspectionDecision
             throw new \InvalidArgumentException('Unknown enum name given');
         }
 
-        return self::{$value}();
+        return new self($value);
     }
 
     public static function fromValue(int $value): self
     {
         foreach (self::OPTIONS as $name => $v) {
             if ($v === $value) {
-                return self::{$name}();
+                return new self($name);
             }
         }
 
         throw new \InvalidArgumentException('Unknown enum value given');
     }
 
+    /** @psalm-pure */
     public function equals(InspectionDecision $other): bool
     {
         return $this->name === $other->name;
     }
 
+    /** @psalm-pure */
     public function name(): string
     {
         return $this->name;
     }
 
+    /** @psalm-pure */
     public function value(): int
     {
         return $this->value;
     }
 
+    /** @psalm-pure */
     public function __toString(): string
     {
         return $this->name;

@@ -130,12 +130,6 @@ class ConnectionString
                         $gossipSeeds[] = new GossipSeed(new EndPoint($host, $port));
                     }
 
-                    if (empty($gossipSeeds)) {
-                        throw new InvalidArgumentException(\sprintf(
-                            'No gossip seeds specified in connection string'
-                        ));
-                    }
-
                     $filteredValue = $gossipSeeds;
                     break;
             }

@@ -55,13 +55,6 @@ class QueryManager implements AsyncQueryManager
      *
      * returns String of JSON containing query result
      *
-     * @param string $name A name for the query
-     * @param string $query The source code for the query
-     * @param int $initialPollingDelay Initial time to wait between polling for projection status
-     * @param int $maximumPollingDelay Maximum time to wait between polling for projection status
-     * @param string $type The type to use, defaults to JS
-     * @param UserCredentials|null $userCredentials Credentials for a user with permission to create a query
-     *
      * @return Promise<string>
      */
     public function executeAsync(
@@ -100,6 +93,7 @@ class QueryManager implements AsyncQueryManager
         return Promise\timeout($promise, $this->queryTimeout);
     }
 
+    /** @return Promise<void> */
     private function waitForCompletedAsync(
         string $name,
         int $initialPollingDelay,
@@ -124,6 +118,7 @@ class QueryManager implements AsyncQueryManager
         });
     }
 
+    /** @return Promise<void> */
     private function delayPollingAsync(
         int $attempts,
         int $initialPollingDelay,
@@ -137,6 +132,7 @@ class QueryManager implements AsyncQueryManager
         });
     }
 
+    /** @return Promise<string> */
     private function getStatusAsync(string $name, ?UserCredentials $userCredentials): Promise
     {
         return $this->projectionsManager->getStatusAsync($name, $userCredentials);

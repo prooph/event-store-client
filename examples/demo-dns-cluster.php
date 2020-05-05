@@ -57,7 +57,6 @@ Loop::run(function () {
         true
     );
 
-    /** @psalm-suppress ForbiddenCode */
     \var_dump($slice);
 
     $slice = yield $connection->readStreamEventsBackwardAsync(
@@ -67,17 +66,14 @@ Loop::run(function () {
         true
     );
 
-    /** @psalm-suppress ForbiddenCode */
     \var_dump($slice);
 
     $event = yield $connection->readEventAsync('foo-bar', 2, true);
 
-    /** @psalm-suppress ForbiddenCode */
     \var_dump($event);
 
     $m = yield $connection->getStreamMetadataAsync('foo-bar');
 
-    /** @psalm-suppress ForbiddenCode */
     \var_dump($m);
 
     $r = yield $connection->setStreamMetadataAsync('foo-bar', ExpectedVersion::ANY, new StreamMetadata(
@@ -86,12 +82,10 @@ Loop::run(function () {
         ]
     ));
 
-    /** @psalm-suppress ForbiddenCode */
     \var_dump($r);
 
     $m = yield $connection->getStreamMetadataAsync('foo-bar');
 
-    /** @psalm-suppress ForbiddenCode */
     \var_dump($m);
 
     $wr = yield $connection->appendToStreamAsync('foo-bar', ExpectedVersion::ANY, [
@@ -101,7 +95,6 @@ Loop::run(function () {
         new EventData(EventId::generate(), 'test-type4', false, 'bbb', 'meta'),
     ]);
 
-    /** @psalm-suppress ForbiddenCode */
     \var_dump($wr);
 
     $ae = yield $connection->readAllEventsForwardAsync(Position::start(), 2, false, new UserCredentials(
@@ -109,7 +102,6 @@ Loop::run(function () {
         'changeit'
     ));
 
-    /** @psalm-suppress ForbiddenCode */
     \var_dump($ae);
 
     $aeb = yield $connection->readAllEventsBackwardAsync(Position::end(), 2, false, new UserCredentials(
@@ -117,7 +109,6 @@ Loop::run(function () {
         'changeit'
     ));
 
-    /** @psalm-suppress ForbiddenCode */
     \var_dump($aeb);
 
     $connection->close();

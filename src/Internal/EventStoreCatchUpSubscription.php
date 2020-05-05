@@ -20,19 +20,14 @@ use Amp\Promise;
 use Amp\Success;
 use Closure;
 use Generator;
-use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
 use Prooph\EventStore\Async\ClientConnectionEventArgs;
-use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
-use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Async\EventStoreCatchUpSubscription as AsyncEventStoreCatchUpSubscription;
 use Prooph\EventStore\Async\EventStoreConnection;
-use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\Internal\DropData;
 use Prooph\EventStore\ListenerHandler;
 use Prooph\EventStore\ResolvedEvent;
-use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
@@ -52,9 +47,12 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
     private ?UserCredentials $userCredentials;
     protected int $readBatchSize;
     protected int $maxPushQueueSize;
-    protected EventAppearedOnCatchupSubscription $eventAppeared;
-    private ?LiveProcessingStartedOnCatchUpSubscription $liveProcessingStarted;
-    private ?CatchUpSubscriptionDropped $subscriptionDropped;
+    /** @var Closure(EventStoreCatchUpSubscription, ResolvedEvent): Promise */
+    protected Closure $eventAppeared;
+    /** @var null|Closure(EventStoreCatchUpSubscription): void  */
+    private ?Closure $liveProcessingStarted;
+    /** @var null|Closure(EventStoreCatchUpSubscription, SubscriptionDropReason, null|Throwable): void */
+    private ?Closure $subscriptionDropped;
     protected bool $verbose;
     /** @var SplQueue<ResolvedEvent> */
     private SplQueue $liveQueue;
@@ -67,15 +65,21 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
     private Deferred $stopped;
     private ListenerHandler $connectListener;
 
-    /** @internal */
+    /**
+     * @param Closure(EventStoreCatchUpSubscription, ResolvedEvent): Promise $eventAppeared
+     * @param null|Closure(EventStoreCatchUpSubscription): void $liveProcessingStarted
+     * @param null|Closure(EventStoreCatchUpSubscription, SubscriptionDropReason, null|Throwable): void $subscriptionDropped
+     *
+     * @internal
+     */
     public function __construct(
         EventStoreConnection $connection,
         Logger $logger,
         string $streamId,
         ?UserCredentials $userCredentials,
-        EventAppearedOnCatchupSubscription $eventAppeared,
-        ?LiveProcessingStartedOnCatchUpSubscription $liveProcessingStarted,
-        ?CatchUpSubscriptionDropped $subscriptionDropped,
+        Closure $eventAppeared,
+        ?Closure $liveProcessingStarted,
+        ?Closure $subscriptionDropped,
         CatchUpSubscriptionSettings $settings
     ) {
         if (null === self::$dropSubscriptionEvent) {

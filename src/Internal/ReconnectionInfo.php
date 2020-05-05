@@ -13,7 +13,11 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 class ReconnectionInfo
 {
     private int $reconnectionAttempt;
@@ -25,11 +29,13 @@ class ReconnectionInfo
         $this->timestamp = $timestamp;
     }
 
+    /** @psalm-pure */
     public function reconnectionAttempt(): int
     {
         return $this->reconnectionAttempt;
     }
 
+    /** @psalm-pure */
     public function timestamp(): int
     {
         return $this->timestamp;

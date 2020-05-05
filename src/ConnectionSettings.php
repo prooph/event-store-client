@@ -20,6 +20,8 @@ use Psr\Log\LoggerInterface as Logger;
 
 /**
  * All times are milliseconds
+ *
+ * @psalm-immutable
  */
 final class ConnectionSettings
 {
@@ -43,7 +45,7 @@ final class ConnectionSettings
     private string $clusterDns;
     private int $maxDiscoverAttempts;
     private int $externalGossipPort;
-    /** @var GossipSeed[] */
+    /** @var list<GossipSeed> */
     private array $gossipSeeds = [];
     private int $gossipTimeout;
     private bool $preferRandomNode;
@@ -59,7 +61,11 @@ final class ConnectionSettings
         return new ConnectionSettingsBuilder();
     }
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @param list<GossipSeed> $gossipSeeds
+     */
     public function __construct(
         Logger $logger,
         bool $verboseLogging,
@@ -142,121 +148,145 @@ final class ConnectionSettings
         $this->clientConnectionTimeout = $clientConnectionTimeout;
     }
 
+    /** @psalm-pure */
     public function log(): Logger
     {
         return $this->log;
     }
 
+    /** @psalm-pure */
     public function verboseLogging(): bool
     {
         return $this->verboseLogging;
     }
 
+    /** @psalm-pure */
     public function maxQueueSize(): int
     {
         return $this->maxQueueSize;
     }
 
+    /** @psalm-pure */
     public function maxConcurrentItems(): int
     {
         return $this->maxConcurrentItems;
     }
 
+    /** @psalm-pure */
     public function maxRetries(): int
     {
         return $this->maxRetries;
     }
 
+    /** @psalm-pure */
     public function maxReconnections(): int
     {
         return $this->maxReconnections;
     }
 
+    /** @psalm-pure */
     public function requireMaster(): bool
     {
         return $this->requireMaster;
     }
 
+    /** @psalm-pure */
     public function reconnectionDelay(): int
     {
         return $this->reconnectionDelay;
     }
 
+    /** @psalm-pure */
     public function operationTimeout(): int
     {
         return $this->operationTimeout;
     }
 
+    /** @psalm-pure */
     public function operationTimeoutCheckPeriod(): int
     {
         return $this->operationTimeoutCheckPeriod;
     }
 
+    /** @psalm-pure */
     public function defaultUserCredentials(): ?UserCredentials
     {
         return $this->defaultUserCredentials;
     }
 
+    /** @psalm-pure */
     public function useSslConnection(): bool
     {
         return $this->useSslConnection;
     }
 
+    /** @psalm-pure */
     public function targetHost(): string
     {
         return $this->targetHost;
     }
 
+    /** @psalm-pure */
     public function validateServer(): bool
     {
         return $this->validateServer;
     }
 
+    /** @psalm-pure */
     public function failOnNoServerResponse(): bool
     {
         return $this->failOnNoServerResponse;
     }
 
+    /** @psalm-pure */
     public function heartbeatInterval(): int
     {
         return $this->heartbeatInterval;
     }
 
+    /** @psalm-pure */
     public function heartbeatTimeout(): int
     {
         return $this->heartbeatTimeout;
     }
 
+    /** @psalm-pure */
     public function clusterDns(): string
     {
         return $this->clusterDns;
     }
 
+    /** @psalm-pure */
     public function maxDiscoverAttempts(): int
     {
         return $this->maxDiscoverAttempts;
     }
 
+    /** @psalm-pure */
     public function externalGossipPort(): int
     {
         return $this->externalGossipPort;
     }
 
+    /** @psalm-pure */
     public function gossipSeeds(): array
     {
         return $this->gossipSeeds;
     }
 
+    /** @psalm-pure */
     public function gossipTimeout(): int
     {
         return $this->gossipTimeout;
     }
 
+    /** @psalm-pure */
     public function preferRandomNode(): bool
     {
         return $this->preferRandomNode;
     }
 
+    /** @psalm-pure */
     public function clientConnectionTimeout(): int
     {
         return $this->clientConnectionTimeout;

@@ -18,13 +18,15 @@ use Prooph\EventStore\Exception\OutOfRangeException;
 
 /**
  * All times are milliseconds
+ *
+ * @psalm-immutable
  */
 final class ClusterSettings
 {
     private string $clusterDns = '';
     private int $maxDiscoverAttempts;
     private int $externalGossipPort = 0;
-    /** @var GossipSeed[] */
+    /** @var list<GossipSeed> */
     private array $gossipSeeds = [];
     private int $gossipTimeout = 0;
     private bool $preferRandomNode;
@@ -98,32 +100,41 @@ final class ClusterSettings
         return $clusterSettings;
     }
 
+    /** @psalm-pure */
     public function clusterDns(): string
     {
         return $this->clusterDns;
     }
 
+    /** @psalm-pure */
     public function maxDiscoverAttempts(): int
     {
         return $this->maxDiscoverAttempts;
     }
 
+    /** @psalm-pure */
     public function externalGossipPort(): int
     {
         return $this->externalGossipPort;
     }
 
-    /** @return GossipSeed[] */
+    /**
+     * @return list<GossipSeed>
+     *
+     * @psalm-pure
+     */
     public function gossipSeeds(): array
     {
         return $this->gossipSeeds;
     }
 
+    /** @psalm-pure */
     public function gossipTimeout(): int
     {
         return $this->gossipTimeout;
     }
 
+    /** @psalm-pure */
     public function preferRandomNode(): bool
     {
         return $this->preferRandomNode;

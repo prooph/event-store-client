@@ -13,7 +13,11 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 class IdentifyInfo
 {
     private string $correlationId;
@@ -25,11 +29,13 @@ class IdentifyInfo
         $this->timestamp = $timestamp;
     }
 
+    /** @psalm-pure */
     public function correlationId(): string
     {
         return $this->correlationId;
     }
 
+    /** @psalm-pure */
     public function timestamp(): int
     {
         return $this->timestamp;
