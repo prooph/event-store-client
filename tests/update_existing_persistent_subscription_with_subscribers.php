@@ -18,9 +18,7 @@ use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
-use Prooph\EventStore\Async\PersistentSubscriptionDropped;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
@@ -64,36 +62,19 @@ class update_existing_persistent_subscription_with_subscribers extends AsyncTest
         yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             'existing',
-            new class() implements EventAppearedOnPersistentSubscription {
-                public function __invoke(
-                    EventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent,
-                    ?int $retryCount = null
-                ): Promise {
-                    return new Success();
-                }
-            },
-            new class($this->dropped, $this->reason, $this->exception) implements PersistentSubscriptionDropped {
-                private Deferred $dropped;
-                private ?SubscriptionDropReason $reason;
-                private ?Throwable $exception;
-
-                public function __construct($dropped, &$reason, &$exception)
-                {
-                    $this->dropped = $dropped;
-                    $this->reason = &$reason;
-                    $this->exception = &$exception;
-                }
-
-                public function __invoke(
-                    EventStorePersistentSubscription $subscription,
-                    SubscriptionDropReason $reason,
-                    ?Throwable $exception = null
-                ): void {
-                    $this->reason = $reason;
-                    $this->exception = $exception;
-                    $this->dropped->resolve(true);
-                }
+            fn (
+                EventStorePersistentSubscription $subscription,
+                ResolvedEvent $resolvedEvent,
+                ?int $retryCount = null
+            ): Promise => new Success(),
+            function (
+                EventStorePersistentSubscription $subscription,
+                SubscriptionDropReason $reason,
+                ?Throwable $exception = null
+            ): void {
+                $this->reason = $reason;
+                $this->exception = $exception;
+                $this->dropped->resolve(true);
             }
         );
     }

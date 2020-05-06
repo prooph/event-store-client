@@ -17,7 +17,6 @@ use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\ResolvedEvent;
@@ -35,15 +34,11 @@ class connect_to_non_existing_persistent_subscription_with_permissions extends A
             yield $this->connection->connectToPersistentSubscriptionAsync(
                 'nonexisting2',
                 'foo',
-                new class() implements EventAppearedOnPersistentSubscription {
-                    public function __invoke(
-                        EventStorePersistentSubscription $subscription,
-                        ResolvedEvent $resolvedEvent,
-                        ?int $retryCount = null
-                    ): Promise {
-                        return new Success();
-                    }
-                }
+                fn (
+                    EventStorePersistentSubscription $subscription,
+                    ResolvedEvent $resolvedEvent,
+                    ?int $retryCount = null
+                ): Promise => new Success()
             );
 
             $this->fail('should have thrown');

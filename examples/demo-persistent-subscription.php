@@ -16,9 +16,7 @@ namespace Prooph\EventStoreClient;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
-use Prooph\EventStore\Async\PersistentSubscriptionDropped;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\Internal\PersistentSubscriptionCreateResult;
@@ -69,29 +67,25 @@ Loop::run(function () {
     yield $connection->connectToPersistentSubscriptionAsync(
         'foo-bar',
         'test-persistent-subscription',
-        new class() implements EventAppearedOnPersistentSubscription {
-            public function __invoke(
-                EventStorePersistentSubscription $subscription,
-                ResolvedEvent $resolvedEvent,
-                ?int $retryCount = null
-            ): Promise {
-                echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
-                echo 'data: ' . $resolvedEvent->originalEvent()->data() . PHP_EOL;
+        function (
+            EventStorePersistentSubscription $subscription,
+            ResolvedEvent $resolvedEvent,
+            ?int $retryCount = null
+        ): Promise {
+            echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
+            echo 'data: ' . $resolvedEvent->originalEvent()->data() . PHP_EOL;
 
-                return new Success();
-            }
+            return new Success();
         },
-        new class() implements PersistentSubscriptionDropped {
-            public function __invoke(
-                EventStorePersistentSubscription $subscription,
-                SubscriptionDropReason $reason,
-                ?Throwable $exception = null
-            ): void {
-                echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
+        function (
+            EventStorePersistentSubscription $subscription,
+            SubscriptionDropReason $reason,
+            ?Throwable $exception = null
+        ): void {
+            echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
 
-                if ($exception) {
-                    echo 'ex: ' . $exception->getMessage() . PHP_EOL;
-                }
+            if ($exception) {
+                echo 'ex: ' . $exception->getMessage() . PHP_EOL;
             }
         },
         10,

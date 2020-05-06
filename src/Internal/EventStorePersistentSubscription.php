@@ -267,7 +267,6 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
         $this->subscription->notifyEventsFailed($eventIds, $action, $reason);
     }
 
-    /** @return Promise<void> */
     public function stop(?int $timeout = null): Promise
     {
         if ($this->verbose) {

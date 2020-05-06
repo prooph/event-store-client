@@ -20,8 +20,6 @@ use Psr\Log\LoggerInterface as Logger;
 
 /**
  * All times are milliseconds
- *
- * @psalm-immutable
  */
 final class ConnectionSettings
 {

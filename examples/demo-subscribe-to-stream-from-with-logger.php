@@ -19,7 +19,6 @@ use Amp\Success;
 use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropReason;
 use Throwable;
@@ -50,7 +49,7 @@ Loop::run(function () {
         'foo-bar',
         null,
         CatchUpSubscriptionSettings::default(),
-        function (EventStoreSubscription $subscription, ResolvedEvent $resolvedEvent): Promise {
+        function (EventStoreCatchUpSubscription $subscription, ResolvedEvent $resolvedEvent): Promise {
             echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
             echo 'data: ' . $resolvedEvent->originalEvent()->data() . PHP_EOL;
 
@@ -60,7 +59,7 @@ Loop::run(function () {
             echo 'liveProcessingStarted on ' . $subscription->streamId() . PHP_EOL;
         },
         function (
-            EventStoreSubscription $subscription,
+            EventStoreCatchUpSubscription $subscription,
             SubscriptionDropReason $reason,
             ?Throwable $exception = null
         ): void {

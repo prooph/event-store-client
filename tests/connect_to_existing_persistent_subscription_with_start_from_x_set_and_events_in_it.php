@@ -19,7 +19,6 @@ use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
@@ -62,33 +61,23 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
             DefaultData::adminCredentials()
         );
 
+        $set = false;
+
         yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
-            new class($this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
-                private Deferred $deferred;
-                private ?ResolvedEvent $firstEvent;
-                private bool $set = false;
-
-                public function __construct($deferred, &$firstEvent)
-                {
-                    $this->deferred = $deferred;
-                    $this->firstEvent = &$firstEvent;
+            function (
+                EventStorePersistentSubscription $subscription,
+                ResolvedEvent $resolvedEvent,
+                ?int $retryCount = null
+            ) use (&$set): Promise {
+                if (! $set) {
+                    $set = true;
+                    $this->firstEvent = $resolvedEvent;
+                    $this->resetEvent->resolve(true);
                 }
 
-                public function __invoke(
-                    EventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent,
-                    ?int $retryCount = null
-                ): Promise {
-                    if (! $this->set) {
-                        $this->set = true;
-                        $this->firstEvent = $resolvedEvent;
-                        $this->deferred->resolve(true);
-                    }
-
-                    return new Success();
-                }
+                return new Success();
             },
             null,
             10,

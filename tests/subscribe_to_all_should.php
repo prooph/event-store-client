@@ -16,14 +16,13 @@ namespace ProophTest\EventStoreClient;
 use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
+use Closure;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Common\SystemRoles;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\StreamMetadata;
-use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
 use ProophTest\EventStoreClient\Helper\TestEvent;
@@ -121,44 +120,26 @@ class subscribe_to_all_should extends EventStoreConnectionTestCase
         $this->assertTrue(yield $appeared->wait(self::TIMEOUT), 'Appeared countdown event didn\'t fire in time');
     }
 
-    private function appearedWithCountdown(CountdownEvent $appeared): EventAppearedOnSubscription
+    private function appearedWithCountdown(CountdownEvent $appeared): Closure
     {
-        return new class($appeared) implements EventAppearedOnSubscription {
-            private CountdownEvent $appeared;
+        return function (
+            EventStoreSubscription $subscription,
+            ResolvedEvent $resolvedEvent
+        ) use ($appeared): Promise {
+            $appeared->signal();
 
-            public function __construct(CountdownEvent $appeared)
-            {
-                $this->appeared = $appeared;
-            }
-
-            public function __invoke(
-                EventStoreSubscription $subscription,
-                ResolvedEvent $resolvedEvent
-            ): Promise {
-                $this->appeared->signal();
-
-                return new Success();
-            }
+            return new Success();
         };
     }
 
-    private function droppedWithCountdown(CountdownEvent $dropped): SubscriptionDropped
+    private function droppedWithCountdown(CountdownEvent $dropped): Closure
     {
-        return new class($dropped) implements SubscriptionDropped {
-            private CountdownEvent $dropped;
-
-            public function __construct(CountdownEvent $dropped)
-            {
-                $this->dropped = $dropped;
-            }
-
-            public function __invoke(
-                EventStoreSubscription $subscription,
-                SubscriptionDropReason $reason,
-                ?Throwable $exception = null
-            ): void {
-                $this->dropped->signal();
-            }
+        return function (
+            EventStoreSubscription $subscription,
+            SubscriptionDropReason $reason,
+            ?Throwable $exception = null
+        ): void {
+            $dropped->signal();
         };
     }
 }

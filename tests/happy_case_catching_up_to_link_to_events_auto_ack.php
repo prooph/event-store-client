@@ -19,7 +19,6 @@ use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\Common\SystemEventTypes;
 use Prooph\EventStore\EventData;
@@ -86,31 +85,18 @@ class happy_case_catching_up_to_link_to_events_auto_ack extends AsyncTestCase
             yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
-                new class($this->eventsReceived, $this->eventReceivedCount, self::EVENT_WRITE_COUNT) implements EventAppearedOnPersistentSubscription {
-                    private Deferred $eventsReceived;
-                    private $eventReceivedCount;
-                    private int $eventWriteCount;
+                function (
+                    EventStorePersistentSubscription $subscription,
+                    ResolvedEvent $resolvedEvent,
+                    ?int $retryCount = null
+                ): Promise {
+                    $this->eventReceivedCount++;
 
-                    public function __construct(Deferred $eventsReceived, &$eventReceivedCount, int $eventWriteCount)
-                    {
-                        $this->eventsReceived = $eventsReceived;
-                        $this->eventReceivedCount = &$eventReceivedCount;
-                        $this->eventWriteCount = $eventWriteCount;
+                    if (++$this->eventReceivedCount === self::EVENT_WRITE_COUNT) {
+                        $this->eventsReceived->resolve(true);
                     }
 
-                    public function __invoke(
-                        EventStorePersistentSubscription $subscription,
-                        ResolvedEvent $resolvedEvent,
-                        ?int $retryCount = null
-                    ): Promise {
-                        $this->eventReceivedCount++;
-
-                        if (++$this->eventReceivedCount === $this->eventWriteCount) {
-                            $this->eventsReceived->resolve(true);
-                        }
-
-                        return new Success();
-                    }
+                    return new Success();
                 },
                 null,
                 10,

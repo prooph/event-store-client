@@ -256,37 +256,19 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
                     ));
                 }
 
-                $eventAppeared = new class(Closure::fromCallable([$this, 'enqueuePushedEvent'])) implements EventAppearedOnSubscription {
-                    private $callback;
-
-                    public function __construct(Closure $callback)
-                    {
-                        $this->callback = $callback;
-                    }
-
-                    public function __invoke(
-                        EventStoreSubscription $subscription,
-                        ResolvedEvent $resolvedEvent
-                    ): Promise {
-                        return ($this->callback)($subscription, $resolvedEvent);
-                    }
+                $eventAppeared = function (
+                    EventStoreSubscription $subscription,
+                    ResolvedEvent $resolvedEvent
+                ): Promise {
+                    return $this->enqueuePushedEvent($subscription, $resolvedEvent);
                 };
 
-                $subscriptionDropped = new class(Closure::fromCallable([$this, 'serverSubscriptionDropped'])) implements SubscriptionDropped {
-                    private $callback;
-
-                    public function __construct(Closure $callback)
-                    {
-                        $this->callback = $callback;
-                    }
-
-                    public function __invoke(
-                        EventStoreSubscription $subscription,
-                        SubscriptionDropReason $reason,
-                        ?Throwable $exception = null
-                    ): void {
-                        ($this->callback)($reason, $exception);
-                    }
+                $subscriptionDropped = function (
+                    EventStoreSubscription $subscription,
+                    SubscriptionDropReason $reason,
+                    ?Throwable $exception = null
+                ): void {
+                    $this->serverSubscriptionDropped($reason, $exception);
                 };
 
                 $subscription = empty($this->streamId)

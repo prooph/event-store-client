@@ -17,10 +17,8 @@ use Amp\Deferred;
 use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
+use Closure;
 use Generator;
-use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
-use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
-use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EventData;
@@ -59,13 +57,11 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         yield $this->connection->subscribeToStreamAsync(
             $stream,
             false,
-            new class() implements EventAppearedOnSubscription {
-                public function __invoke(
-                    EventStoreSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
-                ): Promise {
-                    return new Success();
-                }
+            function (
+                EventStoreSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ): Promise {
+                return new Success();
             }
         );
 
@@ -178,13 +174,11 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
-            new class() implements EventAppearedOnCatchupSubscription {
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
-                ): Promise {
-                    return new Success();
-                }
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ): Promise {
+                return new Success();
             },
             null,
             $this->droppedWithCountdown($dropped)
@@ -213,13 +207,11 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
-            new class() implements EventAppearedOnCatchupSubscription {
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
-                ): Promise {
-                    throw new \Exception('Error');
-                }
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ): Promise {
+                throw new \Exception('Error');
             },
             null,
             $this->droppedWithCountdown($dropped)
@@ -388,109 +380,62 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         $this->assertSame($events[9]->originalEventNumber(), $subscription->lastProcessedEventNumber());
     }
 
-    private function appearedWithCountdown(CountdownEvent $appeared): EventAppearedOnCatchupSubscription
+    private function appearedWithCountdown(CountdownEvent $appeared): Closure
     {
-        return new class($appeared) implements EventAppearedOnCatchupSubscription {
-            private CountdownEvent $appeared;
+        return function (
+            EventStoreCatchUpSubscription $subscription,
+            ResolvedEvent $resolvedEvent
+        ) use ($appeared): Promise {
+            $appeared->signal();
 
-            public function __construct(CountdownEvent $appeared)
-            {
-                $this->appeared = $appeared;
-            }
-
-            public function __invoke(
-                EventStoreCatchUpSubscription $subscription,
-                ResolvedEvent $resolvedEvent
-            ): Promise {
-                $this->appeared->signal();
-
-                return new Success();
-            }
+            return new Success();
         };
     }
 
-    private function appearedWithCountdownAndEventsAdd(array &$events, CountdownEvent $appeared): EventAppearedOnCatchupSubscription
+    private function appearedWithCountdownAndEventsAdd(array &$events, CountdownEvent $appeared): Closure
     {
-        return new class($events, $appeared) implements EventAppearedOnCatchupSubscription {
-            private array $events;
-            private CountdownEvent $appeared;
+        return function (
+            EventStoreCatchUpSubscription $subscription,
+            ResolvedEvent $resolvedEvent
+        ) use (&$events, $appeared): Promise {
+            $events[] = $resolvedEvent;
+            $appeared->signal();
 
-            public function __construct(array &$events, CountdownEvent $appeared)
-            {
-                $this->events = &$events;
-                $this->appeared = $appeared;
-            }
-
-            public function __invoke(
-                EventStoreCatchUpSubscription $subscription,
-                ResolvedEvent $resolvedEvent
-            ): Promise {
-                $this->events[] = $resolvedEvent;
-                $this->appeared->signal();
-
-                return new Success();
-            }
+            return new Success();
         };
     }
 
-    private function appearedWithResetEvent(Deferred $appeared): EventAppearedOnCatchupSubscription
+    private function appearedWithResetEvent(Deferred $appeared): Closure
     {
-        return new class($appeared) implements EventAppearedOnCatchupSubscription {
-            private Deferred $appeared;
+        return function (
+            EventStoreCatchUpSubscription $subscription,
+            ResolvedEvent $resolvedEvent
+        ) use ($appeared): Promise {
+            $appeared->resolve(true);
 
-            public function __construct(Deferred $appeared)
-            {
-                $this->appeared = $appeared;
-            }
-
-            public function __invoke(
-                EventStoreCatchUpSubscription $subscription,
-                ResolvedEvent $resolvedEvent
-            ): Promise {
-                $this->appeared->resolve(true);
-
-                return new Success();
-            }
+            return new Success();
         };
     }
 
-    private function droppedWithCountdown(CountdownEvent $dropped): CatchUpSubscriptionDropped
+    private function droppedWithCountdown(CountdownEvent $dropped): Closure
     {
-        return new class($dropped) implements CatchUpSubscriptionDropped {
-            private CountdownEvent $dropped;
-
-            public function __construct(CountdownEvent $dropped)
-            {
-                $this->dropped = $dropped;
-            }
-
-            public function __invoke(
-                EventStoreCatchUpSubscription $subscription,
-                SubscriptionDropReason $reason,
-                ?Throwable $exception = null
-            ): void {
-                $this->dropped->signal();
-            }
+        return function (
+            EventStoreCatchUpSubscription $subscription,
+            SubscriptionDropReason $reason,
+            ?Throwable $exception = null
+        ) use ($dropped): void {
+            $dropped->signal();
         };
     }
 
-    private function droppedWithResetEvent(Deferred $dropped): CatchUpSubscriptionDropped
+    private function droppedWithResetEvent(Deferred $dropped): Closure
     {
-        return new class($dropped) implements CatchUpSubscriptionDropped {
-            private Deferred $dropped;
-
-            public function __construct(Deferred $dropped)
-            {
-                $this->dropped = $dropped;
-            }
-
-            public function __invoke(
-                EventStoreCatchUpSubscription $subscription,
-                SubscriptionDropReason $reason,
-                ?Throwable $exception = null
-            ): void {
-                $this->dropped->resolve(true);
-            }
+        return function (
+            EventStoreCatchUpSubscription $subscription,
+            SubscriptionDropReason $reason,
+            ?Throwable $exception = null
+        ) use ($dropped): void {
+            $dropped->resolve(true);
         };
     }
 }
