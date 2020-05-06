@@ -109,7 +109,6 @@ class TcpPackageConnection
                     ->withConnectTimeout($this->timeout);
 
                 $uri = \sprintf('tcp://%s:%s', $this->remoteEndPoint->host(), $this->remoteEndPoint->port());
-                $this->connection = yield connect($uri, $context);
 
                 if ($this->ssl) {
                     $tlsContext = new ClientTlsContext($this->targetHost);
@@ -118,7 +117,13 @@ class TcpPackageConnection
                         $tlsContext = $tlsContext->withPeerVerification();
                     }
 
-                    yield $this->connection->enableCrypto($tlsContext);
+                    $context = $context->withTlsContext($tlsContext);
+                }
+
+                $this->connection = yield connect($uri, $context);
+
+                if ($this->ssl) {
+                    yield $this->connection->setupTls();
                 }
 
                 $this->isClosed = false;
@@ -156,6 +161,8 @@ class TcpPackageConnection
     {
         Loop::defer(function () use ($package): Generator {
             try {
+                \assert(null !== $this->connection);
+
                 yield $this->connection->write($package->asBytes());
             } catch (Throwable $e) {
                 ($this->connectionClosed)($this, $e);
@@ -169,7 +176,10 @@ class TcpPackageConnection
             $package = TcpPackage::fromRawData($data);
             ($this->handlePackage)($this, $package);
         } catch (Throwable $e) {
+            \assert(null !== $this->connection);
+
             $this->connection->close();
+
             $message = \sprintf(
                 'TcpPackageConnection: [%s, %s]: Error when processing TcpPackage %s: %s. Connection will be closed',
                 (string) $this->remoteEndPoint,
@@ -179,6 +189,7 @@ class TcpPackageConnection
             );
 
             ($this->onError)($this, $e);
+
             $this->log->debug($message);
         }
     }
@@ -187,6 +198,8 @@ class TcpPackageConnection
     {
         Loop::defer(function (): Generator {
             while (true) {
+                \assert(null !== $this->connection);
+
                 $data = yield $this->connection->read();
 
                 if (null === $data) {

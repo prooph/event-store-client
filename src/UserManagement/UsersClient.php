@@ -122,8 +122,10 @@ class UsersClient
                 return;
             }
 
-            if (! \is_string($body)) {
+            if (null === $body) {
                 $deferred->fail(new UnexpectedValueException('No content received'));
+
+                return;
             }
 
             try {
@@ -171,8 +173,10 @@ class UsersClient
                 return;
             }
 
-            if (! \is_string($body)) {
+            if (null === $body) {
                 $deferred->fail(new UnexpectedValueException('No content received'));
+
+                return;
             }
 
             try {
@@ -216,8 +220,10 @@ class UsersClient
                 return;
             }
 
-            if (! \is_string($body)) {
+            if (null === $body) {
                 $deferred->fail(new UnexpectedValueException('No content received'));
+
+                return;
             }
 
             try {
