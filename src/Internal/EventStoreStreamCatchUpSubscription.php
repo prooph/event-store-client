@@ -186,6 +186,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription 
             }
 
             if ($this->verbose) {
+                /** @psalm-suppress PossiblyNullReference */
                 $this->log->debug(\sprintf(
                     'Catch-up Subscription %s to %s: %s event (%s, %d, %s @ %d)',
                     $this->subscriptionName(),

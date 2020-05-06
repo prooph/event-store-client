@@ -239,6 +239,7 @@ class EventStoreConnectionLogicHandler
                 return;
             }
 
+            /** @psalm-suppress PossiblyNullArgument */
             $this->enqueueMessage(new EstablishTcpConnectionMessage($endpoints));
 
             if ($deferred) {
@@ -344,6 +345,7 @@ class EventStoreConnectionLogicHandler
             return;
         }
 
+        /** @psalm-suppress PossiblyNullReference */
         $this->logDebug('TcpConnectionError connId %s, exception %s', $this->connection->connectionId(), $exception->getMessage());
         $this->closeConnection('TCP connection error occurred', $exception);
     }
@@ -394,6 +396,7 @@ class EventStoreConnectionLogicHandler
             $connection->connectionId()
         );
 
+        /** @psalm-suppress PossiblyNullReference */
         $this->subscriptions->purgeSubscribedAndDroppedSubscriptions($this->connection->connectionId());
 
         if (null === $this->reconnInfo) {
@@ -410,6 +413,7 @@ class EventStoreConnectionLogicHandler
 
     private function tcpConnectionEstablished(TcpPackageConnection $connection): void
     {
+        /** @psalm-suppress PossiblyNullReference */
         if (! $this->state->equals(ConnectionState::connecting())
             || $this->connection !== $connection
             || $this->connection->isClosed()
@@ -447,6 +451,7 @@ class EventStoreConnectionLogicHandler
                 $pass = $this->settings->defaultUserCredentials()->password();
             }
 
+            /** @psalm-suppress PossiblyNullReference */
             $this->connection->enqueueSend(new TcpPackage(
                 TcpCommand::authenticate(),
                 TcpFlags::authenticated(),
@@ -469,6 +474,7 @@ class EventStoreConnectionLogicHandler
         $message->setVersion(self::CLIENT_VERSION);
         $message->setConnectionName($this->esConnection->connectionName());
 
+        /** @psalm-suppress PossiblyNullReference */
         $this->connection->enqueueSend(new TcpPackage(
             TcpCommand::identifyClient(),
             TcpFlags::none(),
@@ -483,6 +489,7 @@ class EventStoreConnectionLogicHandler
         $this->connectingPhase = ConnectingPhase::connected();
         $this->wasConnected = true;
 
+        /** @psalm-suppress PossiblyNullReference */
         $this->raiseConnectedEvent($this->connection->remoteEndPoint());
 
         if ($this->stopWatch->elapsed() - $this->lastTimeoutsTimeStamp >= $this->settings->operationTimeoutCheckPeriod()) {
@@ -501,6 +508,7 @@ class EventStoreConnectionLogicHandler
             case ConnectionState::INIT:
                 break;
             case ConnectionState::CONNECTING:
+                /** @psalm-suppress PossiblyNullReference */
                 if ($this->connectingPhase->equals(ConnectingPhase::reconnecting())
                     && $elapsed - $this->reconnInfo->timestamp() >= $this->settings->reconnectionDelay()
                 ) {
@@ -538,6 +546,7 @@ class EventStoreConnectionLogicHandler
 
                 break;
             case ConnectionState::CONNECTED:
+                /** @psalm-suppress PossiblyNullArgument */
                 if ($elapsed - $this->lastTimeoutsTimeStamp >= $this->settings->operationTimeoutCheckPeriod()) {
                     $this->reconnInfo = new ReconnectionInfo(0, $elapsed);
                     $this->operations->checkTimeoutsAndRetry($this->connection);
@@ -627,6 +636,7 @@ class EventStoreConnectionLogicHandler
                     $maxRetries,
                     $timeout
                 );
+                /** @psalm-suppress PossiblyNullArgument */
                 $this->operations->scheduleOperation(new OperationItem($operation, $maxRetries, $timeout), $this->connection);
                 break;
             case ConnectionState::CLOSED:
@@ -657,7 +667,11 @@ class EventStoreConnectionLogicHandler
                     $message->userCredentials(),
                     fn (EventStoreSubscription $subscription, ResolvedEvent $resolvedEvent): Promise => ($message->eventAppeared())($subscription, $resolvedEvent),
                     function (EventStoreSubscription $subscription, SubscriptionDropReason $reason, ?Throwable $exception = null) use ($message): void {
-                        ($message->subscriptionDropped())($subscription, $reason, $exception);
+                        $subscriptionDropped = $message->subscriptionDropped();
+
+                        if (null !== $subscriptionDropped) {
+                            $subscriptionDropped($subscription, $reason, $exception);
+                        }
                     },
                     $this->settings->verboseLogging(),
                     fn (): ?TcpPackageConnection => $this->connection
@@ -677,6 +691,7 @@ class EventStoreConnectionLogicHandler
                 if ($this->state->equals(ConnectionState::connecting())) {
                     $this->subscriptions->enqueueSubscription($subscription);
                 } else {
+                    /** @psalm-suppress PossiblyNullArgument */
                     $this->subscriptions->startSubscription($subscription, $this->connection);
                 }
 
@@ -728,6 +743,7 @@ class EventStoreConnectionLogicHandler
                 if ($this->state->equals(ConnectionState::connecting())) {
                     $this->subscriptions->enqueueSubscription($subscription);
                 } else {
+                    /** @psalm-suppress PossiblyNullArgument */
                     $this->subscriptions->startSubscription($subscription, $this->connection);
                 }
 
@@ -758,6 +774,7 @@ class EventStoreConnectionLogicHandler
             return;
         }
 
+        /** @psalm-suppress PossiblyNullReference */
         $this->logDebug(
             'HandleTcpPackage connId %s, package %s, %s',
             $this->connection->connectionId(),
@@ -894,12 +911,14 @@ class EventStoreConnectionLogicHandler
             return;
         }
 
+        /** @psalm-suppress PossiblyNullReference */
         if (! $this->state->equals(ConnectionState::connected())
             || $this->connection->remoteEndPoint()->equals($endPoint)
         ) {
             return;
         }
 
+        /** @psalm-suppress PossiblyNullReference */
         $msg = \sprintf(
             'EventStoreNodeConnection \'%s\': going to reconnect to [%s]. Current end point: [%s]',
             $this->esConnection->connectionName(),

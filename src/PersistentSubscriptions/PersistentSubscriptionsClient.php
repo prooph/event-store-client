@@ -26,6 +26,7 @@ use Prooph\EventStore\Util\Json;
 use Prooph\EventStoreClient\Exception\PersistentSubscriptionCommandFailed;
 use Prooph\EventStoreClient\Transport\Http\HttpClient;
 use Throwable;
+use UnexpectedValueException;
 
 /** @internal */
 class PersistentSubscriptionsClient
@@ -66,6 +67,12 @@ class PersistentSubscriptionsClient
         $promise->onResolve(function (?Throwable $e, ?string $body) use ($deferred): void {
             if ($e) {
                 $deferred->fail($e);
+
+                return;
+            }
+
+            if (null === $body) {
+                $deferred->fail(new UnexpectedValueException('No content received'));
 
                 return;
             }
@@ -114,6 +121,12 @@ class PersistentSubscriptionsClient
         $promise->onResolve(function (?Throwable $e, ?string $body) use ($deferred): void {
             if ($e) {
                 $deferred->fail($e);
+
+                return;
+            }
+
+            if (null === $body) {
+                $deferred->fail(new UnexpectedValueException('No content received'));
 
                 return;
             }
