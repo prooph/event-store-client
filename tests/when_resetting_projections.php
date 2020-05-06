@@ -16,6 +16,7 @@ namespace ProophTest\EventStoreClient;
 use Amp\Delayed;
 use Amp\PHPUnit\AsyncTestCase;
 use Generator;
+use Prooph\EventStore\Projections\ProjectionDetails;
 use Prooph\EventStore\Util\Guid;
 
 class when_resetting_projections extends AsyncTestCase
@@ -60,16 +61,13 @@ class when_resetting_projections extends AsyncTestCase
         yield $this->execute(function (): Generator {
             yield new Delayed(500);
 
-            $projectionStatus = \json_decode(
-                yield $this->projectionsManager->getStatusAsync(
-                    $this->projectionName,
-                    $this->credentials
-                ),
-                true
+            /** @var ProjectionDetails $projectionStatus */
+            $projectionStatus = yield $this->projectionsManager->getStatusAsync(
+                $this->projectionName,
+                $this->credentials
             );
-            $status = $projectionStatus['status'];
 
-            $this->assertTrue(\in_array($status, ['Starting/Initial', 'Running'], true));
+            $this->assertContains($projectionStatus->status(), ['Starting/Initial', 'Running']);
         });
     }
 }
