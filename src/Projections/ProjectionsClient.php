@@ -190,6 +190,12 @@ class ProjectionsClient
                 return;
             }
 
+            if (null === $body) {
+                $deferred->fail(new \UnexpectedValueException('Body cannot be empty'));
+
+                return;
+            }
+
             try {
                 $data = Json::decode($body);
             } catch (JsonException $e) {
@@ -237,6 +243,12 @@ class ProjectionsClient
                 return;
             }
 
+            if (null === $body) {
+                $deferred->fail(new \UnexpectedValueException('Body cannot be empty'));
+
+                return;
+            }
+
             try {
                 $data = Json::decode($body);
             } catch (JsonException $e) {
@@ -280,6 +292,12 @@ class ProjectionsClient
         $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
             if ($exception) {
                 $deferred->fail($exception);
+
+                return;
+            }
+
+            if (null === $body) {
+                $deferred->fail(new \UnexpectedValueException('Body cannot be empty'));
 
                 return;
             }

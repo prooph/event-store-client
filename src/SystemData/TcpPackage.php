@@ -112,8 +112,8 @@ class TcpPackage
 
         /** @psalm-suppress ImpureMethodCall */
         if ($this->flags->equals(TcpFlags::authenticated())) {
-            $loginLen = \strlen($this->login);
-            $passLen = \strlen($this->password);
+            $loginLen = \strlen((string) $this->login);
+            $passLen = \strlen((string) $this->password);
 
             if ($loginLen > 255) {
                 throw new InvalidArgumentException(\sprintf(
