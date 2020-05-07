@@ -26,7 +26,6 @@ use Prooph\EventStoreClient\Internal\EventMessageConverter;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEvents;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEventsCompleted;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEventsCompleted\ReadStreamResult;
-use Prooph\EventStoreClient\Messages\ClientMessages\ResolvedIndexedEvent;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
@@ -120,23 +119,14 @@ class ReadStreamEventsBackwardOperation extends AbstractOperation
      */
     protected function transformResponse(Message $response): StreamEventsSlice
     {
-        $records = $response->getEvents();
-
         $resolvedEvents = [];
 
-        foreach ($records as $record) {
-            \assert($record instanceof ResolvedIndexedEvent);
-
-            if ($event = $record->getEvent()) {
-                $event = EventMessageConverter::convertEventRecordMessageToEventRecord($record->getEvent());
-            }
-
-            if ($link = $record->getLink()) {
-                $link = EventMessageConverter::convertEventRecordMessageToEventRecord($link);
-            }
-
-            /** @psalm-suppress PossiblyInvalidArgument */
-            $resolvedEvents[] = new ResolvedEvent($event, $link, null);
+        foreach ($response->getEvents() as $record) {
+            $resolvedEvents[] = new ResolvedEvent(
+                EventMessageConverter::convertEventRecordMessageToEventRecord($record->getEvent()),
+                EventMessageConverter::convertEventRecordMessageToEventRecord($record->getLink()),
+                null
+            );
         }
 
         return new StreamEventsSlice(

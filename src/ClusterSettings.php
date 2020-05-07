@@ -15,6 +15,7 @@ namespace Prooph\EventStoreClient;
 
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\OutOfRangeException;
+use Prooph\EventStore\Internal\Consts;
 
 /**
  * All times are milliseconds
@@ -24,12 +25,12 @@ use Prooph\EventStore\Exception\OutOfRangeException;
 final class ClusterSettings
 {
     private string $clusterDns = '';
-    private int $maxDiscoverAttempts;
+    private int $maxDiscoverAttempts = Consts::DEFAULT_MAX_CLUSTER_DISCOVER_ATTEMPTS;
     private int $externalGossipPort = 0;
     /** @var list<GossipSeed> */
     private array $gossipSeeds = [];
     private int $gossipTimeout = 0;
-    private bool $preferRandomNode;
+    private bool $preferRandomNode = false;
 
     public static function create(): ClusterSettingsBuilder
     {

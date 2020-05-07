@@ -92,8 +92,6 @@ class CreatePersistentSubscriptionOperation extends AbstractOperation
      */
     protected function inspectResponse(Message $response): InspectionResult
     {
-        \assert($response instanceof CreatePersistentSubscriptionCompleted);
-
         switch ($response->getResult()) {
             case CreatePersistentSubscriptionResult::Success:
                 $this->succeed($response);

@@ -25,7 +25,7 @@ class SubscriptionItem
     private int $maxRetries;
     private int $timeout;
     private DateTimeImmutable $created;
-    private string $connectionId;
+    private string $connectionId = '';
     private string $correlationId;
     private bool $isSubscribed;
     private int $retryCount;

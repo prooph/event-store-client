@@ -70,6 +70,7 @@ class EventStoreConnectionLogicHandler
     private ConnectionSettings $settings;
     private ConnectionState $state;
     private ConnectingPhase $connectingPhase;
+    /** @psalm-suppress PropertyNotSetInConstructor */
     private EndPointDiscoverer $endPointDiscoverer;
     private MessageHandler $handler;
     private OperationsManager $operations;
@@ -78,8 +79,11 @@ class EventStoreConnectionLogicHandler
     private StopWatch $stopWatch;
     private string $timerTickWatcherId = '';
     private ?ReconnectionInfo $reconnInfo = null;
+    /** @psalm-suppress PropertyNotSetInConstructor */
     private HeartbeatInfo $heartbeatInfo;
+    /** @psalm-suppress PropertyNotSetInConstructor */
     private AuthInfo $authInfo;
+    /** @psalm-suppress PropertyNotSetInConstructor */
     private IdentifyInfo $identityInfo;
     private bool $wasConnected = false;
     private int $packageNumber = 0;
@@ -378,10 +382,10 @@ class EventStoreConnectionLogicHandler
             || $this->state->equals(ConnectionState::closed())
         ) {
             $this->logDebug('IGNORED (state: %s, internal conn.ID: {1:B}, conn.ID: %s): TCP connection to [%s] closed',
-                $this->state,
+                (string) $this->state,
                 null === $this->connection ? Guid::empty() : $this->connection->connectionId(),
                 $connection->connectionId(),
-                $connection->remoteEndPoint()
+                (string) $connection->remoteEndPoint()
             );
 
             return;
@@ -419,11 +423,11 @@ class EventStoreConnectionLogicHandler
             || $this->connection->isClosed()
         ) {
             $this->logDebug('IGNORED (state %s, internal conn.Id %s, conn.Id %s, conn.closed %s): TCP connection to [%s] established',
-                $this->state,
+                (string) $this->state,
                 null === $this->connection ? Guid::empty() : $this->connection->connectionId(),
                 $connection->connectionId(),
                 $connection->isClosed() ? 'yes' : 'no',
-                $connection->remoteEndPoint()
+                (string) $connection->remoteEndPoint()
             );
 
             return;
@@ -620,11 +624,11 @@ class EventStoreConnectionLogicHandler
                 break;
             case ConnectionState::CONNECTING:
                 $this->logDebug(
-                    'StartOperation enqueue %s, %s, %s',
+                    'StartOperation enqueue %s, %s, %s, %s',
                     $operation->name(),
-                    //$operation,
-                    $maxRetries,
-                    $timeout
+                    (string) $operation,
+                    (string) $maxRetries,
+                    (string) $timeout
                 );
                 $this->operations->enqueueOperation(new OperationItem($operation, $maxRetries, $timeout));
                 break;
@@ -633,8 +637,8 @@ class EventStoreConnectionLogicHandler
                     'StartOperation schedule %s, %s, %s, %s',
                     $operation->name(),
                     (string) $operation,
-                    $maxRetries,
-                    $timeout
+                    (string) $maxRetries,
+                    (string) $timeout
                 );
                 /** @psalm-suppress PossiblyNullArgument */
                 $this->operations->scheduleOperation(new OperationItem($operation, $maxRetries, $timeout), $this->connection);
@@ -682,8 +686,8 @@ class EventStoreConnectionLogicHandler
                     $this->state->equals(ConnectionState::connected()) ? 'fire' : 'enqueue',
                     $operation->name(),
                     (string) $operation,
-                    $message->maxRetries(),
-                    $message->timeout()
+                    (string) $message->maxRetries(),
+                    (string) $message->timeout()
                 );
 
                 $subscription = new SubscriptionItem($operation, $message->maxRetries(), $message->timeout());
@@ -734,8 +738,8 @@ class EventStoreConnectionLogicHandler
                     $this->state->equals(ConnectionState::connected()) ? 'fire' : 'enqueue',
                     $operation->name(),
                     (string) $operation,
-                    $message->maxRetries(),
-                    $message->timeout()
+                    (string) $message->maxRetries(),
+                    (string) $message->timeout()
                 );
 
                 $subscription = new SubscriptionItem($operation, $message->maxRetries(), $message->timeout());
@@ -938,7 +942,7 @@ class EventStoreConnectionLogicHandler
         $this->establishTcpConnection($endPoints);
     }
 
-    private function logDebug(string $message, ...$parameters): void
+    private function logDebug(string $message, string ...$parameters): void
     {
         if ($this->settings->verboseLogging()) {
             $message = empty($parameters)
@@ -953,7 +957,7 @@ class EventStoreConnectionLogicHandler
         }
     }
 
-    private function logInfo(string $message, ...$parameters): void
+    private function logInfo(string $message, string ...$parameters): void
     {
         if ($this->settings->verboseLogging()) {
             $message = empty($parameters)

@@ -83,8 +83,7 @@ class TcpPackageConnection
         $this->connectionClosed = $connectionClosed;
 
         //Setup callback for incoming messages
-        $this->framer = new LengthPrefixMessageFramer();
-        $this->framer->registerMessageArrivedCallback(function (string $data): void {
+        $this->framer = new LengthPrefixMessageFramer(function (string $data): void {
             $this->incomingMessageArrived($data);
         });
     }
@@ -172,8 +171,9 @@ class TcpPackageConnection
 
     private function incomingMessageArrived(string $data): void
     {
+        $package = TcpPackage::fromRawData($data);
+
         try {
-            $package = TcpPackage::fromRawData($data);
             ($this->handlePackage)($this, $package);
         } catch (Throwable $e) {
             \assert(null !== $this->connection);

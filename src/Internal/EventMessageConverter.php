@@ -27,8 +27,12 @@ use UnexpectedValueException;
 /** @internal */
 class EventMessageConverter
 {
-    public static function convertEventRecordMessageToEventRecord(EventRecordMessage $message): RecordedEvent
+    public static function convertEventRecordMessageToEventRecord(?EventRecordMessage $message): ?RecordedEvent
     {
+        if (null === $message) {
+            return null;
+        }
+
         $epoch = (string) $message->getCreatedEpoch();
         $date = \substr($epoch, 0, -3);
         $micro = \substr($epoch, -3);
@@ -55,26 +59,27 @@ class EventMessageConverter
         );
     }
 
-    public static function convertResolvedEventMessageToResolvedEvent(ResolvedEventMessage $message): ResolvedEvent
+    public static function convertResolvedEventMessageToResolvedEvent(? ResolvedEventMessage $message): ?ResolvedEvent
     {
-        $event = $message->getEvent();
-        $link = $message->getLink();
+        if (null === $message) {
+            return null;
+        }
 
         return new ResolvedEvent(
-            $event ? self::convertEventRecordMessageToEventRecord($event) : null,
-            $link ? self::convertEventRecordMessageToEventRecord($link) : null,
-            new Position((int) $message->getCommitPosition(), (int) $message->getPreparePosition())
+            self::convertEventRecordMessageToEventRecord($message->getEvent()),
+            self::convertEventRecordMessageToEventRecord($message->getLink()),
+            new Position(
+                (int) $message->getCommitPosition(),
+                (int) $message->getPreparePosition()
+            )
         );
     }
 
     public static function convertResolvedIndexedEventMessageToResolvedEvent(ResolvedIndexedEventMessage $message): ResolvedEvent
     {
-        $event = $message->getEvent();
-        $link = $message->getLink();
-
         return new ResolvedEvent(
-            $event ? self::convertEventRecordMessageToEventRecord($event) : null,
-            $link ? self::convertEventRecordMessageToEventRecord($link) : null,
+            self::convertEventRecordMessageToEventRecord($message->getEvent()),
+            self::convertEventRecordMessageToEventRecord($message->getLink()),
             null
         );
     }

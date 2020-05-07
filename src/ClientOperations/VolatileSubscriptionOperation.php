@@ -69,6 +69,7 @@ class VolatileSubscriptionOperation extends AbstractSubscriptionOperation
             $message->mergeFromString($package->data());
 
             $event = EventMessageConverter::convertResolvedEventMessageToResolvedEvent($message->getEvent());
+            /** @psalm-suppress PossiblyNullArgument */
             $this->eventAppeared($event);
 
             return new InspectionResult(InspectionDecision::doNothing(), 'StreamEventAppeared');

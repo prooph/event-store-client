@@ -63,7 +63,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
     private SplQueue $actionQueue;
     private ?EventStoreSubscription $subscription = null;
     private bool $unsubscribed = false;
-    protected string $correlationId;
+    protected string $correlationId = '';
 
     public function __construct(
         Logger $logger,

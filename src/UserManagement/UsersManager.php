@@ -144,7 +144,7 @@ class UsersManager implements AsyncUsersManager
         }
 
         foreach ($groups as $group) {
-            if (! \is_string($group) || empty($group)) {
+            if (empty($group)) {
                 throw new InvalidArgumentException('Expected an array of non empty strings for group');
             }
         }
@@ -178,7 +178,7 @@ class UsersManager implements AsyncUsersManager
         }
 
         foreach ($groups as $group) {
-            if (! \is_string($group) || empty($group)) {
+            if (empty($group)) {
                 throw new InvalidArgumentException('Expected an array of non empty strings for group');
             }
         }

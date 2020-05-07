@@ -16,6 +16,7 @@ namespace Prooph\EventStoreClient\Messages\ClusterMessages;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 
+/** @psalm-suppress PropertyNotSetInConstructor */
 class MemberInfoDto
 {
     private string $instanceId;

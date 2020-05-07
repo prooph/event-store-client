@@ -137,6 +137,7 @@ class AppendToStreamOperation extends AbstractOperation
      */
     protected function transformResponse(Message $response): WriteResult
     {
+        /** @psalm-suppress DocblockTypeContradiction */
         return new WriteResult(
             (int) $response->getLastEventNumber(),
             new Position(

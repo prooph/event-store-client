@@ -53,7 +53,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
     private bool $verbose;
     private ConnectionSettings $settings;
     private bool $autoAck;
-    private ?PersistentEventStoreSubscription $subscription;
+    private ?PersistentEventStoreSubscription $subscription = null;
     /** @var SplQueue */
     private $queue;
     private bool $isProcessing = false;

@@ -222,7 +222,7 @@ class OperationsManager
         $this->tryScheduleWaitingOperations($connection);
     }
 
-    private function logDebug(string $message, ...$parameters): void
+    private function logDebug(string $message, string ...$parameters): void
     {
         if ($this->settings->verboseLogging()) {
             $message = empty($parameters)

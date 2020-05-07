@@ -135,6 +135,7 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
             return ConditionalWriteResult::fail(ConditionalWriteStatus::streamDeleted());
         }
 
+        /** @psalm-suppress DocblockTypeContradiction */
         return ConditionalWriteResult::success(
             (int) $response->getLastEventNumber(),
             new Position(

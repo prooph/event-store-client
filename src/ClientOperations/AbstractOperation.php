@@ -104,6 +104,7 @@ abstract class AbstractOperation implements ClientOperation
     public function inspectPackage(TcpPackage $package): InspectionResult
     {
         if ($package->command()->equals($this->responseCommand)) {
+            /** @psalm-suppress InvalidStringClass */
             $responseMessage = new $this->responseClassName();
             $responseMessage->mergeFromString($package->data());
 

@@ -109,23 +109,17 @@ class ReadAllEventsBackwardOperation extends AbstractOperation
      */
     protected function transformResponse(Message $response): AllEventsSlice
     {
-        $records = $response->getEvents();
-
         $resolvedEvents = [];
 
-        foreach ($records as $record) {
-            \assert($response instanceof ReadAllEventsCompleted);
-
-            if ($event = $record->getEvent()) {
-                $event = EventMessageConverter::convertEventRecordMessageToEventRecord($record->getEvent());
-            }
-
-            if ($link = $record->getLink()) {
-                $link = EventMessageConverter::convertEventRecordMessageToEventRecord($link);
-            }
-
-            /** @psalm-suppress PossiblyInvalidArgument */
-            $resolvedEvents[] = new ResolvedEvent($event, $link, new Position($record->getCommitPosition(), $record->getPreparePosition()));
+        foreach ($response->getEvents() as $record) {
+            $resolvedEvents[] = new ResolvedEvent(
+                EventMessageConverter::convertEventRecordMessageToEventRecord($record->getEvent()),
+                EventMessageConverter::convertEventRecordMessageToEventRecord($record->getLink()),
+                new Position(
+                    $record->getCommitPosition(),
+                    $record->getPreparePosition()
+                )
+            );
         }
 
         return new AllEventsSlice(

@@ -426,7 +426,6 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
             do {
                 while (! $this->liveQueue->isEmpty()) {
                     $e = $this->liveQueue->dequeue();
-                    \assert($e instanceof ResolvedEvent);
 
                     if ($e === $this->dropSubscriptionEvent) {
                         $this->dropData ??= new DropData(SubscriptionDropReason::unknown(), new \Exception('Drop reason not specified'));

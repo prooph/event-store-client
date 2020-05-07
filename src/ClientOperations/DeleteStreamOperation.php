@@ -127,6 +127,7 @@ class DeleteStreamOperation extends AbstractOperation
      */
     protected function transformResponse(Message $response): DeleteResult
     {
+        /** @psalm-suppress DocblockTypeContradiction */
         return new DeleteResult(
             new Position(
                 (int) ($response->getCommitPosition() ?? -1),

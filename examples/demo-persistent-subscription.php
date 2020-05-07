@@ -19,7 +19,6 @@ use Amp\Success;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidOperationException;
-use Prooph\EventStore\Internal\PersistentSubscriptionCreateResult;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropReason;
@@ -60,7 +59,6 @@ Loop::run(function () {
         PersistentSubscriptionSettings::default(),
         new UserCredentials('admin', 'changeit')
     );
-    \assert($result instanceof PersistentSubscriptionCreateResult);
 
     \var_dump($result);
 

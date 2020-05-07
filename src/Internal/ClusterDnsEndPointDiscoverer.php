@@ -24,7 +24,6 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Util\Json;
 use Prooph\EventStoreClient\Exception\ClusterException;
 use Prooph\EventStoreClient\GossipSeed;
@@ -71,15 +70,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         $this->clusterDns = $clusterDns;
         $this->maxDiscoverAttempts = $maxDiscoverAttempts;
         $this->managerExternalHttpPort = $managerExternalHttpPort;
-
-        foreach ($gossipSeeds as $gossipSeed) {
-            if (! $gossipSeed instanceof GossipSeed) {
-                throw new InvalidArgumentException('Expected an array of ' . GossipSeed::class);
-            }
-
-            $this->gossipSeeds[] = $gossipSeed;
-        }
-
+        $this->gossipSeeds = $gossipSeeds;
         $this->gossipTimeout = $gossipTimeout;
         $this->preferRandomNode = $preferRandomNode;
 
