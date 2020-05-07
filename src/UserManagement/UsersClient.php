@@ -45,6 +45,7 @@ class UsersClient
         $this->operationTimeout = $operationTimeout;
     }
 
+    /** @return Promise<void> */
     public function enable(
         EndPoint $endPoint,
         string $login,
@@ -64,6 +65,7 @@ class UsersClient
         );
     }
 
+    /** @return Promise<void> */
     public function disable(
         EndPoint $endPoint,
         string $login,
@@ -83,6 +85,7 @@ class UsersClient
         );
     }
 
+    /** @return Promise<void> */
     public function delete(
         EndPoint $endPoint,
         string $login,
@@ -101,7 +104,7 @@ class UsersClient
         );
     }
 
-    /** @return Promise<UserDetails[]> */
+    /** @return Promise<list<UserDetails>> */
     public function listAll(
         EndPoint $endPoint,
         ?UserCredentials $userCredentials = null,
@@ -240,6 +243,7 @@ class UsersClient
         return $deferred->promise();
     }
 
+    /** @return Promise<void> */
     public function createUser(
         EndPoint $endPoint,
         UserCreationInformation $newUser,
@@ -258,6 +262,7 @@ class UsersClient
         );
     }
 
+    /** @return Promise<void> */
     public function updateUser(
         EndPoint $endPoint,
         string $login,
@@ -278,6 +283,7 @@ class UsersClient
         );
     }
 
+    /** @return Promise<void> */
     public function changePassword(
         EndPoint $endPoint,
         string $login,
@@ -298,6 +304,7 @@ class UsersClient
         );
     }
 
+    /** @return Promise<void> */
     public function resetPassword(
         EndPoint $endPoint,
         string $login,
@@ -318,6 +325,7 @@ class UsersClient
         );
     }
 
+    /** @return Promise<string> */
     private function sendGet(
         string $url,
         ?UserCredentials $userCredentials,
@@ -351,6 +359,7 @@ class UsersClient
         return $deferred->promise();
     }
 
+    /** @return Promise<void> */
     private function sendDelete(
         string $url,
         ?UserCredentials $userCredentials,
@@ -384,6 +393,7 @@ class UsersClient
         return $deferred->promise();
     }
 
+    /** @return Promise<void> */
     private function sendPut(
         string $url,
         string $content,
@@ -420,6 +430,7 @@ class UsersClient
         return $deferred->promise();
     }
 
+    /** @return Promise<void> */
     private function sendPost(
         string $url,
         string $content,

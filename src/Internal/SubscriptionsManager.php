@@ -28,10 +28,10 @@ class SubscriptionsManager
 {
     private string $connectionName;
     private ConnectionSettings $settings;
-    /** @var SubscriptionItem[] */
+    /** @var list<SubscriptionItem> */
     private array $activeSubscriptions = [];
     private SplQueue $waitingSubscriptions;
-    /** @var SubscriptionItem[] */
+    /** @var list<SubscriptionItem> */
     private array $retryPendingSubscriptions = [];
 
     public function __construct(string $connectionName, ConnectionSettings $settings)

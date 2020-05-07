@@ -175,7 +175,7 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
         );
     }
 
-    /** @param EventId[] $eventIds */
+    /** @param list<EventId> $eventIds */
     public function notifyEventsProcessed(array $eventIds): void
     {
         if (empty($eventIds)) {
@@ -212,7 +212,7 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
     }
 
     /**
-     * @param EventId[] $eventIds
+     * @param list<EventId> $eventIds
      * @param PersistentSubscriptionNakEventAction $action
      * @param string $reason
      */

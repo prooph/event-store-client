@@ -37,7 +37,7 @@ class TransactionalWriteOperation extends AbstractOperation
 {
     private bool $requireMaster;
     private int $transactionId;
-    /** @var EventData[] */
+    /** @var list<EventData> */
     private array $events;
 
     public function __construct(
