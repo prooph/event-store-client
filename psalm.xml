@@ -22,5 +22,10 @@
                 <directory name="examples"/>
             </errorLevel>
         </ForbiddenCode>
+        <PossiblyNullReference>
+            <errorLevel type="suppress">
+                <directory name="examples"/>
+            </errorLevel>
+        </PossiblyNullReference>
     </issueHandlers>
 </psalm>

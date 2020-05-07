@@ -107,7 +107,7 @@ class AppendToStreamOperation extends AbstractOperation
                 $this->fail(WrongExpectedVersion::with(
                     $this->stream,
                     $this->expectedVersion,
-                    $response->getCurrentVersion()
+                    (int) $response->getCurrentVersion()
                 ));
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'WrongExpectedVersion');
@@ -138,10 +138,10 @@ class AppendToStreamOperation extends AbstractOperation
     protected function transformResponse(Message $response): WriteResult
     {
         return new WriteResult(
-            $response->getLastEventNumber(),
+            (int) $response->getLastEventNumber(),
             new Position(
-                $response->getCommitPosition() ?? -1,
-                $response->getPreparePosition() ?? -1
+                (int) ($response->getCommitPosition() ?? -1),
+                (int) ($response->getPreparePosition() ?? -1)
             )
         );
     }

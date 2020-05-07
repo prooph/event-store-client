@@ -124,13 +124,14 @@ class ReadAllEventsBackwardOperation extends AbstractOperation
                 $link = EventMessageConverter::convertEventRecordMessageToEventRecord($link);
             }
 
+            /** @psalm-suppress PossiblyInvalidArgument */
             $resolvedEvents[] = new ResolvedEvent($event, $link, new Position($record->getCommitPosition(), $record->getPreparePosition()));
         }
 
         return new AllEventsSlice(
             ReadDirection::backward(),
-            new Position($response->getCommitPosition(), $response->getPreparePosition()),
-            new Position($response->getNextCommitPosition(), $response->getNextPreparePosition()),
+            new Position((int) $response->getCommitPosition(), (int) $response->getPreparePosition()),
+            new Position((int) $response->getNextCommitPosition(), (int) $response->getNextPreparePosition()),
             $resolvedEvents
         );
     }

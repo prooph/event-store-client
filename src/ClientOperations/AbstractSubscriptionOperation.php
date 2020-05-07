@@ -337,6 +337,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
         }
 
         if ($this->verboseLogging) {
+            /** @psalm-suppress PossiblyNullReference */
             $this->log->debug(\sprintf(
                 'Subscription %s to %s: event appeared (%s, %d, %s @ %s)',
                 $this->correlationId,

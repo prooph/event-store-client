@@ -120,7 +120,7 @@ class StartTransactionOperation extends AbstractOperation
     protected function transformResponse(Message $response): EventStoreTransaction
     {
         return new EventStoreTransaction(
-            $response->getTransactionId(),
+            (int) $response->getTransactionId(),
             $this->credentials,
             $this->parentConnection
         );

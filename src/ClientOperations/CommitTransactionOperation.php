@@ -118,10 +118,10 @@ class CommitTransactionOperation extends AbstractOperation
     protected function transformResponse(Message $response): WriteResult
     {
         return new WriteResult(
-            $response->getLastEventNumber(),
+            (int) $response->getLastEventNumber(),
             new Position(
-                $response->getCommitPosition() ?? -1,
-                $response->getPreparePosition() ?? -1
+                (int) ($response->getCommitPosition() ?? -1),
+                (int) ($response->getPreparePosition() ?? -1)
             )
         );
     }

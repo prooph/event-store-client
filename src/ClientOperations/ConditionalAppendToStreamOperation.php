@@ -136,10 +136,10 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
         }
 
         return ConditionalWriteResult::success(
-            $response->getLastEventNumber(),
+            (int) $response->getLastEventNumber(),
             new Position(
-                $response->getCommitPosition() ?? -1,
-                $response->getPreparePosition() ?? -1
+                (int) ($response->getCommitPosition() ?? -1),
+                (int) ($response->getPreparePosition() ?? -1)
             )
         );
     }

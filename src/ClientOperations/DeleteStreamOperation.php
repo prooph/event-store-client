@@ -127,9 +127,11 @@ class DeleteStreamOperation extends AbstractOperation
      */
     protected function transformResponse(Message $response): DeleteResult
     {
-        return new DeleteResult(new Position(
-            $response->getCommitPosition() ?? -1,
-            $response->getCommitPosition() ?? -1)
+        return new DeleteResult(
+            new Position(
+                (int) ($response->getCommitPosition() ?? -1),
+                (int) ($response->getCommitPosition() ?? -1)
+            )
         );
     }
 

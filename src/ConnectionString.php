@@ -17,6 +17,7 @@ use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\UserCredentials;
 use ReflectionObject;
+use UnexpectedValueException;
 
 class ConnectionString
 {
@@ -132,6 +133,8 @@ class ConnectionString
 
                     $filteredValue = $gossipSeeds;
                     break;
+                default:
+                    throw new UnexpectedValueException('Invalid connection config "' . $type . '" receveid');
             }
 
             foreach ($properties as $property) {

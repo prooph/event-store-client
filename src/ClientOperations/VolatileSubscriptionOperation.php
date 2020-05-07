@@ -58,6 +58,7 @@ class VolatileSubscriptionOperation extends AbstractSubscriptionOperation
             $message = new SubscriptionConfirmation();
             $message->mergeFromString($package->data());
 
+            /** @psalm-suppress PossiblyInvalidArgument */
             $this->confirmSubscription($message->getLastCommitPosition(), $message->getLastEventNumber());
 
             return new InspectionResult(InspectionDecision::subscribed(), 'SubscriptionConfirmation');

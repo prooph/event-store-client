@@ -129,6 +129,7 @@ class ReadEventOperation extends AbstractOperation
         }
 
         if (EventReadStatus::SUCCESS === $response->getResult()) {
+            /** @psalm-suppress PossiblyInvalidArgument */
             $resolvedEvent = new ResolvedEvent($event, $link, null);
         } else {
             $resolvedEvent = null;

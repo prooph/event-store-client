@@ -36,8 +36,7 @@ use Throwable;
 
 abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSubscription
 {
-    private static ?ResolvedEvent $dropSubscriptionEvent = null;
-
+    private ResolvedEvent $dropSubscriptionEvent;
     private bool $isSubscribedToAll;
     private string $streamId;
     private string $subscriptionName;
@@ -82,10 +81,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
         ?Closure $subscriptionDropped,
         CatchUpSubscriptionSettings $settings
     ) {
-        if (null === self::$dropSubscriptionEvent) {
-            self::$dropSubscriptionEvent = new ResolvedEvent(null, null, null);
-        }
-
+        $this->dropSubscriptionEvent = new ResolvedEvent(null, null, null);
         $this->log = $logger;
         $this->connection = $connection;
         $this->isSubscribedToAll = empty($streamId);
@@ -175,7 +171,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
             ));
         }
 
-        return Promise\timeoutWithDefault($this->stopped->promise(), $timeout, false);
+        return Promise\timeoutWithDefault($this->stopped->promise(), $timeout);
     }
 
     private function onReconnect(ClientConnectionEventArgs $clientConnectionEventArgs): void
@@ -307,6 +303,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
                     ));
                 }
 
+                /** @psalm-suppress PossiblyNullReference */
                 yield $this->readEventsTillAsync(
                     $this->connection,
                     $this->resolveLinkTos,
@@ -361,6 +358,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
     private function enqueuePushedEvent(EventStoreSubscription $subscription, ResolvedEvent $e): Promise
     {
         if ($this->verbose) {
+            /** @psalm-suppress PossiblyNullReference */
             $this->log->debug(\sprintf(
                 'Catch-up Subscription %s to %s: event appeared (%s, %s, %s, @ %s)',
                 $this->subscriptionName,
@@ -403,7 +401,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
         if (null === $this->dropData) {
             $this->dropData = $dropData;
 
-            $this->liveQueue->enqueue(self::$dropSubscriptionEvent);
+            $this->liveQueue->enqueue($this->dropSubscriptionEvent);
 
             if ($this->allowProcessing) {
                 $this->ensureProcessingPushQueue();
@@ -430,7 +428,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
                     $e = $this->liveQueue->dequeue();
                     \assert($e instanceof ResolvedEvent);
 
-                    if ($e === self::$dropSubscriptionEvent) {
+                    if ($e === $this->dropSubscriptionEvent) {
                         $this->dropData ??= new DropData(SubscriptionDropReason::unknown(), new \Exception('Drop reason not specified'));
                         $this->dropSubscription($this->dropData->reason(), $this->dropData->error());
 

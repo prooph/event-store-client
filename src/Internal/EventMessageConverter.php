@@ -22,6 +22,7 @@ use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStoreClient\Messages\ClientMessages\EventRecord as EventRecordMessage;
 use Prooph\EventStoreClient\Messages\ClientMessages\ResolvedEvent as ResolvedEventMessage;
 use Prooph\EventStoreClient\Messages\ClientMessages\ResolvedIndexedEvent as ResolvedIndexedEventMessage;
+use UnexpectedValueException;
 
 /** @internal */
 class EventMessageConverter
@@ -38,9 +39,13 @@ class EventMessageConverter
             new DateTimeZone('UTC')
         );
 
+        if (false === $created) {
+            throw new UnexpectedValueException('Invalid date format received');
+        }
+
         return new RecordedEvent(
             $message->getEventStreamId(),
-            $message->getEventNumber(),
+            (int) $message->getEventNumber(),
             EventId::fromBinary($message->getEventId()),
             $message->getEventType(),
             $message->getDataContentType() === 1,
@@ -58,7 +63,7 @@ class EventMessageConverter
         return new ResolvedEvent(
             $event ? self::convertEventRecordMessageToEventRecord($event) : null,
             $link ? self::convertEventRecordMessageToEventRecord($link) : null,
-            new Position($message->getCommitPosition(), $message->getPreparePosition())
+            new Position((int) $message->getCommitPosition(), (int) $message->getPreparePosition())
         );
     }
 

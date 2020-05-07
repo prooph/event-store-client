@@ -154,6 +154,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription imp
         return call(function () use ($e): \Generator {
             $processed = false;
 
+            /** @psalm-suppress PossiblyNullReference */
             if ($e->originalPosition()->greater($this->lastProcessedPosition)) {
                 try {
                     yield ($this->eventAppeared)($this, $e);
@@ -166,6 +167,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription imp
             }
 
             if ($this->verbose) {
+                /** @psalm-suppress PossiblyNullReference */
                 $this->log->debug(\sprintf(
                     'Catch-up Subscription %s to %s: %s event (%s, %d, %s @ %s)',
                     $this->subscriptionName(),

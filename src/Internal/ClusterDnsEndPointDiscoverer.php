@@ -154,8 +154,6 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
                     return $bestNode;
                 }
             }
-
-            return null;
         });
     }
 
@@ -183,7 +181,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         $filter = function () use ($oldGossip, $failedTcpEndPoint): array {
             $result = [];
             foreach ($oldGossip as $dto) {
-                if ($dto->externalTcpIp() === $failedTcpEndPoint->host()) {
+                if ($failedTcpEndPoint && $dto->externalTcpIp() === $failedTcpEndPoint->host()) {
                     continue;
                 }
 
@@ -245,14 +243,19 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
                 $response = yield $this->httpClient->request($request);
                 \assert($response instanceof Response);
             } catch (Throwable $e) {
-                return null;
+                return;
             }
 
             if ($response->getStatus() !== 200) {
-                return null;
+                return;
             }
 
             $json = yield $response->getBody()->read();
+
+            if (null === $json) {
+                return;
+            }
+
             $data = Json::decode($json);
 
             $members = [];

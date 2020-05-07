@@ -135,6 +135,7 @@ class ReadStreamEventsForwardOperation extends AbstractOperation
                 $link = EventMessageConverter::convertEventRecordMessageToEventRecord($link);
             }
 
+            /** @psalm-suppress PossiblyInvalidArgument */
             $resolvedEvents[] = new ResolvedEvent($event, $link, null);
         }
 
@@ -144,8 +145,8 @@ class ReadStreamEventsForwardOperation extends AbstractOperation
             $this->fromEventNumber,
             ReadDirection::forward(),
             $resolvedEvents,
-            $response->getNextEventNumber(),
-            $response->getLastEventNumber(),
+            (int) $response->getNextEventNumber(),
+            (int) $response->getLastEventNumber(),
             $response->getIsEndOfStream()
         );
     }
