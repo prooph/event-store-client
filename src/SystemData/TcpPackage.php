@@ -38,6 +38,10 @@ class TcpPackage
     private ?string $login;
     private ?string $password;
 
+    /**
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedOperand
+     */
     public static function fromRawData(string $bytes): TcpPackage
     {
         list('m' => $messageLength, 'c' => $command, 'f' => $flags) = \unpack('Vm/Cc/Cf/', $bytes, self::COMMAND_OFFSET);

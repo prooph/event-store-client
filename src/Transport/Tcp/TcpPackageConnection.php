@@ -119,9 +119,11 @@ class TcpPackageConnection
                     $context = $context->withTlsContext($tlsContext);
                 }
 
+                /** @psalm-suppress MixedAssignment */
                 $this->connection = yield connect($uri, $context);
 
                 if ($this->ssl) {
+                    /** @psalm-suppress MixedMethodCall */
                     yield $this->connection->setupTls();
                 }
 
@@ -200,6 +202,7 @@ class TcpPackageConnection
             while (true) {
                 \assert(null !== $this->connection);
 
+                /** @var string|null $data */
                 $data = yield $this->connection->read();
 
                 if (null === $data) {
@@ -208,7 +211,7 @@ class TcpPackageConnection
                 }
 
                 try {
-                    $this->framer->unFrameData($data);
+                    $this->framer->unFrameData((string) $data);
                 } catch (PackageFramingException $exception) {
                     $this->log->error(\sprintf(
                         'TcpPackageConnection: [%s, %s]. Invalid TCP frame received',

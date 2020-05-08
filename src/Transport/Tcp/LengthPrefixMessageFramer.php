@@ -63,6 +63,7 @@ class LengthPrefixMessageFramer
         }
 
         if (0 === $this->packageLength) {
+            /** @var int $this->packageLength */
             list('length' => $this->packageLength) = \unpack('Vlength', \substr($data, 0, 4));
             $this->packageLength += TcpPackage::DATA_OFFSET;
         }

@@ -104,7 +104,11 @@ class UsersClient
         );
     }
 
-    /** @return Promise<list<UserDetails>> */
+    /**
+     * @return Promise<list<UserDetails>>
+     *
+     * @psalm-suppress MixedReturnTypeCoercion
+     */
     public function listAll(
         EndPoint $endPoint,
         ?UserCredentials $userCredentials = null,
@@ -139,19 +143,21 @@ class UsersClient
                 return;
             }
 
-            $userDetails = [];
-
-            foreach ($data['data'] as $entry) {
-                $userDetails[] = UserDetails::fromArray($entry);
-            }
-
-            $deferred->resolve($userDetails);
+            /** @psalm-suppress MixedArgument */
+            $deferred->resolve(\array_map(
+                fn (array $entry): UserDetails => UserDetails::fromArray($entry),
+                $data['data']
+            ));
         });
 
         return $deferred->promise();
     }
 
-    /** @return Promise<UserDetails> */
+    /**
+     * @return Promise<UserDetails>
+     *
+     * @psalm-suppress MixedReturnTypeCoercion
+     */
     public function getCurrentUser(
         EndPoint $endPoint,
         ?UserCredentials $userCredentials = null,
@@ -190,13 +196,18 @@ class UsersClient
                 return;
             }
 
+            /** @psalm-suppress MixedArgument */
             $deferred->resolve(UserDetails::fromArray($data['data']));
         });
 
         return $deferred->promise();
     }
 
-    /** @return Promise<UserDetails> */
+    /**
+     * @return Promise<UserDetails>
+     *
+     * @psalm-suppress MixedReturnTypeCoercion
+     */
     public function getUser(
         EndPoint $endPoint,
         string $login,
@@ -237,6 +248,7 @@ class UsersClient
                 return;
             }
 
+            /** @psalm-suppress MixedArgument */
             $deferred->resolve(UserDetails::fromArray($data['data']));
         });
 
@@ -325,7 +337,11 @@ class UsersClient
         );
     }
 
-    /** @return Promise<string> */
+    /**
+     * @return Promise<string>
+     *
+     * @psalm-suppress MixedReturnTypeCoercion
+     */
     private function sendGet(
         string $url,
         ?UserCredentials $userCredentials,
@@ -359,7 +375,11 @@ class UsersClient
         return $deferred->promise();
     }
 
-    /** @return Promise<void> */
+    /**
+     * @return Promise<void>
+     *
+     * @psalm-suppress MixedReturnTypeCoercion
+     */
     private function sendDelete(
         string $url,
         ?UserCredentials $userCredentials,
@@ -393,7 +413,11 @@ class UsersClient
         return $deferred->promise();
     }
 
-    /** @return Promise<void> */
+    /**
+     * @return Promise<void>
+     *
+     * @psalm-suppress MixedReturnTypeCoercion
+     */
     private function sendPut(
         string $url,
         string $content,
@@ -409,7 +433,7 @@ class UsersClient
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve(null);
+                    $deferred->resolve();
                 } else {
                     $deferred->fail(new UserCommandFailed(
                         $response->getStatus(),
@@ -430,7 +454,11 @@ class UsersClient
         return $deferred->promise();
     }
 
-    /** @return Promise<void> */
+    /**
+     * @return Promise<void>
+     *
+     * @psalm-suppress MixedReturnTypeCoercion
+     */
     private function sendPost(
         string $url,
         string $content,
