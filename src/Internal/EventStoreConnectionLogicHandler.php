@@ -671,10 +671,10 @@ class EventStoreConnectionLogicHandler
                     $message->userCredentials(),
                     fn (EventStoreSubscription $subscription, ResolvedEvent $resolvedEvent): Promise => ($message->eventAppeared())($subscription, $resolvedEvent),
                     function (EventStoreSubscription $subscription, SubscriptionDropReason $reason, ?Throwable $exception = null) use ($message): void {
-                        $subscriptionDropped = $message->subscriptionDropped();
+                        $subscriptionDroppedHandler = $message->subscriptionDropped();
 
-                        if (null !== $subscriptionDropped) {
-                            $subscriptionDropped($subscription, $reason, $exception);
+                        if (null !== $subscriptionDroppedHandler) {
+                            $subscriptionDroppedHandler($subscription, $reason, $exception);
                         }
                     },
                     $this->settings->verboseLogging(),

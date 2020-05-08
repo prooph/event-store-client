@@ -15,6 +15,7 @@ namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
 use Generator;
+use Prooph\EventStore\Projections\ProjectionDetails;
 use Prooph\EventStore\Util\Guid;
 
 class when_disabling_projections extends AsyncTestCase
@@ -57,16 +58,13 @@ class when_disabling_projections extends AsyncTestCase
     public function should_stop_the_projection(): Generator
     {
         yield $this->execute(function (): Generator {
-            $projectionStatus = \json_decode(
-                yield $this->projectionsManager->getStatusAsync(
-                    $this->projectionName,
-                    $this->credentials
-                ),
-                true
+            /** @var ProjectionDetails $projectionStatus */
+            $projectionStatus = yield $this->projectionsManager->getStatusAsync(
+                $this->projectionName,
+                $this->credentials
             );
-            $status = $projectionStatus['status'];
 
-            $this->assertStringStartsWith('Stopped', $status);
+            $this->assertStringStartsWith('Stopped', $projectionStatus->status());
         });
     }
 }

@@ -27,6 +27,7 @@ use Prooph\EventStoreClient\Exception\ProjectionCommandConflict;
 use Prooph\EventStoreClient\Exception\ProjectionCommandFailed;
 use Prooph\EventStoreClient\Transport\Http\HttpClient;
 use Throwable;
+use UnexpectedValueException;
 
 /** @internal */
 class ProjectionsClient
@@ -328,14 +329,16 @@ class ProjectionsClient
         return $deferred->promise();
     }
 
-    /** @return Promise<string> */
+    /** @return Promise<ProjectionDetails> */
     public function getStatus(
         EndPoint $endPoint,
         string $name,
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        return $this->sendGet(
+        $deferred = new Deferred();
+
+        $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
@@ -345,6 +348,33 @@ class ProjectionsClient
             $userCredentials,
             HttpStatusCode::OK
         );
+
+        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
+            if ($exception) {
+                $deferred->fail($exception);
+
+                return;
+            }
+
+            if (null === $body) {
+                $deferred->resolve(new UnexpectedValueException('No content received'));
+
+                return;
+            }
+
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
+
+                return;
+            }
+
+            $projectionDetails = $this->buildProjectionDetails($data);
+            $deferred->resolve($projectionDetails);
+        });
+
+        return $deferred->promise();
     }
 
     /**
