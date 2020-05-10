@@ -15,6 +15,7 @@ namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
 use Generator;
+use Prooph\EventStore\Projections\Query;
 use Prooph\EventStore\Util\Guid;
 
 class when_updating_a_projection_query extends AsyncTestCase
@@ -64,7 +65,7 @@ class when_updating_a_projection_query extends AsyncTestCase
                 $this->credentials
             );
 
-            $this->assertSame($this->newQuery, $query);
+            $this->assertEquals(new Query($this->newQuery), $query);
         });
     }
 }

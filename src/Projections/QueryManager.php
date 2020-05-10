@@ -86,7 +86,7 @@ class QueryManager implements AsyncQueryManager
         return Promise\timeout($promise, $this->queryTimeout);
     }
 
-    /** {@inheritdoc} */
+    /** @return Promise<ProjectionDetails> */
     private function waitForCompletedAsync(
         string $name,
         int $initialPollingDelay,
@@ -111,7 +111,7 @@ class QueryManager implements AsyncQueryManager
         });
     }
 
-    /** {@inheritdoc} */
+    /** @return Delayed */
     private function delayPollingAsync(
         int $attempts,
         int $initialPollingDelay,

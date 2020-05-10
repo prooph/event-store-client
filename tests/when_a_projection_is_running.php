@@ -15,6 +15,8 @@ namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
 use Generator;
+use Prooph\EventStore\Projections\State;
+use Prooph\EventStore\Projections\Query;
 use Prooph\EventStore\Util\Guid;
 
 class when_a_projection_is_running extends AsyncTestCase
@@ -57,7 +59,7 @@ class when_a_projection_is_running extends AsyncTestCase
                 $this->credentials
             );
 
-            $this->assertNotEmpty($state);
+            $this->assertNotEmpty($state->payload());
         });
     }
 
@@ -83,7 +85,9 @@ class when_a_projection_is_running extends AsyncTestCase
                 $this->credentials
             );
 
-            $this->assertSame('{"count":1}', $result);
+            $expectedResult = new State(1);
+
+            $this->assertEquals($expectedResult, $result);
         });
     }
 
@@ -96,7 +100,20 @@ class when_a_projection_is_running extends AsyncTestCase
                 $this->credentials
             );
 
-            $this->assertSame($this->query, $query);
+            $this->assertEquals(new Query($this->query), $query);
+        });
+    }
+
+    /** @test */
+    public function should_be_able_to_get_the_projection_statistics(): Generator
+    {
+        yield $this->execute(function (): Generator {
+            $statistics = yield $this->projectionsManager->getStatisticsAsync(
+                $this->projectionName,
+                $this->credentials
+            );
+
+            $this->assertNotEmpty($statistics);
         });
     }
 }

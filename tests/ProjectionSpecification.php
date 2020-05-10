@@ -72,17 +72,17 @@ trait ProjectionSpecification
         yield new Success();
     }
 
-    protected function createEvent(string $eventType, string $data): EventData
+    protected function createEvent(string $eventType, string $data, string $metadata = ''): EventData
     {
-        return new EventData(null, $eventType, true, $data);
+        return new EventData(null, $eventType, true, $data, $metadata);
     }
 
-    protected function postEvent(string $stream, string $eventType, string $data): Promise
+    protected function postEvent(string $stream, string $eventType, string $data, string $metadata = ''): Promise
     {
         return $this->connection->appendToStreamAsync(
             $stream,
             ExpectedVersion::ANY,
-            [$this->createEvent($eventType, $data)]
+            [$this->createEvent($eventType, $data, $metadata)]
         );
     }
 
@@ -124,6 +124,20 @@ QUERY;
 fromStream('$stream').when({
     '\$any': function (s, e) {
         emit('$emittingStream', 'emittedEvent', e);
+    }
+});
+QUERY;
+    }
+
+    protected function createPartitionedQuery($stream): string
+    {
+        return <<<QUERY
+fromStream('$stream').partitionBy(function(e){
+    return e.metadata.username;
+}).when({
+    '\$any': function (s, e) {
+        s.count = 1;
+        return s;
     }
 });
 QUERY;
