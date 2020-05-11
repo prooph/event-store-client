@@ -19,6 +19,7 @@ use Amp\Promise;
 use Generator;
 use Prooph\EventStore\Async\Projections\QueryManager as AsyncQueryManager;
 use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\Projections\ProjectionDetails;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
 
@@ -48,15 +49,7 @@ class QueryManager implements AsyncQueryManager
         $this->defaultUserCredentials = $defaultUserCredentials;
     }
 
-    /**
-     * Asynchronously executes a query
-     *
-     * Creates a new transient projection and polls its status until it is Completed
-     *
-     * returns String of JSON containing query result
-     *
-     * @return Promise<string>
-     */
+    /** {@inheritdoc} */
     public function executeAsync(
         string $name,
         string $query,
@@ -93,7 +86,7 @@ class QueryManager implements AsyncQueryManager
         return Promise\timeout($promise, $this->queryTimeout);
     }
 
-    /** @return Promise<void> */
+    /** {@inheritdoc} */
     private function waitForCompletedAsync(
         string $name,
         int $initialPollingDelay,
@@ -104,7 +97,7 @@ class QueryManager implements AsyncQueryManager
             $attempts = 0;
             $status = yield $this->getStatusAsync($name, $userCredentials);
 
-            while (false === \strpos($status, 'Completed')) {
+            while (false === \strpos($status->status(), 'Completed')) {
                 $attempts++;
 
                 yield $this->delayPollingAsync(
@@ -118,7 +111,7 @@ class QueryManager implements AsyncQueryManager
         });
     }
 
-    /** @return Promise<void> */
+    /** {@inheritdoc} */
     private function delayPollingAsync(
         int $attempts,
         int $initialPollingDelay,
@@ -132,7 +125,7 @@ class QueryManager implements AsyncQueryManager
         });
     }
 
-    /** @return Promise<string> */
+    /** @return Promise<ProjectionDetails> */
     private function getStatusAsync(string $name, ?UserCredentials $userCredentials): Promise
     {
         return $this->projectionsManager->getStatusAsync($name, $userCredentials);

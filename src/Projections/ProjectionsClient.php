@@ -377,9 +377,7 @@ class ProjectionsClient
         return $deferred->promise();
     }
 
-    /**
-     * @return Promise<string>
-     */
+    /** @return Promise<string> */
     public function getState(
         EndPoint $endPoint,
         string $name,

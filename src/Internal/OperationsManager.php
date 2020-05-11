@@ -29,7 +29,7 @@ class OperationsManager
     private Closure $operationItemSeqNoComparer;
     private string $connectionName;
     private ConnectionSettings $settings;
-    /** @var list<OperationItem> */
+    /** @var array<string, OperationItem> */
     private array $activeOperations = [];
     /** @var SplQueue<OperationItem> */
     private SplQueue $waitingOperations;

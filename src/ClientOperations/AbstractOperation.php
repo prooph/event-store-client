@@ -34,7 +34,7 @@ use Throwable;
 
 /**
  * @internal
- * @template TResponse
+ * @template TResponse of Message
  * @template TResult
  */
 abstract class AbstractOperation implements ClientOperation
@@ -44,8 +44,12 @@ abstract class AbstractOperation implements ClientOperation
     protected ?UserCredentials $credentials;
     private TcpCommand $requestCommand;
     private TcpCommand $responseCommand;
+    /** @var class-string<TResponse> */
     private string $responseClassName;
 
+    /**
+     * @param class-string<TResponse> $responseClassName
+     */
     public function __construct(
         Logger $logger,
         Deferred $deferred,
@@ -64,10 +68,7 @@ abstract class AbstractOperation implements ClientOperation
 
     abstract protected function createRequestDto(): Message;
 
-    /**
-     * @param TResponse $response
-     * @return InspectionResult
-     */
+    /** @param TResponse $response */
     abstract protected function inspectResponse(Message $response): InspectionResult;
 
     /**
@@ -104,7 +105,6 @@ abstract class AbstractOperation implements ClientOperation
     public function inspectPackage(TcpPackage $package): InspectionResult
     {
         if ($package->command()->equals($this->responseCommand)) {
-            /** @psalm-suppress InvalidStringClass */
             $responseMessage = new $this->responseClassName();
             $responseMessage->mergeFromString($package->data());
 

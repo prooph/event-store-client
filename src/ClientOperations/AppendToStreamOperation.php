@@ -86,10 +86,7 @@ class AppendToStreamOperation extends AbstractOperation
         return $message;
     }
 
-    /**
-     * @param WriteEventsCompleted $response
-     * @return InspectionResult
-     */
+    /** @param WriteEventsCompleted $response */
     protected function inspectResponse(Message $response): InspectionResult
     {
         switch ($response->getResult()) {
@@ -131,10 +128,7 @@ class AppendToStreamOperation extends AbstractOperation
         }
     }
 
-    /**
-     * @param WriteEventsCompleted $response
-     * @return WriteResult
-     */
+    /** @param WriteEventsCompleted $response */
     protected function transformResponse(Message $response): WriteResult
     {
         /** @psalm-suppress DocblockTypeContradiction */

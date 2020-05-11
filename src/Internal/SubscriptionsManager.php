@@ -28,7 +28,7 @@ class SubscriptionsManager
 {
     private string $connectionName;
     private ConnectionSettings $settings;
-    /** @var list<SubscriptionItem> */
+    /** @var array<string, SubscriptionItem> */
     private array $activeSubscriptions = [];
     private SplQueue $waitingSubscriptions;
     /** @var list<SubscriptionItem> */
