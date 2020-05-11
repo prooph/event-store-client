@@ -34,13 +34,16 @@ use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Psr\Log\LoggerInterface as Logger;
 
-/** @internal */
+/**
+ * @internal
+ * @extends AbstractOperation<WriteEventsCompleted, WriteResult>
+ */
 class AppendToStreamOperation extends AbstractOperation
 {
     private bool $requireMaster;
     private string $stream;
     private int $expectedVersion;
-    /** @var EventData[] */
+    /** @var list<EventData> */
     private array $events;
 
     public function __construct(
@@ -83,10 +86,9 @@ class AppendToStreamOperation extends AbstractOperation
         return $message;
     }
 
+    /** @param WriteEventsCompleted $response */
     protected function inspectResponse(Message $response): InspectionResult
     {
-        \assert($response instanceof WriteEventsCompleted);
-
         switch ($response->getResult()) {
             case OperationResult::Success:
                 $this->succeed($response);
@@ -102,7 +104,7 @@ class AppendToStreamOperation extends AbstractOperation
                 $this->fail(WrongExpectedVersion::with(
                     $this->stream,
                     $this->expectedVersion,
-                    $response->getCurrentVersion()
+                    (int) $response->getCurrentVersion()
                 ));
 
                 return new InspectionResult(InspectionDecision::endOperation(), 'WrongExpectedVersion');
@@ -126,15 +128,15 @@ class AppendToStreamOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response)
+    /** @param WriteEventsCompleted $response */
+    protected function transformResponse(Message $response): WriteResult
     {
-        \assert($response instanceof WriteEventsCompleted);
-
+        /** @psalm-suppress DocblockTypeContradiction */
         return new WriteResult(
-            $response->getLastEventNumber(),
+            (int) $response->getLastEventNumber(),
             new Position(
-                $response->getCommitPosition() ?? -1,
-                $response->getPreparePosition() ?? -1
+                (int) ($response->getCommitPosition() ?? -1),
+                (int) ($response->getPreparePosition() ?? -1)
             )
         );
     }

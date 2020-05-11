@@ -15,7 +15,11 @@ namespace Prooph\EventStoreClient\SystemData;
 
 use Prooph\EventStore\Exception\InvalidArgumentException;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 final class TcpCommand
 {
     public const OPTIONS = [
@@ -479,35 +483,39 @@ final class TcpCommand
             throw new \InvalidArgumentException('Unknown enum name given');
         }
 
-        return self::{$value}();
+        return new self($value);
     }
 
     public static function fromValue(int $value): self
     {
         foreach (self::OPTIONS as $name => $v) {
             if ($v === $value) {
-                return self::{$name}();
+                return new self($name);
             }
         }
 
         throw new InvalidArgumentException('Unknown enum value given');
     }
 
+    /** @psalm-pure */
     public function equals(TcpCommand $other): bool
     {
         return $this->name === $other->name;
     }
 
+    /** @psalm-pure */
     public function name(): string
     {
         return $this->name;
     }
 
+    /** @psalm-pure */
     public function value(): int
     {
         return $this->value;
     }
 
+    /** @psalm-pure */
     public function __toString(): string
     {
         return $this->name;

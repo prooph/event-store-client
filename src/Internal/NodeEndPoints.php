@@ -16,7 +16,11 @@ namespace Prooph\EventStoreClient\Internal;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 class NodeEndPoints
 {
     private ?EndPoint $tcpEndPoint;
@@ -32,16 +36,19 @@ class NodeEndPoints
         $this->secureTcpEndPoint = $secureTcpEndPoint;
     }
 
+    /** @psalm-pure */
     public function tcpEndPoint(): ?EndPoint
     {
         return $this->tcpEndPoint;
     }
 
+    /** @psalm-pure */
     public function secureTcpEndPoint(): ?EndPoint
     {
         return $this->secureTcpEndPoint;
     }
 
+    /** @psalm-pure */
     public function __toString(): string
     {
         return \sprintf('[%s, %s]',

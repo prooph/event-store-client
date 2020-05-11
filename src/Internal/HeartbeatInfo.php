@@ -13,7 +13,11 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 class HeartbeatInfo
 {
     private int $lastPackageNumber;
@@ -27,16 +31,19 @@ class HeartbeatInfo
         $this->timestamp = $timestamp;
     }
 
+    /** @psalm-pure */
     public function lastPackageNumber(): int
     {
         return $this->lastPackageNumber;
     }
 
+    /** @psalm-pure */
     public function isIntervalStage(): bool
     {
         return $this->isIntervalStage;
     }
 
+    /** @psalm-pure */
     public function timestamp(): int
     {
         return $this->timestamp;

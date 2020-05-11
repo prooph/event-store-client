@@ -54,7 +54,7 @@ class ConnectionSettingsBuilder
     private int $maxDiscoverAttempts = Consts::DEFAULT_MAX_CLUSTER_DISCOVER_ATTEMPTS;
     private int $gossipExternalHttpPort = Consts::DEFAULT_CLUSTER_MANAGER_EXTERNAL_HTTP_PORT;
     private int $gossipTimeout = 1000;
-    /** @var GossipSeed[] */
+    /** @var list<GossipSeed> */
     private array $gossipSeeds = [];
     private bool $preferRandomNode = false;
 
@@ -344,7 +344,7 @@ class ConnectionSettingsBuilder
         return $this;
     }
 
-    /** @param EndPoint[] $gossipSeeds */
+    /** @param list<EndPoint> $gossipSeeds */
     public function setGossipSeedEndPoints(array $gossipSeeds): self
     {
         if (empty($gossipSeeds)) {
@@ -352,30 +352,20 @@ class ConnectionSettingsBuilder
         }
 
         foreach ($gossipSeeds as $seed) {
-            if (! $seed instanceof EndPoint) {
-                throw new InvalidArgumentException('Gossip seeds must be an array of ' . EndPoint::class);
-            }
-
             $this->gossipSeeds[] = new GossipSeed($seed);
         }
 
         return $this;
     }
 
-    /** @param GossipSeed[] $gossipSeeds */
+    /** @param list<GossipSeed> $gossipSeeds */
     public function setGossipSeeds(array $gossipSeeds): self
     {
         if (empty($gossipSeeds)) {
             throw new InvalidArgumentException('Empty FakeDnsEntries collection');
         }
 
-        foreach ($gossipSeeds as $seed) {
-            if (! $seed instanceof GossipSeed) {
-                throw new InvalidArgumentException('Gossip seeds must be an array of ' . GossipSeed::class);
-            }
-
-            $this->gossipSeeds[] = $seed;
-        }
+        $this->gossipSeeds = $gossipSeeds;
 
         return $this;
     }

@@ -25,11 +25,13 @@ class TcpConnectionEstablishedMessage implements Message
         $this->tcpPackageConnection = $tcpPackageConnection;
     }
 
+    /** @psalm-pure */
     public function tcpPackageConnection(): TcpPackageConnection
     {
         return $this->tcpPackageConnection;
     }
 
+    /** @psalm-pure */
     public function __toString(): string
     {
         return 'TcpConnectionEstablishedMessage';

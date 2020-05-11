@@ -24,7 +24,6 @@ use Amp\Promise;
 use Amp\Success;
 use Generator;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Util\Json;
 use Prooph\EventStoreClient\Exception\ClusterException;
 use Prooph\EventStoreClient\GossipSeed;
@@ -41,10 +40,10 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
     private string $clusterDns;
     private int $maxDiscoverAttempts;
     private int $managerExternalHttpPort;
-    /** @var GossipSeed[] */
+    /** @var list<GossipSeed> */
     private array $gossipSeeds = [];
     private HttpClient $httpClient;
-    /** @var MemberInfoDto[] */
+    /** @var list<MemberInfoDto> */
     private array $oldGossip = [];
     private int $gossipTimeout;
     private bool $preferRandomNode;
@@ -54,7 +53,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
      * @param string $clusterDns
      * @param int $maxDiscoverAttempts
      * @param int $managerExternalHttpPort
-     * @param GossipSeed[] $gossipSeeds
+     * @param list<GossipSeed> $gossipSeeds
      * @param int $gossipTimeout
      * @param bool $preferRandomNode
      */
@@ -71,15 +70,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         $this->clusterDns = $clusterDns;
         $this->maxDiscoverAttempts = $maxDiscoverAttempts;
         $this->managerExternalHttpPort = $managerExternalHttpPort;
-
-        foreach ($gossipSeeds as $gossipSeed) {
-            if (! $gossipSeed instanceof GossipSeed) {
-                throw new InvalidArgumentException('Expected an array of ' . GossipSeed::class);
-            }
-
-            $this->gossipSeeds[] = $gossipSeed;
-        }
-
+        $this->gossipSeeds = $gossipSeeds;
         $this->gossipTimeout = $gossipTimeout;
         $this->preferRandomNode = $preferRandomNode;
 
@@ -154,12 +145,10 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
                     return $bestNode;
                 }
             }
-
-            return null;
         });
     }
 
-    /** @return GossipSeed[] */
+    /** @return list<GossipSeed> */
     private function getGossipCandidatesFromDns(): array
     {
         if (\count($this->gossipSeeds) > 0) {
@@ -174,7 +163,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
     }
 
     /**
-     * @param MemberInfoDto[] $oldGossip
+     * @param list<MemberInfoDto> $oldGossip
      * @param EndPoint|null $failedTcpEndPoint
      * @return GossipSeed[]
      */
@@ -183,7 +172,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         $filter = function () use ($oldGossip, $failedTcpEndPoint): array {
             $result = [];
             foreach ($oldGossip as $dto) {
-                if ($dto->externalTcpIp() === $failedTcpEndPoint->host()) {
+                if ($failedTcpEndPoint && $dto->externalTcpIp() === $failedTcpEndPoint->host()) {
                     continue;
                 }
 
@@ -201,7 +190,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
     }
 
     /**
-     * @param MemberInfoDto[] $members
+     * @param list<MemberInfoDto> $members
      * @return GossipSeed[]
      */
     private function arrangeGossipCandidates(array $members): array
@@ -245,14 +234,19 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
                 $response = yield $this->httpClient->request($request);
                 \assert($response instanceof Response);
             } catch (Throwable $e) {
-                return null;
+                return;
             }
 
             if ($response->getStatus() !== 200) {
-                return null;
+                return;
             }
 
             $json = yield $response->getBody()->read();
+
+            if (null === $json) {
+                return;
+            }
+
             $data = Json::decode($json);
 
             $members = [];
@@ -266,13 +260,12 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
     }
 
     /**
-     * @param MemberInfoDto[] $members
+     * @param list<MemberInfoDto> $members
      * @param bool $preferRandomNode
      * @return NodeEndPoints|null
      */
     private function tryDetermineBestNode(array $members, bool $preferRandomNode): ?NodeEndPoints
     {
-        /** @var MemberInfoDto[] $nodes */
         $nodes = [];
 
         foreach ($members as $member) {

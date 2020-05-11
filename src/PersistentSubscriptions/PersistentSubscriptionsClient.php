@@ -16,8 +16,8 @@ namespace Prooph\EventStoreClient\PersistentSubscriptions;
 use Amp\Deferred;
 use Amp\Http\Client\Response;
 use Amp\Promise;
+use JsonException;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\Exception\JsonException;
 use Prooph\EventStore\PersistentSubscriptions\PersistentSubscriptionDetails;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\Transport\Http\HttpStatusCode;
@@ -26,6 +26,7 @@ use Prooph\EventStore\Util\Json;
 use Prooph\EventStoreClient\Exception\PersistentSubscriptionCommandFailed;
 use Prooph\EventStoreClient\Transport\Http\HttpClient;
 use Throwable;
+use UnexpectedValueException;
 
 /** @internal */
 class PersistentSubscriptionsClient
@@ -40,11 +41,6 @@ class PersistentSubscriptionsClient
     }
 
     /**
-     * @param EndPoint $endPoint
-     * @param string $stream
-     * @param string $subscriptionName
-     * @param null|UserCredentials $userCredentials
-     * @param string $httpSchema
      * @return Promise<PersistentSubscriptionDetails>
      */
     public function describe(
@@ -75,6 +71,12 @@ class PersistentSubscriptionsClient
                 return;
             }
 
+            if (null === $body) {
+                $deferred->fail(new UnexpectedValueException('No content received'));
+
+                return;
+            }
+
             try {
                 $data = Json::decode($body);
             } catch (JsonException $e) {
@@ -90,10 +92,6 @@ class PersistentSubscriptionsClient
     }
 
     /**
-     * @param EndPoint $endPoint
-     * @param null|string $stream
-     * @param null|UserCredentials $userCredentials
-     * @param string $httpSchema
      * @return Promise<PersistentSubscriptionDetails[]>
      */
     public function list(
@@ -127,6 +125,12 @@ class PersistentSubscriptionsClient
                 return;
             }
 
+            if (null === $body) {
+                $deferred->fail(new UnexpectedValueException('No content received'));
+
+                return;
+            }
+
             try {
                 $data = Json::decode($body);
             } catch (JsonException $e) {
@@ -147,6 +151,7 @@ class PersistentSubscriptionsClient
         return $deferred->promise();
     }
 
+    /** @return Promise<void> */
     public function replayParkedMessages(
         EndPoint $endPoint,
         string $stream,
@@ -169,9 +174,6 @@ class PersistentSubscriptionsClient
     }
 
     /**
-     * @param string $
-     * @param UserCredentials $
-     * @param int $
      * @return Promise<string>
      */
     private function sendGet(string $url, ?UserCredentials $userCredentials, int $expectedCode): Promise
@@ -204,6 +206,7 @@ class PersistentSubscriptionsClient
         return $deferred->promise();
     }
 
+    /** @return Promise<void> */
     private function sendPost(
         string $url,
         string $content,

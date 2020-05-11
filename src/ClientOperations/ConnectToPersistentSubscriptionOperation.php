@@ -108,7 +108,12 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
             $message = new PersistentSubscriptionConfirmation();
             $message->mergeFromString($package->data());
 
-            $this->confirmSubscription($message->getLastCommitPosition(), $message->getLastEventNumber());
+            $this->confirmSubscription(
+                (int) $message->getLastCommitPosition(),
+                $message->getLastEventNumber()
+                    ? (int) $message->getLastEventNumber()
+                    : null
+            );
             $this->subscriptionId = $message->getSubscriptionId();
 
             return new InspectionResult(InspectionDecision::subscribed(), 'SubscriptionConfirmation');
@@ -170,7 +175,7 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
         );
     }
 
-    /** @param EventId[] $eventIds */
+    /** @param list<EventId> $eventIds */
     public function notifyEventsProcessed(array $eventIds): void
     {
         if (empty($eventIds)) {
@@ -207,7 +212,7 @@ class ConnectToPersistentSubscriptionOperation extends AbstractSubscriptionOpera
     }
 
     /**
-     * @param EventId[] $eventIds
+     * @param list<EventId> $eventIds
      * @param PersistentSubscriptionNakEventAction $action
      * @param string $reason
      */

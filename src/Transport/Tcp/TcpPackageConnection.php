@@ -83,17 +83,18 @@ class TcpPackageConnection
         $this->connectionClosed = $connectionClosed;
 
         //Setup callback for incoming messages
-        $this->framer = new LengthPrefixMessageFramer();
-        $this->framer->registerMessageArrivedCallback(function (string $data): void {
+        $this->framer = new LengthPrefixMessageFramer(function (string $data): void {
             $this->incomingMessageArrived($data);
         });
     }
 
+    /** @psalm-pure */
     public function remoteEndPoint(): EndPoint
     {
         return $this->remoteEndPoint;
     }
 
+    /** @psalm-pure */
     public function connectionId(): string
     {
         return $this->connectionId;
@@ -107,16 +108,23 @@ class TcpPackageConnection
                     ->withConnectTimeout($this->timeout);
 
                 $uri = \sprintf('tcp://%s:%s', $this->remoteEndPoint->host(), $this->remoteEndPoint->port());
-                $this->connection = yield connect($uri, $context);
 
                 if ($this->ssl) {
-                    $tlsContext = (new ClientTlsContext())->withPeerName($this->targetHost);
+                    $tlsContext = new ClientTlsContext($this->targetHost);
 
                     if ($this->validateServer) {
                         $tlsContext = $tlsContext->withPeerVerification();
                     }
 
-                    yield $this->connection->enableCrypto($tlsContext);
+                    $context = $context->withTlsContext($tlsContext);
+                }
+
+                /** @psalm-suppress MixedAssignment */
+                $this->connection = yield connect($uri, $context);
+
+                if ($this->ssl) {
+                    /** @psalm-suppress MixedMethodCall */
+                    yield $this->connection->setupTls();
                 }
 
                 $this->isClosed = false;
@@ -154,6 +162,8 @@ class TcpPackageConnection
     {
         Loop::defer(function () use ($package): Generator {
             try {
+                \assert(null !== $this->connection);
+
                 yield $this->connection->write($package->asBytes());
             } catch (Throwable $e) {
                 ($this->connectionClosed)($this, $e);
@@ -163,11 +173,15 @@ class TcpPackageConnection
 
     private function incomingMessageArrived(string $data): void
     {
+        $package = TcpPackage::fromRawData($data);
+
         try {
-            $package = TcpPackage::fromRawData($data);
             ($this->handlePackage)($this, $package);
         } catch (Throwable $e) {
+            \assert(null !== $this->connection);
+
             $this->connection->close();
+
             $message = \sprintf(
                 'TcpPackageConnection: [%s, %s]: Error when processing TcpPackage %s: %s. Connection will be closed',
                 (string) $this->remoteEndPoint,
@@ -177,6 +191,7 @@ class TcpPackageConnection
             );
 
             ($this->onError)($this, $e);
+
             $this->log->debug($message);
         }
     }
@@ -185,6 +200,9 @@ class TcpPackageConnection
     {
         Loop::defer(function (): Generator {
             while (true) {
+                \assert(null !== $this->connection);
+
+                /** @var string|null $data */
                 $data = yield $this->connection->read();
 
                 if (null === $data) {
@@ -193,7 +211,7 @@ class TcpPackageConnection
                 }
 
                 try {
-                    $this->framer->unFrameData($data);
+                    $this->framer->unFrameData((string) $data);
                 } catch (PackageFramingException $exception) {
                     $this->log->error(\sprintf(
                         'TcpPackageConnection: [%s, %s]. Invalid TCP frame received',

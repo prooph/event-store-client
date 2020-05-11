@@ -20,7 +20,6 @@ use Amp\Promise;
 use Amp\Success;
 use Closure;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Async\EventStoreTransaction;
 use Prooph\EventStore\Common\SystemRoles;
@@ -321,13 +320,11 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         return $this->connection->subscribeToStreamAsync(
             $streamId,
             false,
-            new class() implements EventAppearedOnSubscription {
-                public function __invoke(
-                    EventStoreSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
-                ): Promise {
-                    return new Success();
-                }
+            function (
+                EventStoreSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ): Promise {
+                return new Success();
             },
             null,
             null === $login && null === $password
@@ -340,13 +337,11 @@ abstract class AuthenticationTestCase extends AsyncTestCase
     {
         return $this->connection->subscribeToAllAsync(
             false,
-            new class() implements EventAppearedOnSubscription {
-                public function __invoke(
-                    EventStoreSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
-                ): Promise {
-                    return new Success();
-                }
+            function (
+                EventStoreSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ): Promise {
+                return new Success();
             },
             null,
             null === $login && null === $password

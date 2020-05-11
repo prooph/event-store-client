@@ -16,14 +16,10 @@ namespace Prooph\EventStoreClient;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
-use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
-use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ResolvedEvent;
-use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SubscriptionDropReason;
 use Throwable;
 
@@ -53,34 +49,24 @@ Loop::run(function () {
         'foo-bar',
         null,
         CatchUpSubscriptionSettings::default(),
-        new class() implements EventAppearedOnSubscription {
-            public function __invoke(
-                EventStoreSubscription $subscription,
-                ResolvedEvent $resolvedEvent): Promise
-            {
-                echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
-                echo 'data: ' . $resolvedEvent->originalEvent()->data() . PHP_EOL;
+        function (EventStoreCatchUpSubscription $subscription, ResolvedEvent $resolvedEvent): Promise {
+            echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
+            echo 'data: ' . $resolvedEvent->originalEvent()->data() . PHP_EOL;
 
-                return new Success();
-            }
+            return new Success();
         },
-        new class() implements LiveProcessingStartedOnCatchUpSubscription {
-            public function __invoke(EventStoreCatchUpSubscription $subscription): void
-            {
-                echo 'liveProcessingStarted on ' . $subscription->streamId() . PHP_EOL;
-            }
+        function (EventStoreCatchUpSubscription $subscription): void {
+            echo 'liveProcessingStarted on ' . $subscription->streamId() . PHP_EOL;
         },
-        new class() implements SubscriptionDropped {
-            public function __invoke(
-                EventStoreSubscription $subscription,
-                SubscriptionDropReason $reason,
-                ?Throwable $exception = null
-            ): void {
-                echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
+        function (
+            EventStoreCatchUpSubscription $subscription,
+            SubscriptionDropReason $reason,
+            ?Throwable $exception = null
+        ): void {
+            echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
 
-                if ($exception) {
-                    echo 'ex: ' . $exception->getMessage() . PHP_EOL;
-                }
+            if ($exception) {
+                echo 'ex: ' . $exception->getMessage() . PHP_EOL;
             }
         }
     );

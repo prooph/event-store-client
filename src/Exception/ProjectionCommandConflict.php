@@ -26,6 +26,7 @@ class ProjectionCommandConflict extends BaseException
         parent::__construct($message);
     }
 
+    /** @psalm-pure */
     public function httpStatusCode(): int
     {
         return $this->httpStatusCode;

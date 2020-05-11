@@ -14,10 +14,15 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Internal\Message;
 
 use Amp\Deferred;
+use Amp\Promise;
 use Closure;
+use Prooph\EventStore\Async\EventStorePersistentSubscription;
+use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
+use Throwable;
 
-/** @internal  */
+/** @internal */
 class StartPersistentSubscriptionMessage implements Message
 {
     private Deferred $deferred;
@@ -25,11 +30,17 @@ class StartPersistentSubscriptionMessage implements Message
     private string $streamId;
     private int $bufferSize;
     private ?UserCredentials $userCredentials;
+    /** @var Closure(EventStorePersistentSubscription, ResolvedEvent, null|int): Promise */
     private Closure $eventAppeared;
+    /** @var null|Closure(EventStorePersistentSubscription, SubscriptionDropReason, null|Throwable): void */
     private ?Closure $subscriptionDropped;
     private int $maxRetries;
     private int $timeout;
 
+    /**
+     * @param Closure(EventStorePersistentSubscription, ResolvedEvent, null|int): Promise $eventAppeared
+     * @param null|Closure(EventStorePersistentSubscription, SubscriptionDropReason, null|Throwable): void $subscriptionDropped
+     */
     public function __construct(
         Deferred $deferred,
         string $subscriptionId,
@@ -52,51 +63,69 @@ class StartPersistentSubscriptionMessage implements Message
         $this->timeout = $timeout;
     }
 
+    /** @psalm-pure */
     public function deferred(): Deferred
     {
         return $this->deferred;
     }
 
+    /** @psalm-pure */
     public function subscriptionId(): string
     {
         return $this->subscriptionId;
     }
 
+    /** @psalm-pure */
     public function streamId(): string
     {
         return $this->streamId;
     }
 
+    /** @psalm-pure */
     public function bufferSize(): int
     {
         return $this->bufferSize;
     }
 
+    /** @psalm-pure */
     public function userCredentials(): ?UserCredentials
     {
         return $this->userCredentials;
     }
 
+    /**
+     * @return Closure(EventStorePersistentSubscription, ResolvedEvent, null|int): Promise
+     *
+     * @psalm-pure
+     */
     public function eventAppeared(): Closure
     {
         return $this->eventAppeared;
     }
 
+    /**
+     * @return null|Closure(EventStorePersistentSubscription, SubscriptionDropReason, null|Throwable): void
+     *
+     * @psalm-pure
+     */
     public function subscriptionDropped(): ?Closure
     {
         return $this->subscriptionDropped;
     }
 
+    /** @psalm-pure */
     public function maxRetries(): int
     {
         return $this->maxRetries;
     }
 
+    /** @psalm-pure */
     public function timeout(): int
     {
         return $this->timeout;
     }
 
+    /** @psalm-pure */
     public function __toString(): string
     {
         return 'StartPersistentSubscriptionMessage';

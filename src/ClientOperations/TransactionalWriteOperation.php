@@ -29,12 +29,15 @@ use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Psr\Log\LoggerInterface as Logger;
 
-/** @internal */
+/**
+ * @internal
+ * @extends AbstractOperation<TransactionWriteCompleted, null>
+ */
 class TransactionalWriteOperation extends AbstractOperation
 {
     private bool $requireMaster;
     private int $transactionId;
-    /** @var EventData[] */
+    /** @var list<EventData> */
     private array $events;
 
     public function __construct(
@@ -74,10 +77,12 @@ class TransactionalWriteOperation extends AbstractOperation
         return $message;
     }
 
+    /**
+     * @param TransactionWriteCompleted $response
+     * @return InspectionResult
+     */
     protected function inspectResponse(Message $response): InspectionResult
     {
-        \assert($response instanceof TransactionWriteCompleted);
-
         switch ($response->getResult()) {
             case OperationResult::Success:
                 $this->succeed($response);
@@ -99,8 +104,13 @@ class TransactionalWriteOperation extends AbstractOperation
         }
     }
 
-    protected function transformResponse(Message $response): void
+    /**
+     * @param TransactionWriteCompleted $response
+     * @return null
+     */
+    protected function transformResponse(Message $response)
     {
+        return null;
     }
 
     public function name(): string

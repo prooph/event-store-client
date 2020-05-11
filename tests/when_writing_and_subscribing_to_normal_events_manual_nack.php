@@ -18,7 +18,6 @@ use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
@@ -75,29 +74,18 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends AsyncTes
             yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
-                new class($this->eventReceivedCount, $this->eventsReceived) implements EventAppearedOnPersistentSubscription {
-                    private int $eventReceivedCount;
-                    private Deferred $eventsReceived;
+                function (
+                    EventStorePersistentSubscription $subscription,
+                    ResolvedEvent $resolvedEvent,
+                    ?int $retryCount = null
+                ): Promise {
+                    $subscription->fail($resolvedEvent, PersistentSubscriptionNakEventAction::park(), 'fail');
 
-                    public function __construct(int &$eventReceivedCount, Deferred $eventsReceived)
-                    {
-                        $this->eventReceivedCount = &$eventReceivedCount;
-                        $this->eventsReceived = $eventsReceived;
+                    if (++$this->eventReceivedCount === when_writing_and_subscribing_to_normal_events_manual_nack::EVENT_WRITE_COUNT) {
+                        $this->eventsReceived->resolve(true);
                     }
 
-                    public function __invoke(
-                        EventStorePersistentSubscription $subscription,
-                        ResolvedEvent $resolvedEvent,
-                        ?int $retryCount = null
-                    ): Promise {
-                        $subscription->fail($resolvedEvent, PersistentSubscriptionNakEventAction::park(), 'fail');
-
-                        if (++$this->eventReceivedCount === when_writing_and_subscribing_to_normal_events_manual_nack::EVENT_WRITE_COUNT) {
-                            $this->eventsReceived->resolve(true);
-                        }
-
-                        return new Success();
-                    }
+                    return new Success();
                 },
                 null,
                 10,

@@ -28,10 +28,10 @@ class SubscriptionsManager
 {
     private string $connectionName;
     private ConnectionSettings $settings;
-    /** @var SubscriptionItem[] */
+    /** @var array<string, SubscriptionItem> */
     private array $activeSubscriptions = [];
     private SplQueue $waitingSubscriptions;
-    /** @var SubscriptionItem[] */
+    /** @var list<SubscriptionItem> */
     private array $retryPendingSubscriptions = [];
 
     public function __construct(string $connectionName, ConnectionSettings $settings)
@@ -212,7 +212,7 @@ class SubscriptionsManager
         $this->logDebug('StartSubscription SUBSCRIBING %s', (string) $subscription);
     }
 
-    private function logDebug(string $message, ...$parameters): void
+    private function logDebug(string $message, string ...$parameters): void
     {
         if ($this->settings->verboseLogging()) {
             $message = empty($parameters)

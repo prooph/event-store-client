@@ -17,7 +17,6 @@ use Amp\Promise;
 use Prooph\EventStore\Async\Projections\ProjectionsManager as AsyncProjectionsManager;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
-use Prooph\EventStore\Projections\ProjectionDetails;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
 
@@ -40,9 +39,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         $this->defaultUserCredentials = $defaultUserCredentials;
     }
 
-    /**
-     * Asynchronously enables a projection
-     */
+    /** {@inheritdoc} */
     public function enableAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
@@ -57,9 +54,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously aborts and disables a projection without writing a checkpoint
-     */
+    /** {@inheritdoc} */
     public function disableAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
@@ -74,9 +69,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously disables a projection
-     */
+    /** {@inheritdoc} */
     public function abortAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
@@ -91,9 +84,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously creates a one-time query
-     */
+    /** {@inheritdoc} */
     public function createOneTimeAsync(
         string $query,
         string $type = 'JS',
@@ -112,9 +103,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously creates a one-time query
-     */
+    /** {@inheritdoc} */
     public function createTransientAsync(
         string $name,
         string $query,
@@ -139,9 +128,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously creates a continuous projection
-     */
+    /** {@inheritdoc} */
     public function createContinuousAsync(
         string $name,
         string $query,
@@ -168,11 +155,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously lists all projections
-     *
-     * @return Promise<ProjectionDetails[]>
-     */
+    /** {@inheritdoc} */
     public function listAllAsync(?UserCredentials $userCredentials = null): Promise
     {
         return $this->client->listAll(
@@ -182,11 +165,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously lists all one-time projections
-     *
-     * @return Promise<ProjectionDetails[]>
-     */
+    /** {@inheritdoc} */
     public function listOneTimeAsync(?UserCredentials $userCredentials = null): Promise
     {
         return $this->client->listOneTime(
@@ -196,11 +175,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously lists this status of all continuous projections
-     *
-     * @return Promise<ProjectionDetails[]>
-     */
+    /** {@inheritdoc} */
     public function listContinuousAsync(?UserCredentials $userCredentials = null): Promise
     {
         return $this->client->listContinuous(
@@ -210,13 +185,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously gets the status of a projection
-     *
-     * returns String of JSON containing projection status
-     *
-     * @return Promise<ProjectionDetails>
-     */
+    /** {@inheritdoc} */
     public function getStatusAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
@@ -231,13 +200,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously gets the state of a projection.
-     *
-     * returns String of JSON containing projection state
-     *
-     * @return Promise<string>
-     */
+    /** {@inheritdoc} */
     public function getStateAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
@@ -252,13 +215,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously gets the state of a projection for a specified partition
-     *
-     * returns String of JSON containing projection state
-     *
-     * @return Promise<string>
-     */
+    /** {@inheritdoc} */
     public function getPartitionStateAsync(
         string $name,
         string $partition,
@@ -281,13 +238,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously gets the resut of a projection
-     *
-     * returns String of JSON containing projection result
-     *
-     * @return Promise<string>
-     */
+    /** {@inheritdoc} */
     public function getResultAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
@@ -302,13 +253,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously gets the result of a projection for a specified partition
-     *
-     * returns String of JSON containing projection result
-     *
-     * @return Promise<string>
-     */
+    /** {@inheritdoc} */
     public function getPartitionResultAsync(
         string $name,
         string $partition,
@@ -331,13 +276,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously gets the statistics of a projection
-     *
-     * returns String of JSON containing projection statistics
-     *
-     * @return Promise<string>
-     */
+    /** {@inheritdoc} */
     public function getStatisticsAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
@@ -352,11 +291,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously gets the status of a query
-     *
-     * @return Promise<string>
-     */
+    /** {@inheritdoc} */
     public function getQueryAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {
@@ -371,9 +306,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously updates the definition of a query
-     */
+    /** {@inheritdoc} */
     public function updateQueryAsync(
         string $name,
         string $query,
@@ -398,9 +331,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously deletes a projection
-     */
+    /** {@inheritdoc} */
     public function deleteAsync(
         string $name,
         bool $deleteEmittedStreams = false,
@@ -419,9 +350,7 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /**
-     * Asynchronously resets a projection
-     */
+    /** {@inheritdoc} */
     public function resetAsync(string $name, ?UserCredentials $userCredentials = null): Promise
     {
         if ('' === $name) {

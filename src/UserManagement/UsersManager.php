@@ -22,9 +22,7 @@ use Prooph\EventStore\UserCredentials;
 use Prooph\EventStore\UserManagement\ChangePasswordDetails;
 use Prooph\EventStore\UserManagement\ResetPasswordDetails;
 use Prooph\EventStore\UserManagement\UserCreationInformation;
-use Prooph\EventStore\UserManagement\UserDetails;
 use Prooph\EventStore\UserManagement\UserUpdateInformation;
-use Prooph\EventStoreClient\Exception\UserCommandFailed;
 
 class UsersManager implements AsyncUsersManager
 {
@@ -45,6 +43,7 @@ class UsersManager implements AsyncUsersManager
         $this->defaultCredentials = $userCredentials;
     }
 
+    /** {@inheritdoc} */
     public function enableAsync(string $login, ?UserCredentials $userCredentials = null): Promise
     {
         if (empty($login)) {
@@ -59,6 +58,7 @@ class UsersManager implements AsyncUsersManager
         );
     }
 
+    /** {@inheritdoc} */
     public function disableAsync(string $login, ?UserCredentials $userCredentials = null): Promise
     {
         if (empty($login)) {
@@ -73,7 +73,7 @@ class UsersManager implements AsyncUsersManager
         );
     }
 
-    /** @throws UserCommandFailed */
+    /** {@inheritdoc} */
     public function deleteUserAsync(string $login, ?UserCredentials $userCredentials = null): Promise
     {
         if (empty($login)) {
@@ -88,7 +88,7 @@ class UsersManager implements AsyncUsersManager
         );
     }
 
-    /** @return Promise<UserDetails[]> */
+    /** {@inheritdoc} */
     public function listAllAsync(?UserCredentials $userCredentials = null): Promise
     {
         return $this->client->listAll(
@@ -98,7 +98,7 @@ class UsersManager implements AsyncUsersManager
         );
     }
 
-    /** @return Promise<UserDetails> */
+    /** {@inheritdoc} */
     public function getCurrentUserAsync(?UserCredentials $userCredentials = null): Promise
     {
         return $this->client->getCurrentUser(
@@ -108,7 +108,7 @@ class UsersManager implements AsyncUsersManager
         );
     }
 
-    /** @return Promise<UserDetails> */
+    /** {@inheritdoc} */
     public function getUserAsync(string $login, ?UserCredentials $userCredentials = null): Promise
     {
         if (empty($login)) {
@@ -123,14 +123,7 @@ class UsersManager implements AsyncUsersManager
         );
     }
 
-    /**
-     * @param string $login
-     * @param string $fullName
-     * @param string[] $groups
-     * @param string $password
-     * @param UserCredentials|null $userCredentials
-     * @return Promise
-     */
+    /** {@inheritdoc} */
     public function createUserAsync(
         string $login,
         string $fullName,
@@ -151,7 +144,7 @@ class UsersManager implements AsyncUsersManager
         }
 
         foreach ($groups as $group) {
-            if (! \is_string($group) || empty($group)) {
+            if (empty($group)) {
                 throw new InvalidArgumentException('Expected an array of non empty strings for group');
             }
         }
@@ -169,13 +162,7 @@ class UsersManager implements AsyncUsersManager
         );
     }
 
-    /**
-     * @param string $login
-     * @param string $fullName
-     * @param string[] $groups
-     * @param UserCredentials|null $userCredentials
-     * @return Promise
-     */
+    /** {@inheritdoc} */
     public function updateUserAsync(
         string $login,
         string $fullName,
@@ -191,7 +178,7 @@ class UsersManager implements AsyncUsersManager
         }
 
         foreach ($groups as $group) {
-            if (! \is_string($group) || empty($group)) {
+            if (empty($group)) {
                 throw new InvalidArgumentException('Expected an array of non empty strings for group');
             }
         }
@@ -205,6 +192,7 @@ class UsersManager implements AsyncUsersManager
         );
     }
 
+    /** {@inheritdoc} */
     public function changePasswordAsync(
         string $login,
         string $oldPassword,
@@ -232,6 +220,7 @@ class UsersManager implements AsyncUsersManager
         );
     }
 
+    /** {@inheritdoc} */
     public function resetPasswordAsync(
         string $login,
         string $newPassword,

@@ -23,12 +23,8 @@ use Amp\Promise;
 use Amp\Success;
 use Exception;
 use Generator;
-use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
 use Prooph\EventStore\Async\ClientConnectionEventArgs;
-use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
-use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
-use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventId;
@@ -38,7 +34,6 @@ use Prooph\EventStore\RecordedEvent;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SliceReadStatus;
 use Prooph\EventStore\StreamEventsSlice;
-use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\Util\DateTime;
 use Prooph\EventStoreClient\ClientOperations\VolatileSubscriptionOperation;
@@ -97,55 +92,27 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
             self::$streamId,
             null,
             null,
-            new class($props1) implements EventAppearedOnCatchupSubscription {
-                private $props;
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ) use (&$props1): Promise {
+                $props1['raisedEvents'][] = $resolvedEvent;
+                $props1['raisedEventEvent']->resolve(true);
 
-                public function __construct(array &$props)
-                {
-                    $this->props = &$props;
-                }
-
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
-                ): Promise {
-                    $this->props['raisedEvents'][] = $resolvedEvent;
-                    $this->props['raisedEventEvent']->resolve(true);
-
-                    return new Success();
-                }
+                return new Success();
             },
-            new class($props2) implements LiveProcessingStartedOnCatchUpSubscription {
-                private array $props;
-
-                public function __construct(array &$props)
-                {
-                    $this->props = &$props;
-                }
-
-                public function __invoke(EventStoreCatchUpSubscription $subscription): void
-                {
-                    $this->props['liveProcessingStarted'] = true;
-                }
+            function (EventStoreCatchUpSubscription $subscription) use (&$props2): void {
+                $props2['liveProcessingStarted'] = true;
             },
-            new class($props3) implements CatchUpSubscriptionDropped {
-                private array $props;
-
-                public function __construct(array &$props)
-                {
-                    $this->props = &$props;
-                }
-
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    SubscriptionDropReason $reason,
-                    ?Throwable $exception = null
-                ): void {
-                    $this->props['isDropped'] = true;
-                    $this->props['dropReason'] = $reason;
-                    $this->props['dropException'] = $exception;
-                    $this->props['dropEvent']->resolve(true);
-                }
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                SubscriptionDropReason $reason,
+                ?Throwable $exception = null
+            ) use (&$props3): void {
+                $props3['isDropped'] = true;
+                $props3['dropReason'] = $reason;
+                $props3['dropException'] = $exception;
+                $props3['dropEvent']->resolve(true);
             },
             $settings
         );
@@ -399,7 +366,6 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
         $this->connection->handleSubscribeToStreamAsync(
             function ($stream, $raise, $drop) use (&$innerSubscriptionDrop, &$volatileEventStoreSubscription): Promise {
                 $innerSubscriptionDrop = $drop;
-                \assert($innerSubscriptionDrop instanceof SubscriptionDropped);
                 $volatileEventStoreSubscription = $this->createVolatileSubscription($raise, $drop, null);
                 \assert($volatileEventStoreSubscription instanceof VolatileEventStoreSubscription);
 
@@ -411,7 +377,6 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
         $this->assertCount(0, $this->raisedEvents);
         $this->assertNotNull($innerSubscriptionDrop);
 
-        \assert($innerSubscriptionDrop instanceof SubscriptionDropped);
         $innerSubscriptionDrop($volatileEventStoreSubscription, SubscriptionDropReason::connectionClosed(), null);
 
         $result = yield Promise\timeout($this->dropEvent->promise(), self::$timeoutMs);
@@ -503,36 +468,18 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
                 self::$streamId,
                 false,
                 null,
-                fn () => new class($raise) implements EventAppearedOnSubscription {
-                    private $raise;
-
-                    public function __construct($raise)
-                    {
-                        $this->raise = $raise;
-                    }
-
-                    public function __invoke(
-                        EventStoreSubscription $subscription,
-                        ResolvedEvent $resolvedEvent
-                    ): Promise {
-                        return ($this->raise)($subscription, $resolvedEvent);
-                    }
+                fn () => function (
+                    EventStoreSubscription $subscription,
+                    ResolvedEvent $resolvedEvent
+                ) use ($raise): Promise {
+                    return $raise($subscription, $resolvedEvent);
                 },
-                fn () => new class($drop) implements SubscriptionDropped {
-                    private $drop;
-
-                    public function __construct($drop)
-                    {
-                        $this->drop = $drop;
-                    }
-
-                    public function __invoke(
-                        EventStoreSubscription $subscription,
-                        SubscriptionDropReason $reason,
-                        ?Throwable $exception = null
-                    ): void {
-                        ($this->drop)($subscription, $reason, $exception);
-                    }
+                fn () => function (
+                    EventStoreSubscription $subscription,
+                    SubscriptionDropReason $reason,
+                    ?Throwable $exception = null
+                ) use ($drop): void {
+                    $drop($subscription, $reason, $exception);
                 },
                 false,
                 fn () => null

@@ -28,16 +28,19 @@ class StartConnectionMessage implements Message
         $this->endPointDiscoverer = $endPointDiscoverer;
     }
 
+    /** @psalm-pure */
     public function deferred(): Deferred
     {
         return $this->deferred;
     }
 
+    /** @psalm-pure */
     public function endPointDiscoverer(): EndPointDiscoverer
     {
         return $this->endPointDiscoverer;
     }
 
+    /** @psalm-pure */
     public function __toString(): string
     {
         return 'StartConnectionMessage';

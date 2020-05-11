@@ -33,13 +33,16 @@ use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Psr\Log\LoggerInterface as Logger;
 
-/** @internal */
+/**
+ * @internal
+ * @extends AbstractOperation<WriteEventsCompleted, ConditionalWriteResult>
+ */
 class ConditionalAppendToStreamOperation extends AbstractOperation
 {
     private bool $requireMaster;
     private string $stream;
     private int $expectedVersion;
-    /** @var EventData[] */
+    /** @var list<EventData> */
     private array $events;
 
     public function __construct(
@@ -82,10 +85,12 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
         return $message;
     }
 
+    /**
+     * @param WriteEventsCompleted $response
+     * @return InspectionResult
+     */
     protected function inspectResponse(Message $response): InspectionResult
     {
-        \assert($response instanceof WriteEventsCompleted);
-
         switch ($response->getResult()) {
             case OperationResult::Success:
                 $this->succeed($response);
@@ -122,8 +127,6 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
 
     protected function transformResponse(Message $response): ConditionalWriteResult
     {
-        \assert($response instanceof WriteEventsCompleted);
-
         if ($response->getResult() === OperationResult::WrongExpectedVersion) {
             return ConditionalWriteResult::fail(ConditionalWriteStatus::versionMismatch());
         }
@@ -132,11 +135,12 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
             return ConditionalWriteResult::fail(ConditionalWriteStatus::streamDeleted());
         }
 
+        /** @psalm-suppress DocblockTypeContradiction */
         return ConditionalWriteResult::success(
-            $response->getLastEventNumber(),
+            (int) $response->getLastEventNumber(),
             new Position(
-                $response->getCommitPosition() ?? -1,
-                $response->getPreparePosition() ?? -1
+                (int) ($response->getCommitPosition() ?? -1),
+                (int) ($response->getPreparePosition() ?? -1)
             )
         );
     }

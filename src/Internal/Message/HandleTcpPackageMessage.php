@@ -28,16 +28,19 @@ class HandleTcpPackageMessage implements Message
         $this->tcpPackage = $tcpPackage;
     }
 
+    /** @psalm-pure */
     public function tcpPackageConnection(): TcpPackageConnection
     {
         return $this->tcpPackageConnection;
     }
 
+    /** @psalm-pure */
     public function tcpPackage(): TcpPackage
     {
         return $this->tcpPackage;
     }
 
+    /** @psalm-pure */
     public function __toString(): string
     {
         return 'HandleTcpPackageMessage';

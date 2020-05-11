@@ -16,27 +16,20 @@ namespace ProophTest\EventStoreClient;
 use Amp\Promise;
 use Amp\Success;
 use Closure;
-use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
 use Prooph\EventStore\Async\ClientAuthenticationFailedEventArgs;
 use Prooph\EventStore\Async\ClientClosedEventArgs;
 use Prooph\EventStore\Async\ClientConnectionEventArgs;
 use Prooph\EventStore\Async\ClientErrorEventArgs;
 use Prooph\EventStore\Async\ClientReconnectingEventArgs;
-use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
-use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\Async\EventStoreTransaction;
 use Prooph\EventStore\Async\Internal\EventHandler;
-use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
-use Prooph\EventStore\Async\PersistentSubscriptionDropped;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\ListenerHandler;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Position;
 use Prooph\EventStore\StreamMetadata;
-use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SystemSettings;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\ClusterSettings;
@@ -245,8 +238,8 @@ class FakeEventStoreConnection implements EventStoreConnection
     public function subscribeToStreamAsync(
         string $stream,
         bool $resolveLinkTos,
-        EventAppearedOnSubscription $eventAppeared,
-        ?SubscriptionDropped $subscriptionDropped = null,
+        Closure $eventAppeared,
+        ?Closure $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
         return ($this->subscribeToStreamAsync)(
@@ -261,9 +254,9 @@ class FakeEventStoreConnection implements EventStoreConnection
         string $stream,
         ?int $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
-        EventAppearedOnCatchupSubscription $eventAppeared,
-        ?LiveProcessingStartedOnCatchUpSubscription $liveProcessingStarted = null,
-        ?CatchUpSubscriptionDropped $subscriptionDropped = null,
+        Closure $eventAppeared,
+        ?Closure $liveProcessingStarted = null,
+        ?Closure $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
         throw new \RuntimeException('Not implemented');
@@ -271,8 +264,8 @@ class FakeEventStoreConnection implements EventStoreConnection
 
     public function subscribeToAllAsync(
         bool $resolveLinkTos,
-        EventAppearedOnSubscription $eventAppeared,
-        ?SubscriptionDropped $subscriptionDropped = null,
+        Closure $eventAppeared,
+        ?Closure $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
         return ($this->subscribeToAllAsync)(
@@ -286,9 +279,9 @@ class FakeEventStoreConnection implements EventStoreConnection
     public function subscribeToAllFromAsync(
         ?Position $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
-        EventAppearedOnCatchupSubscription $eventAppeared,
-        ?LiveProcessingStartedOnCatchUpSubscription $liveProcessingStarted = null,
-        ?CatchUpSubscriptionDropped $subscriptionDropped = null,
+        Closure $eventAppeared,
+        ?Closure $liveProcessingStarted = null,
+        ?Closure $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
         throw new \RuntimeException('Not implemented');
@@ -297,8 +290,8 @@ class FakeEventStoreConnection implements EventStoreConnection
     public function connectToPersistentSubscription(
         string $stream,
         string $groupName,
-        EventAppearedOnPersistentSubscription $eventAppeared,
-        ?PersistentSubscriptionDropped $subscriptionDropped = null,
+        Closure $eventAppeared,
+        ?Closure $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         ?UserCredentials $userCredentials = null
@@ -309,8 +302,8 @@ class FakeEventStoreConnection implements EventStoreConnection
     public function connectToPersistentSubscriptionAsync(
         string $stream,
         string $groupName,
-        EventAppearedOnPersistentSubscription $eventAppeared,
-        ?PersistentSubscriptionDropped $subscriptionDropped = null,
+        Closure $eventAppeared,
+        ?Closure $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         ?UserCredentials $userCredentials = null

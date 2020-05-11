@@ -31,7 +31,10 @@ use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Psr\Log\LoggerInterface as Logger;
 
-/** @internal */
+/**
+ * @internal
+ * @extends AbstractOperation<CreatePersistentSubscriptionCompleted, PersistentSubscriptionCreateResult>
+ */
 class CreatePersistentSubscriptionOperation extends AbstractOperation
 {
     private string $stream;
@@ -83,10 +86,12 @@ class CreatePersistentSubscriptionOperation extends AbstractOperation
         return $message;
     }
 
+    /**
+     * @param CreatePersistentSubscriptionCompleted $response
+     * @return InspectionResult
+     */
     protected function inspectResponse(Message $response): InspectionResult
     {
-        \assert($response instanceof CreatePersistentSubscriptionCompleted);
-
         switch ($response->getResult()) {
             case CreatePersistentSubscriptionResult::Success:
                 $this->succeed($response);
@@ -118,10 +123,12 @@ class CreatePersistentSubscriptionOperation extends AbstractOperation
         }
     }
 
+    /**
+     * @param CreatePersistentSubscriptionCompleted $response
+     * @return PersistentSubscriptionCreateResult
+     */
     protected function transformResponse(Message $response): PersistentSubscriptionCreateResult
     {
-        \assert($response instanceof CreatePersistentSubscriptionCompleted);
-
         return new PersistentSubscriptionCreateResult(
             PersistentSubscriptionCreateStatus::success()
         );

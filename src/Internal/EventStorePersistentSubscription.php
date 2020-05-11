@@ -21,9 +21,7 @@ use Amp\Promise;
 use Amp\Success;
 use Closure;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription as AsyncEventStorePersistentSubscription;
-use Prooph\EventStore\Async\PersistentSubscriptionDropped;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\Exception\RuntimeException;
 use Prooph\EventStore\Internal\DropData;
@@ -43,17 +41,19 @@ use Throwable;
 class EventStorePersistentSubscription implements AsyncEventStorePersistentSubscription
 {
     private EventStoreConnectionLogicHandler $handler;
-    private static ?ResolvedEvent $dropSubscriptionEvent = null;
+    private ResolvedEvent $dropSubscriptionEvent;
     private string $subscriptionId;
     private string $streamId;
-    private EventAppearedOnPersistentSubscription $eventAppeared;
-    private ?PersistentSubscriptionDropped $subscriptionDropped;
+    /** @var Closure(EventStorePersistentSubscription, ResolvedEvent, null|int): Promise $eventAppeared */
+    private Closure $eventAppeared;
+    /** @var null|Closure(EventStorePersistentSubscription, SubscriptionDropReason, null|Throwable): void $subscriptionDropped */
+    private ?Closure $subscriptionDropped;
     private ?UserCredentials $userCredentials;
     private Logger $log;
     private bool $verbose;
     private ConnectionSettings $settings;
     private bool $autoAck;
-    private PersistentEventStoreSubscription $subscription;
+    private ?PersistentEventStoreSubscription $subscription = null;
     /** @var SplQueue */
     private $queue;
     private bool $isProcessing = false;
@@ -62,12 +62,17 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
     private int $bufferSize;
     private Deferred $stopped;
 
-    /** @internal  */
+    /**
+     * @internal
+     *
+     * @param Closure(EventStorePersistentSubscription, ResolvedEvent, null|int): Promise $eventAppeared
+     * @param null|Closure(EventStorePersistentSubscription, SubscriptionDropReason, null|Throwable): void $subscriptionDropped
+     */
     public function __construct(
         string $subscriptionId,
         string $streamId,
-        EventAppearedOnPersistentSubscription $eventAppeared,
-        ?PersistentSubscriptionDropped $subscriptionDropped,
+        Closure $eventAppeared,
+        ?Closure $subscriptionDropped,
         ?UserCredentials $userCredentials,
         Logger $logger,
         bool $verboseLogging,
@@ -76,10 +81,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
         int $bufferSize = 10,
         bool $autoAck = true
     ) {
-        if (null === self::$dropSubscriptionEvent) {
-            self::$dropSubscriptionEvent = new ResolvedEvent(null, null, null);
-        }
-
+        $this->dropSubscriptionEvent = new ResolvedEvent(null, null, null);
         $this->subscriptionId = $subscriptionId;
         $this->streamId = $streamId;
         $this->eventAppeared = $eventAppeared;
@@ -96,7 +98,14 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
         $this->handler = $handler;
     }
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @param Closure(EventStorePersistentSubscription, ResolvedEvent, null|int): Promise $eventAppeared
+     * @param null|Closure(EventStorePersistentSubscription, SubscriptionDropReason, null|Throwable): void $subscriptionDropped
+     *
+     * @return Promise<PersistentEventStoreSubscription>
+     */
     public function startSubscription(
         string $subscriptionId,
         string $streamId,
@@ -171,13 +180,10 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
     /**
      * Acknowledge that a message have completed processing (this will tell the server it has been processed)
      * Note: There is no need to ack a message if you have Auto Ack enabled
-     *
-     * @param InternalResolvedEvent $event
-     *
-     * @return void
      */
     public function acknowledge(InternalResolvedEvent $event): void
     {
+        /** @psalm-suppress PossiblyNullReference */
         $this->subscription->notifyEventsProcessed([$event->originalEvent()->eventId()]);
     }
 
@@ -185,30 +191,27 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
      * Acknowledge that a message have completed processing (this will tell the server it has been processed)
      * Note: There is no need to ack a message if you have Auto Ack enabled
      *
-     * @param InternalResolvedEvent[] $events
-     *
-     * @return void
+     * @param list<InternalResolvedEvent> $events
      */
     public function acknowledgeMultiple(array $events): void
     {
         $ids = \array_map(
+            /** @psalm-suppress PossiblyNullReference */
             fn (InternalResolvedEvent $event): EventId => $event->originalEvent()->eventId(),
             $events
         );
 
+        /** @psalm-suppress PossiblyNullReference */
         $this->subscription->notifyEventsProcessed($ids);
     }
 
     /**
      * Acknowledge that a message have completed processing (this will tell the server it has been processed)
      * Note: There is no need to ack a message if you have Auto Ack enabled
-     *
-     * @param EventId $eventId
-     *
-     * @return void
      */
     public function acknowledgeEventId(EventId $eventId): void
     {
+        /** @psalm-suppress PossiblyNullReference */
         $this->subscription->notifyEventsProcessed([$eventId]);
     }
 
@@ -216,12 +219,11 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
      * Acknowledge that a message have completed processing (this will tell the server it has been processed)
      * Note: There is no need to ack a message if you have Auto Ack enabled
      *
-     * @param EventId[] $eventIds
-     *
-     * @return void
+     * @param list<EventId> $eventIds
      */
     public function acknowledgeMultipleEventIds(array $eventIds): void
     {
+        /** @psalm-suppress PossiblyNullReference */
         $this->subscription->notifyEventsProcessed($eventIds);
     }
 
@@ -233,15 +235,14 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
         PersistentSubscriptionNakEventAction $action,
         string $reason
     ): void {
+        /** @psalm-suppress PossiblyNullReference */
         $this->subscription->notifyEventsFailed([$event->originalEvent()->eventId()], $action, $reason);
     }
 
     /**
      * Mark n messages that have failed processing. The server will take action based upon the action parameter
      *
-     * @param InternalResolvedEvent[] $events
-     * @param PersistentSubscriptionNakEventAction $action
-     * @param string $reason
+     * @param list<InternalResolvedEvent> $events
      */
     public function failMultiple(
         array $events,
@@ -249,24 +250,27 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
         string $reason
     ): void {
         $ids = \array_map(
+            /** @psalm-suppress PossiblyNullReference */
             fn (InternalResolvedEvent $event): EventId => $event->originalEvent()->eventId(),
             $events
         );
 
+        /** @psalm-suppress PossiblyNullReference */
         $this->subscription->notifyEventsFailed($ids, $action, $reason);
     }
 
     public function failEventId(EventId $eventId, PersistentSubscriptionNakEventAction $action, string $reason): void
     {
+        /** @psalm-suppress PossiblyNullReference */
         $this->subscription->notifyEventsFailed([$eventId], $action, $reason);
     }
 
+    /**
+     * @param list<EventId> $eventIds
+     */
     public function failMultipleEventIds(array $eventIds, PersistentSubscriptionNakEventAction $action, string $reason): void
     {
-        foreach ($eventIds as $eventId) {
-            \assert($eventId instanceof EventId);
-        }
-
+        /** @psalm-suppress PossiblyNullReference */
         $this->subscription->notifyEventsFailed($eventIds, $action, $reason);
     }
 
@@ -285,7 +289,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
             return new Success();
         }
 
-        return Promise\timeoutWithDefault($this->stopped->promise(), $timeout, false);
+        return Promise\timeoutWithDefault($this->stopped->promise(), $timeout);
     }
 
     private function enqueueSubscriptionDropNotification(
@@ -297,15 +301,15 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
             $this->dropData = new DropData($reason, $error);
 
             $this->enqueue(
-                new PersistentSubscriptionResolvedEvent(self::$dropSubscriptionEvent, null)
+                new PersistentSubscriptionResolvedEvent($this->dropSubscriptionEvent, null)
             );
         }
     }
 
     private function onSubscriptionDropped(
         SubscriptionDropReason $reason,
-        ?Throwable $exception): void
-    {
+        ?Throwable $exception
+    ): void {
         $this->enqueueSubscriptionDropNotification($reason, $exception);
     }
 
@@ -319,7 +323,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
 
     private function enqueue(PersistentSubscriptionResolvedEvent $resolvedEvent): void
     {
-        $this->queue[] = $resolvedEvent;
+        $this->queue->enqueue($resolvedEvent);
 
         if (! $this->isProcessing) {
             $this->isProcessing = true;
@@ -342,7 +346,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
                         $e = $this->queue->dequeue();
                         \assert($e instanceof PersistentSubscriptionResolvedEvent);
 
-                        if ($e->event() === self::$dropSubscriptionEvent) {
+                        if ($e->event() === $this->dropSubscriptionEvent) {
                             // drop subscription artificial ResolvedEvent
 
                             if (null === $this->dropData) {
@@ -364,10 +368,12 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
                             yield ($this->eventAppeared)($this, $e->event(), $e->retryCount());
 
                             if ($this->autoAck) {
+                                /** @psalm-suppress PossiblyNullReference */
                                 $this->subscription->notifyEventsProcessed([$e->originalEvent()->eventId()]);
                             }
 
                             if ($this->verbose) {
+                                /** @psalm-suppress PossiblyNullReference */
                                 $this->log->debug(\sprintf(
                                     'Persistent Subscription to %s: processed event (%s, %d, %s @ %d)',
                                     $this->streamId,

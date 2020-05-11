@@ -29,7 +29,10 @@ use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Psr\Log\LoggerInterface as Logger;
 
-/** @internal */
+/**
+ * @internal
+ * @extends AbstractOperation<DeletePersistentSubscriptionCompleted, PersistentSubscriptionDeleteResult>
+ */
 class DeletePersistentSubscriptionOperation extends AbstractOperation
 {
     private string $stream;
@@ -64,10 +67,12 @@ class DeletePersistentSubscriptionOperation extends AbstractOperation
         return $message;
     }
 
+    /**
+     * @param DeletePersistentSubscriptionCompleted $response
+     * @return InspectionResult
+     */
     protected function inspectResponse(Message $response): InspectionResult
     {
-        \assert($response instanceof DeletePersistentSubscriptionCompleted);
-
         switch ($response->getResult()) {
             case DeletePersistentSubscriptionResult::Success:
                 $this->succeed($response);
@@ -99,10 +104,12 @@ class DeletePersistentSubscriptionOperation extends AbstractOperation
         }
     }
 
+    /**
+     * @param DeletePersistentSubscriptionCompleted $response
+     * @return PersistentSubscriptionDeleteResult
+     */
     protected function transformResponse(Message $response): PersistentSubscriptionDeleteResult
     {
-        \assert($response instanceof DeletePersistentSubscriptionCompleted);
-
         if (0 === $response->getResult()) {
             $status = PersistentSubscriptionDeleteStatus::success();
         } else {

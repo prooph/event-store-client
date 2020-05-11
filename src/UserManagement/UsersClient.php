@@ -16,8 +16,8 @@ namespace Prooph\EventStoreClient\UserManagement;
 use Amp\Deferred;
 use Amp\Http\Client\Response;
 use Amp\Promise;
+use JsonException;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\Exception\JsonException;
 use Prooph\EventStore\Exception\UnexpectedValueException;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\Transport\Http\HttpStatusCode;
@@ -45,6 +45,7 @@ class UsersClient
         $this->operationTimeout = $operationTimeout;
     }
 
+    /** @return Promise<void> */
     public function enable(
         EndPoint $endPoint,
         string $login,
@@ -64,6 +65,7 @@ class UsersClient
         );
     }
 
+    /** @return Promise<void> */
     public function disable(
         EndPoint $endPoint,
         string $login,
@@ -83,6 +85,7 @@ class UsersClient
         );
     }
 
+    /** @return Promise<void> */
     public function delete(
         EndPoint $endPoint,
         string $login,
@@ -101,7 +104,11 @@ class UsersClient
         );
     }
 
-    /** @return Promise<UserDetails[]> */
+    /**
+     * @return Promise<list<UserDetails>>
+     *
+     * @psalm-suppress MixedReturnTypeCoercion
+     */
     public function listAll(
         EndPoint $endPoint,
         ?UserCredentials $userCredentials = null,
@@ -122,8 +129,10 @@ class UsersClient
                 return;
             }
 
-            if (! \is_string($body)) {
+            if (null === $body) {
                 $deferred->fail(new UnexpectedValueException('No content received'));
+
+                return;
             }
 
             try {
@@ -134,19 +143,21 @@ class UsersClient
                 return;
             }
 
-            $userDetails = [];
-
-            foreach ($data['data'] as $entry) {
-                $userDetails[] = UserDetails::fromArray($entry);
-            }
-
-            $deferred->resolve($userDetails);
+            /** @psalm-suppress MixedArgument */
+            $deferred->resolve(\array_map(
+                fn (array $entry): UserDetails => UserDetails::fromArray($entry),
+                $data['data']
+            ));
         });
 
         return $deferred->promise();
     }
 
-    /** @return Promise<UserDetails> */
+    /**
+     * @return Promise<UserDetails>
+     *
+     * @psalm-suppress MixedReturnTypeCoercion
+     */
     public function getCurrentUser(
         EndPoint $endPoint,
         ?UserCredentials $userCredentials = null,
@@ -171,8 +182,10 @@ class UsersClient
                 return;
             }
 
-            if (! \is_string($body)) {
+            if (null === $body) {
                 $deferred->fail(new UnexpectedValueException('No content received'));
+
+                return;
             }
 
             try {
@@ -183,13 +196,18 @@ class UsersClient
                 return;
             }
 
+            /** @psalm-suppress MixedArgument */
             $deferred->resolve(UserDetails::fromArray($data['data']));
         });
 
         return $deferred->promise();
     }
 
-    /** @return Promise<UserDetails> */
+    /**
+     * @return Promise<UserDetails>
+     *
+     * @psalm-suppress MixedReturnTypeCoercion
+     */
     public function getUser(
         EndPoint $endPoint,
         string $login,
@@ -216,8 +234,10 @@ class UsersClient
                 return;
             }
 
-            if (! \is_string($body)) {
+            if (null === $body) {
                 $deferred->fail(new UnexpectedValueException('No content received'));
+
+                return;
             }
 
             try {
@@ -228,12 +248,14 @@ class UsersClient
                 return;
             }
 
+            /** @psalm-suppress MixedArgument */
             $deferred->resolve(UserDetails::fromArray($data['data']));
         });
 
         return $deferred->promise();
     }
 
+    /** @return Promise<void> */
     public function createUser(
         EndPoint $endPoint,
         UserCreationInformation $newUser,
@@ -252,6 +274,7 @@ class UsersClient
         );
     }
 
+    /** @return Promise<void> */
     public function updateUser(
         EndPoint $endPoint,
         string $login,
@@ -272,6 +295,7 @@ class UsersClient
         );
     }
 
+    /** @return Promise<void> */
     public function changePassword(
         EndPoint $endPoint,
         string $login,
@@ -292,6 +316,7 @@ class UsersClient
         );
     }
 
+    /** @return Promise<void> */
     public function resetPassword(
         EndPoint $endPoint,
         string $login,
@@ -312,6 +337,11 @@ class UsersClient
         );
     }
 
+    /**
+     * @return Promise<string>
+     *
+     * @psalm-suppress MixedReturnTypeCoercion
+     */
     private function sendGet(
         string $url,
         ?UserCredentials $userCredentials,
@@ -345,6 +375,11 @@ class UsersClient
         return $deferred->promise();
     }
 
+    /**
+     * @return Promise<void>
+     *
+     * @psalm-suppress MixedReturnTypeCoercion
+     */
     private function sendDelete(
         string $url,
         ?UserCredentials $userCredentials,
@@ -378,6 +413,11 @@ class UsersClient
         return $deferred->promise();
     }
 
+    /**
+     * @return Promise<void>
+     *
+     * @psalm-suppress MixedReturnTypeCoercion
+     */
     private function sendPut(
         string $url,
         string $content,
@@ -393,7 +433,7 @@ class UsersClient
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve(null);
+                    $deferred->resolve();
                 } else {
                     $deferred->fail(new UserCommandFailed(
                         $response->getStatus(),
@@ -414,6 +454,11 @@ class UsersClient
         return $deferred->promise();
     }
 
+    /**
+     * @return Promise<void>
+     *
+     * @psalm-suppress MixedReturnTypeCoercion
+     */
     private function sendPost(
         string $url,
         string $content,
@@ -429,7 +474,7 @@ class UsersClient
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve(null);
+                    $deferred->resolve();
                 } elseif ($response->getStatus() === HttpStatusCode::CONFLICT) {
                     $deferred->fail(new UserCommandConflict($response->getStatus(), $response->getReason()));
                 } else {

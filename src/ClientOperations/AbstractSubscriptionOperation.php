@@ -63,7 +63,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
     private SplQueue $actionQueue;
     private ?EventStoreSubscription $subscription = null;
     private bool $unsubscribed = false;
-    protected string $correlationId;
+    protected string $correlationId = '';
 
     public function __construct(
         Logger $logger,
@@ -263,7 +263,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
                     'Subscription %s to %s: closing subscription, reason: %s, exception: %s...',
                     $this->correlationId,
                     $this->streamId ? $this->streamId : '<all>',
-                    $reason,
+                    (string) $reason,
                     $exception ? $exception->getMessage() : '<none>'
                 ));
             }
@@ -337,6 +337,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
         }
 
         if ($this->verboseLogging) {
+            /** @psalm-suppress PossiblyNullReference */
             $this->log->debug(\sprintf(
                 'Subscription %s to %s: event appeared (%s, %d, %s @ %s)',
                 $this->correlationId,

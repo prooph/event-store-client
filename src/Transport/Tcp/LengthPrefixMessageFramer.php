@@ -23,11 +23,17 @@ class LengthPrefixMessageFramer
 {
     private int $maxPackageSize;
     private ?string $messageBuffer = null;
+    /** @var Closure(string): void */
     private Closure $receivedHandler;
     private int $packageLength = 0;
 
-    public function __construct(int $maxPackageSize = 64 * 1024 * 1024)
+    /**
+     * @param Closure(string): void $handler
+     */
+    public function __construct(Closure $handler, int $maxPackageSize = 64 * 1024 * 1024)
     {
+        $this->receivedHandler = $handler;
+
         if ($maxPackageSize < 1) {
             throw new InvalidArgumentException('Max package size must be positive');
         }
@@ -57,6 +63,7 @@ class LengthPrefixMessageFramer
         }
 
         if (0 === $this->packageLength) {
+            /** @var int $this->packageLength */
             list('length' => $this->packageLength) = \unpack('Vlength', \substr($data, 0, 4));
             $this->packageLength += TcpPackage::DATA_OFFSET;
         }
@@ -88,10 +95,5 @@ class LengthPrefixMessageFramer
         } else {
             $this->messageBuffer = $data;
         }
-    }
-
-    public function registerMessageArrivedCallback(Closure $handler): void
-    {
-        $this->receivedHandler = $handler;
     }
 }

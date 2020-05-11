@@ -18,7 +18,6 @@ use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventData;
@@ -76,15 +75,11 @@ class persistent_subscription_manager extends AsyncTestCase
         $this->sub = yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             'existing',
-            new class() implements EventAppearedOnPersistentSubscription {
-                public function __invoke(
-                    EventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent,
-                    ?int $retryCount = null
-                ): Promise {
-                    return new Success();
-                }
-            },
+            fn (
+                EventStorePersistentSubscription $subscription,
+                ResolvedEvent $resolvedEvent,
+                ?int $retryCount = null
+            ): Promise => new Success(),
             null,
             10,
             true,
@@ -207,20 +202,18 @@ class persistent_subscription_manager extends AsyncTestCase
             $this->sub = yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->stream,
                 'existing',
-                new class() implements EventAppearedOnPersistentSubscription {
-                    public function __invoke(
-                        EventStorePersistentSubscription $subscription,
-                        ResolvedEvent $resolvedEvent,
-                        ?int $retryCount = null
-                    ): Promise {
-                        $subscription->fail(
-                            $resolvedEvent,
-                            PersistentSubscriptionNakEventAction::park(),
-                            'testing'
-                        );
+                function (
+                    EventStorePersistentSubscription $subscription,
+                    ResolvedEvent $resolvedEvent,
+                    ?int $retryCount = null
+                ): Promise {
+                    $subscription->fail(
+                        $resolvedEvent,
+                        PersistentSubscriptionNakEventAction::park(),
+                        'testing'
+                    );
 
-                        return new Success();
-                    }
+                    return new Success();
                 },
                 null,
                 10,
@@ -248,29 +241,20 @@ class persistent_subscription_manager extends AsyncTestCase
             yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->stream,
                 'existing',
-                new class($event) implements EventAppearedOnPersistentSubscription {
-                    private CountdownEvent $event;
+                function (
+                    EventStorePersistentSubscription $subscription,
+                    ResolvedEvent $resolvedEvent,
+                    ?int $retryCount = null
+                ) use ($event): Promise {
+                    $subscription->fail(
+                        $resolvedEvent,
+                        PersistentSubscriptionNakEventAction::park(),
+                        'testing'
+                    );
 
-                    public function __construct(CountdownEvent $event)
-                    {
-                        $this->event = $event;
-                    }
+                    $event->signal();
 
-                    public function __invoke(
-                        EventStorePersistentSubscription $subscription,
-                        ResolvedEvent $resolvedEvent,
-                        ?int $retryCount = null
-                    ): Promise {
-                        $subscription->fail(
-                            $resolvedEvent,
-                            PersistentSubscriptionNakEventAction::park(),
-                            'testing'
-                        );
-
-                        $this->event->signal();
-
-                        return new Success();
-                    }
+                    return new Success();
                 },
                 null,
                 10,

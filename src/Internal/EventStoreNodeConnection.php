@@ -16,15 +16,9 @@ namespace Prooph\EventStoreClient\Internal;
 use Amp\Deferred;
 use Amp\Promise;
 use Closure;
-use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
-use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
-use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Async\EventStoreTransaction;
 use Prooph\EventStore\Async\Internal\EventStoreTransactionConnection;
-use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
-use Prooph\EventStore\Async\PersistentSubscriptionDropped;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\Common\SystemEventTypes;
 use Prooph\EventStore\Common\SystemStreams;
@@ -44,7 +38,6 @@ use Prooph\EventStore\Position;
 use Prooph\EventStore\RawStreamMetadataResult;
 use Prooph\EventStore\StreamMetadata;
 use Prooph\EventStore\StreamMetadataResult;
-use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SystemSettings;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStore\Util\Guid;
@@ -110,6 +103,7 @@ final class EventStoreNodeConnection implements
         return $this->connectionName;
     }
 
+    /** {@inheritdoc} */
     public function connectAsync(): Promise
     {
         $deferred = new Deferred();
@@ -123,6 +117,7 @@ final class EventStoreNodeConnection implements
         $this->handler->enqueueMessage(new CloseConnectionMessage('Connection close requested by client'));
     }
 
+    /** {@inheritdoc} */
     public function deleteStreamAsync(
         string $stream,
         int $expectedVersion,
@@ -200,6 +195,7 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
+    /** {@inheritdoc} */
     public function readEventAsync(
         string $stream,
         int $eventNumber,
@@ -229,6 +225,7 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
+    /** {@inheritdoc} */
     public function readStreamEventsForwardAsync(
         string $stream,
         int $start,
@@ -271,6 +268,7 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
+    /** {@inheritdoc} */
     public function readStreamEventsBackwardAsync(
         string $stream,
         int $start,
@@ -309,6 +307,7 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
+    /** {@inheritdoc} */
     public function readAllEventsForwardAsync(
         Position $position,
         int $count,
@@ -341,6 +340,7 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
+    /** {@inheritdoc} */
     public function readAllEventsBackwardAsync(
         Position $position,
         int $count,
@@ -373,6 +373,7 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
+    /** {@inheritdoc} */
     public function setStreamMetadataAsync(
         string $stream,
         int $expectedMetaStreamVersion,
@@ -389,6 +390,7 @@ final class EventStoreNodeConnection implements
         );
     }
 
+    /** {@inheritdoc} */
     public function setRawStreamMetadataAsync(
         string $stream,
         int $expectedMetaStreamVersion,
@@ -428,6 +430,7 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
+    /** {@inheritdoc} */
     public function getStreamMetadataAsync(string $stream, ?UserCredentials $userCredentials = null): Promise
     {
         $deferred = new Deferred();
@@ -472,6 +475,7 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
+    /** {@inheritdoc} */
     public function getRawStreamMetadataAsync(string $stream, ?UserCredentials $userCredentials = null): Promise
     {
         if (empty($stream)) {
@@ -542,6 +546,7 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
+    /** {@inheritdoc} */
     public function setSystemSettingsAsync(SystemSettings $settings, ?UserCredentials $userCredentials = null): Promise
     {
         return $this->appendToStreamAsync(
@@ -581,6 +586,7 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
+    /** {@inheritdoc} */
     public function updatePersistentSubscriptionAsync(
         string $stream,
         string $groupName,
@@ -609,6 +615,7 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
+    /** {@inheritdoc} */
     public function deletePersistentSubscriptionAsync(
         string $stream,
         string $groupName,
@@ -639,8 +646,8 @@ final class EventStoreNodeConnection implements
     public function subscribeToStreamAsync(
         string $stream,
         bool $resolveLinkTos,
-        EventAppearedOnSubscription $eventAppeared,
-        ?SubscriptionDropped $subscriptionDropped = null,
+        Closure $eventAppeared,
+        ?Closure $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
@@ -668,9 +675,9 @@ final class EventStoreNodeConnection implements
         string $stream,
         ?int $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
-        EventAppearedOnCatchupSubscription $eventAppeared,
-        ?LiveProcessingStartedOnCatchUpSubscription $liveProcessingStarted = null,
-        ?CatchUpSubscriptionDropped $subscriptionDropped = null,
+        Closure $eventAppeared,
+        ?Closure $liveProcessingStarted = null,
+        ?Closure $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
         if (empty($stream)) {
@@ -701,8 +708,8 @@ final class EventStoreNodeConnection implements
     /** {@inheritdoc} */
     public function subscribeToAllAsync(
         bool $resolveLinkTos,
-        EventAppearedOnSubscription $eventAppeared,
-        ?SubscriptionDropped $subscriptionDropped = null,
+        Closure $eventAppeared,
+        ?Closure $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
@@ -721,12 +728,13 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
+    /** {@inheritdoc} */
     public function subscribeToAllFromAsync(
         ?Position $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
-        EventAppearedOnCatchupSubscription $eventAppeared,
-        ?LiveProcessingStartedOnCatchUpSubscription $liveProcessingStarted = null,
-        ?CatchUpSubscriptionDropped $subscriptionDropped = null,
+        Closure $eventAppeared,
+        ?Closure $liveProcessingStarted = null,
+        ?Closure $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
     ): Promise {
         if (null === $settings) {
@@ -753,8 +761,8 @@ final class EventStoreNodeConnection implements
     public function connectToPersistentSubscriptionAsync(
         string $stream,
         string $groupName,
-        EventAppearedOnPersistentSubscription $eventAppeared,
-        ?PersistentSubscriptionDropped $subscriptionDropped = null,
+        Closure $eventAppeared,
+        ?Closure $subscriptionDropped = null,
         int $bufferSize = 10,
         bool $autoAck = true,
         ?UserCredentials $userCredentials = null
@@ -784,6 +792,7 @@ final class EventStoreNodeConnection implements
         return $subscription->start();
     }
 
+    /** {@inheritdoc} */
     public function startTransactionAsync(
         string $stream,
         int $expectedVersion,
@@ -808,6 +817,7 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
+    /** {@inheritdoc} */
     public function continueTransaction(
         int $transactionId,
         ?UserCredentials $userCredentials = null
@@ -819,6 +829,7 @@ final class EventStoreNodeConnection implements
         return new EventStoreTransaction($transactionId, $userCredentials, $this);
     }
 
+    /** {@inheritdoc} */
     public function transactionalWriteAsync(
         EventStoreTransaction $transaction,
         array $events,
@@ -838,6 +849,7 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
+    /** {@inheritdoc} */
     public function commitTransactionAsync(
         EventStoreTransaction $transaction,
         ?UserCredentials $userCredentials
@@ -855,31 +867,37 @@ final class EventStoreNodeConnection implements
         return $deferred->promise();
     }
 
+    /** {@inheritdoc} */
     public function onConnected(Closure $handler): ListenerHandler
     {
         return $this->handler->onConnected($handler);
     }
 
+    /** {@inheritdoc} */
     public function onDisconnected(Closure $handler): ListenerHandler
     {
         return $this->handler->onDisconnected($handler);
     }
 
+    /** {@inheritdoc} */
     public function onReconnecting(Closure $handler): ListenerHandler
     {
         return $this->handler->onReconnecting($handler);
     }
 
+    /** {@inheritdoc} */
     public function onClosed(Closure $handler): ListenerHandler
     {
         return $this->handler->onClosed($handler);
     }
 
+    /** {@inheritdoc} */
     public function onErrorOccurred(Closure $handler): ListenerHandler
     {
         return $this->handler->onErrorOccurred($handler);
     }
 
+    /** {@inheritdoc} */
     public function onAuthenticationFailed(Closure $handler): ListenerHandler
     {
         return $this->handler->onAuthenticationFailed($handler);

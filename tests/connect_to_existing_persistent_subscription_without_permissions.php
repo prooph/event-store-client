@@ -17,7 +17,6 @@ use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\PersistentSubscriptionSettings;
@@ -54,14 +53,12 @@ class connect_to_existing_persistent_subscription_without_permissions extends As
         yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             'agroupname55',
-            new class() implements EventAppearedOnPersistentSubscription {
-                public function __invoke(
-                    EventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent,
-                    ?int $retryCount = null
-                ): Promise {
-                    return new Success();
-                }
+            function (
+                EventStorePersistentSubscription $subscription,
+                ResolvedEvent $resolvedEvent,
+                ?int $retryCount = null
+            ): Promise {
+                return new Success();
             }
         );
     }

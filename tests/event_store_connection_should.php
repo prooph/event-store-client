@@ -16,7 +16,6 @@ namespace ProophTest\EventStoreClient;
 use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
-use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\Position;
@@ -109,13 +108,11 @@ class event_store_connection_should extends AsyncTestCase
             yield $connection->subscribeToStreamAsync(
                 $s,
                 false,
-                new class() implements EventAppearedOnSubscription {
-                    public function __invoke(
-                        EventStoreSubscription $subscription,
-                        ResolvedEvent $resolvedEvent
-                    ): Promise {
-                        return new Success();
-                    }
+                function (
+                    EventStoreSubscription $subscription,
+                    ResolvedEvent $resolvedEvent
+                ): Promise {
+                    return new Success();
                 }
             );
 
@@ -127,13 +124,11 @@ class event_store_connection_should extends AsyncTestCase
         try {
             yield $connection->subscribeToAllAsync(
                 false,
-                new class() implements EventAppearedOnSubscription {
-                    public function __invoke(
-                        EventStoreSubscription $subscription,
-                        ResolvedEvent $resolvedEvent
-                    ): Promise {
-                        return new Success();
-                    }
+                function (
+                    EventStoreSubscription $subscription,
+                    ResolvedEvent $resolvedEvent
+                ): Promise {
+                    return new Success();
                 }
             );
 

@@ -26,13 +26,15 @@ use Prooph\EventStoreClient\Internal\EventMessageConverter;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEvents;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEventsCompleted;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadStreamEventsCompleted\ReadStreamResult;
-use Prooph\EventStoreClient\Messages\ClientMessages\ResolvedIndexedEvent;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Psr\Log\LoggerInterface as Logger;
 
-/** @internal */
+/**
+ * @internal
+ * @extends AbstractOperation<ReadStreamEventsCompleted, StreamEventsSlice>
+ */
 class ReadStreamEventsForwardOperation extends AbstractOperation
 {
     private bool $requireMaster;
@@ -79,10 +81,12 @@ class ReadStreamEventsForwardOperation extends AbstractOperation
         return $message;
     }
 
+    /**
+     * @param ReadStreamEventsCompleted $response
+     * @return InspectionResult
+     */
     protected function inspectResponse(Message $response): InspectionResult
     {
-        \assert($response instanceof ReadStreamEventsCompleted);
-
         switch ($response->getResult()) {
             case ReadStreamResult::Success:
                 $this->succeed($response);
@@ -109,25 +113,20 @@ class ReadStreamEventsForwardOperation extends AbstractOperation
         }
     }
 
+    /**
+     * @param ReadStreamEventsCompleted $response
+     * @return StreamEventsSlice
+     */
     protected function transformResponse(Message $response): StreamEventsSlice
     {
-        /* @var ReadStreamEventsCompleted $response */
-        $records = $response->getEvents();
-
         $resolvedEvents = [];
 
-        foreach ($records as $record) {
-            \assert($record instanceof ResolvedIndexedEvent);
-
-            if ($event = $record->getEvent()) {
-                $event = EventMessageConverter::convertEventRecordMessageToEventRecord($record->getEvent());
-            }
-
-            if ($link = $record->getLink()) {
-                $link = EventMessageConverter::convertEventRecordMessageToEventRecord($link);
-            }
-
-            $resolvedEvents[] = new ResolvedEvent($event, $link, null);
+        foreach ($response->getEvents() as $record) {
+            $resolvedEvents[] = new ResolvedEvent(
+                EventMessageConverter::convertEventRecordMessageToEventRecord($record->getEvent()),
+                EventMessageConverter::convertEventRecordMessageToEventRecord($record->getLink()),
+                null
+            );
         }
 
         return new StreamEventsSlice(
@@ -136,8 +135,8 @@ class ReadStreamEventsForwardOperation extends AbstractOperation
             $this->fromEventNumber,
             ReadDirection::forward(),
             $resolvedEvents,
-            $response->getNextEventNumber(),
-            $response->getLastEventNumber(),
+            (int) $response->getNextEventNumber(),
+            (int) $response->getLastEventNumber(),
             $response->getIsEndOfStream()
         );
     }

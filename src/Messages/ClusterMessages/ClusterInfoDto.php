@@ -13,26 +13,18 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Messages\ClusterMessages;
 
-use Prooph\EventStore\Exception\InvalidArgumentException;
-
 class ClusterInfoDto
 {
-    /** @var MemberInfoDto[] */
+    /** @var list<MemberInfoDto> */
     private array $members = [];
 
-    /** @param MemberInfoDto[] */
+    /** @param list<MemberInfoDto> $members */
     public function __construct(array $members = [])
     {
-        foreach ($members as $member) {
-            if (! $member instanceof MemberInfoDto) {
-                throw new InvalidArgumentException('Expected an array of MemberInfoDto');
-            }
-
-            $this->members[] = $member;
-        }
+        $this->members = $members;
     }
 
-    /** @return MemberInfoDto[] */
+    /** @return list<MemberInfoDto> */
     public function members(): array
     {
         return $this->members;

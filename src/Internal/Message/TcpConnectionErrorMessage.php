@@ -28,16 +28,19 @@ class TcpConnectionErrorMessage implements Message
         $this->exception = $exception;
     }
 
+    /** @psalm-pure */
     public function tcpPackageConnection(): TcpPackageConnection
     {
         return $this->tcpPackageConnection;
     }
 
+    /** @psalm-pure */
     public function exception(): Throwable
     {
         return $this->exception;
     }
 
+    /** @psalm-pure */
     public function __toString(): string
     {
         return 'TcpConnectionErrorMessage';

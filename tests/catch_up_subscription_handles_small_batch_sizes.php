@@ -18,10 +18,9 @@ use Amp\Promise;
 use function Amp\Promise\timeout;
 use Amp\Success;
 use Amp\TimeoutException;
+use Closure;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
 use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
-use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
@@ -110,33 +109,21 @@ class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnecti
         }
     }
 
-    private function eventAppearedResolver(): EventAppearedOnCatchupSubscription
+    private function eventAppearedResolver(): Closure
     {
-        return new class() implements EventAppearedOnCatchupSubscription {
-            public function __invoke(
-                EventStoreCatchUpSubscription $subscription,
-                ResolvedEvent $resolvedEvent
-            ): Promise {
-                return new Success();
-            }
+        return function (
+            EventStoreCatchUpSubscription $subscription,
+            ResolvedEvent $resolvedEvent
+        ): Promise {
+            return new Success();
         };
     }
 
     private function liveProcessingStartedResolver(
         Deferred $deferred
-    ): LiveProcessingStartedOnCatchUpSubscription {
-        return new class($deferred) implements LiveProcessingStartedOnCatchUpSubscription {
-            private Deferred $deferred;
-
-            public function __construct(Deferred $deferred)
-            {
-                $this->deferred = $deferred;
-            }
-
-            public function __invoke(EventStoreCatchUpSubscription $subscription): void
-            {
-                $this->deferred->resolve(true);
-            }
+    ): Closure {
+        return function (EventStoreCatchUpSubscription $subscription) use ($deferred): void {
+            $deferred->resolve(true);
         };
     }
 }

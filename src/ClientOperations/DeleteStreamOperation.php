@@ -31,7 +31,10 @@ use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Psr\Log\LoggerInterface as Logger;
 
-/** @internal */
+/**
+ * @internal
+ * @extends AbstractOperation<DeleteStreamCompleted, DeleteResult>
+ */
 class DeleteStreamOperation extends AbstractOperation
 {
     private bool $requireMaster;
@@ -74,10 +77,12 @@ class DeleteStreamOperation extends AbstractOperation
         return $message;
     }
 
+    /**
+     * @param DeleteStreamCompleted $response
+     * @return InspectionResult
+     */
     public function inspectResponse(Message $response): InspectionResult
     {
-        /** @var DeleteStreamCompleted $response */
-
         switch ($response->getResult()) {
             case OperationResult::Success:
                 $this->succeed($response);
@@ -116,13 +121,18 @@ class DeleteStreamOperation extends AbstractOperation
         }
     }
 
+    /**
+     * @param DeleteStreamCompleted $response
+     * @return DeleteResult
+     */
     protected function transformResponse(Message $response): DeleteResult
     {
-        \assert($response instanceof DeleteStreamCompleted);
-
-        return new DeleteResult(new Position(
-            $response->getCommitPosition() ?? -1,
-            $response->getCommitPosition() ?? -1)
+        /** @psalm-suppress DocblockTypeContradiction */
+        return new DeleteResult(
+            new Position(
+                (int) ($response->getCommitPosition() ?? -1),
+                (int) ($response->getCommitPosition() ?? -1)
+            )
         );
     }
 

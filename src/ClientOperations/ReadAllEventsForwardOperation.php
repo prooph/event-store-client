@@ -26,13 +26,15 @@ use Prooph\EventStoreClient\Internal\EventMessageConverter;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadAllEvents;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadAllEventsCompleted;
 use Prooph\EventStoreClient\Messages\ClientMessages\ReadAllEventsCompleted\ReadAllResult;
-use Prooph\EventStoreClient\Messages\ClientMessages\ResolvedEvent as ResolvedEventMessage;
 use Prooph\EventStoreClient\SystemData\InspectionDecision;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Psr\Log\LoggerInterface as Logger;
 
-/** @internal */
+/**
+ * @internal
+ * @extends AbstractOperation<ReadAllEventsCompleted, AllEventsSlice>
+ */
 class ReadAllEventsForwardOperation extends AbstractOperation
 {
     private bool $requireMaster;
@@ -76,10 +78,12 @@ class ReadAllEventsForwardOperation extends AbstractOperation
         return $message;
     }
 
+    /**
+     * @param ReadAllEventsCompleted $response
+     * @return InspectionResult
+     */
     protected function inspectResponse(Message $response): InspectionResult
     {
-        \assert($response instanceof ReadAllEventsCompleted);
-
         switch ($response->getResult()) {
             case ReadAllResult::Success:
                 $this->succeed($response);
@@ -98,31 +102,29 @@ class ReadAllEventsForwardOperation extends AbstractOperation
         }
     }
 
+    /**
+     * @param ReadAllEventsCompleted $response
+     * @return AllEventsSlice
+     */
     protected function transformResponse(Message $response): AllEventsSlice
     {
-        /* @var ReadAllEventsCompleted $response */
-        $records = $response->getEvents();
-
         $resolvedEvents = [];
 
-        foreach ($records as $record) {
-            \assert($record instanceof ResolvedEventMessage);
-
-            if ($event = $record->getEvent()) {
-                $event = EventMessageConverter::convertEventRecordMessageToEventRecord($record->getEvent());
-            }
-
-            if ($link = $record->getLink()) {
-                $link = EventMessageConverter::convertEventRecordMessageToEventRecord($link);
-            }
-
-            $resolvedEvents[] = new ResolvedEvent($event, $link, new Position($record->getCommitPosition(), $record->getPreparePosition()));
+        foreach ($response->getEvents() as $record) {
+            $resolvedEvents[] = new ResolvedEvent(
+                EventMessageConverter::convertEventRecordMessageToEventRecord($record->getEvent()),
+                EventMessageConverter::convertEventRecordMessageToEventRecord($record->getLink()),
+                new Position(
+                    $record->getCommitPosition(),
+                    $record->getPreparePosition()
+                )
+            );
         }
 
         return new AllEventsSlice(
             ReadDirection::forward(),
-            new Position($response->getCommitPosition(), $response->getPreparePosition()),
-            new Position($response->getNextCommitPosition(), $response->getNextPreparePosition()),
+            new Position((int) $response->getCommitPosition(), (int) $response->getPreparePosition()),
+            new Position((int) $response->getNextCommitPosition(), (int) $response->getNextPreparePosition()),
             $resolvedEvents
         );
     }
@@ -135,7 +137,7 @@ class ReadAllEventsForwardOperation extends AbstractOperation
     public function __toString(): string
     {
         return \sprintf('Position: %s, MaxCount: %d, ResolveLinkTos: %s, RequireMaster: %s',
-            $this->position,
+            (string) $this->position,
             $this->maxCount,
             $this->resolveLinkTos ? 'yes' : 'no',
             $this->requireMaster ? 'yes' : 'no'

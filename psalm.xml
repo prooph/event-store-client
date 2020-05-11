@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<psalm
+    totallyTyped="false"
+    errorLevel="2"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+    <projectFiles>
+        <directory name="src" />
+        <directory name="examples" />
+        <ignoreFiles>
+            <directory name="src/Messages/ClientMessages" />
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+
+    <issueHandlers>
+        <ForbiddenCode>
+            <errorLevel type="suppress">
+                <directory name="examples"/>
+            </errorLevel>
+        </ForbiddenCode>
+        <PossiblyNullReference>
+            <errorLevel type="suppress">
+                <directory name="examples"/>
+            </errorLevel>
+        </PossiblyNullReference>
+    </issueHandlers>
+</psalm>

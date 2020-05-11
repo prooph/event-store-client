@@ -17,12 +17,9 @@ use Amp\Deferred;
 use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\TimeoutException;
-use Closure;
 use Exception;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
-use Prooph\EventStore\Async\PersistentSubscriptionDropped;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
 use Prooph\EventStore\ExpectedVersion;
@@ -77,30 +74,19 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
         yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
-            new class() implements EventAppearedOnPersistentSubscription {
-                public function __invoke(
-                    EventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent,
-                    ?int $retryCount = null
-                ): Promise {
-                    throw new \Exception('test');
-                }
+            function (
+                EventStorePersistentSubscription $subscription,
+                ResolvedEvent $resolvedEvent,
+                ?int $retryCount = null
+            ): Promise {
+                throw new \Exception('test');
             },
-            new class(Closure::fromCallable($dropBehaviour)) implements PersistentSubscriptionDropped {
-                private $callback;
-
-                public function __construct(Closure $callback)
-                {
-                    $this->callback = $callback;
-                }
-
-                public function __invoke(
-                    EventStorePersistentSubscription $subscription,
-                    SubscriptionDropReason $reason,
-                    ?Throwable $exception = null
-                ): void {
-                    ($this->callback)($reason, $exception);
-                }
+            function (
+                EventStorePersistentSubscription $subscription,
+                SubscriptionDropReason $reason,
+                ?Throwable $exception = null
+            ) use ($dropBehaviour): void {
+                ($dropBehaviour)($reason, $exception);
             },
             10,
             true,

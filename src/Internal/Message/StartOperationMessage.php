@@ -15,7 +15,7 @@ namespace Prooph\EventStoreClient\Internal\Message;
 
 use Prooph\EventStoreClient\ClientOperations\ClientOperation;
 
-/** @internal  */
+/** @internal */
 class StartOperationMessage implements Message
 {
     private ClientOperation $operation;
@@ -29,21 +29,25 @@ class StartOperationMessage implements Message
         $this->timeout = $timeout;
     }
 
+    /** @psalm-pure */
     public function operation(): ClientOperation
     {
         return $this->operation;
     }
 
+    /** @psalm-pure */
     public function maxRetries(): int
     {
         return $this->maxRetries;
     }
 
+    /** @psalm-pure */
     public function timeout(): int
     {
         return $this->timeout;
     }
 
+    /** @psalm-pure */
     public function __toString(): string
     {
         return 'StartOperationMessage';

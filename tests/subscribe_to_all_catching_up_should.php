@@ -20,9 +20,6 @@ use Amp\Success;
 use Exception;
 use Generator;
 use Prooph\EventStore\AllEventsSlice;
-use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
-use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
-use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\Common\SystemRoles;
@@ -75,30 +72,19 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
         $subscription = yield $this->connection->subscribeToAllFromAsync(
             null,
             CatchUpSubscriptionSettings::default(),
-            new class() implements EventAppearedOnCatchupSubscription {
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
-                ): Promise {
-                    return new Success();
-                }
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ): Promise {
+                return new Success();
             },
             null,
-            new class($dropped) implements CatchUpSubscriptionDropped {
-                private CountdownEvent $dropped;
-
-                public function __construct(CountdownEvent $dropped)
-                {
-                    $this->dropped = $dropped;
-                }
-
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    SubscriptionDropReason $reason,
-                    ?Throwable $exception = null
-                ): void {
-                    $this->dropped->signal();
-                }
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                SubscriptionDropReason $reason,
+                ?Throwable $exception = null
+            ) use ($dropped): void {
+                $dropped->signal();
             }
         );
         \assert($subscription instanceof EventStoreAllCatchUpSubscription);
@@ -124,30 +110,19 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
         $subscription = yield $this->connection->subscribeToAllFromAsync(
             null,
             CatchUpSubscriptionSettings::default(),
-            new class() implements EventAppearedOnCatchupSubscription {
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
-                ): Promise {
-                    throw new Exception('Error');
-                }
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ): Promise {
+                throw new Exception('Error');
             },
             null,
-            new class($dropped) implements CatchUpSubscriptionDropped {
-                private CountdownEvent $dropped;
-
-                public function __construct(CountdownEvent $dropped)
-                {
-                    $this->dropped = $dropped;
-                }
-
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    SubscriptionDropReason $reason,
-                    ?Throwable $exception = null
-                ): void {
-                    $this->dropped->signal();
-                }
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                SubscriptionDropReason $reason,
+                ?Throwable $exception = null
+            ) use ($dropped): void {
+                $dropped->signal();
             }
         );
         \assert($subscription instanceof EventStoreAllCatchUpSubscription);
@@ -171,41 +146,23 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
         $subscription = yield $this->connection->subscribeToAllFromAsync(
             null,
             CatchUpSubscriptionSettings::default(),
-            new class($appeared) implements EventAppearedOnCatchupSubscription {
-                private Deferred $appeared;
-
-                public function __construct(Deferred $appeared)
-                {
-                    $this->appeared = $appeared;
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ) use ($appeared): Promise {
+                if (! SystemStreams::isSystemStream($resolvedEvent->originalEvent()->eventStreamId())) {
+                    $appeared->resolve(true);
                 }
 
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
-                ): Promise {
-                    if (! SystemStreams::isSystemStream($resolvedEvent->originalEvent()->eventStreamId())) {
-                        $this->appeared->resolve(true);
-                    }
-
-                    return new Success();
-                }
+                return new Success();
             },
             null,
-            new class($dropped) implements CatchUpSubscriptionDropped {
-                private CountdownEvent $dropped;
-
-                public function __construct(CountdownEvent $dropped)
-                {
-                    $this->dropped = $dropped;
-                }
-
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    SubscriptionDropReason $reason,
-                    ?Throwable $exception = null
-                ): void {
-                    $this->dropped->signal();
-                }
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                SubscriptionDropReason $reason,
+                ?Throwable $exception = null
+            ) use ($dropped): void {
+                $this->dropped->signal();
             }
         );
         \assert($subscription instanceof EventStoreAllCatchUpSubscription);
@@ -214,13 +171,11 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
 
         yield $this->connection->subscribeToAllAsync(
             false,
-            new class() implements EventAppearedOnSubscription {
-                public function __invoke(
-                    EventStoreSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
-                ): Promise {
-                    return new Success();
-                }
+            function (
+                EventStoreSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ): Promise {
+                return new Success();
             }
         );
 
@@ -256,44 +211,24 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
         $subscription = yield $this->connection->subscribeToAllFromAsync(
             $position,
             CatchUpSubscriptionSettings::default(),
-            new class($events, $appeared) implements EventAppearedOnCatchupSubscription {
-                private array $events;
-                private CountdownEvent $appeared;
-
-                public function __construct(array &$events, CountdownEvent $appeared)
-                {
-                    $this->events = &$events;
-                    $this->appeared = $appeared;
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ) use (&$events, $appeared): Promise {
+                if (! SystemStreams::isSystemStream($resolvedEvent->originalEvent()->eventStreamId())) {
+                    $events[] = $resolvedEvent;
+                    $appeared->signal();
                 }
 
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
-                ): Promise {
-                    if (! SystemStreams::isSystemStream($resolvedEvent->originalEvent()->eventStreamId())) {
-                        $this->events[] = $resolvedEvent;
-                        $this->appeared->signal();
-                    }
-
-                    return new Success();
-                }
+                return new Success();
             },
             null,
-            new class($dropped) implements CatchUpSubscriptionDropped {
-                private CountdownEvent $dropped;
-
-                public function __construct(CountdownEvent $dropped)
-                {
-                    $this->dropped = $dropped;
-                }
-
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    SubscriptionDropReason $reason,
-                    ?Throwable $exception = null
-                ): void {
-                    $this->dropped->signal();
-                }
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                SubscriptionDropReason $reason,
+                ?Throwable $exception = null
+            ) use ($dropped): void {
+                $dropped->signal();
             }
         );
         \assert($subscription instanceof EventStoreAllCatchUpSubscription);
@@ -352,44 +287,24 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
         $subscription = yield $this->connection->subscribeToAllFromAsync(
             $lastEvent->originalPosition(),
             CatchUpSubscriptionSettings::default(),
-            new class($events, $appeared) implements EventAppearedOnCatchupSubscription {
-                private array $events;
-                private CountdownEvent $appeared;
-
-                public function __construct(array &$events, CountdownEvent $appeared)
-                {
-                    $this->events = &$events;
-                    $this->appeared = $appeared;
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ) use (&$events, $appeared): Promise {
+                if (! SystemStreams::isSystemStream($resolvedEvent->originalEvent()->eventStreamId())) {
+                    $events[] = $resolvedEvent;
+                    $appeared->signal();
                 }
 
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
-                ): Promise {
-                    if (! SystemStreams::isSystemStream($resolvedEvent->originalEvent()->eventStreamId())) {
-                        $this->events[] = $resolvedEvent;
-                        $this->appeared->signal();
-                    }
-
-                    return new Success();
-                }
+                return new Success();
             },
             null,
-            new class($dropped) implements CatchUpSubscriptionDropped {
-                private CountdownEvent $dropped;
-
-                public function __construct(CountdownEvent $dropped)
-                {
-                    $this->dropped = $dropped;
-                }
-
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    SubscriptionDropReason $reason,
-                    ?Throwable $exception = null
-                ): void {
-                    $this->dropped->signal();
-                }
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                SubscriptionDropReason $reason,
+                ?Throwable $exception = null
+            ) use ($dropped): void {
+                $dropped->signal();
             }
         );
         \assert($subscription instanceof EventStoreAllCatchUpSubscription);
@@ -452,42 +367,22 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
         $subscription = yield $this->connection->subscribeToAllFromAsync(
             $lastEvent->originalPosition(),
             CatchUpSubscriptionSettings::default(),
-            new class($events, $appeared) implements EventAppearedOnCatchupSubscription {
-                private array $events;
-                private CountdownEvent $appeared;
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                ResolvedEvent $resolvedEvent
+            ) use (&$events, $appeared): Promise {
+                $events[] = $resolvedEvent;
+                $appeared->signal();
 
-                public function __construct(array &$events, CountdownEvent $appeared)
-                {
-                    $this->events = &$events;
-                    $this->appeared = $appeared;
-                }
-
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    ResolvedEvent $resolvedEvent
-                ): Promise {
-                    $this->events[] = $resolvedEvent;
-                    $this->appeared->signal();
-
-                    return new Success();
-                }
+                return new Success();
             },
             null,
-            new class($dropped) implements CatchUpSubscriptionDropped {
-                private CountdownEvent $dropped;
-
-                public function __construct(CountdownEvent $dropped)
-                {
-                    $this->dropped = $dropped;
-                }
-
-                public function __invoke(
-                    EventStoreCatchUpSubscription $subscription,
-                    SubscriptionDropReason $reason,
-                    ?Throwable $exception = null
-                ): void {
-                    $this->dropped->signal();
-                }
+            function (
+                EventStoreCatchUpSubscription $subscription,
+                SubscriptionDropReason $reason,
+                ?Throwable $exception = null
+            ) use ($dropped): void {
+                $dropped->signal();
             }
         );
         \assert($subscription instanceof EventStoreAllCatchUpSubscription);

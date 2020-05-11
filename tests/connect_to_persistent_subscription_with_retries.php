@@ -18,7 +18,6 @@ use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
@@ -64,35 +63,24 @@ class connect_to_persistent_subscription_with_retries extends AsyncTestCase
         yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             'agroupname55',
-            new class($this->retryCount, $this->resetEvent) implements EventAppearedOnPersistentSubscription {
-                private ?int $retryCount;
-                private $resetEvent;
-
-                public function __construct(&$retryCount, $resetEvent)
-                {
-                    $this->retryCount = &$retryCount;
-                    $this->resetEvent = $resetEvent;
+            function (
+                EventStorePersistentSubscription $subscription,
+                ResolvedEvent $resolvedEvent,
+                ?int $retryCount = null
+            ): Promise {
+                if ($retryCount > 4) {
+                    $this->retryCount = $retryCount;
+                    $subscription->acknowledge($resolvedEvent);
+                    $this->resetEvent->resolve(true);
+                } else {
+                    $subscription->fail(
+                        $resolvedEvent,
+                        PersistentSubscriptionNakEventAction::retry(),
+                        'Not yet tried enough times'
+                    );
                 }
 
-                public function __invoke(
-                    EventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent,
-                    ?int $retryCount = null
-                ): Promise {
-                    if ($retryCount > 4) {
-                        $this->retryCount = $retryCount;
-                        $subscription->acknowledge($resolvedEvent);
-                        $this->resetEvent->resolve(true);
-                    } else {
-                        $subscription->fail(
-                            $resolvedEvent,
-                            PersistentSubscriptionNakEventAction::retry(),
-                            'Not yet tried enough times'
-                        );
-                    }
-
-                    return new Success();
-                }
+                return new Success();
             },
             null,
             10,

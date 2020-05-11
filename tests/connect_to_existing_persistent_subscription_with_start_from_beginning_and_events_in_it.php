@@ -19,7 +19,6 @@ use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
@@ -85,31 +84,18 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
         yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
-            new class($this->set, $this->resetEvent, $this->firstEvent) implements EventAppearedOnPersistentSubscription {
-                private bool $set;
-                private Deferred $deferred;
-                private ?ResolvedEvent $firstEvent;
-
-                public function __construct(&$set, &$deferred, &$firstEvent)
-                {
-                    $this->set = &$set;
-                    $this->deferred = $deferred;
-                    $this->firstEvent = &$firstEvent;
+            function (
+                EventStorePersistentSubscription $subscription,
+                ResolvedEvent $resolvedEvent,
+                ?int $retryCount = null
+            ): Promise {
+                if (! $this->set) {
+                    $this->set = true;
+                    $this->firstEvent = $resolvedEvent;
+                    $this->resetEvent->resolve(true);
                 }
 
-                public function __invoke(
-                    EventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent,
-                    ?int $retryCount = null
-                ): Promise {
-                    if (! $this->set) {
-                        $this->set = true;
-                        $this->firstEvent = $resolvedEvent;
-                        $this->deferred->resolve(true);
-                    }
-
-                    return new Success();
-                }
+                return new Success();
             },
             null,
             10,
@@ -122,7 +108,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
     public function the_subscription_gets_event_zero_as_its_first_event(): Generator
     {
         yield $this->execute(function (): Generator {
-            $value = yield Promise\timeout($this->resetEvent->promise(), 10000);
+            $value = yield Promise\timeout($this->resetEvent->promise(), 5000);
             $this->assertTrue($value);
             $this->assertSame(0, $this->firstEvent->originalEventNumber());
             $this->assertTrue($this->firstEvent->originalEvent()->eventId()->equals($this->ids[0]));

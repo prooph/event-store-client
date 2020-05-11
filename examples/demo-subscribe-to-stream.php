@@ -16,11 +16,9 @@ namespace Prooph\EventStoreClient;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
-use Prooph\EventStore\Async\EventAppearedOnSubscription;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ResolvedEvent;
-use Prooph\EventStore\SubscriptionDropped;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Internal\VolatileEventStoreSubscription;
@@ -46,28 +44,24 @@ Loop::run(function () {
     $subscription = yield $connection->subscribeToStreamAsync(
         'foo-bar',
         true,
-        new class() implements EventAppearedOnSubscription {
-            public function __invoke(
-                EventStoreSubscription $subscription,
-                ResolvedEvent $resolvedEvent): Promise
-            {
-                echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
-                echo 'data: ' . $resolvedEvent->originalEvent()->data() . PHP_EOL;
+        function (
+            EventStoreSubscription $subscription,
+            ResolvedEvent $resolvedEvent
+        ): Promise {
+            echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
+            echo 'data: ' . $resolvedEvent->originalEvent()->data() . PHP_EOL;
 
-                return new Success();
-            }
+            return new Success();
         },
-        new class() implements SubscriptionDropped {
-            public function __invoke(
+        function (
                 EventStoreSubscription $subscription,
                 SubscriptionDropReason $reason,
                 ?Throwable $exception = null
-            ): void {
-                echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
+        ): void {
+            echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
 
-                if ($exception) {
-                    echo 'ex: ' . $exception->getMessage() . PHP_EOL;
-                }
+            if ($exception) {
+                echo 'ex: ' . $exception->getMessage() . PHP_EOL;
             }
         },
         new UserCredentials('admin', 'changeit')

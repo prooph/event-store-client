@@ -70,6 +70,7 @@ class EventStoreConnectionLogicHandler
     private ConnectionSettings $settings;
     private ConnectionState $state;
     private ConnectingPhase $connectingPhase;
+    /** @psalm-suppress PropertyNotSetInConstructor */
     private EndPointDiscoverer $endPointDiscoverer;
     private MessageHandler $handler;
     private OperationsManager $operations;
@@ -78,8 +79,11 @@ class EventStoreConnectionLogicHandler
     private StopWatch $stopWatch;
     private string $timerTickWatcherId = '';
     private ?ReconnectionInfo $reconnInfo = null;
+    /** @psalm-suppress PropertyNotSetInConstructor */
     private HeartbeatInfo $heartbeatInfo;
+    /** @psalm-suppress PropertyNotSetInConstructor */
     private AuthInfo $authInfo;
+    /** @psalm-suppress PropertyNotSetInConstructor */
     private IdentifyInfo $identityInfo;
     private bool $wasConnected = false;
     private int $packageNumber = 0;
@@ -165,7 +169,7 @@ class EventStoreConnectionLogicHandler
 
     public function totalOperationCount(): int
     {
-        return $this->operations ? $this->operations->totalOperationCount() : 0;
+        return $this->operations->totalOperationCount();
     }
 
     public function enqueueMessage(Message $message): void
@@ -239,6 +243,7 @@ class EventStoreConnectionLogicHandler
                 return;
             }
 
+            /** @psalm-suppress PossiblyNullArgument */
             $this->enqueueMessage(new EstablishTcpConnectionMessage($endpoints));
 
             if ($deferred) {
@@ -329,7 +334,7 @@ class EventStoreConnectionLogicHandler
 
             yield $this->connection->connectAsync();
 
-            if (null !== $this->connection && ! $this->connection->isClosed()) {
+            if (! $this->connection->isClosed()) {
                 $this->connection->startReceiving();
             }
         });
@@ -344,6 +349,7 @@ class EventStoreConnectionLogicHandler
             return;
         }
 
+        /** @psalm-suppress PossiblyNullReference */
         $this->logDebug('TcpConnectionError connId %s, exception %s', $this->connection->connectionId(), $exception->getMessage());
         $this->closeConnection('TCP connection error occurred', $exception);
     }
@@ -376,10 +382,10 @@ class EventStoreConnectionLogicHandler
             || $this->state->equals(ConnectionState::closed())
         ) {
             $this->logDebug('IGNORED (state: %s, internal conn.ID: {1:B}, conn.ID: %s): TCP connection to [%s] closed',
-                $this->state,
+                (string) $this->state,
                 null === $this->connection ? Guid::empty() : $this->connection->connectionId(),
                 $connection->connectionId(),
-                $connection->remoteEndPoint()
+                (string) $connection->remoteEndPoint()
             );
 
             return;
@@ -394,6 +400,7 @@ class EventStoreConnectionLogicHandler
             $connection->connectionId()
         );
 
+        /** @psalm-suppress PossiblyNullReference */
         $this->subscriptions->purgeSubscribedAndDroppedSubscriptions($this->connection->connectionId());
 
         if (null === $this->reconnInfo) {
@@ -410,16 +417,17 @@ class EventStoreConnectionLogicHandler
 
     private function tcpConnectionEstablished(TcpPackageConnection $connection): void
     {
+        /** @psalm-suppress PossiblyNullReference */
         if (! $this->state->equals(ConnectionState::connecting())
             || $this->connection !== $connection
             || $this->connection->isClosed()
         ) {
             $this->logDebug('IGNORED (state %s, internal conn.Id %s, conn.Id %s, conn.closed %s): TCP connection to [%s] established',
-                $this->state,
+                (string) $this->state,
                 null === $this->connection ? Guid::empty() : $this->connection->connectionId(),
                 $connection->connectionId(),
                 $connection->isClosed() ? 'yes' : 'no',
-                $connection->remoteEndPoint()
+                (string) $connection->remoteEndPoint()
             );
 
             return;
@@ -447,6 +455,7 @@ class EventStoreConnectionLogicHandler
                 $pass = $this->settings->defaultUserCredentials()->password();
             }
 
+            /** @psalm-suppress PossiblyNullReference */
             $this->connection->enqueueSend(new TcpPackage(
                 TcpCommand::authenticate(),
                 TcpFlags::authenticated(),
@@ -469,6 +478,7 @@ class EventStoreConnectionLogicHandler
         $message->setVersion(self::CLIENT_VERSION);
         $message->setConnectionName($this->esConnection->connectionName());
 
+        /** @psalm-suppress PossiblyNullReference */
         $this->connection->enqueueSend(new TcpPackage(
             TcpCommand::identifyClient(),
             TcpFlags::none(),
@@ -483,6 +493,7 @@ class EventStoreConnectionLogicHandler
         $this->connectingPhase = ConnectingPhase::connected();
         $this->wasConnected = true;
 
+        /** @psalm-suppress PossiblyNullReference */
         $this->raiseConnectedEvent($this->connection->remoteEndPoint());
 
         if ($this->stopWatch->elapsed() - $this->lastTimeoutsTimeStamp >= $this->settings->operationTimeoutCheckPeriod()) {
@@ -501,6 +512,7 @@ class EventStoreConnectionLogicHandler
             case ConnectionState::INIT:
                 break;
             case ConnectionState::CONNECTING:
+                /** @psalm-suppress PossiblyNullReference */
                 if ($this->connectingPhase->equals(ConnectingPhase::reconnecting())
                     && $elapsed - $this->reconnInfo->timestamp() >= $this->settings->reconnectionDelay()
                 ) {
@@ -538,6 +550,7 @@ class EventStoreConnectionLogicHandler
 
                 break;
             case ConnectionState::CONNECTED:
+                /** @psalm-suppress PossiblyNullArgument */
                 if ($elapsed - $this->lastTimeoutsTimeStamp >= $this->settings->operationTimeoutCheckPeriod()) {
                     $this->reconnInfo = new ReconnectionInfo(0, $elapsed);
                     $this->operations->checkTimeoutsAndRetry($this->connection);
@@ -588,7 +601,7 @@ class EventStoreConnectionLogicHandler
             $msg = \sprintf(
                 'EventStoreNodeConnection \'%s\': closing TCP connection [%s, %s] due to HEARTBEAT TIMEOUT at pkgNum %s',
                 $this->esConnection->connectionName(),
-                $this->connection->remoteEndPoint(),
+                (string) $this->connection->remoteEndPoint(),
                 $this->connection->connectionId(),
                 $this->packageNumber
             );
@@ -611,11 +624,11 @@ class EventStoreConnectionLogicHandler
                 break;
             case ConnectionState::CONNECTING:
                 $this->logDebug(
-                    'StartOperation enqueue %s, %s, %s',
+                    'StartOperation enqueue %s, %s, %s, %s',
                     $operation->name(),
-                    //$operation,
-                    $maxRetries,
-                    $timeout
+                    (string) $operation,
+                    (string) $maxRetries,
+                    (string) $timeout
                 );
                 $this->operations->enqueueOperation(new OperationItem($operation, $maxRetries, $timeout));
                 break;
@@ -624,9 +637,10 @@ class EventStoreConnectionLogicHandler
                     'StartOperation schedule %s, %s, %s, %s',
                     $operation->name(),
                     (string) $operation,
-                    $maxRetries,
-                    $timeout
+                    (string) $maxRetries,
+                    (string) $timeout
                 );
+                /** @psalm-suppress PossiblyNullArgument */
                 $this->operations->scheduleOperation(new OperationItem($operation, $maxRetries, $timeout), $this->connection);
                 break;
             case ConnectionState::CLOSED:
@@ -658,7 +672,8 @@ class EventStoreConnectionLogicHandler
                     fn (EventStoreSubscription $subscription, ResolvedEvent $resolvedEvent): Promise => ($message->eventAppeared())($subscription, $resolvedEvent),
                     function (EventStoreSubscription $subscription, SubscriptionDropReason $reason, ?Throwable $exception = null) use ($message): void {
                         $subscriptionDroppedHandler = $message->subscriptionDropped();
-                        if ($subscriptionDroppedHandler !== null) {
+
+                        if (null !== $subscriptionDroppedHandler) {
                             $subscriptionDroppedHandler($subscription, $reason, $exception);
                         }
                     },
@@ -671,8 +686,8 @@ class EventStoreConnectionLogicHandler
                     $this->state->equals(ConnectionState::connected()) ? 'fire' : 'enqueue',
                     $operation->name(),
                     (string) $operation,
-                    $message->maxRetries(),
-                    $message->timeout()
+                    (string) $message->maxRetries(),
+                    (string) $message->timeout()
                 );
 
                 $subscription = new SubscriptionItem($operation, $message->maxRetries(), $message->timeout());
@@ -680,6 +695,7 @@ class EventStoreConnectionLogicHandler
                 if ($this->state->equals(ConnectionState::connecting())) {
                     $this->subscriptions->enqueueSubscription($subscription);
                 } else {
+                    /** @psalm-suppress PossiblyNullArgument */
                     $this->subscriptions->startSubscription($subscription, $this->connection);
                 }
 
@@ -722,8 +738,8 @@ class EventStoreConnectionLogicHandler
                     $this->state->equals(ConnectionState::connected()) ? 'fire' : 'enqueue',
                     $operation->name(),
                     (string) $operation,
-                    $message->maxRetries(),
-                    $message->timeout()
+                    (string) $message->maxRetries(),
+                    (string) $message->timeout()
                 );
 
                 $subscription = new SubscriptionItem($operation, $message->maxRetries(), $message->timeout());
@@ -731,6 +747,7 @@ class EventStoreConnectionLogicHandler
                 if ($this->state->equals(ConnectionState::connecting())) {
                     $this->subscriptions->enqueueSubscription($subscription);
                 } else {
+                    /** @psalm-suppress PossiblyNullArgument */
                     $this->subscriptions->startSubscription($subscription, $this->connection);
                 }
 
@@ -761,6 +778,7 @@ class EventStoreConnectionLogicHandler
             return;
         }
 
+        /** @psalm-suppress PossiblyNullReference */
         $this->logDebug(
             'HandleTcpPackage connId %s, package %s, %s',
             $this->connection->connectionId(),
@@ -897,17 +915,19 @@ class EventStoreConnectionLogicHandler
             return;
         }
 
+        /** @psalm-suppress PossiblyNullReference */
         if (! $this->state->equals(ConnectionState::connected())
             || $this->connection->remoteEndPoint()->equals($endPoint)
         ) {
             return;
         }
 
+        /** @psalm-suppress PossiblyNullReference */
         $msg = \sprintf(
             'EventStoreNodeConnection \'%s\': going to reconnect to [%s]. Current end point: [%s]',
             $this->esConnection->connectionName(),
             (string) $endPoint,
-            $this->connection->remoteEndPoint()
+            (string) $this->connection->remoteEndPoint()
         );
 
         if ($this->settings->verboseLogging()) {
@@ -922,7 +942,7 @@ class EventStoreConnectionLogicHandler
         $this->establishTcpConnection($endPoints);
     }
 
-    private function logDebug(string $message, ...$parameters): void
+    private function logDebug(string $message, string ...$parameters): void
     {
         if ($this->settings->verboseLogging()) {
             $message = empty($parameters)
@@ -937,7 +957,7 @@ class EventStoreConnectionLogicHandler
         }
     }
 
-    private function logInfo(string $message, ...$parameters): void
+    private function logInfo(string $message, string ...$parameters): void
     {
         if ($this->settings->verboseLogging()) {
             $message = empty($parameters)

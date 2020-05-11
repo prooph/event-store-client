@@ -16,12 +16,10 @@ namespace Prooph\EventStoreClient\Internal;
 use function Amp\call;
 use Amp\Delayed;
 use Amp\Promise;
+use Closure;
 use Prooph\EventStore\AllEventsSlice;
-use Prooph\EventStore\Async\CatchUpSubscriptionDropped;
-use Prooph\EventStore\Async\EventAppearedOnCatchupSubscription;
 use Prooph\EventStore\Async\EventStoreAllCatchUpSubscription as AsyncEventStoreAllCatchUpSubscription;
 use Prooph\EventStore\Async\EventStoreConnection;
-use Prooph\EventStore\Async\LiveProcessingStartedOnCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\Position;
 use Prooph\EventStore\ResolvedEvent;
@@ -37,15 +35,19 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription imp
 
     /**
      * @internal
+     *
+     * @param Closure(EventStoreCatchUpSubscription, ResolvedEvent): Promise $eventAppeared
+     * @param null|Closure(EventStoreCatchUpSubscription): void $liveProcessingStarted
+     * @param null|Closure(EventStoreCatchUpSubscription, SubscriptionDropReason, null|Throwable): void $subscriptionDropped
      */
     public function __construct(
         EventStoreConnection $connection,
         Logger $logger,
         ?Position $fromPositionExclusive, // if null from the very beginning
         ?UserCredentials $userCredentials,
-        EventAppearedOnCatchupSubscription $eventAppeared,
-        ?LiveProcessingStartedOnCatchUpSubscription $liveProcessingStarted,
-        ?CatchUpSubscriptionDropped $subscriptionDropped,
+        Closure $eventAppeared,
+        ?Closure $liveProcessingStarted,
+        ?Closure $subscriptionDropped,
         CatchUpSubscriptionSettings $settings
     ) {
         parent::__construct(
@@ -109,7 +111,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription imp
                     'Catch-up Subscription %s to %s: finished reading events, nextReadPosition = %s',
                     $this->subscriptionName(),
                     $this->isSubscribedToAll() ? '<all>' : $this->streamId(),
-                    $this->nextReadPosition ? $this->nextReadPosition->__toString() : '<null>'
+                    (string) $this->nextReadPosition
                 ));
             }
 
@@ -152,6 +154,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription imp
         return call(function () use ($e): \Generator {
             $processed = false;
 
+            /** @psalm-suppress PossiblyNullReference */
             if ($e->originalPosition()->greater($this->lastProcessedPosition)) {
                 try {
                     yield ($this->eventAppeared)($this, $e);
@@ -164,6 +167,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription imp
             }
 
             if ($this->verbose) {
+                /** @psalm-suppress PossiblyNullReference */
                 $this->log->debug(\sprintf(
                     'Catch-up Subscription %s to %s: %s event (%s, %d, %s @ %s)',
                     $this->subscriptionName(),

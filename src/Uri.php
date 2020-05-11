@@ -16,6 +16,7 @@ namespace Prooph\EventStoreClient;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\UserCredentials;
 
+/** @psalm-immutable */
 class Uri
 {
     /**
@@ -74,38 +75,44 @@ class Uri
         return new self($scheme, $host, $port, $userCredentials);
     }
 
+    /** @psalm-pure */
     public function scheme(): string
     {
         return $this->scheme;
     }
 
+    /** @psalm-pure */
     public function userCredentials(): ?UserCredentials
     {
         return $this->userCredentials;
     }
 
+    /** @psalm-pure */
     public function host(): string
     {
         return $this->host;
     }
 
+    /** @psalm-pure */
     public function port(): int
     {
         return $this->port;
     }
 
+    /** @psalm-pure */
     private static function filterScheme(string $scheme): string
     {
         return \preg_replace('#:(//)?$#', '', \strtolower($scheme));
     }
 
+    /** @psalm-pure */
     private static function filterUserInfoPart(string $part): string
     {
         // Note the addition of `%` to initial charset; this allows `|` portion
         // to match and thus prevent double-encoding.
         return \preg_replace_callback(
             '/(?:[^%' . self::CHAR_UNRESERVED . self::CHAR_SUB_DELIMS . ']+|%(?![A-Fa-f0-9]{2}))/u',
-            fn (array $matches): string => \rawurlencode($matches[0]),
+            fn (array $matches): string => \rawurlencode((string) $matches[0]),
             $part
         );
     }

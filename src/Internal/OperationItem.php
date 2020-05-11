@@ -27,7 +27,7 @@ class OperationItem
     private int $maxRetries;
     private int $timeout;
     private DateTimeImmutable $created;
-    private string $connectionId;
+    private string $connectionId = '';
     private string $correlationId;
     private int $retryCount;
     private DateTimeImmutable $lastUpdated;

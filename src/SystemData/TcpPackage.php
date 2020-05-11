@@ -15,7 +15,11 @@ namespace Prooph\EventStoreClient\SystemData;
 
 use Prooph\EventStore\Exception\InvalidArgumentException;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 class TcpPackage
 {
     public const COMMAND_OFFSET = 0;
@@ -34,6 +38,10 @@ class TcpPackage
     private ?string $login;
     private ?string $password;
 
+    /**
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedOperand
+     */
     public static function fromRawData(string $bytes): TcpPackage
     {
         list('m' => $messageLength, 'c' => $command, 'f' => $flags) = \unpack('Vm/Cc/Cf/', $bytes, self::COMMAND_OFFSET);
@@ -99,15 +107,17 @@ class TcpPackage
         $this->password = $password;
     }
 
+    /** @psalm-pure */
     public function asBytes(): string
     {
         $dataLen = \strlen($this->data);
         $headerSize = self::MANDATORY_SIZE;
         $messageLen = $headerSize + $dataLen;
 
+        /** @psalm-suppress ImpureMethodCall */
         if ($this->flags->equals(TcpFlags::authenticated())) {
-            $loginLen = \strlen($this->login);
-            $passLen = \strlen($this->password);
+            $loginLen = \strlen((string) $this->login);
+            $passLen = \strlen((string) $this->password);
 
             if ($loginLen > 255) {
                 throw new InvalidArgumentException(\sprintf(
@@ -147,31 +157,37 @@ class TcpPackage
         );
     }
 
+    /** @psalm-pure */
     public function command(): TcpCommand
     {
         return $this->command;
     }
 
+    /** @psalm-pure */
     public function flags(): TcpFlags
     {
         return $this->flags;
     }
 
+    /** @psalm-pure */
     public function correlationId(): string
     {
         return $this->correlationId;
     }
 
+    /** @psalm-pure */
     public function data(): string
     {
         return $this->data;
     }
 
+    /** @psalm-pure */
     public function login(): ?string
     {
         return $this->login;
     }
 
+    /** @psalm-pure */
     public function password(): ?string
     {
         return $this->password;

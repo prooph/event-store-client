@@ -18,9 +18,7 @@ use Amp\PHPUnit\AsyncTestCase;
 use Amp\Promise;
 use Amp\Success;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
-use Prooph\EventStore\Async\PersistentSubscriptionDropped;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropReason;
@@ -59,30 +57,19 @@ class deleting_existing_persistent_subscription_with_subscriber extends AsyncTes
         yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             'groupname123',
-            new class() implements EventAppearedOnPersistentSubscription {
-                public function __invoke(
-                    EventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent,
-                    ?int $retryCount = null
-                ): Promise {
-                    return new Success();
-                }
+            function (
+                EventStorePersistentSubscription $subscription,
+                ResolvedEvent $resolvedEvent,
+                ?int $retryCount = null
+            ): Promise {
+                return new Success();
             },
-            new class($this->called) implements PersistentSubscriptionDropped {
-                private $called;
-
-                public function __construct(&$called)
-                {
-                    $this->called = &$called;
-                }
-
-                public function __invoke(
-                    EventStorePersistentSubscription $subscription,
-                    SubscriptionDropReason $reason,
-                    ?Throwable $exception = null
-                ): void {
-                    $this->called->resolve(true);
-                }
+            function (
+                EventStorePersistentSubscription $subscription,
+                SubscriptionDropReason $reason,
+                ?Throwable $exception = null
+            ): void {
+                $this->called->resolve(true);
             }
         );
     }

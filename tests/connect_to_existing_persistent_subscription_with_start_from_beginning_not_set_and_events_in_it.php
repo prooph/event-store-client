@@ -20,7 +20,6 @@ use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
 use Generator;
-use Prooph\EventStore\Async\EventAppearedOnPersistentSubscription;
 use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
@@ -65,25 +64,16 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
         yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
-            new class($deferred) implements EventAppearedOnPersistentSubscription {
-                private $deferred;
-
-                public function __construct($deferred)
-                {
-                    $this->deferred = $deferred;
+            function (
+                EventStorePersistentSubscription $subscription,
+                ResolvedEvent $resolvedEvent,
+                ?int $retryCount = null
+            ) use ($deferred): Promise {
+                if ($resolvedEvent->originalEventNumber() === 0) {
+                    $deferred->resolve(true);
                 }
 
-                public function __invoke(
-                    EventStorePersistentSubscription $subscription,
-                    ResolvedEvent $resolvedEvent,
-                    ?int $retryCount = null
-                ): Promise {
-                    if ($resolvedEvent->originalEventNumber() === 0) {
-                        $this->deferred->resolve(true);
-                    }
-
-                    return new Success();
-                }
+                return new Success();
             },
             null,
             10,

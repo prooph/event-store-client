@@ -29,11 +29,11 @@ class OperationsManager
     private Closure $operationItemSeqNoComparer;
     private string $connectionName;
     private ConnectionSettings $settings;
-    /** @var OperationItem[] */
+    /** @var array<string, OperationItem> */
     private array $activeOperations = [];
     /** @var SplQueue<OperationItem> */
     private SplQueue $waitingOperations;
-    /** @var OperationItem[] */
+    /** @var list<OperationItem> */
     private array $retryPendingOperations = [];
     private int $totalOperationCount = 0;
 
@@ -222,7 +222,7 @@ class OperationsManager
         $this->tryScheduleWaitingOperations($connection);
     }
 
-    private function logDebug(string $message, ...$parameters): void
+    private function logDebug(string $message, string ...$parameters): void
     {
         if ($this->settings->verboseLogging()) {
             $message = empty($parameters)

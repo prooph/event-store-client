@@ -41,6 +41,7 @@ class ProjectionsClient
         $this->operationTimeout = $operationTimeout;
     }
 
+    /** @return Promise<void> */
     public function enable(
         EndPoint $endPoint,
         string $name,
@@ -60,6 +61,7 @@ class ProjectionsClient
         );
     }
 
+    /** @return Promise<void> */
     public function disable(
         EndPoint $endPoint,
         string $name,
@@ -79,6 +81,7 @@ class ProjectionsClient
         );
     }
 
+    /** @return Promise<void> */
     public function abort(
         EndPoint $endPoint,
         string $name,
@@ -98,6 +101,7 @@ class ProjectionsClient
         );
     }
 
+    /** @return Promise<void> */
     public function createOneTime(
         EndPoint $endPoint,
         string $query,
@@ -118,6 +122,7 @@ class ProjectionsClient
         );
     }
 
+    /** @return Promise<void> */
     public function createTransient(
         EndPoint $endPoint,
         string $name,
@@ -140,6 +145,7 @@ class ProjectionsClient
         );
     }
 
+    /** @return Promise<void> */
     public function createContinuous(
         EndPoint $endPoint,
         string $name,
@@ -156,7 +162,7 @@ class ProjectionsClient
                 '/projections/continuous?name=%s&type=%s&emit=1&trackemittedstreams=%d',
                 \urlencode($name),
                 $type,
-                (int) $trackEmittedStreams
+                (string) (int) $trackEmittedStreams
             ),
             $query,
             $userCredentials,
@@ -164,9 +170,7 @@ class ProjectionsClient
         );
     }
 
-    /**
-     * @return Promise<ProjectionDetails[]>
-     */
+    /** @return Promise<list<ProjectionDetails>> */
     public function listAll(
         EndPoint $endPoint,
         ?UserCredentials $userCredentials = null,
@@ -187,6 +191,12 @@ class ProjectionsClient
                 return;
             }
 
+            if (null === $body) {
+                $deferred->fail(new \UnexpectedValueException('Body cannot be empty'));
+
+                return;
+            }
+
             try {
                 $data = Json::decode($body);
             } catch (JsonException $e) {
@@ -213,9 +223,7 @@ class ProjectionsClient
         return $deferred->promise();
     }
 
-    /**
-     * @return Promise<ProjectionDetails[]>
-     */
+    /** @return Promise<list<ProjectionDetails>> */
     public function listOneTime(
         EndPoint $endPoint,
         ?UserCredentials $userCredentials = null,
@@ -236,6 +244,12 @@ class ProjectionsClient
                 return;
             }
 
+            if (null === $body) {
+                $deferred->fail(new \UnexpectedValueException('Body cannot be empty'));
+
+                return;
+            }
+
             try {
                 $data = Json::decode($body);
             } catch (JsonException $e) {
@@ -262,9 +276,7 @@ class ProjectionsClient
         return $deferred->promise();
     }
 
-    /**
-     * @return Promise<ProjectionDetails[]>
-     */
+    /** @return Promise<list<ProjectionDetails>> */
     public function listContinuous(
         EndPoint $endPoint,
         ?UserCredentials $userCredentials = null,
@@ -285,6 +297,12 @@ class ProjectionsClient
                 return;
             }
 
+            if (null === $body) {
+                $deferred->fail(new \UnexpectedValueException('Body cannot be empty'));
+
+                return;
+            }
+
             try {
                 $data = Json::decode($body);
             } catch (JsonException $e) {
@@ -311,9 +329,7 @@ class ProjectionsClient
         return $deferred->promise();
     }
 
-    /**
-     * @return Promise<ProjectionDetails>
-     */
+    /** @return Promise<ProjectionDetails> */
     public function getStatus(
         EndPoint $endPoint,
         string $name,
@@ -361,9 +377,7 @@ class ProjectionsClient
         return $deferred->promise();
     }
 
-    /**
-     * @return Promise<string>
-     */
+    /** @return Promise<string> */
     public function getState(
         EndPoint $endPoint,
         string $name,
@@ -382,9 +396,7 @@ class ProjectionsClient
         );
     }
 
-    /**
-     * @return Promise<string>
-     */
+    /** @return Promise<string> */
     public function getPartitionState(
         EndPoint $endPoint,
         string $name,
@@ -405,9 +417,7 @@ class ProjectionsClient
         );
     }
 
-    /**
-     * @return Promise<string>
-     */
+    /** @return Promise<string> */
     public function getResult(
         EndPoint $endPoint,
         string $name,
@@ -426,9 +436,7 @@ class ProjectionsClient
         );
     }
 
-    /**
-     * @return Promise<string>
-     */
+    /** @return Promise<string> */
     public function getPartitionResult(
         EndPoint $endPoint,
         string $name,
@@ -449,9 +457,7 @@ class ProjectionsClient
         );
     }
 
-    /**
-     * @return Promise<string>
-     */
+    /** @return Promise<string> */
     public function getStatistics(
         EndPoint $endPoint,
         string $name,
@@ -470,9 +476,7 @@ class ProjectionsClient
         );
     }
 
-    /**
-     * @return Promise<string>
-     */
+    /** @return Promise<string> */
     public function getQuery(
         EndPoint $endPoint,
         string $name,
@@ -491,6 +495,7 @@ class ProjectionsClient
         );
     }
 
+    /** @return Promise<void> */
     public function updateQuery(
         EndPoint $endPoint,
         string $name,
@@ -518,6 +523,7 @@ class ProjectionsClient
         );
     }
 
+    /** @return Promise<void> */
     public function reset(
         EndPoint $endPoint,
         string $name,
@@ -537,6 +543,7 @@ class ProjectionsClient
         );
     }
 
+    /** @return Promise<void> */
     public function delete(
         EndPoint $endPoint,
         string $name,
@@ -550,13 +557,14 @@ class ProjectionsClient
                 $httpSchema,
                 '/projection/%s?deleteEmittedStreams=%d',
                 $name,
-                (int) $deleteEmittedStreams
+                (string) (int) $deleteEmittedStreams
             ),
             $userCredentials,
             HttpStatusCode::OK
         );
     }
 
+    /** @return Promise<string> */
     private function sendGet(
         string $url,
         ?UserCredentials $userCredentials,
@@ -590,6 +598,7 @@ class ProjectionsClient
         return $deferred->promise();
     }
 
+    /** @return Promise<void> */
     private function sendDelete(
         string $url,
         ?UserCredentials $userCredentials,
@@ -602,7 +611,7 @@ class ProjectionsClient
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve($response->getBody()->buffer());
+                    $deferred->resolve();
                 } else {
                     $deferred->fail(new ProjectionCommandFailed(
                         $response->getStatus(),
@@ -623,6 +632,7 @@ class ProjectionsClient
         return $deferred->promise();
     }
 
+    /** @return Promise<void> */
     private function sendPut(
         string $url,
         string $content,
@@ -638,7 +648,7 @@ class ProjectionsClient
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve(null);
+                    $deferred->resolve();
                 } else {
                     $deferred->fail(new ProjectionCommandFailed(
                         $response->getStatus(),
@@ -659,6 +669,7 @@ class ProjectionsClient
         return $deferred->promise();
     }
 
+    /** @return Promise<void> */
     private function sendPost(
         string $url,
         string $content,
@@ -674,7 +685,7 @@ class ProjectionsClient
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve(null);
+                    $deferred->resolve();
                 } elseif ($response->getStatus() === HttpStatusCode::CONFLICT) {
                     $deferred->fail(new ProjectionCommandConflict($response->getStatus(), $response->getReason()));
                 } else {
