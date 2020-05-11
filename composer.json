@@ -27,7 +27,7 @@
     "amphp/file": "^1.0.0",
     "amphp/socket": "^1.1.1",
     "google/protobuf": "^3.11.4",
-    "prooph/event-store": "dev-psalm",
+    "prooph/event-store": "dev-master",
     "psr/log": "^1.1.3"
   },
   "require-dev": {
