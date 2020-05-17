@@ -360,7 +360,7 @@ class ProjectionsClient
             }
 
             if (null === $body) {
-                $deferred->resolve(new UnexpectedValueException('No content received'));
+                $deferred->fail(new UnexpectedValueException('No content received'));
 
                 return;
             }
@@ -408,7 +408,7 @@ class ProjectionsClient
             }
 
             if (null === $body) {
-                $deferred->resolve(new UnexpectedValueException('No content received'));
+                $deferred->fail(new UnexpectedValueException('No content received'));
 
                 return;
             }
@@ -457,7 +457,7 @@ class ProjectionsClient
             }
 
             if (null === $body) {
-                $deferred->resolve(new UnexpectedValueException('No content received'));
+                $deferred->fail(new UnexpectedValueException('No content received'));
 
                 return;
             }
@@ -504,7 +504,7 @@ class ProjectionsClient
             }
 
             if (null === $body) {
-                $deferred->resolve(new UnexpectedValueException('No content received'));
+                $deferred->fail(new UnexpectedValueException('No content received'));
 
                 return;
             }
@@ -553,7 +553,7 @@ class ProjectionsClient
             }
 
             if (null === $body) {
-                $deferred->resolve(new UnexpectedValueException('No content received'));
+                $deferred->fail(new UnexpectedValueException('No content received'));
 
                 return;
             }
@@ -600,7 +600,7 @@ class ProjectionsClient
             }
 
             if (null === $body) {
-                $deferred->resolve(new UnexpectedValueException('No content received'));
+                $deferred->fail(new UnexpectedValueException('No content received'));
 
                 return;
             }
@@ -648,7 +648,7 @@ class ProjectionsClient
             }
 
             if (null === $body) {
-                $deferred->resolve(new UnexpectedValueException('No content received'));
+                $deferred->fail(new UnexpectedValueException('No content received'));
 
                 return;
             }
