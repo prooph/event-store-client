@@ -19,6 +19,9 @@ use Amp\Promise;
 use JsonException;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Projections\ProjectionDetails;
+use Prooph\EventStore\Projections\State;
+use Prooph\EventStore\Projections\ProjectionStatistics;
+use Prooph\EventStore\Projections\Query;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\Transport\Http\HttpStatusCode;
 use Prooph\EventStore\UserCredentials;
@@ -357,7 +360,7 @@ class ProjectionsClient
             }
 
             if (null === $body) {
-                $deferred->resolve(new UnexpectedValueException('No content received'));
+                $deferred->fail(new UnexpectedValueException('No content received'));
 
                 return;
             }
@@ -377,14 +380,16 @@ class ProjectionsClient
         return $deferred->promise();
     }
 
-    /** @return Promise<string> */
+    /** @return Promise<State> */
     public function getState(
         EndPoint $endPoint,
         string $name,
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        return $this->sendGet(
+        $deferred = new Deferred();
+
+        $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
@@ -394,9 +399,35 @@ class ProjectionsClient
             $userCredentials,
             HttpStatusCode::OK
         );
+
+        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
+            if ($exception) {
+                $deferred->fail($exception);
+
+                return;
+            }
+
+            if (null === $body) {
+                $deferred->fail(new UnexpectedValueException('No content received'));
+
+                return;
+            }
+
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
+
+                return;
+            }
+
+            $deferred->resolve(new State($data));
+        });
+
+        return $deferred->promise();
     }
 
-    /** @return Promise<string> */
+    /** @return Promise<State> */
     public function getPartitionState(
         EndPoint $endPoint,
         string $name,
@@ -404,7 +435,9 @@ class ProjectionsClient
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        return $this->sendGet(
+        $deferred = new Deferred();
+
+        $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
@@ -415,16 +448,44 @@ class ProjectionsClient
             $userCredentials,
             HttpStatusCode::OK
         );
+
+        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
+            if ($exception) {
+                $deferred->fail($exception);
+
+                return;
+            }
+
+            if (null === $body) {
+                $deferred->fail(new UnexpectedValueException('No content received'));
+
+                return;
+            }
+
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
+
+                return;
+            }
+
+            $deferred->resolve(new State($data));
+        });
+
+        return $deferred->promise();
     }
 
-    /** @return Promise<string> */
+    /** @return Promise<State> */
     public function getResult(
         EndPoint $endPoint,
         string $name,
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        return $this->sendGet(
+        $deferred = new Deferred();
+
+        $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
@@ -434,9 +495,35 @@ class ProjectionsClient
             $userCredentials,
             HttpStatusCode::OK
         );
+
+        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
+            if ($exception) {
+                $deferred->fail($exception);
+
+                return;
+            }
+
+            if (null === $body) {
+                $deferred->fail(new UnexpectedValueException('No content received'));
+
+                return;
+            }
+
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
+
+                return;
+            }
+
+            $deferred->resolve(new State($data));
+        });
+
+        return $deferred->promise();
     }
 
-    /** @return Promise<string> */
+    /** @return Promise<State> */
     public function getPartitionResult(
         EndPoint $endPoint,
         string $name,
@@ -444,7 +531,9 @@ class ProjectionsClient
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        return $this->sendGet(
+        $deferred = new Deferred();
+
+        $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
@@ -455,16 +544,44 @@ class ProjectionsClient
             $userCredentials,
             HttpStatusCode::OK
         );
+
+        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
+            if ($exception) {
+                $deferred->fail($exception);
+
+                return;
+            }
+
+            if (null === $body) {
+                $deferred->fail(new UnexpectedValueException('No content received'));
+
+                return;
+            }
+
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
+
+                return;
+            }
+
+            $deferred->resolve(new State($data));
+        });
+
+        return $deferred->promise();
     }
 
-    /** @return Promise<string> */
+    /** @return Promise<ProjectionStatistics> */
     public function getStatistics(
         EndPoint $endPoint,
         string $name,
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        return $this->sendGet(
+        $deferred = new Deferred();
+
+        $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
@@ -474,16 +591,45 @@ class ProjectionsClient
             $userCredentials,
             HttpStatusCode::OK
         );
+
+        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
+            if ($exception) {
+                $deferred->fail($exception);
+
+                return;
+            }
+
+            if (null === $body) {
+                $deferred->fail(new UnexpectedValueException('No content received'));
+
+                return;
+            }
+
+            try {
+                $data = Json::decode($body);
+            } catch (JsonException $e) {
+                $deferred->fail($e);
+
+                return;
+            }
+
+            $projectionStatistics = $this->buildProjectionStatistics($data);
+            $deferred->resolve($projectionStatistics);
+        });
+
+        return $deferred->promise();
     }
 
-    /** @return Promise<string> */
+    /** @return Promise<Query> */
     public function getQuery(
         EndPoint $endPoint,
         string $name,
         ?UserCredentials $userCredentials = null,
         string $httpSchema = EndpointExtensions::HTTP_SCHEMA
     ): Promise {
-        return $this->sendGet(
+        $deferred = new Deferred();
+
+        $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $httpSchema,
@@ -493,6 +639,24 @@ class ProjectionsClient
             $userCredentials,
             HttpStatusCode::OK
         );
+
+        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
+            if ($exception) {
+                $deferred->fail($exception);
+
+                return;
+            }
+
+            if (null === $body) {
+                $deferred->fail(new UnexpectedValueException('No content received'));
+
+                return;
+            }
+
+            $deferred->resolve(new Query($body));
+        });
+
+        return $deferred->promise();
     }
 
     /** @return Promise<void> */
@@ -737,5 +901,16 @@ class ProjectionsClient
             $entry['writePendingEventsBeforeCheckpoint'],
             $entry['writePendingEventsAfterCheckpoint']
         );
+    }
+
+    private function buildProjectionStatistics(array $entry): ProjectionStatistics
+    {
+        $projections = array_reduce($entry['projections'], function(array $carrier, array $entry){
+            $carrier[] = $this->buildProjectionDetails($entry);
+
+            return $carrier;
+        }, []);
+
+        return new ProjectionStatistics($projections);
     }
 }

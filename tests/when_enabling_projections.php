@@ -60,7 +60,7 @@ class when_enabling_projections extends AsyncTestCase
     }
 
     /** @test */
-    public function should_stop_the_projection(): Generator
+    public function should_run_the_projection(): Generator
     {
         yield $this->execute(function (): Generator {
             /** @var ProjectionDetails $projectionStatus */
