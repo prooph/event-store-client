@@ -27,7 +27,6 @@ use Prooph\EventStore\PersistentSubscriptionNakEventAction;
 use Prooph\EventStore\PersistentSubscriptions\PersistentSubscriptionDetails;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
-use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\Util\Guid;
 use Prooph\EventStoreClient\PersistentSubscriptions\PersistentSubscriptionsManager;
 use ProophTest\EventStoreClient\CountdownEvent;
@@ -53,7 +52,7 @@ class persistent_subscription_manager extends AsyncTestCase
                 (int) \getenv('ES_HTTP_PORT')
             ),
             5000,
-            EndpointExtensions::HTTP_SCHEMA,
+            false,
             DefaultData::adminCredentials()
         );
         $this->stream = Guid::generateAsHex();
@@ -116,7 +115,7 @@ class persistent_subscription_manager extends AsyncTestCase
     {
         yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
-            yield $this->manager->describe('', 'existing');
+            $this->manager->describe('', 'existing');
         });
     }
 
@@ -125,7 +124,7 @@ class persistent_subscription_manager extends AsyncTestCase
     {
         yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
-            yield $this->manager->describe($this->stream, '');
+            $this->manager->describe($this->stream, '');
         });
     }
 
@@ -271,7 +270,7 @@ class persistent_subscription_manager extends AsyncTestCase
     {
         yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
-            yield $this->manager->replayParkedMessages('', 'existing');
+            $this->manager->replayParkedMessages('', 'existing');
         });
     }
 
@@ -280,7 +279,7 @@ class persistent_subscription_manager extends AsyncTestCase
     {
         yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
-            yield $this->manager->replayParkedMessages($this->stream, '');
+            $this->manager->replayParkedMessages($this->stream, '');
         });
     }
 }

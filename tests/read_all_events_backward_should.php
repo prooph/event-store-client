@@ -184,7 +184,7 @@ class read_all_events_backward_should extends AsyncTestCase
         yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
 
-            yield $this->connection->readAllEventsBackwardAsync(Position::start(), \PHP_INT_MAX, false);
+            $this->connection->readAllEventsBackwardAsync(Position::start(), \PHP_INT_MAX, false);
         });
     }
 }

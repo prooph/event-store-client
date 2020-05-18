@@ -38,24 +38,25 @@ class UsersClient
 {
     private HttpClient $client;
     private int $operationTimeout;
+    private string $httpSchema;
 
-    public function __construct(int $operationTimeout)
+    public function __construct(int $operationTimeout, bool $tlsTerminatedEndpoint)
     {
         $this->client = new HttpClient($operationTimeout);
         $this->operationTimeout = $operationTimeout;
+        $this->httpSchema = $tlsTerminatedEndpoint ? EndpointExtensions::HTTPS_SCHEMA : EndpointExtensions::HTTP_SCHEMA;
     }
 
     /** @return Promise<void> */
     public function enable(
         EndPoint $endPoint,
         string $login,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/users/%s/command/enable',
                 \urlencode($login)
             ),
@@ -69,13 +70,12 @@ class UsersClient
     public function disable(
         EndPoint $endPoint,
         string $login,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/users/%s/command/disable',
                 \urlencode($login)
             ),
@@ -89,13 +89,12 @@ class UsersClient
     public function delete(
         EndPoint $endPoint,
         string $login,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendDelete(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/users/%s',
                 \urlencode($login)
             ),
@@ -111,13 +110,12 @@ class UsersClient
      */
     public function listAll(
         EndPoint $endPoint,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
-            EndpointExtensions::rawUrlToHttpUrl($endPoint, $httpSchema, '/users/'),
+            EndpointExtensions::rawUrlToHttpUrl($endPoint, $this->httpSchema, '/users/'),
             $userCredentials,
             HttpStatusCode::OK
         );
@@ -160,15 +158,14 @@ class UsersClient
      */
     public function getCurrentUser(
         EndPoint $endPoint,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
             EndpointExtensions::rawUrlToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/users/$current'
             ),
             $userCredentials,
@@ -211,15 +208,14 @@ class UsersClient
     public function getUser(
         EndPoint $endPoint,
         string $login,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/users/%s',
                 \urlencode($login)
             ),
@@ -259,13 +255,12 @@ class UsersClient
     public function createUser(
         EndPoint $endPoint,
         UserCreationInformation $newUser,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::rawUrlToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/users/'
             ),
             Json::encode($newUser),
@@ -279,13 +274,12 @@ class UsersClient
         EndPoint $endPoint,
         string $login,
         UserUpdateInformation $updatedUser,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendPut(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/users/%s',
                 \urlencode($login)
             ),
@@ -300,13 +294,12 @@ class UsersClient
         EndPoint $endPoint,
         string $login,
         ChangePasswordDetails $changePasswordDetails,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/users/%s/command/change-password',
                 \urlencode($login)
             ),
@@ -321,13 +314,12 @@ class UsersClient
         EndPoint $endPoint,
         string $login,
         ResetPasswordDetails $resetPasswordDetails,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/users/%s/command/reset-password',
                 \urlencode($login)
             ),

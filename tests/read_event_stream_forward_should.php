@@ -157,7 +157,7 @@ class read_event_stream_forward_should extends EventStoreConnectionTestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        yield $this->connection->readStreamEventsForwardAsync(
+        $this->connection->readStreamEventsForwardAsync(
             'foo',
             StreamPosition::START,
             \PHP_INT_MAX,

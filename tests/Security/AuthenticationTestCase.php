@@ -30,7 +30,6 @@ use Prooph\EventStore\Position;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\StreamMetadata;
 use Prooph\EventStore\SystemSettings;
-use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\UserManagement\UsersManager;
 use ProophTest\EventStoreClient\Helper\TestConnection;
@@ -45,7 +44,7 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         $manager = new UsersManager(
             TestConnection::httpEndPoint(),
             5000,
-            EndpointExtensions::HTTP_SCHEMA,
+            false,
             $this->adminUser()
         );
 
@@ -166,7 +165,7 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         $manager = new UsersManager(
             TestConnection::httpEndPoint(),
             5000,
-            EndpointExtensions::HTTP_SCHEMA,
+            false,
             $this->adminUser()
         );
 
