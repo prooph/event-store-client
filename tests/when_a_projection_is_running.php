@@ -15,8 +15,8 @@ namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
 use Generator;
-use Prooph\EventStore\Projections\State;
 use Prooph\EventStore\Projections\Query;
+use Prooph\EventStore\Projections\State;
 use Prooph\EventStore\Util\Guid;
 
 class when_a_projection_is_running extends AsyncTestCase
@@ -85,7 +85,7 @@ class when_a_projection_is_running extends AsyncTestCase
                 $this->credentials
             );
 
-            $expectedResult = new State(1);
+            $expectedResult = new State(['count' => 1]);
 
             $this->assertEquals($expectedResult, $result);
         });

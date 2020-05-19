@@ -20,7 +20,6 @@ use Generator;
 use Prooph\EventStore\Async\Projections\QueryManager as AsyncQueryManager;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Projections\ProjectionDetails;
-use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
 
 /**
@@ -37,14 +36,14 @@ class QueryManager implements AsyncQueryManager
         EndPoint $httpEndPoint,
         int $projectionOperationTimeout,
         int $queryTimeout,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA,
+        bool $tlsTerminatedEndpoint = false,
         ?UserCredentials $defaultUserCredentials = null
     ) {
         $this->queryTimeout = $queryTimeout;
         $this->projectionsManager = new ProjectionsManager(
             $httpEndPoint,
             $projectionOperationTimeout,
-            $httpSchema
+            $tlsTerminatedEndpoint
         );
         $this->defaultUserCredentials = $defaultUserCredentials;
     }

@@ -19,9 +19,9 @@ use Amp\Promise;
 use JsonException;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Projections\ProjectionDetails;
-use Prooph\EventStore\Projections\State;
 use Prooph\EventStore\Projections\ProjectionStatistics;
 use Prooph\EventStore\Projections\Query;
+use Prooph\EventStore\Projections\State;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\Transport\Http\HttpStatusCode;
 use Prooph\EventStore\UserCredentials;
@@ -37,24 +37,25 @@ class ProjectionsClient
 {
     private HttpClient $client;
     private int $operationTimeout;
+    private string $httpSchema;
 
-    public function __construct(int $operationTimeout)
+    public function __construct(int $operationTimeout, bool $tlsTerminatedEndpoint)
     {
         $this->client = new HttpClient($operationTimeout);
         $this->operationTimeout = $operationTimeout;
+        $this->httpSchema = $tlsTerminatedEndpoint ? EndpointExtensions::HTTPS_SCHEMA : EndpointExtensions::HTTP_SCHEMA;
     }
 
     /** @return Promise<void> */
     public function enable(
         EndPoint $endPoint,
         string $name,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/projection/%s/command/enable',
                 \urlencode($name)
             ),
@@ -68,13 +69,12 @@ class ProjectionsClient
     public function disable(
         EndPoint $endPoint,
         string $name,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/projection/%s/command/disable',
                 \urlencode($name)
             ),
@@ -88,13 +88,12 @@ class ProjectionsClient
     public function abort(
         EndPoint $endPoint,
         string $name,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/projection/%s/command/abort',
                 \urlencode($name)
             ),
@@ -109,13 +108,12 @@ class ProjectionsClient
         EndPoint $endPoint,
         string $query,
         string $type,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/projections/onetime?type=%s',
                 $type
             ),
@@ -131,13 +129,12 @@ class ProjectionsClient
         string $name,
         string $query,
         string $type,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/projections/transient?name=%s&type=%s',
                 \urlencode($name),
                 $type
@@ -155,13 +152,12 @@ class ProjectionsClient
         string $query,
         bool $trackEmittedStreams,
         string $type,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/projections/continuous?name=%s&type=%s&emit=1&trackemittedstreams=%d',
                 \urlencode($name),
                 $type,
@@ -176,13 +172,12 @@ class ProjectionsClient
     /** @return Promise<list<ProjectionDetails>> */
     public function listAll(
         EndPoint $endPoint,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
-            EndpointExtensions::rawUrlToHttpUrl($endPoint, $httpSchema, '/projections/any'),
+            EndpointExtensions::rawUrlToHttpUrl($endPoint, $this->httpSchema, '/projections/any'),
             $userCredentials,
             HttpStatusCode::OK
         );
@@ -229,13 +224,12 @@ class ProjectionsClient
     /** @return Promise<list<ProjectionDetails>> */
     public function listOneTime(
         EndPoint $endPoint,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
-            EndpointExtensions::rawUrlToHttpUrl($endPoint, $httpSchema, '/projections/onetime'),
+            EndpointExtensions::rawUrlToHttpUrl($endPoint, $this->httpSchema, '/projections/onetime'),
             $userCredentials,
             HttpStatusCode::OK
         );
@@ -282,13 +276,12 @@ class ProjectionsClient
     /** @return Promise<list<ProjectionDetails>> */
     public function listContinuous(
         EndPoint $endPoint,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
-            EndpointExtensions::rawUrlToHttpUrl($endPoint, $httpSchema, '/projections/continuous'),
+            EndpointExtensions::rawUrlToHttpUrl($endPoint, $this->httpSchema, '/projections/continuous'),
             $userCredentials,
             HttpStatusCode::OK
         );
@@ -336,15 +329,14 @@ class ProjectionsClient
     public function getStatus(
         EndPoint $endPoint,
         string $name,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/projection/%s',
                 $name
             ),
@@ -384,15 +376,14 @@ class ProjectionsClient
     public function getState(
         EndPoint $endPoint,
         string $name,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/projection/%s/state',
                 $name
             ),
@@ -432,15 +423,14 @@ class ProjectionsClient
         EndPoint $endPoint,
         string $name,
         string $partition,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/projection/%s/state?partition=%s',
                 $name,
                 $partition
@@ -480,15 +470,14 @@ class ProjectionsClient
     public function getResult(
         EndPoint $endPoint,
         string $name,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/projection/%s/result',
                 $name
             ),
@@ -528,15 +517,14 @@ class ProjectionsClient
         EndPoint $endPoint,
         string $name,
         string $partition,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/projection/%s/result?partition=%s',
                 $name,
                 $partition
@@ -576,15 +564,14 @@ class ProjectionsClient
     public function getStatistics(
         EndPoint $endPoint,
         string $name,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/projection/%s/statistics',
                 $name
             ),
@@ -624,15 +611,14 @@ class ProjectionsClient
     public function getQuery(
         EndPoint $endPoint,
         string $name,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/projection/%s/query',
                 $name
             ),
@@ -665,8 +651,7 @@ class ProjectionsClient
         string $name,
         string $query,
         ?bool $emitEnabled = null,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $url = '/projection/%s/query';
 
@@ -677,7 +662,7 @@ class ProjectionsClient
         return $this->sendPut(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 $url,
                 $name
             ),
@@ -691,13 +676,12 @@ class ProjectionsClient
     public function reset(
         EndPoint $endPoint,
         string $name,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/projection/%s/command/reset',
                 $name
             ),
@@ -712,13 +696,12 @@ class ProjectionsClient
         EndPoint $endPoint,
         string $name,
         bool $deleteEmittedStreams,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendDelete(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/projection/%s?deleteEmittedStreams=%d',
                 $name,
                 (string) (int) $deleteEmittedStreams
@@ -905,7 +888,7 @@ class ProjectionsClient
 
     private function buildProjectionStatistics(array $entry): ProjectionStatistics
     {
-        $projections = array_reduce($entry['projections'], function(array $carrier, array $entry){
+        $projections = \array_reduce($entry['projections'], function (array $carrier, array $entry) {
             $carrier[] = $this->buildProjectionDetails($entry);
 
             return $carrier;

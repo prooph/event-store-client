@@ -15,7 +15,6 @@ namespace ProophTest\EventStoreClient\UserManagement;
 
 use Generator;
 use Prooph\EventStore\EndPoint;
-use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserManagement\UserDetails;
 use Prooph\EventStoreClient\UserManagement\UsersManager;
 use ProophTest\EventStoreClient\DefaultData;
@@ -64,7 +63,7 @@ class list_users extends TestWithNode
                 (int) \getenv('ES_HTTP_PORT')
             ),
             5000,
-            EndpointExtensions::HTTP_SCHEMA,
+            false,
             DefaultData::adminCredentials()
         );
 

@@ -33,11 +33,13 @@ class PersistentSubscriptionsClient
 {
     private HttpClient $client;
     private int $operationTimeout;
+    private string $httpSchema;
 
-    public function __construct(int $operationTimeout)
+    public function __construct(int $operationTimeout, bool $tlsTerminatedEndpoint)
     {
         $this->client = new HttpClient($operationTimeout);
         $this->operationTimeout = $operationTimeout;
+        $this->httpSchema = $tlsTerminatedEndpoint ? EndpointExtensions::HTTPS_SCHEMA : EndpointExtensions::HTTP_SCHEMA;
     }
 
     /**
@@ -47,15 +49,14 @@ class PersistentSubscriptionsClient
         EndPoint $endPoint,
         string $stream,
         string $subscriptionName,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
         $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/subscriptions/%s/%s/info',
                 $stream,
                 $subscriptionName
@@ -97,8 +98,7 @@ class PersistentSubscriptionsClient
     public function list(
         EndPoint $endPoint,
         ?string $stream = null,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         $deferred = new Deferred();
 
@@ -111,7 +111,7 @@ class PersistentSubscriptionsClient
         $promise = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 $formatString
             ),
             $userCredentials,
@@ -156,13 +156,12 @@ class PersistentSubscriptionsClient
         EndPoint $endPoint,
         string $stream,
         string $subscriptionName,
-        ?UserCredentials $userCredentials = null,
-        string $httpSchema = EndpointExtensions::HTTP_SCHEMA
+        ?UserCredentials $userCredentials = null
     ): Promise {
         return $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
-                $httpSchema,
+                $this->httpSchema,
                 '/subscriptions/%s/%s/replayParked',
                 $stream,
                 $subscriptionName

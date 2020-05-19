@@ -247,7 +247,7 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        yield $this->connection->readStreamEventsBackwardAsync(
+        $this->connection->readStreamEventsBackwardAsync(
             'foo',
             StreamPosition::START,
             \PHP_INT_MAX,

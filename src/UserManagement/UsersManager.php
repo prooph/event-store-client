@@ -17,7 +17,6 @@ use Amp\Promise;
 use Prooph\EventStore\Async\UserManagement\UsersManager as AsyncUsersManager;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
-use Prooph\EventStore\Transport\Http\EndpointExtensions;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStore\UserManagement\ChangePasswordDetails;
 use Prooph\EventStore\UserManagement\ResetPasswordDetails;
@@ -28,18 +27,16 @@ class UsersManager implements AsyncUsersManager
 {
     private UsersClient $client;
     private EndPoint $endPoint;
-    private string $schema;
     private ?UserCredentials $defaultCredentials;
 
     public function __construct(
         EndPoint $endPoint,
         int $operationTimeout,
-        string $schema = EndpointExtensions::HTTP_SCHEMA,
+        bool $tlsTerminatedEndpoint = false,
         ?UserCredentials $userCredentials = null
     ) {
-        $this->client = new UsersClient($operationTimeout);
+        $this->client = new UsersClient($operationTimeout, $tlsTerminatedEndpoint);
         $this->endPoint = $endPoint;
-        $this->schema = $schema;
         $this->defaultCredentials = $userCredentials;
     }
 
@@ -53,8 +50,7 @@ class UsersManager implements AsyncUsersManager
         return $this->client->enable(
             $this->endPoint,
             $login,
-            $userCredentials ?? $this->defaultCredentials,
-            $this->schema
+            $userCredentials ?? $this->defaultCredentials
         );
     }
 
@@ -68,8 +64,7 @@ class UsersManager implements AsyncUsersManager
         return $this->client->disable(
             $this->endPoint,
             $login,
-            $userCredentials ?? $this->defaultCredentials,
-            $this->schema
+            $userCredentials ?? $this->defaultCredentials
         );
     }
 
@@ -83,8 +78,7 @@ class UsersManager implements AsyncUsersManager
         return $this->client->delete(
             $this->endPoint,
             $login,
-            $userCredentials ?? $this->defaultCredentials,
-            $this->schema
+            $userCredentials ?? $this->defaultCredentials
         );
     }
 
@@ -93,8 +87,7 @@ class UsersManager implements AsyncUsersManager
     {
         return $this->client->listAll(
             $this->endPoint,
-            $userCredentials ?? $this->defaultCredentials,
-            $this->schema
+            $userCredentials ?? $this->defaultCredentials
         );
     }
 
@@ -103,8 +96,7 @@ class UsersManager implements AsyncUsersManager
     {
         return $this->client->getCurrentUser(
             $this->endPoint,
-            $userCredentials ?? $this->defaultCredentials,
-            $this->schema
+            $userCredentials ?? $this->defaultCredentials
         );
     }
 
@@ -118,8 +110,7 @@ class UsersManager implements AsyncUsersManager
         return $this->client->getUser(
             $this->endPoint,
             $login,
-            $userCredentials ?? $this->defaultCredentials,
-            $this->schema
+            $userCredentials ?? $this->defaultCredentials
         );
     }
 
@@ -157,8 +148,7 @@ class UsersManager implements AsyncUsersManager
                 $groups,
                 $password
             ),
-            $userCredentials ?? $this->defaultCredentials,
-            $this->schema
+            $userCredentials ?? $this->defaultCredentials
         );
     }
 
@@ -187,8 +177,7 @@ class UsersManager implements AsyncUsersManager
             $this->endPoint,
             $login,
             new UserUpdateInformation($fullName, $groups),
-            $userCredentials ?? $this->defaultCredentials,
-            $this->schema
+            $userCredentials ?? $this->defaultCredentials
         );
     }
 
@@ -215,8 +204,7 @@ class UsersManager implements AsyncUsersManager
             $this->endPoint,
             $login,
             new ChangePasswordDetails($oldPassword, $newPassword),
-            $userCredentials ?? $this->defaultCredentials,
-            $this->schema
+            $userCredentials ?? $this->defaultCredentials
         );
     }
 
@@ -238,8 +226,7 @@ class UsersManager implements AsyncUsersManager
             $this->endPoint,
             $login,
             new ResetPasswordDetails($newPassword),
-            $userCredentials ?? $this->defaultCredentials,
-            $this->schema
+            $userCredentials ?? $this->defaultCredentials
         );
     }
 }

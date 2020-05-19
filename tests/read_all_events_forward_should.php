@@ -186,7 +186,7 @@ class read_all_events_forward_should extends AsyncTestCase
         yield $this->execute(function (): Generator {
             $this->expectException(InvalidArgumentException::class);
 
-            yield $this->connection->readAllEventsForwardAsync(Position::start(), \PHP_INT_MAX, false);
+            $this->connection->readAllEventsForwardAsync(Position::start(), \PHP_INT_MAX, false);
         });
     }
 }
