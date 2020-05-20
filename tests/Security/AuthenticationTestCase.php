@@ -45,6 +45,7 @@ abstract class AuthenticationTestCase extends AsyncTestCase
             TestConnection::httpEndPoint(),
             5000,
             false,
+            false,
             $this->adminUser()
         );
 
@@ -165,6 +166,7 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         $manager = new UsersManager(
             TestConnection::httpEndPoint(),
             5000,
+            false,
             false,
             $this->adminUser()
         );

@@ -53,6 +53,7 @@ class persistent_subscription_manager extends AsyncTestCase
             ),
             5000,
             false,
+            false,
             DefaultData::adminCredentials()
         );
         $this->stream = Guid::generateAsHex();

@@ -64,6 +64,7 @@ class list_users extends TestWithNode
             ),
             5000,
             false,
+            false,
             DefaultData::adminCredentials()
         );
 

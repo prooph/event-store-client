@@ -37,13 +37,15 @@ class QueryManager implements AsyncQueryManager
         int $projectionOperationTimeout,
         int $queryTimeout,
         bool $tlsTerminatedEndpoint = false,
+        bool $verifyPeer = true,
         ?UserCredentials $defaultUserCredentials = null
     ) {
         $this->queryTimeout = $queryTimeout;
         $this->projectionsManager = new ProjectionsManager(
             $httpEndPoint,
             $projectionOperationTimeout,
-            $tlsTerminatedEndpoint
+            $tlsTerminatedEndpoint,
+            $verifyPeer,
         );
         $this->defaultUserCredentials = $defaultUserCredentials;
     }

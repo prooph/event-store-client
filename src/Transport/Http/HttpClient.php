@@ -13,11 +13,15 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Transport\Http;
 
+use Amp\Http\Client\Connection\DefaultConnectionFactory;
+use Amp\Http\Client\Connection\UnlimitedConnectionPool;
 use Amp\Http\Client\HttpClient as AmpHttpClient;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Interceptor\SetRequestTimeout;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
+use Amp\Socket\ClientTlsContext;
+use Amp\Socket\ConnectContext;
 use Closure;
 use Prooph\EventStore\Transport\Http\HttpMethod;
 use Prooph\EventStore\UserCredentials;
@@ -28,11 +32,20 @@ class HttpClient
 {
     private AmpHttpClient $httpClient;
 
-    public function __construct(int $operationTimeout)
+    public function __construct(int $operationTimeout, bool $verifyPeer)
     {
         $builder = new HttpClientBuilder();
-        $builder->intercept(new SetRequestTimeout($operationTimeout, $operationTimeout, $operationTimeout));
-        $this->httpClient = $builder->build();
+
+        $tlsContext = new ClientTlsContext('');
+        if (! $verifyPeer) {
+            $tlsContext = $tlsContext->withoutPeerVerification();
+        }
+        $connectContext = (new ConnectContext())
+            ->withTlsContext($tlsContext);
+        $this->httpClient = $builder
+            ->intercept(new SetRequestTimeout($operationTimeout, $operationTimeout, $operationTimeout))
+            ->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(null, $connectContext)))
+            ->build();
     }
 
     public function get(
