@@ -162,7 +162,7 @@ class subscribe_to_all_catching_up_should extends EventStoreConnectionTestCase
                 SubscriptionDropReason $reason,
                 ?Throwable $exception = null
             ) use ($dropped): void {
-                $this->dropped->signal();
+                $dropped->signal();
             }
         );
         \assert($subscription instanceof EventStoreAllCatchUpSubscription);
