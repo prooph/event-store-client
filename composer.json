@@ -38,7 +38,7 @@
     "phpspec/prophecy": "^1.10.3",
     "phpunit/phpunit": "^9.1",
     "prooph/php-cs-fixer-config": "^0.3.1",
-    "vimeo/psalm": "^3.11.2"
+    "vimeo/psalm": "^4.0.1"
   },
   "suggest": {
     "ext/protobuf": "for protobuf PHP extension (pecl)"
