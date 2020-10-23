@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use Exception;
 use function Amp\call;
 use Amp\Delayed;
 use Amp\Http\Client\HttpClient;
@@ -97,7 +98,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
                         return new Success($endPoints);
                     }
-                } catch (Throwable $e) {
+                } catch (Exception $e) {
                     $this->log->info(\sprintf(
                         'Discovering attempt %d/%d failed with error: %s',
                         $attempt,
@@ -233,7 +234,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
                 $response = yield $this->httpClient->request($request);
                 \assert($response instanceof Response);
-            } catch (Throwable $e) {
+            } catch (Exception $e) {
                 return;
             }
 

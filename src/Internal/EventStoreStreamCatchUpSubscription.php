@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use Exception;
 use function Amp\call;
 use Amp\Delayed;
 use Amp\Promise;
@@ -177,7 +178,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription 
             if ($e->originalEventNumber() > $this->lastProcessedEventNumber) {
                 try {
                     yield ($this->eventAppeared)($this, $e);
-                } catch (Throwable $ex) {
+                } catch (Exception $ex) {
                     $this->dropSubscription(SubscriptionDropReason::eventHandlerException(), $ex);
                 }
 

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use Exception;
 use function Amp\call;
 use Amp\Deferred;
 use Amp\Delayed;
@@ -383,7 +384,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
                                     $e->event()->originalEventNumber()
                                 ));
                             }
-                        } catch (Throwable $ex) {
+                        } catch (Exception $ex) {
                             //TODO GFY should we autonak here?
 
                             $this->dropSubscription(SubscriptionDropReason::eventHandlerException(), $ex);

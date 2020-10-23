@@ -15,6 +15,7 @@ namespace Prooph\EventStoreClient\ClientOperations;
 
 use Amp\Deferred;
 use Amp\Promise;
+use Exception;
 use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\NotAuthenticated;
@@ -127,7 +128,7 @@ abstract class AbstractOperation implements ClientOperation
     {
         try {
             $result = $this->transformResponse($response);
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
             $this->deferred->fail($e);
 
             return;
