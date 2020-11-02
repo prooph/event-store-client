@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Exception;
 use function Amp\call;
 use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Closure;
+use Exception;
 use Generator;
 use Prooph\EventStore\Async\ClientConnectionEventArgs;
 use Prooph\EventStore\Async\EventStoreCatchUpSubscription as AsyncEventStoreCatchUpSubscription;

@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
-use Exception;
 use function Amp\call;
 use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Closure;
+use Exception;
 use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventStoreSubscription;
@@ -91,7 +91,11 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 
     protected function enqueueSend(TcpPackage $package): void
     {
-        ($this->getConnection)()->enqueueSend($package);
+        $connection = ($this->getConnection)();
+
+        if (null !== $connection) {
+            $connection->enqueueSend($package);
+        }
     }
 
     public function subscribe(string $correlationId, TcpPackageConnection $connection): bool
