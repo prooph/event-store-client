@@ -91,7 +91,11 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 
     protected function enqueueSend(TcpPackage $package): void
     {
-        ($this->getConnection)()->enqueueSend($package);
+        $connection = ($this->getConnection)();
+
+        if (null !== $connection) {
+            $connection->enqueueSend($package);
+        }
     }
 
     public function subscribe(string $correlationId, TcpPackageConnection $connection): bool
