@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Exception;
 use function Amp\call;
 use Amp\Delayed;
 use Amp\Promise;
 use Closure;
+use Exception;
 use Prooph\EventStore\AllEventsSlice;
 use Prooph\EventStore\Async\EventStoreAllCatchUpSubscription as AsyncEventStoreAllCatchUpSubscription;
 use Prooph\EventStore\Async\EventStoreConnection;

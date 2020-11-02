@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Exception;
 use function Amp\call;
 use Amp\Delayed;
 use Amp\Http\Client\HttpClient;
@@ -23,6 +22,7 @@ use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\Promise;
 use Amp\Success;
+use Exception;
 use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Util\Json;
@@ -32,7 +32,6 @@ use Prooph\EventStoreClient\Messages\ClusterMessages\ClusterInfoDto;
 use Prooph\EventStoreClient\Messages\ClusterMessages\MemberInfoDto;
 use Prooph\EventStoreClient\Messages\ClusterMessages\VNodeState;
 use Psr\Log\LoggerInterface as Logger;
-use Throwable;
 
 /** @internal */
 final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
