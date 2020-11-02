@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use Exception;
 use function Amp\call;
 use Amp\Deferred;
 use Amp\Loop;
@@ -227,7 +228,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
                 try {
                     yield $this->readEventsTillAsync($this->connection, $this->resolveLinkTos, $this->userCredentials, null, null);
                     yield $this->subscribeToStreamAsync();
-                } catch (Throwable $ex) {
+                } catch (Exception $ex) {
                     $this->dropSubscription(SubscriptionDropReason::catchUpError(), $ex);
 
                     throw $ex;
@@ -438,7 +439,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
 
                     try {
                         yield $this->tryProcessAsync($e);
-                    } catch (Throwable $ex) {
+                    } catch (Exception $ex) {
                         $this->log->debug(\sprintf(
                             'Catch-up Subscription %s to %s: Exception occurred in subscription %s',
                             $this->subscriptionName,

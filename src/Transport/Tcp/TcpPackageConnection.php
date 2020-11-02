@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Transport\Tcp;
 
+use Exception;
 use function Amp\call;
 use Amp\Loop;
 use Amp\Promise;
@@ -137,7 +138,7 @@ class TcpPackageConnection
                     $e->getMessage()
                 ));
                 ($this->connectionClosed)($this, $e);
-            } catch (Throwable $e) {
+            } catch (Exception $e) {
                 $this->isClosed = true;
                 $this->log->debug(\sprintf(
                     'TcpPackageConnection: connection [%s, %s] was closed with error %s',
@@ -165,7 +166,7 @@ class TcpPackageConnection
                 \assert(null !== $this->connection);
 
                 yield $this->connection->write($package->asBytes());
-            } catch (Throwable $e) {
+            } catch (Exception $e) {
                 ($this->connectionClosed)($this, $e);
             }
         });
@@ -177,7 +178,7 @@ class TcpPackageConnection
 
         try {
             ($this->handlePackage)($this, $package);
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
             \assert(null !== $this->connection);
 
             $this->connection->close();

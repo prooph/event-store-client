@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
+use Exception;
 use function Amp\call;
 use Amp\Deferred;
 use Amp\Loop;
@@ -357,7 +358,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
         $this->actionQueue->enqueue($action);
 
         if ($this->actionQueue->count() > $this->maxQueueSize) {
-            $this->dropSubscription(SubscriptionDropReason::userInitiated(), new \Exception('client buffer too big'));
+            $this->dropSubscription(SubscriptionDropReason::userInitiated(), new Exception('client buffer too big'));
         }
 
         Loop::defer(function (): Generator {
@@ -375,7 +376,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 
                 try {
                     yield $action();
-                } catch (Throwable $exception) {
+                } catch (Exception $exception) {
                     $this->log->error(\sprintf(
                         'Exception during executing user callback: %s', $exception->getMessage()
                     ));
