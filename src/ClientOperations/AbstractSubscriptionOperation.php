@@ -93,6 +93,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
     {
         $connection = ($this->getConnection)();
 
+        // In rare case the connection can be null. It is race condition where the connection was just closed.
         if (null !== $connection) {
             $connection->enqueueSend($package);
         }
