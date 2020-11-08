@@ -658,28 +658,16 @@ final class EventStoreNodeConnection implements
 
         $stopped = new Deferred();
 
-        $subscriptionDropped = new class($subscriptionDropped, $stopped) implements SubscriptionDropped {
-            private ?SubscriptionDropped $callback;
-
-            private Deferred $stopped;
-
-            public function __construct(?SubscriptionDropped $callback, Deferred $stopped)
-            {
-                $this->callback = $callback;
-                $this->stopped = $stopped;
+        $subscriptionDropped = function (
+            EventStoreSubscription $subscription,
+            SubscriptionDropReason $reason,
+            ?Throwable $exception = null
+        ) use ($subscriptionDropped, $stopped) {
+            if ($subscriptionDropped) {
+                ($subscriptionDropped)($subscription, $reason, $exception);
             }
 
-            public function __invoke(
-                EventStoreSubscription $subscription,
-                SubscriptionDropReason $reason,
-                ?Throwable $exception = null
-            ): void {
-                if ($this->callback) {
-                    ($this->callback)($subscription, $reason, $exception);
-                }
-
-                $this->stopped->resolve();
-            }
+            $stopped->resolve();
         };
 
         $deferred = new Deferred();
@@ -743,28 +731,16 @@ final class EventStoreNodeConnection implements
     ): Promise {
         $stopped = new Deferred();
 
-        $subscriptionDropped = new class($subscriptionDropped, $stopped) implements SubscriptionDropped {
-            private ?SubscriptionDropped $callback;
-
-            private Deferred $stopped;
-
-            public function __construct(?SubscriptionDropped $callback, Deferred $stopped)
-            {
-                $this->callback = $callback;
-                $this->stopped = $stopped;
+        $subscriptionDropped = function (
+            EventStoreSubscription $subscription,
+            SubscriptionDropReason $reason,
+            ?Throwable $exception = null
+        ) use ($subscriptionDropped, $stopped) {
+            if ($subscriptionDropped) {
+                ($subscriptionDropped)($subscription, $reason, $exception);
             }
 
-            public function __invoke(
-                EventStoreSubscription $subscription,
-                SubscriptionDropReason $reason,
-                ?Throwable $exception = null
-            ): void {
-                if ($this->callback) {
-                    ($this->callback)($subscription, $reason, $exception);
-                }
-
-                $this->stopped->resolve();
-            }
+            $stopped->resolve();
         };
 
         $deferred = new Deferred();
