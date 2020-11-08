@@ -97,7 +97,11 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
                 ResolvedEvent $resolvedEvent
             ) use (&$props1): Promise {
                 $props1['raisedEvents'][] = $resolvedEvent;
-                $props1['raisedEventEvent']->resolve(true);
+                try {
+                    $props1['raisedEventEvent']->resolve(true);
+                } catch (Throwable $e) {
+                    // on connection close this event may appear twice, just ignore second occurrence
+                }
 
                 return new Success();
             },

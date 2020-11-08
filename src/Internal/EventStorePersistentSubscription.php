@@ -20,6 +20,7 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Closure;
+use Exception;
 use Generator;
 use Prooph\EventStore\Async\EventStorePersistentSubscription as AsyncEventStorePersistentSubscription;
 use Prooph\EventStore\EventId;
@@ -383,7 +384,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
                                     $e->event()->originalEventNumber()
                                 ));
                             }
-                        } catch (Throwable $ex) {
+                        } catch (Exception $ex) {
                             //TODO GFY should we autonak here?
 
                             $this->dropSubscription(SubscriptionDropReason::eventHandlerException(), $ex);

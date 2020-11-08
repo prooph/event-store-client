@@ -19,6 +19,7 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Closure;
+use Exception;
 use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventStoreSubscription;
@@ -90,7 +91,12 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 
     protected function enqueueSend(TcpPackage $package): void
     {
-        ($this->getConnection)()->enqueueSend($package);
+        $connection = ($this->getConnection)();
+
+        // In rare case the connection can be null. It is race condition where the connection was just closed.
+        if (null !== $connection) {
+            $connection->enqueueSend($package);
+        }
     }
 
     public function subscribe(string $correlationId, TcpPackageConnection $connection): bool
@@ -357,7 +363,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
         $this->actionQueue->enqueue($action);
 
         if ($this->actionQueue->count() > $this->maxQueueSize) {
-            $this->dropSubscription(SubscriptionDropReason::userInitiated(), new \Exception('client buffer too big'));
+            $this->dropSubscription(SubscriptionDropReason::userInitiated(), new Exception('client buffer too big'));
         }
 
         Loop::defer(function (): Generator {
@@ -375,7 +381,7 @@ abstract class AbstractSubscriptionOperation implements SubscriptionOperation
 
                 try {
                     yield $action();
-                } catch (Throwable $exception) {
+                } catch (Exception $exception) {
                     $this->log->error(\sprintf(
                         'Exception during executing user callback: %s', $exception->getMessage()
                     ));

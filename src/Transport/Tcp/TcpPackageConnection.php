@@ -22,13 +22,13 @@ use Amp\Socket\ConnectContext;
 use Amp\Socket\ConnectException;
 use Amp\Socket\EncryptableSocket;
 use Closure;
+use Exception;
 use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\PackageFramingException;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Psr\Log\LoggerInterface as Logger;
-use Throwable;
 
 /** @internal */
 class TcpPackageConnection
@@ -137,7 +137,7 @@ class TcpPackageConnection
                     $e->getMessage()
                 ));
                 ($this->connectionClosed)($this, $e);
-            } catch (Throwable $e) {
+            } catch (Exception $e) {
                 $this->isClosed = true;
                 $this->log->debug(\sprintf(
                     'TcpPackageConnection: connection [%s, %s] was closed with error %s',
@@ -165,7 +165,7 @@ class TcpPackageConnection
                 \assert(null !== $this->connection);
 
                 yield $this->connection->write($package->asBytes());
-            } catch (Throwable $e) {
+            } catch (Exception $e) {
                 ($this->connectionClosed)($this, $e);
             }
         });
@@ -177,7 +177,7 @@ class TcpPackageConnection
 
         try {
             ($this->handlePackage)($this, $package);
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
             \assert(null !== $this->connection);
 
             $this->connection->close();

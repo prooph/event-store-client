@@ -17,6 +17,7 @@ use function Amp\call;
 use Amp\Delayed;
 use Amp\Promise;
 use Closure;
+use Exception;
 use Generator;
 use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\Async\EventStoreStreamCatchUpSubscription as AsyncEventStoreStreamCatchUpSubscription;
@@ -177,7 +178,7 @@ class EventStoreStreamCatchUpSubscription extends EventStoreCatchUpSubscription 
             if ($e->originalEventNumber() > $this->lastProcessedEventNumber) {
                 try {
                     yield ($this->eventAppeared)($this, $e);
-                } catch (Throwable $ex) {
+                } catch (Exception $ex) {
                     $this->dropSubscription(SubscriptionDropReason::eventHandlerException(), $ex);
                 }
 

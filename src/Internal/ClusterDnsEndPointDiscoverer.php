@@ -22,6 +22,7 @@ use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\Promise;
 use Amp\Success;
+use Exception;
 use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Util\Json;
@@ -31,7 +32,6 @@ use Prooph\EventStoreClient\Messages\ClusterMessages\ClusterInfoDto;
 use Prooph\EventStoreClient\Messages\ClusterMessages\MemberInfoDto;
 use Prooph\EventStoreClient\Messages\ClusterMessages\VNodeState;
 use Psr\Log\LoggerInterface as Logger;
-use Throwable;
 
 /** @internal */
 final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
@@ -97,7 +97,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
                         return new Success($endPoints);
                     }
-                } catch (Throwable $e) {
+                } catch (Exception $e) {
                     $this->log->info(\sprintf(
                         'Discovering attempt %d/%d failed with error: %s',
                         $attempt,
@@ -233,7 +233,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
                 $response = yield $this->httpClient->request($request);
                 \assert($response instanceof Response);
-            } catch (Throwable $e) {
+            } catch (Exception $e) {
                 return;
             }
 
