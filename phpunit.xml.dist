@@ -11,7 +11,7 @@
 
 <phpunit
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.0/phpunit.xsd"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
         backupGlobals="false"
         backupStaticAttributes="false"
         colors="true"
@@ -24,18 +24,18 @@
         failOnWarning="true"
         failOnRisky="true"
 >
+    <coverage>
+        <include>
+            <directory>./src/</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">./src/Messages/ClientMessages</directory>
+        </exclude>
+    </coverage>
+
     <testsuite name="Prooph EventStoreClient Test Suite">
         <directory suffix=".php">./tests</directory>
     </testsuite>
-
-    <filter>
-        <whitelist>
-            <directory>./src/</directory>
-            <exclude>
-                <directory suffix=".php">./src/Messages/ClientMessages</directory>
-            </exclude>
-        </whitelist>
-    </filter>
 
     <php>
         <env name="ES_HOST" value="localhost"/>
