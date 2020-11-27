@@ -64,7 +64,7 @@ class when_committing_empty_transaction extends AsyncTestCase
 
     protected function tearDownAsync()
     {
-        $this->connection->close();
+        //$this->connection->close();
     }
 
     /** @test */

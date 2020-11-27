@@ -404,7 +404,7 @@ class append_to_stream extends EventStoreConnectionTestCase
 
         $readEvent = $events->events()[0]->event();
 
-        $this->connection->close();
+        //$this->connection->close();
 
         $this->assertSame($event->eventId()->toString(), $readEvent->eventId()->toString());
 

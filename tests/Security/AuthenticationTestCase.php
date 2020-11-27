@@ -151,7 +151,7 @@ abstract class AuthenticationTestCase extends AsyncTestCase
             new UserCredentials('adm', 'admpa$$')
         );
 
-        $connection->close();
+        //$connection->close();
 
         $this->connection = TestConnection::create($this->userCredentials);
 
@@ -161,7 +161,7 @@ abstract class AuthenticationTestCase extends AsyncTestCase
     protected function tearDownAsync(): Generator
     {
         $this->userCredentials = null;
-        $this->connection->close();
+        //$this->connection->close();
 
         $manager = new UsersManager(
             TestConnection::httpEndPoint(),
@@ -197,7 +197,7 @@ abstract class AuthenticationTestCase extends AsyncTestCase
             $this->adminUser()
         );
 
-        $connection->close();
+        //$connection->close();
     }
 
     protected function readEvent(string $streamId, ?string $login, ?string $password): Promise

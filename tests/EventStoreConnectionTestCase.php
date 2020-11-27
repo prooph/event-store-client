@@ -31,7 +31,7 @@ abstract class EventStoreConnectionTestCase extends AsyncTestCase
 
     protected function tearDownAsync(): Generator
     {
-        $this->connection->close();
+        //$this->connection->close();
 
         yield new Success();
     }

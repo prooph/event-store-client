@@ -137,6 +137,6 @@ class event_store_connection_should extends AsyncTestCase
             $this->assertInstanceOf(InvalidOperationException::class, $e);
         }
 
-        $connection->close();
+        //$connection->close();
     }
 }

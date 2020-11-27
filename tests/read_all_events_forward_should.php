@@ -79,7 +79,7 @@ class read_all_events_forward_should extends AsyncTestCase
             DefaultData::adminCredentials()
         );
 
-        $this->connection->close();
+        //$this->connection->close();
     }
 
     /** @test */

@@ -92,7 +92,7 @@ class read_all_events_backward_should extends AsyncTestCase
             DefaultData::adminCredentials()
         );
 
-        $this->connection->close();
+        //$this->connection->close();
     }
 
     /** @test */
