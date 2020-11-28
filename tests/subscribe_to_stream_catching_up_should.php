@@ -435,7 +435,7 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
             SubscriptionDropReason $reason,
             ?Throwable $exception = null
         ) use ($dropped): void {
-            $dropped->resolve(true);
+            $dropped->resolve();
         };
     }
 }

@@ -38,7 +38,7 @@ class subscribe_should extends EventStoreConnectionTestCase
 
         $appeared = new Deferred();
 
-        yield $this->connection->subscribeToStreamAsync(
+        $subscription = yield $this->connection->subscribeToStreamAsync(
             $stream,
             false,
             $this->eventAppearedResolver($appeared)
@@ -52,6 +52,8 @@ class subscribe_should extends EventStoreConnectionTestCase
         } catch (TimeoutException $e) {
             $this->fail('Appeared countdown event timed out');
         }
+
+        $subscription->unsubscribe();
     }
 
     /** @test */
@@ -62,13 +64,13 @@ class subscribe_should extends EventStoreConnectionTestCase
         $appeared1 = new Deferred();
         $appeared2 = new Deferred();
 
-        yield $this->connection->subscribeToStreamAsync(
+        $subscription1 = yield $this->connection->subscribeToStreamAsync(
             $stream,
             false,
             $this->eventAppearedResolver($appeared1)
         );
 
-        yield $this->connection->subscribeToStreamAsync(
+        $subscription2 = yield $this->connection->subscribeToStreamAsync(
             $stream,
             false,
             $this->eventAppearedResolver($appeared2)
@@ -89,6 +91,9 @@ class subscribe_should extends EventStoreConnectionTestCase
         } catch (TimeoutException $e) {
             $this->fail('Appeared2 countdown event timed out');
         }
+
+        $subscription1->unsubscribe();
+        $subscription2->unsubscribe();
     }
 
     /** @test */
@@ -128,7 +133,7 @@ class subscribe_should extends EventStoreConnectionTestCase
 
         $appeared = new Deferred();
 
-        yield $this->connection->subscribeToStreamAsync(
+        $subscription = yield $this->connection->subscribeToStreamAsync(
             $stream,
             false,
             $this->eventAppearedResolver($appeared)
@@ -142,6 +147,8 @@ class subscribe_should extends EventStoreConnectionTestCase
         } catch (TimeoutException $e) {
             $this->fail('Appeared countdown event timed out');
         }
+
+        $subscription->unsubscribe();
     }
 
     private function eventAppearedResolver(Deferred $deferred): Closure

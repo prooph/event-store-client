@@ -64,13 +64,13 @@ class subscribe_to_all_should extends EventStoreConnectionTestCase
         $appeared = new CountdownEvent(2);
         $dropped = new CountdownEvent(2);
 
-        yield $this->connection->subscribeToAllAsync(
+        $subscription1 = yield $this->connection->subscribeToAllAsync(
             false,
             $this->appearedWithCountdown($appeared),
             $this->droppedWithCountdown($dropped)
         );
 
-        yield $this->connection->subscribeToAllAsync(
+        $subscription2 = yield $this->connection->subscribeToAllAsync(
             false,
             $this->appearedWithCountdown($appeared),
             $this->droppedWithCountdown($dropped)
@@ -91,6 +91,9 @@ class subscribe_to_all_should extends EventStoreConnectionTestCase
         }
 
         $this->assertTrue(yield $appeared->wait(self::TIMEOUT), 'Appeared countdown event timed out');
+
+        $subscription1->unsubscribe();
+        $subscription2->unsubscribe();
     }
 
     /** @test */
@@ -101,7 +104,7 @@ class subscribe_to_all_should extends EventStoreConnectionTestCase
         $appeared = new CountdownEvent(1);
         $dropped = new CountdownEvent(1);
 
-        yield $this->connection->subscribeToAllAsync(
+        $subscription = yield $this->connection->subscribeToAllAsync(
             false,
             $this->appearedWithCountdown($appeared),
             $this->droppedWithCountdown($dropped)
@@ -118,6 +121,8 @@ class subscribe_to_all_should extends EventStoreConnectionTestCase
         }
 
         $this->assertTrue(yield $appeared->wait(self::TIMEOUT), 'Appeared countdown event didn\'t fire in time');
+
+        $subscription->unsubscribe();
     }
 
     private function appearedWithCountdown(CountdownEvent $appeared): Closure
@@ -138,7 +143,7 @@ class subscribe_to_all_should extends EventStoreConnectionTestCase
             EventStoreSubscription $subscription,
             SubscriptionDropReason $reason,
             ?Throwable $exception = null
-        ): void {
+        ) use ($dropped): void {
             $dropped->signal();
         };
     }

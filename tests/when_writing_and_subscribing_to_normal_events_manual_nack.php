@@ -71,7 +71,7 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends AsyncTes
                 DefaultData::adminCredentials()
             );
 
-            yield $this->connection->connectToPersistentSubscriptionAsync(
+            $subscription = yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 function (
@@ -105,6 +105,8 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends AsyncTes
             }
 
             yield Promise\timeout($this->eventsReceived->promise(), 5000);
+
+            yield $subscription->stop();
         });
     }
 }
