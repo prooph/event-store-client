@@ -95,7 +95,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
         $this->autoAck = $autoAck;
         $this->queue = new SplQueue();
         $this->stopped = new Deferred();
-        $this->stopped->resolve(true);
+        $this->stopped->resolve();
         $this->handler = $handler;
     }
 
@@ -170,6 +170,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
         $promise->onResolve(function (?Throwable $exception, $result) use ($deferred) {
             if ($exception) {
                 $deferred->fail($exception);
+                $this->stopped->resolve();
 
                 return;
             }
@@ -424,7 +425,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
                 ($this->subscriptionDropped)($this, $reason, $error);
             }
 
-            $this->stopped->resolve(true);
+            $this->stopped->resolve();
         }
     }
 }
