@@ -662,7 +662,7 @@ final class EventStoreNodeConnection implements
             EventStoreSubscription $subscription,
             SubscriptionDropReason $reason,
             ?Throwable $exception = null
-        ) use ($subscriptionDropped, $stopped) {
+        ) use ($subscriptionDropped, $stopped): void {
             if ($subscriptionDropped) {
                 ($subscriptionDropped)($subscription, $reason, $exception);
             }
@@ -671,6 +671,13 @@ final class EventStoreNodeConnection implements
         };
 
         $deferred = new Deferred();
+        $deferred->promise()->onResolve(
+            function (?Throwable $exception) use ($stopped): void {
+                if ($exception !== null) {
+                    $stopped->resolve();
+                }
+            }
+        );
 
         $this->handler->enqueueMessage(new StartSubscriptionMessage(
             $deferred,
@@ -735,7 +742,7 @@ final class EventStoreNodeConnection implements
             EventStoreSubscription $subscription,
             SubscriptionDropReason $reason,
             ?Throwable $exception = null
-        ) use ($subscriptionDropped, $stopped) {
+        ) use ($subscriptionDropped, $stopped): void {
             if ($subscriptionDropped) {
                 ($subscriptionDropped)($subscription, $reason, $exception);
             }
@@ -744,6 +751,13 @@ final class EventStoreNodeConnection implements
         };
 
         $deferred = new Deferred();
+        $deferred->promise()->onResolve(
+            function (?Throwable $exception) use ($stopped): void {
+                if ($exception !== null) {
+                    $stopped->resolve();
+                }
+            }
+        );
 
         $this->handler->enqueueMessage(new StartSubscriptionMessage(
             $deferred,
