@@ -50,8 +50,8 @@ class authorized_default_credentials_security extends AuthenticationTestCase
             yield $this->readMeta('metaread-stream', null, null);
             yield $this->writeMeta('metawrite-stream', null, null, 'user1');
 
-            yield $this->subscribeToStream('read-stream', null, null);
-            yield $this->subscribeToAll(null, null);
+            (yield $this->subscribeToStream('read-stream', null, null))->unsubscribe();
+            (yield $this->subscribeToAll(null, null))->unsubscribe();
         }));
     }
 

@@ -40,7 +40,7 @@ class persistent_subscription_manager extends AsyncTestCase
     private PersistentSubscriptionsManager $manager;
     private string $stream;
     private PersistentSubscriptionSettings $settings;
-    private EventStorePersistentSubscription $sub;
+    private ?EventStorePersistentSubscription $sub = null;
 
     protected function setUp(): void
     {
@@ -94,6 +94,13 @@ class persistent_subscription_manager extends AsyncTestCase
                 new EventData(null, 'whatever', true, \json_encode(['bar' => 3])),
             ]
         );
+    }
+
+    protected function end(): Generator
+    {
+        if ($this->sub !== null) {
+            yield $this->sub->stop();
+        }
     }
 
     /** @test */

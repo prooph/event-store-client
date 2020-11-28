@@ -63,7 +63,7 @@ class all_stream_with_no_acl_security extends AuthenticationTestCase
             yield $this->readStreamForward('$all', 'adm', 'admpa$$');
             yield $this->readStreamBackward('$all', 'adm', 'admpa$$');
             yield $this->readMeta('$all', 'adm', 'admpa$$');
-            yield $this->subscribeToStream('$all', 'adm', 'admpa$$');
+            (yield $this->subscribeToStream('$all', 'adm', 'admpa$$'))->unsubscribe();
         }));
     }
 

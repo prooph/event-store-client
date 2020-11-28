@@ -32,7 +32,7 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends As
     private PersistentSubscriptionSettings $settings;
     private Throwable $exception;
     private string $group = 'startinbeginning1';
-    private ?EventStorePersistentSubscription $firstSubscription;
+    private ?EventStorePersistentSubscription $firstSubscription = null;
 
     protected function setUp(): void
     {
@@ -44,6 +44,13 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends As
             ->startFromCurrent()
             ->withMaxSubscriberCountOf(1)
             ->build();
+    }
+
+    protected function tearDownAsync(): Generator
+    {
+        if ($this->firstSubscription !== null) {
+            yield $this->firstSubscription->stop();
+        }
     }
 
     protected function given(): Generator
@@ -114,6 +121,7 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends As
     {
         yield $this->execute(function (): Generator {
             $this->assertInstanceOf(MaximumSubscribersReached::class, $this->exception);
+
             yield new Success();
         });
     }

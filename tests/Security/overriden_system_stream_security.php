@@ -42,8 +42,8 @@ class overriden_system_stream_security extends AuthenticationTestCase
             $stream = '$sys-authorized-user';
 
             yield $this->readEvent($stream, 'user1', 'pa$$1');
-            yield $this->ReadStreamForward($stream, 'user1', 'pa$$1');
-            yield $this->ReadStreamBackward($stream, 'user1', 'pa$$1');
+            yield $this->readStreamForward($stream, 'user1', 'pa$$1');
+            yield $this->readStreamBackward($stream, 'user1', 'pa$$1');
 
             yield $this->writeStream($stream, 'user1', 'pa$$1');
             yield $this->transStart($stream, 'user1', 'pa$$1');
@@ -58,7 +58,7 @@ class overriden_system_stream_security extends AuthenticationTestCase
             yield $this->readMeta($stream, 'user1', 'pa$$1');
             yield $this->writeMeta($stream, 'user1', 'pa$$1', null);
 
-            yield $this->subscribeToStream($stream, 'user1', 'pa$$1');
+            (yield $this->subscribeToStream($stream, 'user1', 'pa$$1'))->unsubscribe();
 
             yield $this->deleteStream($stream, 'user1', 'pa$$1');
         }));
@@ -70,8 +70,8 @@ class overriden_system_stream_security extends AuthenticationTestCase
         $stream = '$sys-not-authorized-user';
 
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readEvent($stream, 'user2', 'pa$$2'));
-        yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->ReadStreamForward($stream, 'user2', 'pa$$2'));
-        yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->ReadStreamBackward($stream, 'user2', 'pa$$2'));
+        yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readStreamForward($stream, 'user2', 'pa$$2'));
+        yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readStreamBackward($stream, 'user2', 'pa$$2'));
 
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream($stream, 'user2', 'pa$$2'));
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->transStart($stream, 'user2', 'pa$$2'));
@@ -97,8 +97,8 @@ class overriden_system_stream_security extends AuthenticationTestCase
         $stream = '$sys-anonymous-user';
 
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readEvent($stream, null, null));
-        yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->ReadStreamForward($stream, null, null));
-        yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->ReadStreamBackward($stream, null, null));
+        yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readStreamForward($stream, null, null));
+        yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->readStreamBackward($stream, null, null));
 
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->writeStream($stream, null, null));
         yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->transStart($stream, null, null));
@@ -125,8 +125,8 @@ class overriden_system_stream_security extends AuthenticationTestCase
             $stream = '$sys-admin';
 
             yield $this->readEvent($stream, 'adm', 'admpa$$');
-            yield $this->ReadStreamForward($stream, 'adm', 'admpa$$');
-            yield $this->ReadStreamBackward($stream, 'adm', 'admpa$$');
+            yield $this->readStreamForward($stream, 'adm', 'admpa$$');
+            yield $this->readStreamBackward($stream, 'adm', 'admpa$$');
 
             yield $this->writeStream($stream, 'adm', 'admpa$$');
             yield $this->transStart($stream, 'adm', 'admpa$$');
@@ -141,7 +141,7 @@ class overriden_system_stream_security extends AuthenticationTestCase
             yield $this->readMeta($stream, 'adm', 'admpa$$');
             yield $this->writeMeta($stream, 'adm', 'admpa$$', null);
 
-            yield $this->subscribeToStream($stream, 'adm', 'admpa$$');
+            (yield $this->subscribeToStream($stream, 'adm', 'admpa$$'))->unsubscribe();
 
             yield $this->deleteStream($stream, 'adm', 'admpa$$');
         }));

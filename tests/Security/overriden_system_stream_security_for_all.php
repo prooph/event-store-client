@@ -42,8 +42,8 @@ class overriden_system_stream_security_for_all extends AuthenticationTestCase
             $stream = '$sys-authorized-user2';
 
             yield $this->readEvent($stream, 'user1', 'pa$$1');
-            yield $this->ReadStreamForward($stream, 'user1', 'pa$$1');
-            yield $this->ReadStreamBackward($stream, 'user1', 'pa$$1');
+            yield $this->readStreamForward($stream, 'user1', 'pa$$1');
+            yield $this->readStreamBackward($stream, 'user1', 'pa$$1');
 
             yield $this->writeStream($stream, 'user1', 'pa$$1');
             yield $this->transStart($stream, 'user1', 'pa$$1');
@@ -58,7 +58,7 @@ class overriden_system_stream_security_for_all extends AuthenticationTestCase
             yield $this->readMeta($stream, 'user1', 'pa$$1');
             yield $this->writeMeta($stream, 'user1', 'pa$$1', null);
 
-            yield $this->subscribeToStream($stream, 'user1', 'pa$$1');
+            (yield $this->subscribeToStream($stream, 'user1', 'pa$$1'))->unsubscribe();
 
             yield $this->deleteStream($stream, 'user1', 'pa$$1');
         }));
@@ -71,8 +71,8 @@ class overriden_system_stream_security_for_all extends AuthenticationTestCase
             $stream = '$sys-anonymous-user2';
 
             yield $this->readEvent($stream, null, null);
-            yield $this->ReadStreamForward($stream, null, null);
-            yield $this->ReadStreamBackward($stream, null, null);
+            yield $this->readStreamForward($stream, null, null);
+            yield $this->readStreamBackward($stream, null, null);
 
             yield $this->writeStream($stream, null, null);
             yield $this->transStart($stream, null, null);
@@ -87,7 +87,7 @@ class overriden_system_stream_security_for_all extends AuthenticationTestCase
             yield $this->readMeta($stream, null, null);
             yield $this->writeMeta($stream, null, null, null);
 
-            yield $this->subscribeToStream($stream, null, null);
+            (yield $this->subscribeToStream($stream, null, null))->unsubscribe();
 
             yield $this->deleteStream($stream, null, null);
         }));
@@ -100,8 +100,8 @@ class overriden_system_stream_security_for_all extends AuthenticationTestCase
             $stream = '$sys-admin2';
 
             yield $this->readEvent($stream, 'adm', 'admpa$$');
-            yield $this->ReadStreamForward($stream, 'adm', 'admpa$$');
-            yield $this->ReadStreamBackward($stream, 'adm', 'admpa$$');
+            yield $this->readStreamForward($stream, 'adm', 'admpa$$');
+            yield $this->readStreamBackward($stream, 'adm', 'admpa$$');
 
             yield $this->writeStream($stream, 'adm', 'admpa$$');
             yield $this->transStart($stream, 'adm', 'admpa$$');
@@ -116,7 +116,7 @@ class overriden_system_stream_security_for_all extends AuthenticationTestCase
             yield $this->readMeta($stream, 'adm', 'admpa$$');
             yield $this->writeMeta($stream, 'adm', 'admpa$$', null);
 
-            yield $this->subscribeToStream($stream, 'adm', 'admpa$$');
+            (yield $this->subscribeToStream($stream, 'adm', 'admpa$$'))->unsubscribe();
 
             yield $this->deleteStream($stream, 'adm', 'admpa$$');
         }));

@@ -16,6 +16,7 @@ namespace ProophTest\EventStoreClient\Security;
 use Generator;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\NotAuthenticated;
+use function Amp\call;
 
 class subscribe_to_all_security extends AuthenticationTestCase
 {
@@ -40,12 +41,16 @@ class subscribe_to_all_security extends AuthenticationTestCase
     /** @test */
     public function subscribing_to_all_with_authorized_user_credentials_succeeds(): Generator
     {
-        yield $this->expectNoExceptionFromCallback(fn () => $this->subscribeToAll('user1', 'pa$$1'));
+        yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
+            (yield $this->subscribeToAll('user1', 'pa$$1'))->unsubscribe();
+        }));
     }
 
     /** @test */
     public function subscribing_to_all_with_admin_user_credentials_succeeds(): Generator
     {
-        yield $this->expectNoExceptionFromCallback(fn () => $this->subscribeToAll('adm', 'admpa$$'));
+        yield $this->expectNoExceptionFromCallback(fn () => call(function (): Generator {
+            (yield $this->subscribeToAll('adm', 'admpa$$'))->unsubscribe();
+        }));
     }
 }

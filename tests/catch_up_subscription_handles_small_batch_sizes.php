@@ -67,7 +67,7 @@ class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnecti
     {
         $deferred = new Deferred();
 
-        yield $this->connection->subscribeToAllFromAsync(
+        $subscription = yield $this->connection->subscribeToAllFromAsync(
             null,
             $this->settings,
             $this->eventAppearedResolver(),
@@ -83,6 +83,8 @@ class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnecti
         } catch (TimeoutException $e) {
             $this->fail('Timed out waiting for test to complete');
         }
+
+        yield $subscription->stop();
     }
 
     /** @test */
@@ -90,7 +92,7 @@ class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnecti
     {
         $deferred = new Deferred();
 
-        yield $this->connection->subscribeToStreamFromAsync(
+        $subscription = yield $this->connection->subscribeToStreamFromAsync(
             $this->streamName,
             null,
             $this->settings,
@@ -107,6 +109,8 @@ class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnecti
         } catch (TimeoutException $e) {
             $this->fail('Timed out waiting for test to complete');
         }
+
+        yield $subscription->stop();
     }
 
     private function eventAppearedResolver(): Closure

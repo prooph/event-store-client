@@ -66,7 +66,7 @@ class system_stream_security extends AuthenticationTestCase
             yield $this->readMeta('$system-no-acl', 'adm', 'admpa$$');
             yield $this->writeMeta('$system-no-acl', 'adm', 'admpa$$', null);
 
-            yield $this->subscribeToStream('$system-no-acl', 'adm', 'admpa$$');
+            (yield $this->subscribeToStream('$system-no-acl', 'adm', 'admpa$$'))->unsubscribe();
         }));
     }
 
@@ -114,7 +114,7 @@ class system_stream_security extends AuthenticationTestCase
             yield $this->readMeta('$system-acl', 'user1', 'pa$$1');
             yield $this->writeMeta('$system-acl', 'user1', 'pa$$1', 'user1');
 
-            yield $this->subscribeToStream('$system-acl', 'user1', 'pa$$1');
+            (yield $this->subscribeToStream('$system-acl', 'user1', 'pa$$1'))->unsubscribe();
         }));
     }
 
@@ -139,7 +139,7 @@ class system_stream_security extends AuthenticationTestCase
             yield $this->readMeta('$system-acl', 'adm', 'admpa$$');
             yield $this->writeMeta('$system-acl', 'adm', 'admpa$$', null);
 
-            yield $this->subscribeToStream('$system-acl', 'adm', 'admpa$$');
+            (yield $this->subscribeToStream('$system-acl', 'adm', 'admpa$$'))->unsubscribe();
         }));
     }
 
@@ -187,7 +187,7 @@ class system_stream_security extends AuthenticationTestCase
             yield $this->readMeta('$system-adm', 'adm', 'admpa$$');
             yield $this->writeMeta('$system-adm', 'adm', 'admpa$$', null);
 
-            yield $this->subscribeToStream('$system-adm', 'adm', 'admpa$$');
+            (yield $this->subscribeToStream('$system-adm', 'adm', 'admpa$$'))->unsubscribe();
         }));
     }
 
@@ -212,7 +212,7 @@ class system_stream_security extends AuthenticationTestCase
             yield $this->readMeta('$system-all', null, null);
             yield $this->writeMeta('$system-all', null, null, SystemRoles::ALL);
 
-            yield $this->subscribeToStream('$system-all', null, null);
+            (yield $this->subscribeToStream('$system-all', null, null))->unsubscribe();
         }));
     }
 
@@ -237,7 +237,7 @@ class system_stream_security extends AuthenticationTestCase
             yield $this->readMeta('$system-all', 'user1', 'pa$$1');
             yield $this->writeMeta('$system-all', 'user1', 'pa$$1', SystemRoles::ALL);
 
-            yield $this->subscribeToStream('$system-all', 'user1', 'pa$$1');
+            (yield $this->subscribeToStream('$system-all', 'user1', 'pa$$1'))->unsubscribe();
         }));
     }
 
@@ -262,7 +262,7 @@ class system_stream_security extends AuthenticationTestCase
             yield $this->readMeta('$system-all', 'adm', 'admpa$$');
             yield $this->writeMeta('$system-all', 'adm', 'admpa$$', SystemRoles::ALL);
 
-            yield $this->subscribeToStream('$system-all', 'adm', 'admpa$$');
+            (yield $this->subscribeToStream('$system-all', 'adm', 'admpa$$'))->unsubscribe();
         }));
     }
 }
