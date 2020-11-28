@@ -99,6 +99,13 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends As
         }
     }
 
+    protected function end(): Generator
+    {
+        $this->connection->close();
+
+        yield new Success();
+    }
+
     /** @test */
     public function the_first_subscription_connects_successfully(): Generator
     {

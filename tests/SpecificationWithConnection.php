@@ -56,7 +56,7 @@ trait SpecificationWithConnection
 
     protected function end(): Generator
     {
-        //$this->connection->close();
+        $this->connection->close();
 
         yield new Success();
     }

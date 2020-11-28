@@ -161,7 +161,7 @@ abstract class AuthenticationTestCase extends AsyncTestCase
     protected function tearDownAsync(): Generator
     {
         $this->userCredentials = null;
-        //$this->connection->close();
+        $this->connection->close();
 
         $manager = new UsersManager(
             TestConnection::httpEndPoint(),

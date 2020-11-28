@@ -50,6 +50,13 @@ class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnecti
         $this->settings = new CatchUpSubscriptionSettings(100, 1, false, true);
     }
 
+    protected function tearDownAsync(): Generator
+    {
+        $this->connection->close();
+
+        yield new Success();
+    }
+
     /** @return EventData[] */
     private function createOneHundredEvents(): array
     {

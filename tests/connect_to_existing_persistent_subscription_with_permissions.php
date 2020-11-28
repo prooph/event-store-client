@@ -61,8 +61,15 @@ class connect_to_existing_persistent_subscription_with_permissions extends Async
         );
     }
 
+    protected function end(): Generator
+    {
+        $this->connection->close();
+
+        yield new Success();
+    }
+
     /** @test */
-    public function the_subscription_suceeds(): Generator
+    public function the_subscription_succeeds(): Generator
     {
         yield $this->execute(function (): Generator {
             $this->assertNotNull(yield $this->sub);

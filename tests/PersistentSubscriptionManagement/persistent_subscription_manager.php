@@ -96,6 +96,13 @@ class persistent_subscription_manager extends AsyncTestCase
         );
     }
 
+    protected function end(): Generator
+    {
+        $this->sub->stop();
+
+        yield new Success();
+    }
+
     /** @test */
     public function can_describe_persistent_subscription(): Generator
     {
