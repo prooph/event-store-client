@@ -46,13 +46,6 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends As
             ->build();
     }
 
-    protected function tearDownAsync(): Generator
-    {
-        if ($this->firstSubscription !== null) {
-            yield $this->firstSubscription->stop();
-        }
-    }
-
     protected function given(): Generator
     {
         yield $this->connection->createPersistentSubscriptionAsync(
@@ -103,6 +96,13 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends As
             );
         } catch (Throwable $e) {
             $this->exception = $e;
+        }
+    }
+
+    protected function end(): Generator
+    {
+        if ($this->firstSubscription !== null) {
+            yield $this->firstSubscription->stop();
         }
     }
 

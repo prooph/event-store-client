@@ -40,6 +40,7 @@ class happy_case_catching_up_to_link_to_events_auto_ack extends AsyncTestCase
 
     private Deferred $eventsReceived;
     private int $eventReceivedCount = 0;
+    private ?EventStorePersistentSubscription $subscription = null;
 
     protected function setUp(): void
     {
@@ -53,6 +54,13 @@ class happy_case_catching_up_to_link_to_events_auto_ack extends AsyncTestCase
     protected function when(): Generator
     {
         yield new Success();
+    }
+
+    protected function end(): Generator
+    {
+        if ($this->subscription !== null) {
+            yield $this->subscription->stop();
+        }
     }
 
     /** @test */
@@ -82,7 +90,7 @@ class happy_case_catching_up_to_link_to_events_auto_ack extends AsyncTestCase
                 DefaultData::adminCredentials()
             );
 
-            yield $this->connection->connectToPersistentSubscriptionAsync(
+            $this->subscription = yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 function (

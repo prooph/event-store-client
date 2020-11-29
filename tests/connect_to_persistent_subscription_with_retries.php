@@ -37,6 +37,7 @@ class connect_to_persistent_subscription_with_retries extends AsyncTestCase
     private EventId $eventId;
     private ?int $retryCount;
     private string $group = 'retries';
+    private ?EventStorePersistentSubscription $subscription = null;
 
     protected function setUp(): void
     {
@@ -60,7 +61,7 @@ class connect_to_persistent_subscription_with_retries extends AsyncTestCase
             DefaultData::adminCredentials()
         );
 
-        yield $this->connection->connectToPersistentSubscriptionAsync(
+        $this->subscription = yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             'agroupname55',
             function (
@@ -97,6 +98,13 @@ class connect_to_persistent_subscription_with_retries extends AsyncTestCase
             [new EventData($this->eventId, 'test', true, '{"foo":"bar"}')],
             DefaultData::adminCredentials()
         );
+    }
+
+    protected function end(): Generator
+    {
+        if ($this->subscription !== null) {
+            yield $this->subscription->stop();
+        }
     }
 
     /** @test */

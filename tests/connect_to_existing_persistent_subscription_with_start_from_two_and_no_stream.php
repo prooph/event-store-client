@@ -37,6 +37,7 @@ class connect_to_existing_persistent_subscription_with_start_from_two_and_no_str
     private Deferred $resetEvent;
     private EventId $eventId;
     private bool $set = false;
+    private ?EventStorePersistentSubscription $subscription = null;
 
     protected function setUp(): void
     {
@@ -60,7 +61,7 @@ class connect_to_existing_persistent_subscription_with_start_from_two_and_no_str
             DefaultData::adminCredentials()
         );
 
-        yield $this->connection->connectToPersistentSubscriptionAsync(
+        $this->subscription = yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             function (
@@ -105,6 +106,13 @@ class connect_to_existing_persistent_subscription_with_start_from_two_and_no_str
             [new EventData($this->eventId, 'test', true, '{"foo":"bar"}')],
             DefaultData::adminCredentials()
         );
+    }
+
+    protected function end(): Generator
+    {
+        if ($this->subscription !== null) {
+            yield $this->subscription->stop();
+        }
     }
 
     /** @test */

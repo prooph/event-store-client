@@ -40,6 +40,7 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends Async
     private int $bufferCount = 10;
     private Deferred $eventsReceived;
     private int $eventReceivedCount = 0;
+    private ?EventStorePersistentSubscription $subscription = null;
 
     protected function setUp(): void
     {
@@ -55,6 +56,13 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends Async
         yield new Success();
     }
 
+    protected function end(): Generator
+    {
+        if ($this->subscription !== null) {
+            yield $this->subscription->stop();
+        }
+    }
+
     /** @test */
     public function test(): Generator
     {
@@ -68,7 +76,7 @@ class happy_case_writing_and_subscribing_to_normal_events_auto_ack extends Async
                 DefaultData::adminCredentials()
             );
 
-            yield $this->connection->connectToPersistentSubscriptionAsync(
+            $this->subscription = yield $this->connection->connectToPersistentSubscriptionAsync(
                 $this->streamName,
                 $this->groupName,
                 function (

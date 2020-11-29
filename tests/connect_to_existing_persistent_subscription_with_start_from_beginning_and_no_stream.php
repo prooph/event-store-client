@@ -38,6 +38,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
     private Deferred $resetEvent;
     private array $ids = [];
     private bool $set = false;
+    private ?EventStorePersistentSubscription $subscription = null;
 
     protected function setUp(): void
     {
@@ -60,7 +61,7 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
             DefaultData::adminCredentials()
         );
 
-        yield $this->connection->connectToPersistentSubscriptionAsync(
+        $this->subscription = yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             function (
@@ -102,6 +103,13 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_and_
     protected function when(): Generator
     {
         yield $this->writeEvents();
+    }
+
+    protected function end(): Generator
+    {
+        if ($this->subscription !== null) {
+            yield $this->subscription->stop();
+        }
     }
 
     /** @test */

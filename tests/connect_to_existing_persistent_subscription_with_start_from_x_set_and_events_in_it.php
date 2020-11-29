@@ -37,6 +37,7 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
     private Deferred $resetEvent;
     private ?ResolvedEvent $firstEvent;
     private EventId $eventId;
+    private ?EventStorePersistentSubscription $subscription = null;
 
     protected function setUp(): void
     {
@@ -63,7 +64,7 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
 
         $set = false;
 
-        yield $this->connection->connectToPersistentSubscriptionAsync(
+        $this->subscription = yield $this->connection->connectToPersistentSubscriptionAsync(
             $this->stream,
             $this->group,
             function (
@@ -114,6 +115,13 @@ class connect_to_existing_persistent_subscription_with_start_from_x_set_and_even
             [new EventData($this->eventId, 'test', true, '{"foo":"bar"}')],
             DefaultData::adminCredentials()
         );
+    }
+
+    protected function end(): Generator
+    {
+        if ($this->subscription !== null) {
+            yield $this->subscription->stop();
+        }
     }
 
     /** @test */
