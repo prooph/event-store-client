@@ -201,9 +201,9 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
         foreach ($members as $k => $member) {
             if ($members[$k]->state()->equals(VNodeState::manager())) {
-                $result[--$j] = new GossipSeed(new EndPoint($members[$k]->externalHttpIp(), $members[$k]->externalHttpPort()));
+                $result[--$j] = new GossipSeed(new EndPoint($members[$k]->httpAddress(), $members[$k]->httpPort()));
             } else {
-                $result[++$i] = new GossipSeed(new EndPoint($members[$k]->externalHttpIp(), $members[$k]->externalHttpPort()));
+                $result[++$i] = new GossipSeed(new EndPoint($members[$k]->httpAddress(), $members[$k]->httpPort()));
             }
         }
 
@@ -220,7 +220,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
     {
         return call(function () use ($endPoint): Generator {
             $uri = 'https://' . $endPoint->endPoint()->host() . ':' . $endPoint->endPoint()->port() . '/gossip?format=json';
-
+            $this->log->info($uri);
             try {
                 $request = new Request($uri);
 
@@ -234,6 +234,8 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
                 $response = yield $this->httpClient->request($request);
                 \assert($response instanceof Response);
             } catch (Exception $e) {
+                $this->log->error($e->getMessage());
+
                 return;
             }
 
