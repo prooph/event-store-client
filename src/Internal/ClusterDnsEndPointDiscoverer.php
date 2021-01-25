@@ -219,7 +219,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
     private function tryGetGossipFrom(GossipSeed $endPoint): Promise
     {
         return call(function () use ($endPoint): Generator {
-            $uri = 'http://' . $endPoint->endPoint()->host() . ':' . $endPoint->endPoint()->port() . '/gossip?format=json';
+            $uri = 'https://' . $endPoint->endPoint()->host() . ':' . $endPoint->endPoint()->port() . '/gossip?format=json';
 
             try {
                 $request = new Request($uri);
