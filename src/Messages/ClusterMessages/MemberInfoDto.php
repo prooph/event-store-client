@@ -20,7 +20,7 @@ use Ramsey\Uuid\Uuid;
 class MemberInfoDto
 {
     private string $instanceId;
-    private int $timeStamp;
+    private string $timeStamp;
     private VNodeState $state;
     private bool $isAlive;
     private string $internalTcpIp;
@@ -66,12 +66,12 @@ class MemberInfoDto
         $this->instanceId = $instanceId;
     }
 
-    public function timeStamp(): int
+    public function timeStamp(): string
     {
         return $this->timeStamp;
     }
 
-    public function setTimeStamp(int $timeStamp): void
+    public function setTimeStamp(string $timeStamp): void
     {
         $this->timeStamp = $timeStamp;
     }
