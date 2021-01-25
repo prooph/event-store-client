@@ -43,9 +43,9 @@ class ConnectionSettingsBuilder
     private int $operationTimeout = Consts::DEFAULT_OPERATION_TIMEOUT;
     private int $operationTimeoutCheckPeriod = Consts::DEFAULT_OPERATION_TIMEOUT_CHECK_PERIOD;
     private ?UserCredentials $defaultUserCredentials = null;
-    private bool $useSslConnection = false;
+    private bool $useSslConnection = true;
     private string $targetHost = '';
-    private bool $validateServer = false;
+    private bool $validateServer = true;
     private bool $failOnNoServerResponse = true;
     private int $heartbeatInterval = 750;
     private int $heartbeatTimeout = 1500;
