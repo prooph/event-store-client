@@ -23,19 +23,27 @@ class MemberInfoDto
     private string $timeStamp;
     private VNodeState $state;
     private bool $isAlive;
+    
     private string $internalTcpIp;
     private int $internalTcpPort;
     private int $internalSecureTcpPort;
+    
     private string $externalTcpIp;
     private int $externalTcpPort;
     private int $externalSecureTcpPort;
-    private string $internalHttpIp;
-    private int $internalHttpPort;
-    private string $externalHttpIp = '';
-    private int $externalHttpPort = 0;
+
+    // 20.x cluster info
+    public string $httpEndPointIp;
+    public int $httpEndPointPort;
+
+    // 5.x cluster info
+    public string $externalHttpIp;
+    public int $externalHttpPort;
+    
     private int $lastCommitPosition;
     private int $writerCheckpoint;
     private int $chaserCheckpoint;
+    
     private int $epochPosition;
     private int $epochNumber;
     private string $epochId;
@@ -268,5 +276,15 @@ class MemberInfoDto
     public function setNodePriority(int $nodePriority): void
     {
         $this->nodePriority = $nodePriority;
+    }
+
+    public function httpAddress(): string
+    {
+        return $this->httpEndPointIp ?? $this->externalHttpIp;
+    }
+    
+    public function httpPort(): int
+    {
+        return $this->httpEndPointPort ?? $this->externalHttpPort();
     }
 }
