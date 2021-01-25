@@ -31,8 +31,8 @@ class MemberInfoDto
     private int $externalSecureTcpPort;
     private string $internalHttpIp;
     private int $internalHttpPort;
-    private string $externalHttpIp;
-    private int $externalHttpPort;
+    private string $externalHttpIp = '';
+    private int $externalHttpPort = 0;
     private int $lastCommitPosition;
     private int $writerCheckpoint;
     private int $chaserCheckpoint;
