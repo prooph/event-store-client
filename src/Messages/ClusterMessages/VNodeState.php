@@ -17,30 +17,42 @@ namespace Prooph\EventStoreClient\Messages\ClusterMessages;
 final class VNodeState
 {
     public const OPTIONS = [
-        'Initializing' => 0,
-        'Unknown' => 1,
-        'PreReplica' => 2,
-        'CatchingUp' => 3,
-        'Clone' => 4,
-        'Slave' => 5,
-        'PreMaster' => 6,
-        'Master' => 7,
-        'Manager' => 8,
-        'ShuttingDown' => 9,
-        'Shutdown' => 10,
+        'Initializing' => 1,
+        'ReadOnlyLeaderless' => 2,
+        'Unknown' => 3,
+        'PreReadOnlyReplica' => 4,
+        'PreReplica' => 5,
+        'CatchingUp' => 6,
+        'Clone' => 7,
+        'ReadOnlyReplica' => 8,
+        'Slave' => 9,
+        'Follower' => 10,
+        'PreMaster' => 11,
+        'PreLeader' => 12,
+        'Master' => 13,
+        'Leader' => 14,
+        'Manager' => 15,
+        'ShuttingDown' => 16,
+        'Shutdown' => 17,
     ];
 
-    public const INITIALIZING = 0;
-    public const UNKNOWN = 1;
-    public const PRE_REPLICA = 2;
-    public const CATCHING_UP = 3;
-    public const CLONE = 4;
-    public const SLAVE = 5;
-    public const PRE_MASTER = 6;
-    public const MASTER = 7;
-    public const MANAGER = 8;
-    public const SHUTTING_DOWN = 9;
-    public const SHUTDOWN = 10;
+    public const Initializing = 1;
+    public const ReadOnlyLeaderless = 2;
+    public const Unknown = 3;
+    public const PreReadOnlyReplica = 4;
+    public const PreReplica = 5;
+    public const CatchingUp = 6;
+    public const Clone = 7;
+    public const ReadOnlyReplica = 8;
+    public const Slave = 9;
+    public const Follower = 10;
+    public const PreMaster = 11;
+    public const PreLeader = 12;
+    public const Master = 13;
+    public const Leader = 14;
+    public const Manager = 15;
+    public const ShuttingDown = 16;
+    public const Shutdown = 17;
 
     private string $name;
     private int $value;
@@ -56,9 +68,19 @@ final class VNodeState
         return new self('Initializing');
     }
 
+    public static function readOnlyLeaderless(): self
+    {
+        return new self('ReadOnlyLeaderless');
+    }
+
     public static function unknown(): self
     {
         return new self('Unknown');
+    }
+
+    public static function preReadOnlyReplica(): self
+    {
+        return new self('PreReadOnlyReplica');
     }
 
     public static function preReplica(): self
@@ -76,9 +98,19 @@ final class VNodeState
         return new self('Clone');
     }
 
+    public static function readOnlyReplica(): self
+    {
+        return new self('ReadOnlyReplica');
+    }
+
     public static function slave(): self
     {
         return new self('Slave');
+    }
+
+    public static function follower(): self
+    {
+        return new self('Follower');
     }
 
     public static function preMaster(): self
@@ -86,9 +118,19 @@ final class VNodeState
         return new self('PreMaster');
     }
 
+    public static function preLeader(): self
+    {
+        return new self('PreLeader');
+    }
+
     public static function master(): self
     {
         return new self('Master');
+    }
+
+    public static function leader(): self
+    {
+        return new self('Leader');
     }
 
     public static function manager(): self
