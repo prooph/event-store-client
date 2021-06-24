@@ -2,8 +2,8 @@
 
 /**
  * This file is part of `prooph/event-store-client`.
- * (c) 2018-2020 Alexander Miertsch <kontakt@codeliner.ws>
- * (c) 2018-2020 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
+ * (c) 2018-2021 Alexander Miertsch <kontakt@codeliner.ws>
+ * (c) 2018-2021 Sascha-Oliver Prolic <saschaprolic@googlemail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -23,11 +23,11 @@ class MemberInfoDto
     private string $timeStamp;
     private VNodeState $state;
     private bool $isAlive;
-    
+
     private string $internalTcpIp;
     private int $internalTcpPort;
     private int $internalSecureTcpPort;
-    
+
     private string $externalTcpIp;
     private int $externalTcpPort;
     private int $externalSecureTcpPort;
@@ -39,11 +39,11 @@ class MemberInfoDto
     // 5.x cluster info
     public string $externalHttpIp;
     public int $externalHttpPort;
-    
+
     private int $lastCommitPosition;
     private int $writerCheckpoint;
     private int $chaserCheckpoint;
-    
+
     private int $epochPosition;
     private int $epochNumber;
     private string $epochId;
@@ -282,7 +282,7 @@ class MemberInfoDto
     {
         return $this->httpEndPointIp ?? $this->externalHttpIp;
     }
-    
+
     public function httpPort(): int
     {
         return $this->httpEndPointPort ?? $this->externalHttpPort();
