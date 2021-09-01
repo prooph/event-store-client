@@ -37,7 +37,7 @@
     "php-coveralls/php-coveralls": "^2.2",
     "phpspec/prophecy": "^1.10.3",
     "phpunit/phpunit": "^9.1",
-    "prooph/php-cs-fixer-config": "^0.4.0",
+    "prooph/php-cs-fixer-config": "^0.4.0 || ^0.5.0",
     "vimeo/psalm": "^4.0.1"
   },
   "suggest": {
