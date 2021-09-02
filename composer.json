@@ -19,7 +19,7 @@
   ],
   "prefer-stable": true,
   "require": {
-    "php": "^7.4",
+    "php": "^7.4 || ^8.0",
     "ext-json": "*",
     "amphp/amp": "^2.4.4",
     "amphp/http-client": "^4.2.2",
