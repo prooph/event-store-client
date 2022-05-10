@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Projections;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Http\Client\Response;
-use Amp\Promise;
-use JsonException;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Projections\ProjectionDetails;
 use Prooph\EventStore\Projections\ProjectionStatistics;
@@ -35,24 +33,22 @@ use UnexpectedValueException;
 /** @internal */
 class ProjectionsClient
 {
-    private HttpClient $client;
-    private int $operationTimeout;
-    private string $httpSchema;
+    private readonly HttpClient $client;
+
+    private readonly EndpointExtensions $httpSchema;
 
     public function __construct(int $operationTimeout, bool $tlsTerminatedEndpoint, bool $verifyPeer)
     {
         $this->client = new HttpClient($operationTimeout, $verifyPeer);
-        $this->operationTimeout = $operationTimeout;
-        $this->httpSchema = $tlsTerminatedEndpoint ? EndpointExtensions::HTTPS_SCHEMA : EndpointExtensions::HTTP_SCHEMA;
+        $this->httpSchema = EndpointExtensions::useHttps($tlsTerminatedEndpoint);
     }
 
-    /** @return Promise<void> */
     public function enable(
         EndPoint $endPoint,
         string $name,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return $this->sendPost(
+    ): void {
+        $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -61,17 +57,16 @@ class ProjectionsClient
             ),
             '',
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
     }
 
-    /** @return Promise<void> */
     public function disable(
         EndPoint $endPoint,
         string $name,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return $this->sendPost(
+    ): void {
+        $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -80,17 +75,16 @@ class ProjectionsClient
             ),
             '',
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
     }
 
-    /** @return Promise<void> */
     public function abort(
         EndPoint $endPoint,
         string $name,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return $this->sendPost(
+    ): void {
+        $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -99,18 +93,17 @@ class ProjectionsClient
             ),
             '',
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
     }
 
-    /** @return Promise<void> */
     public function createOneTime(
         EndPoint $endPoint,
         string $query,
         string $type,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return $this->sendPost(
+    ): void {
+        $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -119,19 +112,18 @@ class ProjectionsClient
             ),
             $query,
             $userCredentials,
-            HttpStatusCode::CREATED
+            HttpStatusCode::Created
         );
     }
 
-    /** @return Promise<void> */
     public function createTransient(
         EndPoint $endPoint,
         string $name,
         string $query,
         string $type,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return $this->sendPost(
+    ): void {
+        $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -141,11 +133,10 @@ class ProjectionsClient
             ),
             $query,
             $userCredentials,
-            HttpStatusCode::CREATED
+            HttpStatusCode::Created
         );
     }
 
-    /** @return Promise<void> */
     public function createContinuous(
         EndPoint $endPoint,
         string $name,
@@ -153,8 +144,8 @@ class ProjectionsClient
         bool $trackEmittedStreams,
         string $type,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return $this->sendPost(
+    ): void {
+        $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -165,175 +156,97 @@ class ProjectionsClient
             ),
             $query,
             $userCredentials,
-            HttpStatusCode::CREATED
+            HttpStatusCode::Created
         );
     }
 
-    /** @return Promise<list<ProjectionDetails>> */
+    /** @return list<ProjectionDetails> */
     public function listAll(
         EndPoint $endPoint,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        $deferred = new Deferred();
-
-        $promise = $this->sendGet(
+    ): array {
+        $body = $this->sendGet(
             EndpointExtensions::rawUrlToHttpUrl($endPoint, $this->httpSchema, '/projections/any'),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
 
-        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
-            if ($exception) {
-                $deferred->fail($exception);
+        if ('' === $body) {
+            throw new \UnexpectedValueException('Body cannot be empty');
+        }
 
-                return;
-            }
+        $data = Json::decode($body);
 
-            if (null === $body) {
-                $deferred->fail(new \UnexpectedValueException('Body cannot be empty'));
+        if (null === $data['projections']) {
+            return [];
+        }
 
-                return;
-            }
-
-            try {
-                $data = Json::decode($body);
-            } catch (JsonException $e) {
-                $deferred->fail($e);
-
-                return;
-            }
-
-            $projectionDetails = [];
-
-            if (null === $data['projections']) {
-                $deferred->resolve($projectionDetails);
-
-                return;
-            }
-
-            foreach ($data['projections'] as $entry) {
-                $projectionDetails[] = $this->buildProjectionDetails($entry);
-            }
-
-            $deferred->resolve($projectionDetails);
-        });
-
-        return $deferred->promise();
+        return \array_map(
+            fn (array $entry) => $this->buildProjectionDetails($entry),
+            $data['projections']
+        );
     }
 
-    /** @return Promise<list<ProjectionDetails>> */
+    /** @return list<ProjectionDetails> */
     public function listOneTime(
         EndPoint $endPoint,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        $deferred = new Deferred();
-
-        $promise = $this->sendGet(
+    ): array {
+        $body = $this->sendGet(
             EndpointExtensions::rawUrlToHttpUrl($endPoint, $this->httpSchema, '/projections/onetime'),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
 
-        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
-            if ($exception) {
-                $deferred->fail($exception);
+        if ('' === $body) {
+            throw new \UnexpectedValueException('Body cannot be empty');
+        }
 
-                return;
-            }
+        $data = Json::decode($body);
 
-            if (null === $body) {
-                $deferred->fail(new \UnexpectedValueException('Body cannot be empty'));
+        if (null === $data['projections']) {
+            return [];
+        }
 
-                return;
-            }
-
-            try {
-                $data = Json::decode($body);
-            } catch (JsonException $e) {
-                $deferred->fail($e);
-
-                return;
-            }
-
-            $projectionDetails = [];
-
-            if (null === $data['projections']) {
-                $deferred->resolve($projectionDetails);
-
-                return;
-            }
-
-            foreach ($data['projections'] as $entry) {
-                $projectionDetails[] = $this->buildProjectionDetails($entry);
-            }
-
-            $deferred->resolve($projectionDetails);
-        });
-
-        return $deferred->promise();
+        return \array_map(
+            fn (array $entry) => $this->buildProjectionDetails($entry),
+            $data['projections']
+        );
     }
 
-    /** @return Promise<list<ProjectionDetails>> */
+    /** @return list<ProjectionDetails> */
     public function listContinuous(
         EndPoint $endPoint,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        $deferred = new Deferred();
-
-        $promise = $this->sendGet(
+    ): array {
+        $body = $this->sendGet(
             EndpointExtensions::rawUrlToHttpUrl($endPoint, $this->httpSchema, '/projections/continuous'),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
 
-        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
-            if ($exception) {
-                $deferred->fail($exception);
+        if ('' === $body) {
+            throw new \UnexpectedValueException('Body cannot be empty');
+        }
 
-                return;
-            }
+        $data = Json::decode($body);
 
-            if (null === $body) {
-                $deferred->fail(new \UnexpectedValueException('Body cannot be empty'));
+        if (null === $data['projections']) {
+            return [];
+        }
 
-                return;
-            }
-
-            try {
-                $data = Json::decode($body);
-            } catch (JsonException $e) {
-                $deferred->fail($e);
-
-                return;
-            }
-
-            $projectionDetails = [];
-
-            if (null === $data['projections']) {
-                $deferred->resolve($projectionDetails);
-
-                return;
-            }
-
-            foreach ($data['projections'] as $entry) {
-                $projectionDetails[] = $this->buildProjectionDetails($entry);
-            }
-
-            $deferred->resolve($projectionDetails);
-        });
-
-        return $deferred->promise();
+        return \array_map(
+            fn (array $entry) => $this->buildProjectionDetails($entry),
+            $data['projections']
+        );
     }
 
-    /** @return Promise<ProjectionDetails> */
     public function getStatus(
         EndPoint $endPoint,
         string $name,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        $deferred = new Deferred();
-
-        $promise = $this->sendGet(
+    ): ProjectionDetails {
+        $body = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -341,46 +254,22 @@ class ProjectionsClient
                 $name
             ),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
 
-        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
-            if ($exception) {
-                $deferred->fail($exception);
+        if ('' === $body) {
+            throw new UnexpectedValueException('No content received');
+        }
 
-                return;
-            }
-
-            if (null === $body) {
-                $deferred->fail(new UnexpectedValueException('No content received'));
-
-                return;
-            }
-
-            try {
-                $data = Json::decode($body);
-            } catch (JsonException $e) {
-                $deferred->fail($e);
-
-                return;
-            }
-
-            $projectionDetails = $this->buildProjectionDetails($data);
-            $deferred->resolve($projectionDetails);
-        });
-
-        return $deferred->promise();
+        return $this->buildProjectionDetails(Json::decode($body));
     }
 
-    /** @return Promise<State> */
     public function getState(
         EndPoint $endPoint,
         string $name,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        $deferred = new Deferred();
-
-        $promise = $this->sendGet(
+    ): State {
+        $body = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -388,46 +277,23 @@ class ProjectionsClient
                 $name
             ),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
 
-        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
-            if ($exception) {
-                $deferred->fail($exception);
+        if ('' === $body) {
+            throw new UnexpectedValueException('No content received');
+        }
 
-                return;
-            }
-
-            if (null === $body) {
-                $deferred->fail(new UnexpectedValueException('No content received'));
-
-                return;
-            }
-
-            try {
-                $data = Json::decode($body);
-            } catch (JsonException $e) {
-                $deferred->fail($e);
-
-                return;
-            }
-
-            $deferred->resolve(new State($data));
-        });
-
-        return $deferred->promise();
+        return new State(Json::decode($body));
     }
 
-    /** @return Promise<State> */
     public function getPartitionState(
         EndPoint $endPoint,
         string $name,
         string $partition,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        $deferred = new Deferred();
-
-        $promise = $this->sendGet(
+    ): State {
+        $body = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -436,45 +302,22 @@ class ProjectionsClient
                 $partition
             ),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
 
-        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
-            if ($exception) {
-                $deferred->fail($exception);
+        if ('' === $body) {
+            throw new UnexpectedValueException('No content received');
+        }
 
-                return;
-            }
-
-            if (null === $body) {
-                $deferred->fail(new UnexpectedValueException('No content received'));
-
-                return;
-            }
-
-            try {
-                $data = Json::decode($body);
-            } catch (JsonException $e) {
-                $deferred->fail($e);
-
-                return;
-            }
-
-            $deferred->resolve(new State($data));
-        });
-
-        return $deferred->promise();
+        return new State(Json::decode($body));
     }
 
-    /** @return Promise<State> */
     public function getResult(
         EndPoint $endPoint,
         string $name,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        $deferred = new Deferred();
-
-        $promise = $this->sendGet(
+    ): State {
+        $body = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -482,46 +325,23 @@ class ProjectionsClient
                 $name
             ),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
 
-        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
-            if ($exception) {
-                $deferred->fail($exception);
+        if ('' === $body) {
+            throw new UnexpectedValueException('No content received');
+        }
 
-                return;
-            }
-
-            if (null === $body) {
-                $deferred->fail(new UnexpectedValueException('No content received'));
-
-                return;
-            }
-
-            try {
-                $data = Json::decode($body);
-            } catch (JsonException $e) {
-                $deferred->fail($e);
-
-                return;
-            }
-
-            $deferred->resolve(new State($data));
-        });
-
-        return $deferred->promise();
+        return new State(Json::decode($body));
     }
 
-    /** @return Promise<State> */
     public function getPartitionResult(
         EndPoint $endPoint,
         string $name,
         string $partition,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        $deferred = new Deferred();
-
-        $promise = $this->sendGet(
+    ): State {
+        $body = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -530,45 +350,22 @@ class ProjectionsClient
                 $partition
             ),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
 
-        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
-            if ($exception) {
-                $deferred->fail($exception);
+        if ('' === $body) {
+            throw new UnexpectedValueException('No content received');
+        }
 
-                return;
-            }
-
-            if (null === $body) {
-                $deferred->fail(new UnexpectedValueException('No content received'));
-
-                return;
-            }
-
-            try {
-                $data = Json::decode($body);
-            } catch (JsonException $e) {
-                $deferred->fail($e);
-
-                return;
-            }
-
-            $deferred->resolve(new State($data));
-        });
-
-        return $deferred->promise();
+        return new State(Json::decode($body));
     }
 
-    /** @return Promise<ProjectionStatistics> */
     public function getStatistics(
         EndPoint $endPoint,
         string $name,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        $deferred = new Deferred();
-
-        $promise = $this->sendGet(
+    ): ProjectionStatistics {
+        $body = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -576,46 +373,22 @@ class ProjectionsClient
                 $name
             ),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
 
-        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
-            if ($exception) {
-                $deferred->fail($exception);
+        if ('' === $body) {
+            throw new UnexpectedValueException('No content received');
+        }
 
-                return;
-            }
-
-            if (null === $body) {
-                $deferred->fail(new UnexpectedValueException('No content received'));
-
-                return;
-            }
-
-            try {
-                $data = Json::decode($body);
-            } catch (JsonException $e) {
-                $deferred->fail($e);
-
-                return;
-            }
-
-            $projectionStatistics = $this->buildProjectionStatistics($data);
-            $deferred->resolve($projectionStatistics);
-        });
-
-        return $deferred->promise();
+        return $this->buildProjectionStatistics(Json::decode($body));
     }
 
-    /** @return Promise<Query> */
     public function getQuery(
         EndPoint $endPoint,
         string $name,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        $deferred = new Deferred();
-
-        $promise = $this->sendGet(
+    ): Query {
+        $body = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -623,43 +396,30 @@ class ProjectionsClient
                 $name
             ),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
 
-        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
-            if ($exception) {
-                $deferred->fail($exception);
+        if ('' === $body) {
+            throw new UnexpectedValueException('No content received');
+        }
 
-                return;
-            }
-
-            if (null === $body) {
-                $deferred->fail(new UnexpectedValueException('No content received'));
-
-                return;
-            }
-
-            $deferred->resolve(new Query($body));
-        });
-
-        return $deferred->promise();
+        return new Query($body);
     }
 
-    /** @return Promise<void> */
     public function updateQuery(
         EndPoint $endPoint,
         string $name,
         string $query,
         ?bool $emitEnabled = null,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): void {
         $url = '/projection/%s/query';
 
         if (null !== $emitEnabled) {
             $url .= '?emit=' . (int) $emitEnabled;
         }
 
-        return $this->sendPut(
+        $this->sendPut(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -668,17 +428,16 @@ class ProjectionsClient
             ),
             $query,
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
     }
 
-    /** @return Promise<void> */
     public function reset(
         EndPoint $endPoint,
         string $name,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return $this->sendPost(
+    ): void {
+        $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -687,18 +446,17 @@ class ProjectionsClient
             ),
             '',
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
     }
 
-    /** @return Promise<void> */
     public function delete(
         EndPoint $endPoint,
         string $name,
         bool $deleteEmittedStreams,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return $this->sendDelete(
+    ): void {
+        $this->sendDelete(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -707,26 +465,25 @@ class ProjectionsClient
                 (string) (int) $deleteEmittedStreams
             ),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
     }
 
-    /** @return Promise<string> */
     private function sendGet(
         string $url,
         ?UserCredentials $userCredentials,
         int $expectedCode
-    ): Promise {
-        $deferred = new Deferred();
+    ): string {
+        $deferred = new DeferredFuture();
 
         $this->client->get(
             $url,
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve($response->getBody()->buffer());
+                    $deferred->complete($response->getBody()->buffer());
                 } else {
-                    $deferred->fail(new ProjectionCommandFailed(
+                    $deferred->error(new ProjectionCommandFailed(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for GET on %s',
@@ -738,29 +495,28 @@ class ProjectionsClient
                 }
             },
             function (Throwable $exception) use ($deferred): void {
-                $deferred->fail($exception);
+                $deferred->error($exception);
             }
         );
 
-        return $deferred->promise();
+        return $deferred->getFuture()->await();
     }
 
-    /** @return Promise<void> */
     private function sendDelete(
         string $url,
         ?UserCredentials $userCredentials,
         int $expectedCode
-    ): Promise {
-        $deferred = new Deferred();
+    ): void {
+        $deferred = new DeferredFuture();
 
         $this->client->delete(
             $url,
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve();
+                    $deferred->complete();
                 } else {
-                    $deferred->fail(new ProjectionCommandFailed(
+                    $deferred->error(new ProjectionCommandFailed(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for DELETE on %s',
@@ -772,21 +528,20 @@ class ProjectionsClient
                 }
             },
             function (Throwable $exception) use ($deferred): void {
-                $deferred->fail($exception);
+                $deferred->error($exception);
             }
         );
 
-        return $deferred->promise();
+        $deferred->getFuture()->await();
     }
 
-    /** @return Promise<void> */
     private function sendPut(
         string $url,
         string $content,
         ?UserCredentials $userCredentials,
         int $expectedCode
-    ): Promise {
-        $deferred = new Deferred();
+    ): void {
+        $deferred = new DeferredFuture();
 
         $this->client->put(
             $url,
@@ -795,9 +550,9 @@ class ProjectionsClient
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve();
+                    $deferred->complete();
                 } else {
-                    $deferred->fail(new ProjectionCommandFailed(
+                    $deferred->error(new ProjectionCommandFailed(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for PUT on %s',
@@ -809,21 +564,20 @@ class ProjectionsClient
                 }
             },
             function (Throwable $exception) use ($deferred): void {
-                $deferred->fail($exception);
+                $deferred->error($exception);
             }
         );
 
-        return $deferred->promise();
+        $deferred->getFuture()->await();
     }
 
-    /** @return Promise<void> */
     private function sendPost(
         string $url,
         string $content,
         ?UserCredentials $userCredentials,
         int $expectedCode
-    ): Promise {
-        $deferred = new Deferred();
+    ): void {
+        $deferred = new DeferredFuture();
 
         $this->client->post(
             $url,
@@ -832,11 +586,11 @@ class ProjectionsClient
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve();
-                } elseif ($response->getStatus() === HttpStatusCode::CONFLICT) {
-                    $deferred->fail(new ProjectionCommandConflict($response->getStatus(), $response->getReason()));
+                    $deferred->complete();
+                } elseif ($response->getStatus() === HttpStatusCode::Conflict) {
+                    $deferred->error(new ProjectionCommandConflict($response->getStatus(), $response->getReason()));
                 } else {
-                    $deferred->fail(new ProjectionCommandFailed(
+                    $deferred->error(new ProjectionCommandFailed(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for POST on %s',
@@ -848,11 +602,11 @@ class ProjectionsClient
                 }
             },
             function (Throwable $exception) use ($deferred): void {
-                $deferred->fail($exception);
+                $deferred->error($exception);
             }
         );
 
-        return $deferred->promise();
+        $deferred->getFuture()->await();
     }
 
     private function buildProjectionDetails(array $entry): ProjectionDetails

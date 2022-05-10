@@ -25,11 +25,16 @@ use Prooph\EventStore\Internal\Consts;
 final class ClusterSettings
 {
     private string $clusterDns = '';
-    private int $maxDiscoverAttempts = Consts::DEFAULT_MAX_CLUSTER_DISCOVER_ATTEMPTS;
+
+    private int $maxDiscoverAttempts = Consts::DefaultMaxClusterDiscoverAttempts;
+
     private int $externalGossipPort = 0;
+
     /** @var list<GossipSeed> */
     private array $gossipSeeds = [];
-    private int $gossipTimeout = 0;
+
+    private float $gossipTimeout = 0;
+
     private bool $preferRandomNode = false;
 
     public static function create(): ClusterSettingsBuilder
@@ -40,7 +45,7 @@ final class ClusterSettings
     public static function fromGossipSeeds(
         array $gossipSeeds,
         int $maxDiscoverAttempts,
-        int $gossipTimeout,
+        float $gossipTimeout,
         bool $preferRandomNode
     ): self {
         $clusterSettings = new self();
@@ -67,7 +72,7 @@ final class ClusterSettings
         string $clusterDns,
         int $maxDiscoverAttempts,
         int $externalGossipPort,
-        int $gossipTimeout,
+        float $gossipTimeout,
         bool $preferRandomNode
     ): self {
         $clusterSettings = new self();
@@ -101,19 +106,16 @@ final class ClusterSettings
         return $clusterSettings;
     }
 
-    /** @psalm-pure */
     public function clusterDns(): string
     {
         return $this->clusterDns;
     }
 
-    /** @psalm-pure */
     public function maxDiscoverAttempts(): int
     {
         return $this->maxDiscoverAttempts;
     }
 
-    /** @psalm-pure */
     public function externalGossipPort(): int
     {
         return $this->externalGossipPort;
@@ -121,21 +123,17 @@ final class ClusterSettings
 
     /**
      * @return list<GossipSeed>
-     *
-     * @psalm-pure
      */
     public function gossipSeeds(): array
     {
         return $this->gossipSeeds;
     }
 
-    /** @psalm-pure */
-    public function gossipTimeout(): int
+    public function gossipTimeout(): float
     {
         return $this->gossipTimeout;
     }
 
-    /** @psalm-pure */
     public function preferRandomNode(): bool
     {
         return $this->preferRandomNode;

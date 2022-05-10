@@ -22,20 +22,15 @@ use Prooph\EventStoreClient\Internal\NodeEndPoints;
  */
 class EstablishTcpConnectionMessage implements Message
 {
-    private NodeEndPoints $nodeEndPoints;
-
-    public function __construct(NodeEndPoints $nodeEndPoints)
+    public function __construct(private readonly NodeEndPoints $nodeEndPoints)
     {
-        $this->nodeEndPoints = $nodeEndPoints;
     }
 
-    /** @psalm-pure */
     public function nodeEndPoints(): NodeEndPoints
     {
         return $this->nodeEndPoints;
     }
 
-    /** @psalm-pure */
     public function __toString(): string
     {
         return 'EstablishTcpConnectionMessage';

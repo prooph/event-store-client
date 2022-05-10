@@ -27,7 +27,7 @@ class clientapi_tcp_package extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new TcpPackage(TcpCommand::badRequest(), TcpFlags::authenticated(), Guid::generateAsHex(), '');
+        new TcpPackage(TcpCommand::BadRequest, TcpFlags::Authenticated, Guid::generateAsHex(), '');
     }
 
     /** @test */
@@ -35,7 +35,7 @@ class clientapi_tcp_package extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new TcpPackage(TcpCommand::badRequest(), TcpFlags::authenticated(), Guid::generateAsHex(), '', 'login');
+        new TcpPackage(TcpCommand::BadRequest, TcpFlags::Authenticated, Guid::generateAsHex(), '', 'login');
     }
 
     /** @test */
@@ -43,7 +43,7 @@ class clientapi_tcp_package extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new TcpPackage(TcpCommand::badRequest(), TcpFlags::none(), Guid::generateAsHex(), '', 'login', null);
+        new TcpPackage(TcpCommand::BadRequest, TcpFlags::None, Guid::generateAsHex(), '', 'login', null);
     }
 
     /** @test */
@@ -51,19 +51,19 @@ class clientapi_tcp_package extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new TcpPackage(TcpCommand::badRequest(), TcpFlags::none(), Guid::generateAsHex(), '', null, 'pa$$');
+        new TcpPackage(TcpCommand::BadRequest, TcpFlags::None, Guid::generateAsHex(), '', null, 'pa$$');
     }
 
     /** @test */
     public function not_authorized_with_data_should_serialize_and_deserialize_correctly(): void
     {
         $corrId = Guid::generateAsHex();
-        $refPkg = new TcpPackage(TcpCommand::badRequest(), TcpFlags::none(), $corrId, 'data');
+        $refPkg = new TcpPackage(TcpCommand::BadRequest, TcpFlags::None, $corrId, 'data');
         $bytes = $refPkg->asBytes();
         $pkg = TcpPackage::fromRawData($bytes);
 
-        $this->assertTrue($pkg->command()->equals(TcpCommand::badRequest()));
-        $this->assertTrue($pkg->flags()->equals(TcpFlags::none()));
+        $this->assertSame(TcpCommand::BadRequest, $pkg->command());
+        $this->assertTrue($pkg->flags() === TcpFlags::None);
         $this->assertSame($corrId, $pkg->correlationId());
         $this->assertNull($pkg->login());
         $this->assertNull($pkg->password());
@@ -74,12 +74,12 @@ class clientapi_tcp_package extends TestCase
     public function not_authorized_with_empty_data_should_serialize_and_deserialize_correctly(): void
     {
         $corrId = Guid::generateAsHex();
-        $refPkg = new TcpPackage(TcpCommand::badRequest(), TcpFlags::none(), $corrId);
+        $refPkg = new TcpPackage(TcpCommand::BadRequest, TcpFlags::None, $corrId);
         $bytes = $refPkg->asBytes();
         $pkg = TcpPackage::fromRawData($bytes);
 
-        $this->assertTrue($pkg->command()->equals(TcpCommand::badRequest()));
-        $this->assertTrue($pkg->flags()->equals(TcpFlags::none()));
+        $this->assertSame(TcpCommand::BadRequest, $pkg->command());
+        $this->assertSame(TcpFlags::None, $pkg->flags());
         $this->assertSame($corrId, $pkg->correlationId());
         $this->assertNull($pkg->login());
         $this->assertNull($pkg->password());
@@ -90,12 +90,12 @@ class clientapi_tcp_package extends TestCase
     public function authorized_with_data_should_serialize_and_deserialize_correctly(): void
     {
         $corrId = Guid::generateAsHex();
-        $refPkg = new TcpPackage(TcpCommand::badRequest(), TcpFlags::authenticated(), $corrId, 'data', 'login', 'password');
+        $refPkg = new TcpPackage(TcpCommand::BadRequest, TcpFlags::Authenticated, $corrId, 'data', 'login', 'password');
         $bytes = $refPkg->asBytes();
         $pkg = TcpPackage::fromRawData($bytes);
 
-        $this->assertTrue($pkg->command()->equals(TcpCommand::badRequest()));
-        $this->assertTrue($pkg->flags()->equals(TcpFlags::authenticated()));
+        $this->assertSame(TcpCommand::BadRequest, $pkg->command());
+        $this->assertSame(TcpFlags::Authenticated, $pkg->flags());
         $this->assertSame($corrId, $pkg->correlationId());
         $this->assertSame('login', $pkg->login());
         $this->assertSame('password', $pkg->password());
@@ -106,12 +106,12 @@ class clientapi_tcp_package extends TestCase
     public function authorized_with_empty_data_should_serialize_and_deserialize_correctly(): void
     {
         $corrId = Guid::generateAsHex();
-        $refPkg = new TcpPackage(TcpCommand::badRequest(), TcpFlags::authenticated(), $corrId, '', 'login', 'password');
+        $refPkg = new TcpPackage(TcpCommand::BadRequest, TcpFlags::Authenticated, $corrId, '', 'login', 'password');
         $bytes = $refPkg->asBytes();
         $pkg = TcpPackage::fromRawData($bytes);
 
-        $this->assertTrue($pkg->command()->equals(TcpCommand::badRequest()));
-        $this->assertTrue($pkg->flags()->equals(TcpFlags::authenticated()));
+        $this->assertSame(TcpCommand::BadRequest, $pkg->command());
+        $this->assertSame(TcpFlags::Authenticated, $pkg->flags());
         $this->assertSame($corrId, $pkg->correlationId());
         $this->assertSame('login', $pkg->login());
         $this->assertSame('password', $pkg->password());
@@ -122,7 +122,7 @@ class clientapi_tcp_package extends TestCase
     public function should_throw_argument_exception_on_serialization_when_login_too_long(): void
     {
         $corrId = Guid::generateAsHex();
-        $pkg = new TcpPackage(TcpCommand::badRequest(), TcpFlags::authenticated(), $corrId, '', \str_repeat('*', 256), 'password');
+        $pkg = new TcpPackage(TcpCommand::BadRequest, TcpFlags::Authenticated, $corrId, '', \str_repeat('*', 256), 'password');
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -133,7 +133,7 @@ class clientapi_tcp_package extends TestCase
     public function should_throw_argument_exception_on_serialization_when_password_too_long(): void
     {
         $corrId = Guid::generateAsHex();
-        $pkg = new TcpPackage(TcpCommand::badRequest(), TcpFlags::authenticated(), $corrId, '', 'login', \str_repeat('*', 256));
+        $pkg = new TcpPackage(TcpCommand::BadRequest, TcpFlags::Authenticated, $corrId, '', 'login', \str_repeat('*', 256));
 
         $this->expectException(InvalidArgumentException::class);
 

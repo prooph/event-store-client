@@ -13,16 +13,17 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\Helper;
 
-use Amp\Parallel\Worker\Environment;
+use Amp\Cache\Cache;
+use Amp\Cancellation;
 use Amp\Parallel\Worker\Task;
-use Amp\Promise;
-use Prooph\EventStore\Async\EventStoreTransaction;
+use Amp\Sync\Channel;
 use Prooph\EventStore\ExpectedVersion;
 
 class ParallelTransactionTask implements Task
 {
-    private string $stream;
-    private string $metadata;
+    private readonly string $stream;
+
+    private readonly string $metadata;
 
     public function __construct(string $stream, string $metadata)
     {
@@ -30,29 +31,24 @@ class ParallelTransactionTask implements Task
         $this->metadata = $metadata;
     }
 
-    public function run(Environment $environment)
+    public function run(Channel $channel, Cache $cache, Cancellation $cancellation): mixed
     {
         $store = TestConnection::create();
 
-        yield $store->connectAsync();
+        $store->connect();
 
-        $transaction = yield $store->startTransactionAsync(
+        $transaction = $store->startTransaction(
             $this->stream,
-            ExpectedVersion::ANY
+            ExpectedVersion::Any
         );
-        \assert($transaction instanceof EventStoreTransaction);
-
-        $writes = [];
 
         for ($i = 0; $i < 250; $i++) {
-            $writes[] = $transaction->writeAsync(
+            $transaction->write(
                 [TestEvent::newTestEvent(null, (string) $i, $this->metadata)]
             );
         }
 
-        yield Promise\all($writes);
-
-        yield $transaction->commitAsync();
+        $transaction->commit();
 
         $store->close();
 

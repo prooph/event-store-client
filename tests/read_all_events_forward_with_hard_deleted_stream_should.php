@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Generator;
-use Prooph\EventStore\AllEventsSlice;
 use Prooph\EventStore\Common\SystemEventTypes;
 use Prooph\EventStore\Common\SystemRoles;
 use Prooph\EventStore\EventData;
@@ -23,7 +21,6 @@ use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\Position;
 use Prooph\EventStore\SliceReadStatus;
 use Prooph\EventStore\StreamAcl;
-use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\StreamMetadata;
 use Prooph\EventStore\UserCredentials;
 use ProophTest\EventStoreClient\Helper\EventDataComparer;
@@ -35,65 +32,64 @@ class read_all_events_forward_with_hard_deleted_stream_should extends AsyncTestC
 
     /** @var EventData[] */
     private array $testEvents;
+
     private string $streamName;
+
     private Position $from;
 
-    protected function when(): Generator
+    protected function when(): void
     {
         $this->streamName = 'read_all_events_forward_with_hard_deleted_stream_should' . $this->getName();
 
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             '$all',
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             new StreamMetadata(
                 null,
                 null,
                 null,
                 null,
                 new StreamAcl(
-                    [SystemRoles::ALL]
+                    [SystemRoles::All]
                 )
             ),
-            new UserCredentials(SystemUsers::ADMIN, SystemUsers::DEFAULT_ADMIN_PASSWORD)
+            new UserCredentials(SystemUsers::Admin, SystemUsers::DefaultAdminPassword)
         );
 
-        $result = yield $this->connection->readAllEventsBackwardAsync(Position::end(), 1, false);
-        \assert($result instanceof AllEventsSlice);
+        $result = $this->connection->readAllEventsBackward(Position::end(), 1, false);
 
         $this->from = $result->nextPosition();
 
         $this->testEvents = TestEvent::newAmount(20);
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->streamName,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             $this->testEvents
         );
 
-        yield $this->connection->deleteStreamAsync(
+        $this->connection->deleteStream(
             $this->streamName,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             true
         );
     }
 
     /** @test */
-    public function ensure_deleted_stream(): Generator
+    public function ensure_deleted_stream(): void
     {
-        yield $this->execute(function (): Generator {
-            $res = yield $this->connection->readStreamEventsForwardAsync($this->streamName, 0, 100, false);
-            \assert($res instanceof StreamEventsSlice);
-            $this->assertTrue($res->status()->equals(SliceReadStatus::streamDeleted()));
+        $this->execute(function (): void {
+            $res = $this->connection->readStreamEventsForward($this->streamName, 0, 100, false);
+            $this->assertSame(SliceReadStatus::StreamDeleted, $res->status());
             $this->assertCount(0, $res->events());
         });
     }
 
     /** @test */
-    public function returns_all_events_including_tombstone(): Generator
+    public function returns_all_events_including_tombstone(): void
     {
-        yield $this->execute(function (): Generator {
-            $read = yield $this->connection->readAllEventsForwardAsync($this->from, \count($this->testEvents) + 10, false);
-            \assert($read instanceof AllEventsSlice);
+        $this->execute(function (): void {
+            $read = $this->connection->readAllEventsForward($this->from, \count($this->testEvents) + 10, false);
 
             $events = [];
             foreach ($read->events() as $event) {
@@ -110,7 +106,7 @@ class read_all_events_forward_with_hard_deleted_stream_should extends AsyncTestC
             $lastEvent = \end($events);
 
             $this->assertSame($this->streamName, $lastEvent->eventStreamId());
-            $this->assertSame(SystemEventTypes::STREAM_DELETED, $lastEvent->eventType());
+            $this->assertSame(SystemEventTypes::StreamDeleted->value, $lastEvent->eventType());
         });
     }
 }

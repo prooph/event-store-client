@@ -13,13 +13,9 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
-use Amp\Promise;
-use Amp\Success;
 use Closure;
-use Generator;
-use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventStoreConnection;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStore\Util\Guid;
@@ -29,47 +25,42 @@ use ProophTest\EventStoreClient\Helper\TestConnection;
 trait ProjectionSpecification
 {
     protected ProjectionsManager $projectionsManager;
+
     protected EventStoreConnection $connection;
+
     protected UserCredentials $credentials;
 
-    protected function given(): Generator
+    protected function given(): void
     {
-        yield new Success();
     }
 
-    abstract protected function when(): Generator;
+    abstract protected function when(): void;
 
-    protected function execute(Closure $test): Promise
+    protected function execute(Closure $test): void
     {
-        return call(function () use ($test): Generator {
-            $this->credentials = DefaultData::adminCredentials();
-            $this->connection = TestConnection::create();
+        $this->credentials = DefaultData::adminCredentials();
+        $this->connection = TestConnection::create();
 
-            yield $this->connection->connectAsync();
+        $this->connection->connect();
 
-            $this->projectionsManager = new ProjectionsManager(
-                TestConnection::httpEndPoint(),
-                5000
-            );
+        $this->projectionsManager = new ProjectionsManager(
+            TestConnection::httpEndPoint(),
+            5
+        );
 
-            yield from $this->given();
-            yield from $this->when();
+        $this->given();
+        $this->when();
 
-            try {
-                $result = yield from $test();
-            } finally {
-                yield from $this->end();
-            }
-
-            return $result;
-        });
+        try {
+            $test();
+        } finally {
+            $this->end();
+        }
     }
 
-    protected function end(): Generator
+    protected function end(): void
     {
         $this->connection->close();
-
-        yield new Success();
     }
 
     protected function createEvent(string $eventType, string $data, string $metadata = ''): EventData
@@ -77,27 +68,27 @@ trait ProjectionSpecification
         return new EventData(null, $eventType, true, $data, $metadata);
     }
 
-    protected function postEvent(string $stream, string $eventType, string $data, string $metadata = ''): Promise
+    protected function postEvent(string $stream, string $eventType, string $data, string $metadata = ''): void
     {
-        return $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             [$this->createEvent($eventType, $data, $metadata)]
         );
     }
 
-    protected function createOneTimeProjection(): Promise
+    protected function createOneTimeProjection(): void
     {
         $query = $this->createStandardQuery(Guid::generateAsHex());
 
-        return $this->projectionsManager->createOneTimeAsync($query, 'JS', $this->credentials);
+        $this->projectionsManager->createOneTime($query, 'JS', $this->credentials);
     }
 
-    protected function createContinuousProjection(string $projectionName): Promise
+    protected function createContinuousProjection(string $projectionName): void
     {
         $query = $this->createStandardQuery(Guid::generateAsHex());
 
-        return $this->projectionsManager->createContinuousAsync(
+        $this->projectionsManager->createContinuous(
             $projectionName,
             $query,
             false,

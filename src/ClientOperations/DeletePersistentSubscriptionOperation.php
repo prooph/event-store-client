@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\InvalidOperationException;
@@ -35,25 +35,19 @@ use Psr\Log\LoggerInterface as Logger;
  */
 class DeletePersistentSubscriptionOperation extends AbstractOperation
 {
-    private string $stream;
-    private string $groupName;
-
     public function __construct(
         Logger $logger,
-        Deferred $deferred,
-        string $stream,
-        string $groupName,
+        DeferredFuture $deferred,
+        private readonly string $stream,
+        private readonly string $groupName,
         ?UserCredentials $userCredentials
     ) {
-        $this->stream = $stream;
-        $this->groupName = $groupName;
-
         parent::__construct(
             $logger,
             $deferred,
             $userCredentials,
-            TcpCommand::deletePersistentSubscription(),
-            TcpCommand::deletePersistentSubscriptionCompleted(),
+            TcpCommand::DeletePersistentSubscription,
+            TcpCommand::DeletePersistentSubscriptionCompleted,
             DeletePersistentSubscriptionCompleted::class
         );
     }
@@ -77,7 +71,7 @@ class DeletePersistentSubscriptionOperation extends AbstractOperation
             case DeletePersistentSubscriptionResult::Success:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'Success');
+                return new InspectionResult(InspectionDecision::EndOperation, 'Success');
             case DeletePersistentSubscriptionResult::Fail:
                 $this->fail(new InvalidOperationException(\sprintf(
                     'Subscription group \'%s\' on stream \'%s\' failed \'%s\'',
@@ -86,11 +80,11 @@ class DeletePersistentSubscriptionOperation extends AbstractOperation
                     $response->getReason()
                 )));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'Fail');
+                return new InspectionResult(InspectionDecision::EndOperation, 'Fail');
             case DeletePersistentSubscriptionResult::AccessDenied:
                 $this->fail(AccessDenied::toStream($this->stream));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');
+                return new InspectionResult(InspectionDecision::EndOperation, 'AccessDenied');
             case DeletePersistentSubscriptionResult::DoesNotExist:
                 $this->fail(new InvalidOperationException(\sprintf(
                     'Subscription group \'%s\' on stream \'%s\' does not exist',
@@ -98,7 +92,7 @@ class DeletePersistentSubscriptionOperation extends AbstractOperation
                     $this->stream
                 )));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'DoesNotExist');
+                return new InspectionResult(InspectionDecision::EndOperation, 'DoesNotExist');
             default:
                 throw new UnexpectedOperationResult();
         }
@@ -111,9 +105,9 @@ class DeletePersistentSubscriptionOperation extends AbstractOperation
     protected function transformResponse(Message $response): PersistentSubscriptionDeleteResult
     {
         if (0 === $response->getResult()) {
-            $status = PersistentSubscriptionDeleteStatus::success();
+            $status = PersistentSubscriptionDeleteStatus::Success;
         } else {
-            $status = PersistentSubscriptionDeleteStatus::failure();
+            $status = PersistentSubscriptionDeleteStatus::Failure;
         }
 
         return new PersistentSubscriptionDeleteResult($status);

@@ -22,9 +22,12 @@ use Prooph\EventStoreClient\SystemData\TcpPackage;
 class LengthPrefixMessageFramer
 {
     private int $maxPackageSize;
+
     private ?string $messageBuffer = null;
+
     /** @var Closure(string): void */
     private Closure $receivedHandler;
+
     private int $packageLength = 0;
 
     /**
@@ -55,7 +58,7 @@ class LengthPrefixMessageFramer
 
         $dataLength = \strlen($data);
 
-        if ($dataLength < TcpPackage::MANDATORY_SIZE) {
+        if ($dataLength < TcpPackage::MandatorySize) {
             // message too short, let's wait for more data
             $this->messageBuffer = $data;
 
@@ -65,7 +68,7 @@ class LengthPrefixMessageFramer
         if (0 === $this->packageLength) {
             /** @var int $this->packageLength */
             list('length' => $this->packageLength) = \unpack('Vlength', \substr($data, 0, 4));
-            $this->packageLength += TcpPackage::DATA_OFFSET;
+            $this->packageLength += TcpPackage::DataOffset;
         }
 
         if ($this->packageLength > $this->maxPackageSize) {

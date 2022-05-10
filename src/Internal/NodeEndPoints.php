@@ -23,8 +23,9 @@ use Prooph\EventStore\Exception\InvalidArgumentException;
  */
 class NodeEndPoints
 {
-    private ?EndPoint $tcpEndPoint;
-    private ?EndPoint $secureTcpEndPoint;
+    private readonly ?EndPoint $tcpEndPoint;
+
+    private readonly ?EndPoint $secureTcpEndPoint;
 
     public function __construct(?EndPoint $tcpEndPoint, ?EndPoint $secureTcpEndPoint = null)
     {
@@ -36,22 +37,20 @@ class NodeEndPoints
         $this->secureTcpEndPoint = $secureTcpEndPoint;
     }
 
-    /** @psalm-pure */
     public function tcpEndPoint(): ?EndPoint
     {
         return $this->tcpEndPoint;
     }
 
-    /** @psalm-pure */
     public function secureTcpEndPoint(): ?EndPoint
     {
         return $this->secureTcpEndPoint;
     }
 
-    /** @psalm-pure */
     public function __toString(): string
     {
-        return \sprintf('[%s, %s]',
+        return \sprintf(
+            '[%s, %s]',
             null === $this->tcpEndPoint ? 'n/a' : $this->tcpEndPoint->__toString(),
             null === $this->secureTcpEndPoint ? 'n/a' : $this->secureTcpEndPoint->__toString()
         );

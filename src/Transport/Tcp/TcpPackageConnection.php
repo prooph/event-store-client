@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Transport\Tcp;
 
-use function Amp\call;
-use Amp\Loop;
-use Amp\Promise;
 use Amp\Socket\ClientTlsContext;
 use function Amp\Socket\connect;
 use Amp\Socket\ConnectContext;
@@ -23,44 +20,40 @@ use Amp\Socket\ConnectException;
 use Amp\Socket\EncryptableSocket;
 use Closure;
 use Exception;
-use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Exception\PackageFramingException;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Psr\Log\LoggerInterface as Logger;
+use Revolt\EventLoop;
 
 /** @internal */
 class TcpPackageConnection
 {
-    private Logger $log;
-    private EndPoint $remoteEndPoint;
-    private string $connectionId;
-    private bool $ssl;
-    private string $targetHost;
-    private bool $validateServer;
-    private int $timeout;
-    private ?EncryptableSocket $connection = null;
-    private bool $isClosed = true;
-    private Closure $handlePackage;
-    private Closure $onError;
-    private Closure $connectionEstablished;
-    private Closure $connectionClosed;
+    private readonly string $connectionId;
 
-    private LengthPrefixMessageFramer $framer;
+    private readonly bool $ssl;
+
+    private readonly string $targetHost;
+
+    private ?EncryptableSocket $connection = null;
+
+    private bool $isClosed = true;
+
+    private readonly LengthPrefixMessageFramer $framer;
 
     public function __construct(
-        Logger $logger,
-        EndPoint $remoteEndPoint,
+        private readonly Logger $log,
+        private readonly EndPoint $remoteEndPoint,
         string $connectionId,
         bool $ssl,
         string $targetHost,
-        bool $validateServer,
-        int $timeout,
-        Closure $handlePackage,
-        Closure $onError,
-        Closure $connectionEstablished,
-        Closure $connectionClosed
+        private readonly bool $validateServer,
+        private readonly float $timeout,
+        private readonly Closure $handlePackage,
+        private readonly Closure $onError,
+        private readonly Closure $connectionEstablished,
+        private readonly Closure $connectionClosed
     ) {
         if ($ssl && empty($targetHost)) {
             throw new InvalidArgumentException('Target host cannot be empty when using SSL');
@@ -70,17 +63,9 @@ class TcpPackageConnection
             throw new InvalidArgumentException('ConnectionId cannot be empty');
         }
 
-        $this->log = $logger;
-        $this->remoteEndPoint = $remoteEndPoint;
         $this->connectionId = $connectionId;
         $this->ssl = $ssl;
         $this->targetHost = $targetHost;
-        $this->validateServer = $validateServer;
-        $this->timeout = $timeout;
-        $this->handlePackage = $handlePackage;
-        $this->onError = $onError;
-        $this->connectionEstablished = $connectionEstablished;
-        $this->connectionClosed = $connectionClosed;
 
         //Setup callback for incoming messages
         $this->framer = new LengthPrefixMessageFramer(function (string $data): void {
@@ -88,83 +73,80 @@ class TcpPackageConnection
         });
     }
 
-    /** @psalm-pure */
+    /** @psalm-mutation-free */
     public function remoteEndPoint(): EndPoint
     {
         return $this->remoteEndPoint;
     }
 
-    /** @psalm-pure */
+    /** @psalm-mutation-free */
     public function connectionId(): string
     {
         return $this->connectionId;
     }
 
-    public function connectAsync(): Promise
+    public function connect(): void
     {
-        return call(function (): Generator {
-            try {
-                $context = (new ConnectContext())
-                    ->withConnectTimeout($this->timeout);
+        try {
+            $context = (new ConnectContext())
+                ->withConnectTimeout($this->timeout);
 
-                $uri = \sprintf('tcp://%s:%s', $this->remoteEndPoint->host(), $this->remoteEndPoint->port());
+            $uri = \sprintf('tcp://%s:%s', $this->remoteEndPoint->host(), $this->remoteEndPoint->port());
 
-                if ($this->ssl) {
-                    $tlsContext = new ClientTlsContext($this->targetHost);
+            if ($this->ssl) {
+                $tlsContext = new ClientTlsContext($this->targetHost);
 
-                    if ($this->validateServer) {
-                        $tlsContext = $tlsContext->withPeerVerification();
-                    }
-
-                    $context = $context->withTlsContext($tlsContext);
+                if ($this->validateServer) {
+                    $tlsContext = $tlsContext->withPeerVerification();
                 }
 
-                /** @psalm-suppress MixedAssignment */
-                $this->connection = yield connect($uri, $context);
-
-                if ($this->ssl) {
-                    /** @psalm-suppress MixedMethodCall */
-                    yield $this->connection->setupTls();
-                }
-
-                $this->isClosed = false;
-            } catch (ConnectException $e) {
-                $this->isClosed = true;
-                $this->log->debug(\sprintf(
-                    'TcpPackageConnection: connection to [%s, %s] failed. Error: %s',
-                    (string) $this->remoteEndPoint,
-                    $this->connectionId,
-                    $e->getMessage()
-                ));
-                ($this->connectionClosed)($this, $e);
-            } catch (Exception $e) {
-                $this->isClosed = true;
-                $this->log->debug(\sprintf(
-                    'TcpPackageConnection: connection [%s, %s] was closed with error %s',
-                    (string) $this->remoteEndPoint,
-                    $this->connectionId,
-                    $e->getMessage()
-                ));
-                ($this->connectionClosed)($this, $e);
+                $context = $context->withTlsContext($tlsContext);
             }
 
-            $this->log->debug(\sprintf(
-                'TcpPackageConnection: connected to [%s, %s]',
-                (string) $this->remoteEndPoint,
-                $this->connectionId
-            ));
+            /** @psalm-suppress MixedAssignment */
+            $this->connection = connect($uri, $context);
 
-            ($this->connectionEstablished)($this);
-        });
+            if ($this->ssl) {
+                $this->connection->setupTls();
+            }
+
+            $this->isClosed = false;
+        } catch (ConnectException $e) {
+            $this->isClosed = true;
+            $this->log->debug(\sprintf(
+                'TcpPackageConnection: connection to [%s, %s] failed. Error: %s',
+                (string) $this->remoteEndPoint,
+                $this->connectionId,
+                $e->getMessage()
+            ));
+            ($this->connectionClosed)($this, $e);
+        } catch (Exception $e) {
+            $this->isClosed = true;
+            $this->log->debug(\sprintf(
+                'TcpPackageConnection: connection [%s, %s] was closed with error %s',
+                (string) $this->remoteEndPoint,
+                $this->connectionId,
+                $e->getMessage()
+            ));
+            ($this->connectionClosed)($this, $e);
+        }
+
+        $this->log->debug(\sprintf(
+            'TcpPackageConnection: connected to [%s, %s]',
+            (string) $this->remoteEndPoint,
+            $this->connectionId
+        ));
+
+        ($this->connectionEstablished)($this);
     }
 
     public function enqueueSend(TcpPackage $package): void
     {
-        Loop::defer(function () use ($package): Generator {
+        EventLoop::defer(function () use ($package): void {
             try {
                 \assert(null !== $this->connection);
 
-                yield $this->connection->write($package->asBytes());
+                $this->connection->write($package->asBytes());
             } catch (Exception $e) {
                 ($this->connectionClosed)($this, $e);
             }
@@ -186,7 +168,7 @@ class TcpPackageConnection
                 'TcpPackageConnection: [%s, %s]: Error when processing TcpPackage %s: %s. Connection will be closed',
                 (string) $this->remoteEndPoint,
                 $this->connectionId,
-                isset($package) ? $package->command()->name() : '<invalid package>',
+                isset($package) ? $package->command()->name : '<invalid package>',
                 $e->getMessage()
             );
 
@@ -198,12 +180,11 @@ class TcpPackageConnection
 
     public function startReceiving(): void
     {
-        Loop::defer(function (): Generator {
+        EventLoop::defer(function (): void {
             while (true) {
                 \assert(null !== $this->connection);
 
-                /** @var string|null $data */
-                $data = yield $this->connection->read();
+                $data = $this->connection->read();
 
                 if (null === $data) {
                     // stream got closed
@@ -211,7 +192,7 @@ class TcpPackageConnection
                 }
 
                 try {
-                    $this->framer->unFrameData((string) $data);
+                    $this->framer->unFrameData($data);
                 } catch (PackageFramingException $exception) {
                     $this->log->error(\sprintf(
                         'TcpPackageConnection: [%s, %s]. Invalid TCP frame received',
@@ -220,8 +201,6 @@ class TcpPackageConnection
                     ));
 
                     $this->close();
-
-                    return;
                 }
             }
         });
@@ -229,9 +208,7 @@ class TcpPackageConnection
 
     public function close(): void
     {
-        if ($this->connection) {
-            $this->connection->close();
-        }
+        $this->connection?->close();
     }
 
     public function isClosed(): bool

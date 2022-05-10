@@ -13,32 +13,25 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Amp\Promise;
-use Amp\Success;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStoreClient\Uri;
 
 /** @internal */
 final class SingleEndpointDiscoverer implements EndPointDiscoverer
 {
-    private Uri $uri;
-    private bool $useSslConnection;
-
-    public function __construct(Uri $uri, bool $useSslConnection)
-    {
-        $this->uri = $uri;
-        $this->useSslConnection = $useSslConnection;
+    public function __construct(
+        private readonly Uri $uri,
+        private readonly bool $useSslConnection
+    ) {
     }
 
-    public function discoverAsync(?EndPoint $failedTcpEndPoint): Promise
+    public function discover(?EndPoint $failedTcpEndPoint): NodeEndPoints
     {
         $endPoint = new EndPoint($this->uri->host(), $this->uri->port());
 
-        return new Success(
-            new NodeEndPoints(
-                $this->useSslConnection ? null : $endPoint,
-                $this->useSslConnection ? $endPoint : null
-            )
+        return new NodeEndPoints(
+            $this->useSslConnection ? null : $endPoint,
+            $this->useSslConnection ? $endPoint : null
         );
     }
 }

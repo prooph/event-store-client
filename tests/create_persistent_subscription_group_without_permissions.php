@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Success;
-use Generator;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
@@ -26,6 +24,7 @@ class create_persistent_subscription_group_without_permissions extends AsyncTest
     use SpecificationWithConnection;
 
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
 
     protected function setUp(): void
@@ -39,17 +38,12 @@ class create_persistent_subscription_group_without_permissions extends AsyncTest
             ->build();
     }
 
-    protected function when(): Generator
-    {
-        yield new Success();
-    }
-
     /** @test */
-    public function the_completion_succeeds(): Generator
+    public function the_completion_succeeds(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             try {
-                yield $this->connection->createPersistentSubscriptionAsync(
+                $this->connection->createPersistentSubscription(
                     $this->stream,
                     'nonexistinggroup',
                     $this->settings

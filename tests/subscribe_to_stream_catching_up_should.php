@@ -13,36 +13,35 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Deferred;
-use Amp\Delayed;
-use Amp\Promise;
-use Amp\Success;
+use Amp\CancelledException;
+use Amp\DeferredFuture;
+use function Amp\delay;
+use Amp\Future;
+use Amp\TimeoutCancellation;
 use Closure;
-use Generator;
-use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventStoreCatchUpSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropReason;
-use Prooph\EventStoreClient\Internal\EventStoreStreamCatchUpSubscription;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 
 class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCase
 {
-    private const TIMEOUT = 5000;
+    private const Timeout = 5;
 
     /** @test */
-    public function be_able_to_subscribe_to_non_existing_stream(): Generator
+    public function be_able_to_subscribe_to_non_existing_stream(): void
     {
         $stream = 'be_able_to_subscribe_to_non_existing_stream';
 
-        $appeared = new Deferred();
+        $appeared = new DeferredFuture();
         $dropped = new CountdownEvent(1);
 
-        $subscription = yield $this->connection->subscribeToStreamFromAsync(
+        $subscription = $this->connection->subscribeToStreamFrom(
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
@@ -50,40 +49,38 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
             null,
             $this->droppedWithCountdown($dropped)
         );
-        \assert($subscription instanceof EventStoreStreamCatchUpSubscription);
 
-        yield new Delayed(self::TIMEOUT); // give time for first pull phase
+        delay(0.1); // give time for first pull phase
 
-        yield $this->connection->subscribeToStreamAsync(
+        $this->connection->subscribeToStream(
             $stream,
             false,
             function (
                 EventStoreSubscription $subscription,
                 ResolvedEvent $resolvedEvent
-            ): Promise {
-                return new Success();
+            ): void {
             }
         );
 
-        yield new Delayed(self::TIMEOUT);
+        delay(0.1);
 
-        $this->assertFalse(yield Promise\timeoutWithDefault($appeared->promise(), 0, false), 'Some event appeared');
-        $this->assertFalse(yield $dropped->wait(0), 'Subscription was dropped prematurely');
+        $this->assertFalse($this->timeoutWithDefault($appeared->getFuture(), 0, false), 'Some event appeared');
+        $this->assertFalse($dropped->wait(0), 'Subscription was dropped prematurely');
 
-        yield $subscription->stop(self::TIMEOUT);
+        $subscription->stop(self::Timeout);
 
-        $this->assertTrue(yield $dropped->wait(0));
+        $this->assertTrue($dropped->wait(0));
     }
 
     /** @test */
-    public function be_able_to_subscribe_to_non_existing_stream_and_then_catch_event(): Generator
+    public function be_able_to_subscribe_to_non_existing_stream_and_then_catch_event(): void
     {
         $stream = 'be_able_to_subscribe_to_non_existing_stream_and_then_catch_event';
 
         $appeared = new CountdownEvent(1);
         $dropped = new CountdownEvent(1);
 
-        $subscription = yield $this->connection->subscribeToStreamFromAsync(
+        $subscription = $this->connection->subscribeToStreamFrom(
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
@@ -91,36 +88,33 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
             null,
             $this->droppedWithCountdown($dropped)
         );
-        \assert($subscription instanceof EventStoreStreamCatchUpSubscription);
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             [TestEvent::newTestEvent()]
         );
 
-        if (! yield $appeared->wait(self::TIMEOUT)) {
-            $this->assertFalse(yield $dropped->wait(0), 'Subscription was dropped prematurely');
+        if (! $appeared->wait(self::Timeout)) {
+            $this->assertFalse($dropped->wait(0), 'Subscription was dropped prematurely');
             $this->fail('Appeared countdown event timed out');
-
-            return;
         }
 
-        $this->assertFalse(yield $dropped->wait(0));
-        yield $subscription->stop(self::TIMEOUT);
-        $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
+        $this->assertFalse($dropped->wait(0));
+        $subscription->stop(self::Timeout);
+        $this->assertTrue($dropped->wait(self::Timeout));
     }
 
     /** @test */
-    public function allow_multiple_subscriptions_to_same_stream(): Generator
+    public function allow_multiple_subscriptions_to_same_stream(): void
     {
         $stream = 'allow_multiple_subscriptions_to_same_stream';
 
         $appeared = new CountdownEvent(2);
-        $dropped1 = new Deferred();
-        $dropped2 = new Deferred();
+        $dropped1 = new DeferredFuture();
+        $dropped2 = new DeferredFuture();
 
-        $sub1 = yield $this->connection->subscribeToStreamFromAsync(
+        $sub1 = $this->connection->subscribeToStreamFrom(
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
@@ -128,9 +122,8 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
             null,
             $this->droppedWithResetEvent($dropped1)
         );
-        \assert($sub1 instanceof EventStoreStreamCatchUpSubscription);
 
-        $sub2 = yield $this->connection->subscribeToStreamFromAsync(
+        $sub2 = $this->connection->subscribeToStreamFrom(
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
@@ -138,90 +131,85 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
             null,
             $this->droppedWithResetEvent($dropped2)
         );
-        \assert($sub2 instanceof EventStoreStreamCatchUpSubscription);
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             [TestEvent::newTestEvent()]
         );
 
-        if (! yield $appeared->wait(self::TIMEOUT)) {
-            $this->assertFalse(yield Promise\timeoutWithDefault($dropped1->promise(), 0, false), 'Subscription1 was dropped prematurely');
-            $this->assertFalse(yield Promise\timeoutWithDefault($dropped2->promise(), 0, false), 'Subscription2 was dropped prematurely');
+        if (! $appeared->wait(self::Timeout)) {
+            $this->assertFalse($this->timeoutWithDefault($dropped1->getFuture(), 0, false), 'Subscription1 was dropped prematurely');
+            $this->assertFalse($this->timeoutWithDefault($dropped2->getFuture(), 0, false), 'Subscription2 was dropped prematurely');
             $this->fail('Could not wait for all events');
-
-            return;
         }
 
-        $this->assertFalse(yield Promise\timeoutWithDefault($dropped1->promise(), 0, false));
-        yield $sub1->stop(self::TIMEOUT);
-        $this->assertTrue(yield Promise\timeoutWithDefault($dropped1->promise(), self::TIMEOUT, false));
+        $this->assertFalse($this->timeoutWithDefault($dropped1->getFuture(), 0, false));
+        $sub1->stop(self::Timeout);
+        $this->assertTrue($this->timeoutWithDefault($dropped1->getFuture(), self::Timeout, false));
 
-        $this->assertFalse(yield Promise\timeoutWithDefault($dropped2->promise(), 0, false));
-        yield $sub2->stop(self::TIMEOUT);
-        $this->assertTrue(yield Promise\timeoutWithDefault($dropped2->promise(), self::TIMEOUT, false));
+        $this->assertFalse($this->timeoutWithDefault($dropped2->getFuture(), 0, false));
+        $sub2->stop(self::Timeout);
+        $this->assertTrue($this->timeoutWithDefault($dropped2->getFuture(), self::Timeout, false));
     }
 
     /** @test */
-    public function call_dropped_callback_after_stop_method_call(): Generator
+    public function call_dropped_callback_after_stop_method_call(): void
     {
         $stream = 'call_dropped_callback_after_stop_method_call';
 
         $dropped = new CountdownEvent(1);
 
-        $subscription = yield $this->connection->subscribeToStreamFromAsync(
+        $subscription = $this->connection->subscribeToStreamFrom(
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
             function (
                 EventStoreCatchUpSubscription $subscription,
                 ResolvedEvent $resolvedEvent
-            ): Promise {
-                return new Success();
+            ): void {
             },
             null,
             $this->droppedWithCountdown($dropped)
         );
-        \assert($subscription instanceof EventStoreStreamCatchUpSubscription);
 
-        $this->assertFalse(yield $dropped->wait(0));
-        yield $subscription->stop(self::TIMEOUT);
-        $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
+        $this->assertFalse($dropped->wait(0));
+        $subscription->stop(self::Timeout);
+        $this->assertTrue($dropped->wait(self::Timeout));
     }
 
     /** @test */
-    public function call_dropped_callback_when_an_error_occurs_while_processing_an_event(): Generator
+    public function call_dropped_callback_when_an_error_occurs_while_processing_an_event(): void
     {
         $stream = 'call_dropped_callback_when_an_error_occurs_while_processing_an_event';
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             [new EventData(null, 'event', false)]
         );
 
         $dropped = new CountdownEvent(1);
 
-        yield $this->connection->subscribeToStreamFromAsync(
+        $this->connection->subscribeToStreamFrom(
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
             function (
                 EventStoreCatchUpSubscription $subscription,
                 ResolvedEvent $resolvedEvent
-            ): Promise {
+            ): void {
                 throw new \Exception('Error');
             },
             null,
             $this->droppedWithCountdown($dropped)
         );
 
-        $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
+        $this->assertTrue($dropped->wait(self::Timeout));
     }
 
     /** @test */
-    public function read_all_existing_events_and_keep_listening_to_new_ones(): Generator
+    public function read_all_existing_events_and_keep_listening_to_new_ones(): void
     {
         $stream = 'read_all_existing_events_and_keep_listening_to_new_ones';
 
@@ -231,14 +219,14 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         $dropped = new CountdownEvent(1);
 
         for ($i = 0; $i < 10; $i++) {
-            yield $this->connection->appendToStreamAsync(
+            $this->connection->appendToStream(
                 $stream,
                 $i - 1,
                 [new EventData(null, 'et-' . $i, false)]
             );
         }
 
-        $subscription = yield $this->connection->subscribeToStreamFromAsync(
+        $subscription = $this->connection->subscribeToStreamFrom(
             $stream,
             null,
             CatchUpSubscriptionSettings::default(),
@@ -246,21 +234,18 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
             null,
             $this->droppedWithCountdown($dropped)
         );
-        \assert($subscription instanceof EventStoreStreamCatchUpSubscription);
 
         for ($i = 10; $i < 20; $i++) {
-            yield $this->connection->appendToStreamAsync(
+            $this->connection->appendToStream(
                 $stream,
                 $i - 1,
                 [new EventData(null, 'et-' . $i, false)]
             );
         }
 
-        if (! yield $appeared->wait(self::TIMEOUT)) {
-            $this->assertFalse(yield $dropped->wait(0), 'Subscription was dropped prematurely');
+        if (! $appeared->wait(self::Timeout)) {
+            $this->assertFalse($dropped->wait(0), 'Subscription was dropped prematurely');
             $this->fail('Could not wait for all events');
-
-            return;
         }
 
         $this->assertCount(20, $events);
@@ -269,13 +254,13 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
             $this->assertSame('et-' . $i, $events[$i]->originalEvent()->eventType());
         }
 
-        $this->assertFalse(yield $dropped->wait(0));
-        yield $subscription->stop(self::TIMEOUT);
-        $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
+        $this->assertFalse($dropped->wait(0));
+        $subscription->stop(self::Timeout);
+        $this->assertTrue($dropped->wait(self::Timeout));
     }
 
     /** @test */
-    public function filter_events_and_keep_listening_to_new_ones(): Generator
+    public function filter_events_and_keep_listening_to_new_ones(): void
     {
         $stream = 'filter_events_and_keep_listening_to_new_ones';
 
@@ -285,14 +270,14 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         $dropped = new CountdownEvent(1);
 
         for ($i = 0; $i < 20; $i++) {
-            yield $this->connection->appendToStreamAsync(
+            $this->connection->appendToStream(
                 $stream,
                 $i - 1,
                 [new EventData(null, 'et-' . $i, false)]
             );
         }
 
-        $subscription = yield $this->connection->subscribeToStreamFromAsync(
+        $subscription = $this->connection->subscribeToStreamFrom(
             $stream,
             9,
             CatchUpSubscriptionSettings::default(),
@@ -300,21 +285,18 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
             null,
             $this->droppedWithCountdown($dropped)
         );
-        \assert($subscription instanceof EventStoreStreamCatchUpSubscription);
 
         for ($i = 20; $i < 30; $i++) {
-            yield $this->connection->appendToStreamAsync(
+            $this->connection->appendToStream(
                 $stream,
                 $i - 1,
                 [new EventData(null, 'et-' . $i, false)]
             );
         }
 
-        if (! yield $appeared->wait(self::TIMEOUT)) {
-            $this->assertFalse(yield $dropped->wait(0), 'Subscription was dropped prematurely');
+        if (! $appeared->wait(self::Timeout)) {
+            $this->assertFalse($dropped->wait(0), 'Subscription was dropped prematurely');
             $this->fail('Could not wait for all events');
-
-            return;
         }
 
         $this->assertCount(20, $events);
@@ -323,17 +305,17 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
             $this->assertSame('et-' . ($i + 10), $events[$i]->originalEvent()->eventType());
         }
 
-        $this->assertFalse(yield $dropped->wait(0));
-        yield $subscription->stop(self::TIMEOUT);
-        $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
+        $this->assertFalse($dropped->wait(0));
+        $subscription->stop(self::Timeout);
+        $this->assertTrue($dropped->wait(self::Timeout));
 
         $this->assertSame($events[19]->originalEventNumber(), $subscription->lastProcessedEventNumber());
 
-        yield $subscription->stop(0);
+        $subscription->stop(0);
     }
 
     /** @test */
-    public function filter_events_and_work_if_nothing_was_written_after_subscription(): Generator
+    public function filter_events_and_work_if_nothing_was_written_after_subscription(): void
     {
         $stream = 'filter_events_and_work_if_nothing_was_written_after_subscription';
 
@@ -343,14 +325,14 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         $dropped = new CountdownEvent(1);
 
         for ($i = 0; $i < 20; $i++) {
-            yield $this->connection->appendToStreamAsync(
+            $this->connection->appendToStream(
                 $stream,
                 $i - 1,
                 [new EventData(null, 'et-' . $i, false)]
             );
         }
 
-        $subscription = yield $this->connection->subscribeToStreamFromAsync(
+        $subscription = $this->connection->subscribeToStreamFrom(
             $stream,
             9,
             CatchUpSubscriptionSettings::default(),
@@ -358,13 +340,10 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
             null,
             $this->droppedWithCountdown($dropped)
         );
-        \assert($subscription instanceof EventStoreStreamCatchUpSubscription);
 
-        if (! yield $appeared->wait(self::TIMEOUT)) {
-            $this->assertFalse(yield $dropped->wait(0), 'Subscription was dropped prematurely');
+        if (! $appeared->wait(self::Timeout)) {
+            $this->assertFalse($dropped->wait(0), 'Subscription was dropped prematurely');
             $this->fail('Could not wait for all events');
-
-            return;
         }
 
         $this->assertCount(10, $events);
@@ -373,9 +352,9 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
             $this->assertSame('et-' . ($i + 10), $events[$i]->originalEvent()->eventType());
         }
 
-        $this->assertFalse(yield $dropped->wait(0));
-        yield $subscription->stop(self::TIMEOUT);
-        $this->assertTrue(yield $dropped->wait(self::TIMEOUT));
+        $this->assertFalse($dropped->wait(0));
+        $subscription->stop(self::Timeout);
+        $this->assertTrue($dropped->wait(self::Timeout));
 
         $this->assertSame($events[9]->originalEventNumber(), $subscription->lastProcessedEventNumber());
     }
@@ -385,10 +364,8 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         return function (
             EventStoreCatchUpSubscription $subscription,
             ResolvedEvent $resolvedEvent
-        ) use ($appeared): Promise {
+        ) use ($appeared): void {
             $appeared->signal();
-
-            return new Success();
         };
     }
 
@@ -397,23 +374,19 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         return function (
             EventStoreCatchUpSubscription $subscription,
             ResolvedEvent $resolvedEvent
-        ) use (&$events, $appeared): Promise {
+        ) use (&$events, $appeared): void {
             $events[] = $resolvedEvent;
             $appeared->signal();
-
-            return new Success();
         };
     }
 
-    private function appearedWithResetEvent(Deferred $appeared): Closure
+    private function appearedWithResetEvent(DeferredFuture $appeared): Closure
     {
         return function (
             EventStoreCatchUpSubscription $subscription,
             ResolvedEvent $resolvedEvent
-        ) use ($appeared): Promise {
-            $appeared->resolve(true);
-
-            return new Success();
+        ) use ($appeared): void {
+            $appeared->complete(true);
         };
     }
 
@@ -428,14 +401,23 @@ class subscribe_to_stream_catching_up_should extends EventStoreConnectionTestCas
         };
     }
 
-    private function droppedWithResetEvent(Deferred $dropped): Closure
+    private function droppedWithResetEvent(DeferredFuture $dropped): Closure
     {
         return function (
             EventStoreCatchUpSubscription $subscription,
             SubscriptionDropReason $reason,
             ?Throwable $exception = null
         ) use ($dropped): void {
-            $dropped->resolve(true);
+            $dropped->complete(true);
         };
+    }
+
+    private function timeoutWithDefault(Future $future, int $timeout, mixed $default = null): mixed
+    {
+        try {
+            return $future->await(new TimeoutCancellation($timeout));
+        } catch (CancelledException $e) {
+            return $default;
+        }
     }
 }

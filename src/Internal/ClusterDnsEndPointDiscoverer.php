@@ -13,17 +13,12 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use function Amp\call;
-use Amp\Delayed;
+use function Amp\delay;
 use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Interceptor\SetRequestTimeout;
 use Amp\Http\Client\Request;
-use Amp\Http\Client\Response;
-use Amp\Promise;
-use Amp\Success;
 use Exception;
-use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Util\Json;
 use Prooph\EventStoreClient\Exception\ClusterException;
@@ -36,116 +31,86 @@ use Psr\Log\LoggerInterface as Logger;
 /** @internal */
 final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 {
-    private Logger $log;
-    private string $clusterDns;
-    private int $maxDiscoverAttempts;
-    private int $managerExternalHttpPort;
-    /** @var list<GossipSeed> */
-    private array $gossipSeeds = [];
     private HttpClient $httpClient;
+
     /** @var list<MemberInfoDto> */
     private array $oldGossip = [];
-    private int $gossipTimeout;
-    private bool $preferRandomNode;
 
     /**
-     * @param Logger $logger
-     * @param string $clusterDns
-     * @param int $maxDiscoverAttempts
-     * @param int $managerExternalHttpPort
      * @param list<GossipSeed> $gossipSeeds
-     * @param int $gossipTimeout
-     * @param bool $preferRandomNode
      */
     public function __construct(
-        Logger $logger,
-        string $clusterDns,
-        int $maxDiscoverAttempts,
-        int $managerExternalHttpPort,
-        array $gossipSeeds,
-        int $gossipTimeout,
-        bool $preferRandomNode
+        private readonly Logger $log,
+        private readonly string $clusterDns,
+        private readonly int $maxDiscoverAttempts,
+        private readonly int $managerExternalHttpPort,
+        private readonly array $gossipSeeds,
+        float $gossipTimeout,
+        private readonly bool $preferRandomNode
     ) {
-        $this->log = $logger;
-        $this->clusterDns = $clusterDns;
-        $this->maxDiscoverAttempts = $maxDiscoverAttempts;
-        $this->managerExternalHttpPort = $managerExternalHttpPort;
-        $this->gossipSeeds = $gossipSeeds;
-        $this->gossipTimeout = $gossipTimeout;
-        $this->preferRandomNode = $preferRandomNode;
-
         $builder = new HttpClientBuilder();
         $builder->intercept(new SetRequestTimeout($gossipTimeout, $gossipTimeout, $gossipTimeout));
         $this->httpClient = $builder->build();
     }
 
-    /** {@inheritdoc} */
-    public function discoverAsync(?EndPoint $failedTcpEndPoint): Promise
+    public function discover(?EndPoint $failedTcpEndPoint): NodeEndPoints
     {
-        return call(function () use ($failedTcpEndPoint): Generator {
-            for ($attempt = 1; $attempt <= $this->maxDiscoverAttempts; ++$attempt) {
-                try {
-                    $endPoints = yield $this->discoverEndPoint($failedTcpEndPoint);
+        for ($attempt = 1; $attempt <= $this->maxDiscoverAttempts; ++$attempt) {
+            try {
+                $endPoints = $this->discoverEndPoint($failedTcpEndPoint);
 
-                    if (null !== $endPoints) {
-                        $this->log->info(\sprintf(
-                            'Discovering attempt %d/%d successful: best candidate is %s',
-                            $attempt,
-                            $this->maxDiscoverAttempts,
-                            $endPoints
-                        ));
-
-                        return new Success($endPoints);
-                    }
-                } catch (Exception $e) {
+                if (null !== $endPoints) {
                     $this->log->info(\sprintf(
-                        'Discovering attempt %d/%d failed with error: %s',
+                        'Discovering attempt %d/%d successful: best candidate is %s',
                         $attempt,
                         $this->maxDiscoverAttempts,
-                        $e->getMessage()
+                        $endPoints
                     ));
-                }
 
-                yield new Delayed(100);
+                    return $endPoints;
+                }
+            } catch (Exception $e) {
+                $this->log->info(\sprintf(
+                    'Discovering attempt %d/%d failed with error: %s',
+                    $attempt,
+                    $this->maxDiscoverAttempts,
+                    $e->getMessage()
+                ));
             }
 
-            throw new ClusterException(\sprintf(
-                'Failed to discover candidate in %d attempts',
-                $this->maxDiscoverAttempts
-            ));
-        });
+            delay(0.5);
+        }
+
+        throw new ClusterException(\sprintf(
+            'Failed to discover candidate in %d attempts',
+            $this->maxDiscoverAttempts
+        ));
     }
 
-    /**
-     * @param EndPoint|null $failedTcpEndPoint
-     * @return Promise<NodeEndPoints|null>
-     */
-    private function discoverEndPoint(?EndPoint $failedTcpEndPoint): Promise
+    private function discoverEndPoint(?EndPoint $failedTcpEndPoint): ?NodeEndPoints
     {
-        return call(function () use ($failedTcpEndPoint): Generator {
-            $oldGossip = $this->oldGossip;
+        $oldGossip = $this->oldGossip;
 
-            $gossipCandidates = ! empty($oldGossip)
-                ? $this->getGossipCandidatesFromOldGossip($oldGossip, $failedTcpEndPoint)
-                : $this->getGossipCandidatesFromDns();
+        $gossipCandidates = ! empty($oldGossip)
+            ? $this->getGossipCandidatesFromOldGossip($oldGossip, $failedTcpEndPoint)
+            : $this->getGossipCandidatesFromDns();
 
-            foreach ($gossipCandidates as $candidate) {
-                $gossip = yield $this->tryGetGossipFrom($candidate);
-                \assert(null === $gossip || $gossip instanceof ClusterInfoDto);
+        foreach ($gossipCandidates as $candidate) {
+            $gossip = $this->tryGetGossipFrom($candidate);
+            \assert(null === $gossip || $gossip instanceof ClusterInfoDto);
 
-                if (null === $gossip || empty($gossip->members())) {
-                    continue;
-                }
-
-                $bestNode = $this->tryDetermineBestNode($gossip->members(), $this->preferRandomNode);
-
-                if (null !== $bestNode) {
-                    $this->oldGossip = $gossip->members();
-
-                    return $bestNode;
-                }
+            if (null === $gossip || empty($gossip->members())) {
+                continue;
             }
-        });
+
+            $bestNode = $this->tryDetermineBestNode($gossip->members(), $this->preferRandomNode);
+
+            if (null !== $bestNode) {
+                $this->oldGossip = $gossip->members();
+
+                return $bestNode;
+            }
+        }
     }
 
     /** @return list<GossipSeed> */
@@ -200,7 +165,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         $j = \count($members);
 
         foreach ($members as $k => $member) {
-            if ($members[$k]->state()->equals(VNodeState::manager())) {
+            if ($members[$k]->state() === VNodeState::Manager) {
                 $result[--$j] = new GossipSeed(new EndPoint($members[$k]->httpAddress(), $members[$k]->httpPort()));
             } else {
                 $result[++$i] = new GossipSeed(new EndPoint($members[$k]->httpAddress(), $members[$k]->httpPort()));
@@ -212,53 +177,44 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         return $result;
     }
 
-    /**
-     * @param GossipSeed $endPoint
-     * @return Promise<ClusterInfoDto|null>
-     */
-    private function tryGetGossipFrom(GossipSeed $endPoint): Promise
+    private function tryGetGossipFrom(GossipSeed $endPoint): ?ClusterInfoDto
     {
-        return call(function () use ($endPoint): Generator {
-            $uri = 'https://' . $endPoint->endPoint()->host() . ':' . $endPoint->endPoint()->port() . '/gossip?format=json';
-            $this->log->info($uri);
-            try {
-                $request = new Request($uri);
+        $uri = 'https://' . $endPoint->endPoint()->host() . ':' . $endPoint->endPoint()->port() . '/gossip?format=json';
+        $this->log->info($uri);
 
-                $header = $endPoint->hostHeader();
+        try {
+            $request = new Request($uri);
 
-                if (! empty($header)) {
-                    $headerData = \explode(':', $header);
-                    $request->setHeader($headerData[0], $headerData[1]);
-                }
+            $header = $endPoint->hostHeader();
 
-                $response = yield $this->httpClient->request($request);
-                \assert($response instanceof Response);
-            } catch (Exception $e) {
-                $this->log->error($e->getMessage());
-
-                return;
+            if (! empty($header)) {
+                $headerData = \explode(':', $header);
+                $request->setHeader($headerData[0], $headerData[1]);
             }
 
-            if ($response->getStatus() !== 200) {
-                return;
-            }
+            $response = $this->httpClient->request($request);
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage());
 
-            $json = yield $response->getBody()->read();
+            return null;
+        }
 
-            if (null === $json) {
-                return;
-            }
+        if ($response->getStatus() !== 200) {
+            return null;
+        }
 
-            $data = Json::decode($json);
+        $json = $response->getBody()->read();
 
-            $members = [];
+        if ('' === $json) {
+            return null;
+        }
 
-            foreach ($data['members'] as $member) {
-                $members[] = new MemberInfoDto($member);
-            }
+        $data = Json::decode($json);
 
-            return new ClusterInfoDto($members);
-        });
+        return new ClusterInfoDto(\array_map(
+            fn (array $member) => new MemberInfoDto($member),
+            $data['members']
+        ));
     }
 
     /**
@@ -271,10 +227,15 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         $nodes = [];
 
         foreach ($members as $member) {
-            if ($member->state()->equals(VNodeState::manager())
-                || $member->state()->equals(VNodeState::shuttingDown())
-                || $member->state()->equals(VNodeState::shutdown())
-            ) {
+            if (\in_array(
+                $member->state(),
+                [
+                    VNodeState::Manager,
+                    VNodeState::ShuttingDown,
+                    VNodeState::Shutdown,
+                ],
+                true
+            )) {
                 continue;
             }
 

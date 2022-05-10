@@ -15,13 +15,9 @@ namespace Prooph\EventStoreClient\Messages\ClusterMessages;
 
 class ClusterInfoDto
 {
-    /** @var list<MemberInfoDto> */
-    private array $members = [];
-
     /** @param list<MemberInfoDto> $members */
-    public function __construct(array $members = [])
+    public function __construct(private readonly array $members = [])
     {
-        $this->members = $members;
     }
 
     /** @return list<MemberInfoDto> */

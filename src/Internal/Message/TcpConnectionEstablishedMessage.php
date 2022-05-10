@@ -15,23 +15,22 @@ namespace Prooph\EventStoreClient\Internal\Message;
 
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 class TcpConnectionEstablishedMessage implements Message
 {
-    private TcpPackageConnection $tcpPackageConnection;
-
-    public function __construct(TcpPackageConnection $tcpPackageConnection)
+    public function __construct(private readonly TcpPackageConnection $tcpPackageConnection)
     {
-        $this->tcpPackageConnection = $tcpPackageConnection;
     }
 
-    /** @psalm-pure */
     public function tcpPackageConnection(): TcpPackageConnection
     {
         return $this->tcpPackageConnection;
     }
 
-    /** @psalm-pure */
     public function __toString(): string
     {
         return 'TcpConnectionEstablishedMessage';

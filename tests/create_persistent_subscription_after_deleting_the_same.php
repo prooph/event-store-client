@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Generator;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
@@ -25,6 +24,7 @@ class create_persistent_subscription_after_deleting_the_same extends AsyncTestCa
     use SpecificationWithConnection;
 
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
 
     protected function setUp(): void
@@ -38,24 +38,24 @@ class create_persistent_subscription_after_deleting_the_same extends AsyncTestCa
             ->build();
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             [
                 new EventData(null, 'whatever', true, \json_encode(['foo' => 2])),
             ]
         );
 
-        yield $this->connection->createPersistentSubscriptionAsync(
+        $this->connection->createPersistentSubscription(
             $this->stream,
             'existing',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        yield $this->connection->deletePersistentSubscriptionAsync(
+        $this->connection->deletePersistentSubscription(
             $this->stream,
             'existing',
             DefaultData::adminCredentials()
@@ -66,10 +66,10 @@ class create_persistent_subscription_after_deleting_the_same extends AsyncTestCa
      * @test
      * @doesNotPerformAssertions
      */
-    public function the_completion_succeeds(): Generator
+    public function the_completion_succeeds(): void
     {
-        yield $this->execute(function (): Generator {
-            yield $this->connection->createPersistentSubscriptionAsync(
+        $this->execute(function (): void {
+            $this->connection->createPersistentSubscription(
                 $this->stream,
                 'existing',
                 $this->settings,

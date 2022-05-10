@@ -21,8 +21,11 @@ class GossipSeedClusterSettingsBuilder
 {
     /** @var list<GossipSeed> */
     private array $gossipSeeds = [];
-    private int $maxDiscoverAttempts = Consts::DEFAULT_MAX_CLUSTER_DISCOVER_ATTEMPTS;
-    private int $gossipTimeout = 1000;
+
+    private int $maxDiscoverAttempts = Consts::DefaultMaxClusterDiscoverAttempts;
+
+    private float $gossipTimeout = 1;
+
     private bool $preferRandomNode = false;
 
     public function addEndPoint(EndPoint $endPoint): self
@@ -77,7 +80,7 @@ class GossipSeedClusterSettingsBuilder
         return $this;
     }
 
-    public function setGossipTimeout(int $timeout): self
+    public function setGossipTimeout(float $timeout): self
     {
         $this->gossipTimeout = $timeout;
 

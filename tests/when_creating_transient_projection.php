@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Generator;
 use Prooph\EventStore\Util\Guid;
 
 class when_creating_transient_projection extends AsyncTestCase
@@ -22,24 +21,26 @@ class when_creating_transient_projection extends AsyncTestCase
     use ProjectionSpecification;
 
     private string $projectionName;
+
     private string $streamName;
+
     private string $query;
 
-    public function given(): Generator
+    public function given(): void
     {
         $id = Guid::generateAsHex();
         $this->projectionName = 'when_creating_transient_projection-' . $id;
         $this->streamName = 'test-stream-' . $id;
 
-        yield $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');
-        yield $this->postEvent($this->streamName, 'testEvent', '{"A": 2}');
+        $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');
+        $this->postEvent($this->streamName, 'testEvent', '{"A": 2}');
 
         $this->query = $this->createStandardQuery($this->streamName);
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->projectionsManager->createTransientAsync(
+        $this->projectionsManager->createTransient(
             $this->projectionName,
             $this->query,
             'JS',
@@ -48,10 +49,10 @@ class when_creating_transient_projection extends AsyncTestCase
     }
 
     /** @test */
-    public function should_create_projection(): Generator
+    public function should_create_projection(): void
     {
-        yield $this->execute(function (): Generator {
-            $status = yield $this->projectionsManager->getStatusAsync(
+        $this->execute(function (): void {
+            $status = $this->projectionsManager->getStatus(
                 $this->projectionName,
                 $this->credentials
             );

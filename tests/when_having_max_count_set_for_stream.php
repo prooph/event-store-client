@@ -13,27 +13,26 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Generator;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\SliceReadStatus;
-use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\StreamMetadata;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 
 class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
 {
     private string $stream = 'max-count-test-stream';
+
     /** @var EventData[] */
     private array $testEvents = [];
 
-    protected function setUpAsync(): Generator
+    protected function setUp(): void
     {
-        yield from parent::setUpAsync();
+        parent::setUp();
 
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $this->stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()->setMaxCount(3)->build(),
             DefaultData::adminCredentials()
         );
@@ -42,27 +41,26 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
             $this->testEvents[] = TestEvent::newTestEvent(null, (string) $i);
         }
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             $this->testEvents,
             DefaultData::adminCredentials()
         );
     }
 
     /** @test */
-    public function read_stream_forward_respects_max_count(): Generator
+    public function read_stream_forward_respects_max_count(): void
     {
-        $res = yield $this->connection->readStreamEventsForwardAsync(
+        $res = $this->connection->readStreamEventsForward(
             $this->stream,
             0,
             100,
             false,
             DefaultData::adminCredentials()
         );
-        \assert($res instanceof StreamEventsSlice);
 
-        $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
+        $this->assertSame(SliceReadStatus::Success, $res->status());
         $this->assertCount(3, $res->events());
 
         for ($i = 0; $i < 3; $i++) {
@@ -74,18 +72,17 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function read_stream_backward_respects_max_count(): Generator
+    public function read_stream_backward_respects_max_count(): void
     {
-        $res = yield $this->connection->readStreamEventsBackwardAsync(
+        $res = $this->connection->readStreamEventsBackward(
             $this->stream,
             -1,
             100,
             false,
             DefaultData::adminCredentials()
         );
-        \assert($res instanceof StreamEventsSlice);
 
-        $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
+        $this->assertSame(SliceReadStatus::Success, $res->status());
         $this->assertCount(3, $res->events());
 
         for ($i = 0; $i < 3; $i++) {
@@ -97,18 +94,17 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function after_setting_less_strict_max_count_read_stream_forward_reads_more_events(): Generator
+    public function after_setting_less_strict_max_count_read_stream_forward_reads_more_events(): void
     {
-        $res = yield $this->connection->readStreamEventsForwardAsync(
+        $res = $this->connection->readStreamEventsForward(
             $this->stream,
             0,
             100,
             false,
             DefaultData::adminCredentials()
         );
-        \assert($res instanceof StreamEventsSlice);
 
-        $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
+        $this->assertSame(SliceReadStatus::Success, $res->status());
         $this->assertCount(3, $res->events());
 
         for ($i = 0; $i < 3; $i++) {
@@ -118,23 +114,22 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
             $this->assertTrue($testEvent->eventId()->equals($event->event()->eventId()));
         }
 
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $this->stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()->setMaxCount(4)->build(),
             DefaultData::adminCredentials()
         );
 
-        $res = yield $this->connection->readStreamEventsForwardAsync(
+        $res = $this->connection->readStreamEventsForward(
             $this->stream,
             0,
             100,
             false,
             DefaultData::adminCredentials()
         );
-        \assert($res instanceof StreamEventsSlice);
 
-        $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
+        $this->assertSame(SliceReadStatus::Success, $res->status());
         $this->assertCount(4, $res->events());
 
         for ($i = 0; $i < 4; $i++) {
@@ -146,18 +141,17 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function after_setting_more_strict_max_count_read_stream_forward_reads_less_events(): Generator
+    public function after_setting_more_strict_max_count_read_stream_forward_reads_less_events(): void
     {
-        $res = yield $this->connection->readStreamEventsForwardAsync(
+        $res = $this->connection->readStreamEventsForward(
             $this->stream,
             0,
             100,
             false,
             DefaultData::adminCredentials()
         );
-        \assert($res instanceof StreamEventsSlice);
 
-        $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
+        $this->assertSame(SliceReadStatus::Success, $res->status());
         $this->assertCount(3, $res->events());
 
         for ($i = 0; $i < 3; $i++) {
@@ -167,23 +161,22 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
             $this->assertTrue($testEvent->eventId()->equals($event->event()->eventId()));
         }
 
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $this->stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()->setMaxCount(2)->build(),
             DefaultData::adminCredentials()
         );
 
-        $res = yield $this->connection->readStreamEventsForwardAsync(
+        $res = $this->connection->readStreamEventsForward(
             $this->stream,
             0,
             100,
             false,
             DefaultData::adminCredentials()
         );
-        \assert($res instanceof StreamEventsSlice);
 
-        $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
+        $this->assertSame(SliceReadStatus::Success, $res->status());
         $this->assertCount(2, $res->events());
 
         for ($i = 0; $i < 2; $i++) {
@@ -195,18 +188,17 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function after_setting_less_strict_max_count_read_stream_backward_reads_more_events(): Generator
+    public function after_setting_less_strict_max_count_read_stream_backward_reads_more_events(): void
     {
-        $res = yield $this->connection->readStreamEventsBackwardAsync(
+        $res = $this->connection->readStreamEventsBackward(
             $this->stream,
             -1,
             100,
             false,
             DefaultData::adminCredentials()
         );
-        \assert($res instanceof StreamEventsSlice);
 
-        $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
+        $this->assertSame(SliceReadStatus::Success, $res->status());
         $this->assertCount(3, $res->events());
 
         for ($i = 0; $i < 3; $i++) {
@@ -216,23 +208,22 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
             $this->assertTrue($testEvent->eventId()->equals($event->event()->eventId()));
         }
 
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $this->stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()->setMaxCount(4)->build(),
             DefaultData::adminCredentials()
         );
 
-        $res = yield $this->connection->readStreamEventsBackwardAsync(
+        $res = $this->connection->readStreamEventsBackward(
             $this->stream,
             -1,
             100,
             false,
             DefaultData::adminCredentials()
         );
-        \assert($res instanceof StreamEventsSlice);
 
-        $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
+        $this->assertSame(SliceReadStatus::Success, $res->status());
         $this->assertCount(4, $res->events());
 
         for ($i = 0; $i < 4; $i++) {
@@ -244,18 +235,17 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function after_setting_more_strict_max_count_read_stream_backward_reads_less_events(): Generator
+    public function after_setting_more_strict_max_count_read_stream_backward_reads_less_events(): void
     {
-        $res = yield $this->connection->readStreamEventsBackwardAsync(
+        $res = $this->connection->readStreamEventsBackward(
             $this->stream,
             -1,
             100,
             false,
             DefaultData::adminCredentials()
         );
-        \assert($res instanceof StreamEventsSlice);
 
-        $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
+        $this->assertSame(SliceReadStatus::Success, $res->status());
         $this->assertCount(3, $res->events());
 
         for ($i = 0; $i < 3; $i++) {
@@ -265,23 +255,22 @@ class when_having_max_count_set_for_stream extends EventStoreConnectionTestCase
             $this->assertTrue($testEvent->eventId()->equals($event->event()->eventId()));
         }
 
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $this->stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()->setMaxCount(2)->build(),
             DefaultData::adminCredentials()
         );
 
-        $res = yield $this->connection->readStreamEventsBackwardAsync(
+        $res = $this->connection->readStreamEventsBackward(
             $this->stream,
             -1,
             100,
             false,
             DefaultData::adminCredentials()
         );
-        \assert($res instanceof StreamEventsSlice);
 
-        $this->assertTrue($res->status()->equals(SliceReadStatus::success()));
+        $this->assertSame(SliceReadStatus::Success, $res->status());
         $this->assertCount(2, $res->events());
 
         for ($i = 0; $i < 2; $i++) {

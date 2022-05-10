@@ -13,17 +13,18 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\PersistentSubscriptions;
 
-use Amp\Promise;
-use Prooph\EventStore\Async\PersistentSubscriptions\PersistentSubscriptionsManager as AsyncPersistentSubscriptionsManager;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\PersistentSubscriptions\PersistentSubscriptionDetails;
+use Prooph\EventStore\PersistentSubscriptions\PersistentSubscriptionsManager as PersistentSubscriptionsManagerInterface;
 use Prooph\EventStore\UserCredentials;
 
-class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsManager
+class PersistentSubscriptionsManager implements PersistentSubscriptionsManagerInterface
 {
     private PersistentSubscriptionsClient $client;
+
     private EndPoint $httpEndPoint;
+
     private ?UserCredentials $defaultUserCredentials;
 
     public function __construct(
@@ -38,14 +39,11 @@ class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsMana
         $this->defaultUserCredentials = $defaultUserCredentials;
     }
 
-    /**
-     * @return Promise<PersistentSubscriptionDetails>
-     */
     public function describe(
         string $stream,
         string $subscriptionName,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): PersistentSubscriptionDetails {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
         }
@@ -62,12 +60,11 @@ class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsMana
         );
     }
 
-    /** @return Promise<void> */
     public function replayParkedMessages(
         string $stream,
         string $subscriptionName,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): void {
         if (empty($stream)) {
             throw new InvalidArgumentException('Stream cannot be empty');
         }
@@ -76,7 +73,7 @@ class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsMana
             throw new InvalidArgumentException('Subscription name cannot be empty');
         }
 
-        return $this->client->replayParkedMessages(
+        $this->client->replayParkedMessages(
             $this->httpEndPoint,
             $stream,
             $subscriptionName,
@@ -85,9 +82,9 @@ class PersistentSubscriptionsManager implements AsyncPersistentSubscriptionsMana
     }
 
     /**
-     * @return Promise<list<PersistentSubscriptionDetails>>
+     * @return list<PersistentSubscriptionDetails>
      */
-    public function list(?string $stream = null, ?UserCredentials $userCredentials = null): Promise
+    public function list(?string $stream = null, ?UserCredentials $userCredentials = null): array
     {
         if ('' === $stream) {
             $stream = null;

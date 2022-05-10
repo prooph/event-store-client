@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\Helper;
 
-use function Amp\call;
-use Amp\Promise;
-use Generator;
-use Prooph\EventStore\Async\EventStoreTransaction;
 use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventStoreTransaction;
+use Prooph\EventStore\WriteResult;
 
 /** @internal */
 class OngoingTransaction
@@ -31,20 +29,16 @@ class OngoingTransaction
 
     /**
      * @param EventData[] $events
-     * @return Promise<OngoingTransaction>
      */
-    public function writeAsync(array $events): Promise
+    public function write(array $events): OngoingTransaction
     {
-        return call(function () use ($events): Generator {
-            yield $this->transaction->writeAsync($events);
+        $this->transaction->write($events);
 
-            return $this;
-        });
+        return $this;
     }
 
-    /** @return Promise<WriteResult> */
-    public function commitAsync(): Promise
+    public function commit(): WriteResult
     {
-        return call(fn (): Generator => yield $this->transaction->commitAsync());
+        return $this->transaction->commit();
     }
 }

@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Success;
-use Generator;
 use Prooph\EventStore\StreamEventsSlice;
 
 class read_all_events_forward_with_linkto_to_deleted_event extends AsyncTestCase
@@ -24,9 +22,9 @@ class read_all_events_forward_with_linkto_to_deleted_event extends AsyncTestCase
 
     private StreamEventsSlice $read;
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        $this->read = yield $this->connection->readStreamEventsForwardAsync(
+        $this->read = $this->connection->readStreamEventsForward(
             $this->linkedStreamName,
             0,
             1
@@ -34,42 +32,34 @@ class read_all_events_forward_with_linkto_to_deleted_event extends AsyncTestCase
     }
 
     /** @test */
-    public function one_event_is_read(): Generator
+    public function one_event_is_read(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->assertCount(1, $this->read->events());
-
-            yield new Success();
         });
     }
 
     /** @test */
-    public function the_linked_event_is_not_resolved(): Generator
+    public function the_linked_event_is_not_resolved(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->assertNull($this->read->events()[0]->event());
-
-            yield new Success();
         });
     }
 
     /** @test */
-    public function the_link_event_is_included(): Generator
+    public function the_link_event_is_included(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->assertNotNull($this->read->events()[0]->originalEvent());
-
-            yield new Success();
         });
     }
 
     /** @test */
-    public function the_event_is_not_resolved(): Generator
+    public function the_event_is_not_resolved(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->assertFalse($this->read->events()[0]->isResolved());
-
-            yield new Success();
         });
     }
 }

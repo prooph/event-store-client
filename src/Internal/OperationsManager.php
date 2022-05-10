@@ -27,14 +27,20 @@ use SplQueue;
 class OperationsManager
 {
     private Closure $operationItemSeqNoComparer;
+
     private string $connectionName;
+
     private ConnectionSettings $settings;
+
     /** @var array<string, OperationItem> */
     private array $activeOperations = [];
+
     /** @var SplQueue<OperationItem> */
     private SplQueue $waitingOperations;
+
     /** @var list<OperationItem> */
     private array $retryPendingOperations = [];
+
     private int $totalOperationCount = 0;
 
     public function __construct(string $connectionName, ConnectionSettings $settings)
@@ -71,16 +77,17 @@ class OperationsManager
             try {
                 $operationItem->operation()->fail($closedConnectionException);
             } catch (\Error $e) {
-                // ignore, promise was already resolved
+                // ignore, future was already completed
             }
         }
 
         while (! $this->waitingOperations->isEmpty()) {
             $operationItem = $this->waitingOperations->dequeue();
+
             try {
                 $operationItem->operation()->fail($closedConnectionException);
             } catch (\Error $e) {
-                // ignore, promise was already resolved
+                // ignore, future was already completed
             }
         }
 
@@ -88,7 +95,7 @@ class OperationsManager
             try {
                 $operationItem->operation()->fail($closedConnectionException);
             } catch (\Error $e) {
-                // ignore, promise was already resolved
+                // ignore, future was already completed
             }
         }
 
@@ -202,8 +209,9 @@ class OperationsManager
 
         $package = $operation->operation()->createNetworkPackage($correlationId);
 
-        $this->logDebug('ExecuteOperation package %s, %s, %s',
-            (string) $package->command(),
+        $this->logDebug(
+            'ExecuteOperation package %s, %s, %s',
+            $package->command()->name,
             $package->correlationId(),
             (string) $operation
         );

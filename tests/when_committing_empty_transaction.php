@@ -14,80 +14,77 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Generator;
-use Prooph\EventStore\Async\EventStoreConnection;
-use Prooph\EventStore\Async\EventStoreTransaction;
 use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventStoreConnection;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\SliceReadStatus;
-use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\Util\Guid;
-use Prooph\EventStore\WriteResult;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 
 class when_committing_empty_transaction extends AsyncTestCase
 {
     private EventStoreConnection $connection;
+
     private EventData $firstEvent;
+
     private string $stream;
 
-    protected function setUpAsync(): Generator
+    protected function setUp(): void
     {
+        parent::setUp();
+
         $this->firstEvent = TestEvent::newTestEvent();
         $this->connection = TestConnection::create();
         $this->stream = Guid::generateAsHex();
 
-        yield $this->connection->connectAsync();
+        $this->connection->connect();
 
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $this->stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             [$this->firstEvent, TestEvent::newTestEvent(), TestEvent::newTestEvent()]
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(2, $result->nextExpectedVersion());
 
-        $transaction = yield $this->connection->startTransactionAsync(
+        $transaction = $this->connection->startTransaction(
             $this->stream,
             2
         );
-        \assert($transaction instanceof EventStoreTransaction);
 
-        $result = yield $transaction->commitAsync();
-        \assert($result instanceof WriteResult);
+        $result = $transaction->commit();
 
         $this->assertSame(2, $result->nextExpectedVersion());
     }
 
-    protected function tearDownAsync()
+    protected function tearDown(): void
     {
         $this->connection->close();
+
+        parent::tearDown();
     }
 
     /** @test */
-    public function following_append_with_correct_expected_version_are_commited_correctly(): Generator
+    public function following_append_with_correct_expected_version_are_commited_correctly(): void
     {
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $this->stream,
             2,
             TestEvent::newAmount(2)
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(4, $result->nextExpectedVersion());
 
-        $result = yield $this->connection->readStreamEventsForwardAsync(
+        $result = $this->connection->readStreamEventsForward(
             $this->stream,
             0,
             100,
             false
         );
-        \assert($result instanceof StreamEventsSlice);
 
-        $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
+        $this->assertSame(SliceReadStatus::Success, $result->status());
         $this->assertCount(5, $result->events());
 
         for ($i = 0; $i < 5; $i++) {
@@ -96,26 +93,24 @@ class when_committing_empty_transaction extends AsyncTestCase
     }
 
     /** @test */
-    public function following_append_with_expected_version_any_are_commited_correctly(): Generator
+    public function following_append_with_expected_version_any_are_commited_correctly(): void
     {
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $this->stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             TestEvent::newAmount(2)
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(4, $result->nextExpectedVersion());
 
-        $result = yield $this->connection->readStreamEventsForwardAsync(
+        $result = $this->connection->readStreamEventsForward(
             $this->stream,
             0,
             100,
             false
         );
-        \assert($result instanceof StreamEventsSlice);
 
-        $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
+        $this->assertSame(SliceReadStatus::Success, $result->status());
         $this->assertCount(5, $result->events());
 
         for ($i = 0; $i < 5; $i++) {
@@ -124,26 +119,24 @@ class when_committing_empty_transaction extends AsyncTestCase
     }
 
     /** @test */
-    public function committing_first_event_with_expected_version_no_stream_is_idempotent(): Generator
+    public function committing_first_event_with_expected_version_no_stream_is_idempotent(): void
     {
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $this->stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             [$this->firstEvent]
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(0, $result->nextExpectedVersion());
 
-        $result = yield $this->connection->readStreamEventsForwardAsync(
+        $result = $this->connection->readStreamEventsForward(
             $this->stream,
             0,
             100,
             false
         );
-        \assert($result instanceof StreamEventsSlice);
 
-        $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
+        $this->assertSame(SliceReadStatus::Success, $result->status());
         $this->assertCount(3, $result->events());
 
         for ($i = 0; $i < 3; $i++) {
@@ -152,13 +145,13 @@ class when_committing_empty_transaction extends AsyncTestCase
     }
 
     /** @test */
-    public function trying_to_append_new_events_with_expected_version_no_stream_fails(): Generator
+    public function trying_to_append_new_events_with_expected_version_no_stream_fails(): void
     {
         $this->expectException(WrongExpectedVersion::class);
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             [TestEvent::newTestEvent()]
         );
     }

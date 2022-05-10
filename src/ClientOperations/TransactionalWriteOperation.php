@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\Exception\AccessDenied;
@@ -35,29 +35,28 @@ use Psr\Log\LoggerInterface as Logger;
  */
 class TransactionalWriteOperation extends AbstractOperation
 {
-    private bool $requireMaster;
-    private int $transactionId;
-    /** @var list<EventData> */
-    private array $events;
-
+    /**
+     * @param Logger $logger
+     * @param DeferredFuture $deferred
+     * @param bool $requireMaster
+     * @param int $transactionId
+     * @param list<EventData> $events
+     * @param ?UserCredentials $userCredentials
+     */
     public function __construct(
         Logger $logger,
-        Deferred $deferred,
-        bool $requireMaster,
-        int $transactionId,
-        array $events,
+        DeferredFuture $deferred,
+        private readonly bool $requireMaster,
+        private readonly int $transactionId,
+        private readonly array $events,
         ?UserCredentials $userCredentials
     ) {
-        $this->requireMaster = $requireMaster;
-        $this->transactionId = $transactionId;
-        $this->events = $events;
-
         parent::__construct(
             $logger,
             $deferred,
             $userCredentials,
-            TcpCommand::transactionWrite(),
-            TcpCommand::transactionWriteCompleted(),
+            TcpCommand::TransactionWrite,
+            TcpCommand::TransactionWriteCompleted,
             TransactionWriteCompleted::class
         );
     }
@@ -87,18 +86,18 @@ class TransactionalWriteOperation extends AbstractOperation
             case OperationResult::Success:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'Success');
+                return new InspectionResult(InspectionDecision::EndOperation, 'Success');
             case OperationResult::PrepareTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'PrepareTimeout');
+                return new InspectionResult(InspectionDecision::Retry, 'PrepareTimeout');
             case OperationResult::ForwardTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'ForwardTimeout');
+                return new InspectionResult(InspectionDecision::Retry, 'ForwardTimeout');
             case OperationResult::CommitTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'CommitTimeout');
+                return new InspectionResult(InspectionDecision::Retry, 'CommitTimeout');
             case OperationResult::AccessDenied:
                 $exception = new AccessDenied('Write access denied');
                 $this->fail($exception);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');
+                return new InspectionResult(InspectionDecision::EndOperation, 'AccessDenied');
             default:
                 throw new UnexpectedOperationResult();
         }
@@ -120,7 +119,8 @@ class TransactionalWriteOperation extends AbstractOperation
 
     public function __toString(): string
     {
-        return \sprintf('TransactionId: %s, RequireMaster: %s',
+        return \sprintf(
+            'TransactionId: %s, RequireMaster: %s',
             $this->transactionId,
             $this->requireMaster ? 'yes' : 'no'
         );

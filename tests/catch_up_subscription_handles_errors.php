@@ -13,21 +13,17 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
-use Amp\Deferred;
-use Amp\Delayed;
-use Amp\Failure;
-use Amp\Loop;
+use Amp\CancelledException;
+use Amp\DeferredFuture;
+use function Amp\delay;
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Amp\Success;
+use Amp\TimeoutCancellation;
 use Exception;
-use Generator;
-use Prooph\EventStore\Async\ClientConnectionEventArgs;
-use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
+use Prooph\EventStore\ClientConnectionEventArgs;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventId;
+use Prooph\EventStore\EventStoreCatchUpSubscription;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ReadDirection;
 use Prooph\EventStore\RecordedEvent;
@@ -40,21 +36,32 @@ use Prooph\EventStoreClient\ClientOperations\VolatileSubscriptionOperation;
 use Prooph\EventStoreClient\Internal\EventStoreStreamCatchUpSubscription;
 use Prooph\EventStoreClient\Internal\VolatileEventStoreSubscription;
 use Psr\Log\NullLogger;
+use Revolt\EventLoop;
 use Throwable;
 
 class catch_up_subscription_handles_errors extends AsyncTestCase
 {
-    private static int $timeoutMs = 2000;
+    private const Timeout = 2;
+
+    private const StreamId = 'stream1';
+
     private FakeEventStoreConnection $connection;
+
     private array $raisedEvents;
+
     private bool $liveProcessingStarted;
+
     private bool $isDropped;
-    private Deferred $dropEvent;
-    private Deferred $raisedEventEvent;
+
+    private DeferredFuture $dropEvent;
+
+    private DeferredFuture $raisedEventEvent;
+
     private ?Throwable $dropException;
+
     private SubscriptionDropReason $dropReason;
+
     private EventStoreStreamCatchUpSubscription $subscription;
-    private static string $streamId = 'stream1';
 
     protected function setUp(): void
     {
@@ -62,11 +69,11 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
 
         $this->connection = new FakeEventStoreConnection();
         $this->raisedEvents = [];
-        $this->dropEvent = new Deferred();
-        $this->raisedEventEvent = new Deferred();
+        $this->dropEvent = new DeferredFuture();
+        $this->raisedEventEvent = new DeferredFuture();
         $this->liveProcessingStarted = false;
         $this->isDropped = false;
-        $this->dropReason = SubscriptionDropReason::unknown();
+        $this->dropReason = SubscriptionDropReason::Unknown;
         $this->dropException = null;
 
         $props1 = [
@@ -89,21 +96,20 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
         $this->subscription = new EventStoreStreamCatchUpSubscription(
             $this->connection,
             new NullLogger(),
-            self::$streamId,
+            self::StreamId,
             null,
             null,
             function (
                 EventStoreCatchUpSubscription $subscription,
                 ResolvedEvent $resolvedEvent
-            ) use (&$props1): Promise {
+            ) use (&$props1): void {
                 $props1['raisedEvents'][] = $resolvedEvent;
+
                 try {
-                    $props1['raisedEventEvent']->resolve(true);
+                    $props1['raisedEventEvent']->complete(true);
                 } catch (Throwable $e) {
                     // on connection close this event may appear twice, just ignore second occurrence
                 }
-
-                return new Success();
             },
             function (EventStoreCatchUpSubscription $subscription) use (&$props2): void {
                 $props2['liveProcessingStarted'] = true;
@@ -116,7 +122,7 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
                 $props3['isDropped'] = true;
                 $props3['dropReason'] = $reason;
                 $props3['dropException'] = $exception;
-                $props3['dropEvent']->resolve(true);
+                $props3['dropEvent']->complete(true);
             },
             $settings
         );
@@ -127,11 +133,12 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
     {
         $expectedException = new Exception('Test');
 
-        $this->connection->handleReadStreamEventsForwardAsync(
-            function ($stream, $start, $max) use ($expectedException): Promise {
-                $this->assertSame(self::$streamId, $stream);
+        $this->connection->handleReadStreamEventsForward(
+            function ($stream, $start, $max) use ($expectedException): StreamEventsSlice {
+                $this->assertSame(self::StreamId, $stream);
                 $this->assertSame(0, $start);
                 $this->assertSame(1, $max);
+
                 throw $expectedException;
             }
         );
@@ -142,13 +149,10 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
     private function assertStartFailsAndDropsSubscriptionWithException(Exception $expectedException): void
     {
         try {
-            $promise = $this->subscription->startAsync();
-            $promise = Promise\timeout($promise, self::$timeoutMs);
-
-            Promise\wait($promise);
+            $this->subscription->start();
         } catch (Throwable $e) {
             $this->assertTrue($this->isDropped);
-            $this->assertTrue($this->dropReason->equals(SubscriptionDropReason::catchUpError()));
+            $this->assertSame(SubscriptionDropReason::CatchUpError, $this->dropReason);
             $this->assertSame($expectedException, $this->dropException);
             $this->assertFalse($this->liveProcessingStarted);
 
@@ -163,13 +167,13 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
     {
         $expectedException = new Exception('Test');
 
-        $this->connection->handleReadStreamEventsForwardAsync(
-            function ($stream, $start, $max) use ($expectedException): Promise {
-                $this->assertSame(self::$streamId, $stream);
+        $this->connection->handleReadStreamEventsForward(
+            function ($stream, $start, $max) use ($expectedException): StreamEventsSlice {
+                $this->assertSame(self::StreamId, $stream);
                 $this->assertSame(0, $start);
                 $this->assertSame(1, $max);
 
-                return new Failure($expectedException);
+                throw $expectedException;
             }
         );
 
@@ -183,20 +187,20 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
 
         $callCount = 0;
 
-        $this->connection->handleReadStreamEventsForwardAsync(
-            function ($stream, $start, $max) use (&$callCount, $expectedException): Promise {
-                $this->assertSame(self::$streamId, $stream);
+        $this->connection->handleReadStreamEventsForward(
+            function ($stream, $start, $max) use (&$callCount, $expectedException): StreamEventsSlice {
+                $this->assertSame(self::StreamId, $stream);
                 $this->assertSame(1, $max);
 
                 if ($callCount++ === 0) {
                     $this->assertSame(0, $start);
 
-                    return new Success($this->createStreamEventsSlice());
+                    return $this->createStreamEventsSlice();
                 }
 
                 $this->assertSame(1, $start);
 
-                return new Failure($expectedException);
+                throw $expectedException;
             }
         );
 
@@ -210,13 +214,13 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
     {
         $expectedException = new Exception('Test');
 
-        $this->connection->handleReadStreamEventsForwardAsync(
-            fn ($stream, $start, $max): Promise => new Success($this->createStreamEventsSlice(0, 1, true))
+        $this->connection->handleReadStreamEventsForward(
+            fn (): StreamEventsSlice => $this->createStreamEventsSlice(0, 1, true)
         );
 
-        $this->connection->handleSubscribeToStreamAsync(
-            function ($stream, $raise, $drop) use ($expectedException): void {
-                $this->assertSame(self::$streamId, $stream);
+        $this->connection->handleSubscribeToStream(
+            function ($stream, $raise, $drop) use ($expectedException): VolatileEventStoreSubscription {
+                $this->assertSame(self::StreamId, $stream);
 
                 throw $expectedException;
             }
@@ -227,16 +231,16 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
     }
 
     /** @test */
-    public function start_stops_subscription_if_subscribe_fails_async(): void
+    public function start_stops_subscription_if_subscribe_fails_(): void
     {
         $expectedException = new Exception('Test');
 
-        $this->connection->handleReadStreamEventsForwardAsync(
-            fn ($stream, $start, $max): Promise => new Success($this->createStreamEventsSlice(0, 1, true))
+        $this->connection->handleReadStreamEventsForward(
+            fn (): StreamEventsSlice => $this->createStreamEventsSlice(0, 1, true)
         );
 
-        $this->connection->handleSubscribeToStreamAsync(
-            fn ($stream, $raise, $drop): Promise => new Failure($expectedException)
+        $this->connection->handleSubscribeToStream(
+            fn (): VolatileEventStoreSubscription => throw $expectedException
         );
 
         $this->assertStartFailsAndDropsSubscriptionWithException($expectedException);
@@ -250,12 +254,12 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
 
         $callCount = 0;
 
-        $this->connection->handleReadStreamEventsForwardAsync(
-            function ($stream, $start, $max) use (&$callCount, $expectedException): Promise {
+        $this->connection->handleReadStreamEventsForward(
+            function ($stream, $start, $max) use (&$callCount, $expectedException): StreamEventsSlice {
                 if ($callCount++ === 0) {
                     $this->assertSame(0, $start);
 
-                    return new Success($this->createStreamEventsSlice(0, 1, true));
+                    return $this->createStreamEventsSlice(0, 1, true);
                 }
 
                 $this->assertSame(1, $start);
@@ -264,8 +268,8 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
             }
         );
 
-        $this->connection->handleSubscribeToStreamAsync(
-            fn ($stream, $raise, $drop): Promise => new Success($this->createVolatileSubscription($raise, $drop, 1))
+        $this->connection->handleSubscribeToStream(
+            fn ($stream, $raise, $drop): VolatileEventStoreSubscription => $this->createVolatileSubscription($raise, $drop, 1)
         );
 
         $this->assertStartFailsAndDropsSubscriptionWithException($expectedException);
@@ -273,147 +277,146 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
     }
 
     /** @test */
-    public function start_stops_subscription_if_historical_missed_events_load_fails_async(): void
+    public function start_stops_subscription_if_historical_missed_events_load_fails_(): void
     {
         $expectedException = new Exception('Test');
 
         $callCount = 0;
 
-        $this->connection->handleReadStreamEventsForwardAsync(
-            function ($stream, $start, $max) use (&$callCount, $expectedException): Promise {
+        $this->connection->handleReadStreamEventsForward(
+            function ($stream, $start, $max) use (&$callCount, $expectedException): StreamEventsSlice {
                 if ($callCount++ === 0) {
                     $this->assertSame(0, $start);
 
-                    return new Success($this->createStreamEventsSlice(0, 1, true));
+                    return $this->createStreamEventsSlice(0, 1, true);
                 }
 
                 $this->assertSame(1, $start);
 
-                return new Failure($expectedException);
+                throw $expectedException;
             }
         );
 
-        $this->connection->handleSubscribeToStreamAsync(
-            fn ($stream, $raise, $drop): Promise => new Success($this->createVolatileSubscription($raise, $drop, 1))
+        $this->connection->handleSubscribeToStream(
+            fn ($stream, $raise, $drop): VolatileEventStoreSubscription => $this->createVolatileSubscription($raise, $drop, 1)
         );
 
         $this->assertStartFailsAndDropsSubscriptionWithException($expectedException);
         $this->assertCount(1, $this->raisedEvents);
     }
 
-    /** @test */
-    public function start_completes_onces_subscription_is_live(): Generator
+    /**
+     * @test
+     * @group by
+     */
+    public function start_completes_once_subscription_is_live(): void
     {
-        $finalEvent = new Deferred();
+        $finalEvent = new DeferredFuture();
 
         $callCount = 0;
 
-        $this->connection->handleReadStreamEventsForwardAsync(
-            function ($stream, $start, $max) use (&$callCount, $finalEvent): Promise {
+        $this->connection->handleReadStreamEventsForward(
+            function ($stream, $start, $max) use (&$callCount, $finalEvent): StreamEventsSlice {
                 $callCount++;
 
-                $result = null;
-
                 if (1 === $callCount) {
-                    return new Success($this->createStreamEventsSlice(0, 1, true));
+                    return $this->createStreamEventsSlice(0, 1, true);
                 }
 
                 if (2 === $callCount) {
-                    $promise = Promise\timeout($finalEvent->promise(), self::$timeoutMs);
+                    try {
+                        $result = $finalEvent->getFuture()->await(new TimeoutCancellation(self::Timeout));
+                    } catch (CancelledException $e) {
+                        $result = false;
+                    }
 
-                    $promise->onResolve(function ($ex, $result) {
-                        $this->assertTrue($result);
-                    });
+                    $this->assertTrue($result);
 
-                    return new Success($this->createStreamEventsSlice(1, 1, true));
+                    return $this->createStreamEventsSlice(1, 1, true);
                 }
 
                 $this->fail('Should not happen');
             }
         );
 
-        $this->connection->handleSubscribeToStreamAsync(
-            fn ($stream, $raise, $drop): Promise => new Success($this->createVolatileSubscription($raise, $drop, 1))
+        $this->connection->handleSubscribeToStream(
+            fn ($stream, $raise, $drop): VolatileEventStoreSubscription => $this->createVolatileSubscription($raise, $drop, 1)
         );
 
-        $promise = $this->subscription->startAsync();
+        EventLoop::defer(function (): void {
+            $this->subscription->start();
+        });
 
-        $finalEvent->resolve(true);
-
-        $this->assertNotNull(yield Promise\timeout($promise, self::$timeoutMs));
+        $finalEvent->complete(true);
     }
 
     /** @test */
-    public function when_live_processing_and_disconnected_reconnect_keeps_events_ordered(): Generator
+    public function when_live_processing_and_disconnected_reconnect_keeps_events_ordered(): void
     {
         $callCount = 0;
 
-        $this->connection->handleReadStreamEventsForwardAsync(
-            function ($stream, $start, $max) use (&$callCount): Promise {
+        $this->connection->handleReadStreamEventsForward(
+            function ($stream, $start, $max) use (&$callCount): StreamEventsSlice {
                 $callCount++;
 
                 if (1 === $callCount) {
-                    return new Success($this->createStreamEventsSlice(0, 0, true));
+                    return $this->createStreamEventsSlice(0, 0, true);
                 }
 
                 if (2 === $callCount) {
-                    return new Success($this->createStreamEventsSlice(0, 0, true));
+                    return $this->createStreamEventsSlice(0, 0, true);
                 }
 
-                return new Failure(new Exception('Error'));
+                throw new Exception('Error');
             }
         );
 
         $volatileEventStoreSubscription = null;
         $innerSubscriptionDrop = null;
 
-        $this->connection->handleSubscribeToStreamAsync(
-            function ($stream, $raise, $drop) use (&$innerSubscriptionDrop, &$volatileEventStoreSubscription): Promise {
+        $this->connection->handleSubscribeToStream(
+            function ($stream, $raise, $drop) use (&$innerSubscriptionDrop, &$volatileEventStoreSubscription): VolatileEventStoreSubscription {
                 $innerSubscriptionDrop = $drop;
-                $volatileEventStoreSubscription = $this->createVolatileSubscription($raise, $drop, null);
-                \assert($volatileEventStoreSubscription instanceof VolatileEventStoreSubscription);
 
-                return new Success($volatileEventStoreSubscription);
+                return $volatileEventStoreSubscription = $this->createVolatileSubscription($raise, $drop, null);
             }
         );
 
-        $this->assertNotNull(yield Promise\timeout($this->subscription->startAsync(), self::$timeoutMs));
+        $this->subscription->start();
         $this->assertCount(0, $this->raisedEvents);
         $this->assertNotNull($innerSubscriptionDrop);
 
-        $innerSubscriptionDrop($volatileEventStoreSubscription, SubscriptionDropReason::connectionClosed(), null);
+        $innerSubscriptionDrop($volatileEventStoreSubscription, SubscriptionDropReason::ConnectionClosed, null);
 
-        $result = yield Promise\timeout($this->dropEvent->promise(), self::$timeoutMs);
+        $result = $this->dropEvent->getFuture()->await(new TimeoutCancellation(self::Timeout));
         $this->assertTrue($result);
 
-        $this->dropEvent = new Deferred();
-        $waitForOutOfOrderEvent = new Deferred();
+        $this->dropEvent = new DeferredFuture();
+        $waitForOutOfOrderEvent = new DeferredFuture();
 
         $callCount = 0;
 
-        $this->connection->handleReadStreamEventsForwardAsync(
-            function ($stream, $start, $max) use (&$callCount, $waitForOutOfOrderEvent): Promise {
-                return call(function () use (&$callCount, $waitForOutOfOrderEvent): Generator {
-                    $callCount++;
+        $this->connection->handleReadStreamEventsForward(
+            function ($stream, $start, $max) use (&$callCount, $waitForOutOfOrderEvent): StreamEventsSlice {
+                $callCount++;
 
-                    if (1 === $callCount) {
-                        return yield new Success($this->createStreamEventsSlice(0, 0, true));
-                    }
+                if (1 === $callCount) {
+                    return $this->createStreamEventsSlice(0, 0, true);
+                }
 
-                    if (2 === $callCount) {
-                        $result = yield Promise\timeout($waitForOutOfOrderEvent->promise(), self::$timeoutMs);
+                if (2 === $callCount) {
+                    $result = $waitForOutOfOrderEvent->getFuture()->await(new TimeoutCancellation(self::Timeout));
 
-                        $this->assertTrue($result);
+                    $this->assertTrue($result);
 
-                        return yield new Success($this->createStreamEventsSlice(0, 1, true));
-                    }
-                });
+                    return $this->createStreamEventsSlice(0, 1, true);
+                }
             }
         );
 
         $event1 = new ResolvedEvent(
             new RecordedEvent(
-                self::$streamId,
+                self::StreamId,
                 1,
                 EventId::generate(),
                 'test-event',
@@ -426,37 +429,37 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
             null
         );
 
-        $this->connection->handleSubscribeToStreamAsync(
-            fn ($stream, $raise, $drop): Promise => call(function () use ($raise, $drop, $event1, $volatileEventStoreSubscription): Generator {
+        $this->connection->handleSubscribeToStream(
+            function ($stream, $raise, $drop) use ($event1, $volatileEventStoreSubscription): VolatileEventStoreSubscription {
                 $volatileEventStoreSubscription2 = $this->createVolatileSubscription($raise, $drop, null);
-                yield $raise($volatileEventStoreSubscription2, $event1);
+                $raise($volatileEventStoreSubscription2, $event1);
 
-                return yield new Success($volatileEventStoreSubscription);
-            })
+                return $volatileEventStoreSubscription;
+            }
         );
 
-        $reconnectDeferred = new Deferred();
-        Loop::defer(function () use ($reconnectDeferred): void {
+        $reconnectDeferred = new DeferredFuture();
+        EventLoop::defer(function () use ($reconnectDeferred): void {
             $this->connection->onConnected2(new ClientConnectionEventArgs(
                 $this->connection,
                 new EndPoint('0.0.0.0', 1)
             ));
 
-            $reconnectDeferred->resolve(true);
+            $reconnectDeferred->complete(true);
         });
 
-        $waitForOutOfOrderEvent->resolve(true);
+        $waitForOutOfOrderEvent->complete(true);
 
-        yield new Delayed(250); // wait for subscription to do its job
+        delay(0.25); // wait for subscription to do its job
 
-        $result = yield Promise\timeout($this->raisedEventEvent->promise(), self::$timeoutMs);
+        $result = $this->raisedEventEvent->getFuture()->await(new TimeoutCancellation(self::Timeout));
 
         $this->assertTrue($result);
 
         $this->assertSame(0, $this->raisedEvents[0]->originalEventNumber());
         $this->assertSame(1, $this->raisedEvents[1]->originalEventNumber());
 
-        $result = yield Promise\timeout($reconnectDeferred->promise(), self::$timeoutMs);
+        $result = $reconnectDeferred->getFuture()->await(new TimeoutCancellation(self::Timeout));
         $this->assertTrue($result);
     }
 
@@ -468,15 +471,15 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
         return new VolatileEventStoreSubscription(
             new VolatileSubscriptionOperation(
                 new NullLogger(),
-                new Deferred(),
-                self::$streamId,
+                new DeferredFuture(),
+                self::StreamId,
                 false,
                 null,
                 fn () => function (
                     EventStoreSubscription $subscription,
                     ResolvedEvent $resolvedEvent
-                ) use ($raise): Promise {
-                    return $raise($subscription, $resolvedEvent);
+                ) use ($raise): void {
+                    $raise($subscription, $resolvedEvent);
                 },
                 fn () => function (
                     EventStoreSubscription $subscription,
@@ -488,7 +491,7 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
                 false,
                 fn () => null
             ),
-            self::$streamId,
+            self::StreamId,
             -1,
             $lastEventNumber
         );
@@ -504,7 +507,7 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
         for ($i = 0; $i < $count; $i++) {
             $events[] = new ResolvedEvent(
                 new RecordedEvent(
-                    self::$streamId,
+                    self::StreamId,
                     $i,
                     EventId::generate(),
                     'test-event',
@@ -519,10 +522,10 @@ class catch_up_subscription_handles_errors extends AsyncTestCase
         }
 
         return new StreamEventsSlice(
-            SliceReadStatus::success(),
-            self::$streamId,
+            SliceReadStatus::Success,
+            self::StreamId,
             $fromEvent,
-            ReadDirection::forward(),
+            ReadDirection::Forward,
             $events,
             $fromEvent + $count,
             100,

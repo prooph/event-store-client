@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\EventReadResult;
 use Prooph\EventStore\EventReadStatus;
@@ -36,31 +36,21 @@ use Psr\Log\LoggerInterface as Logger;
  */
 class ReadEventOperation extends AbstractOperation
 {
-    private bool $requireMaster;
-    private string $stream;
-    private int $eventNumber;
-    private bool $resolveLinkTos;
-
     public function __construct(
         Logger $logger,
-        Deferred $deferred,
-        bool $requireMaster,
-        string $stream,
-        int $eventNumber,
-        bool $resolveLinkTos,
+        DeferredFuture $deferred,
+        private readonly bool $requireMaster,
+        private readonly string $stream,
+        private readonly int $eventNumber,
+        private readonly bool $resolveLinkTos,
         ?UserCredentials $userCredentials
     ) {
-        $this->requireMaster = $requireMaster;
-        $this->stream = $stream;
-        $this->eventNumber = $eventNumber;
-        $this->resolveLinkTos = $resolveLinkTos;
-
         parent::__construct(
             $logger,
             $deferred,
             $userCredentials,
-            TcpCommand::readEvent(),
-            TcpCommand::readEventCompleted(),
+            TcpCommand::ReadEvent,
+            TcpCommand::ReadEventCompleted,
             ReadEventCompleted::class
         );
     }
@@ -86,27 +76,27 @@ class ReadEventOperation extends AbstractOperation
             case ReadEventResult::Success:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'Success');
+                return new InspectionResult(InspectionDecision::EndOperation, 'Success');
             case ReadEventResult::NotFound:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'NotFound');
+                return new InspectionResult(InspectionDecision::EndOperation, 'NotFound');
             case ReadEventResult::NoStream:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'NoStream');
+                return new InspectionResult(InspectionDecision::EndOperation, 'NoStream');
             case ReadEventResult::StreamDeleted:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'StreamDeleted');
+                return new InspectionResult(InspectionDecision::EndOperation, 'StreamDeleted');
             case ReadEventResult::Error:
                 $this->fail(new ServerError($response->getError()));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'Error');
+                return new InspectionResult(InspectionDecision::EndOperation, 'Error');
             case ReadEventResult::AccessDenied:
                 $this->fail(AccessDenied::toStream($this->stream));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');
+                return new InspectionResult(InspectionDecision::EndOperation, 'AccessDenied');
             default:
                 throw new ServerError('Unexpected ReadEventResult');
         }
@@ -120,7 +110,7 @@ class ReadEventOperation extends AbstractOperation
     {
         $eventMessage = $response->getEvent();
 
-        if (EventReadStatus::SUCCESS === $response->getResult()) {
+        if (EventReadStatus::Success->value === $response->getResult()) {
             /** @psalm-suppress PossiblyInvalidArgument */
             $resolvedEvent = new ResolvedEvent(
                 EventMessageConverter::convertEventRecordMessageToEventRecord($eventMessage->getEvent()),
@@ -132,7 +122,7 @@ class ReadEventOperation extends AbstractOperation
         }
 
         return new EventReadResult(
-            EventReadStatus::byValue($response->getResult()),
+            EventReadStatus::from($response->getResult()),
             $this->stream,
             $this->eventNumber,
             $resolvedEvent
@@ -146,7 +136,8 @@ class ReadEventOperation extends AbstractOperation
 
     public function __toString(): string
     {
-        return \sprintf('Stream: %s, EventNumber: %d, ResolveLinkTo: %s, RequireMaster: %s',
+        return \sprintf(
+            'Stream: %s, EventNumber: %d, ResolveLinkTo: %s, RequireMaster: %s',
             $this->stream,
             $this->eventNumber,
             $this->resolveLinkTos ? 'yes' : 'no',

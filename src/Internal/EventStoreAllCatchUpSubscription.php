@@ -13,15 +13,14 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use function Amp\call;
-use Amp\Delayed;
-use Amp\Promise;
+use function Amp\async;
+use function Amp\delay;
 use Closure;
 use Exception;
 use Prooph\EventStore\AllEventsSlice;
-use Prooph\EventStore\Async\EventStoreAllCatchUpSubscription as AsyncEventStoreAllCatchUpSubscription;
-use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
+use Prooph\EventStore\EventStoreAllCatchUpSubscription as EventStoreAllCatchUpSubscriptionInterface;
+use Prooph\EventStore\EventStoreConnection;
 use Prooph\EventStore\Position;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropReason;
@@ -29,15 +28,16 @@ use Prooph\EventStore\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
 use Throwable;
 
-class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription implements AsyncEventStoreAllCatchUpSubscription
+class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription implements EventStoreAllCatchUpSubscriptionInterface
 {
     private Position $nextReadPosition;
+
     private Position $lastProcessedPosition;
 
     /**
      * @internal
      *
-     * @param Closure(EventStoreCatchUpSubscription, ResolvedEvent): Promise $eventAppeared
+     * @param Closure(EventStoreCatchUpSubscription, ResolvedEvent): void $eventAppeared
      * @param null|Closure(EventStoreCatchUpSubscription): void $liveProcessingStarted
      * @param null|Closure(EventStoreCatchUpSubscription, SubscriptionDropReason, null|Throwable): void $subscriptionDropped
      */
@@ -71,59 +71,46 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription imp
         return $this->lastProcessedPosition;
     }
 
-    protected function readEventsTillAsync(
+    protected function readEventsTill(
         EventStoreConnection $connection,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         ?int $lastCommitPosition,
         ?int $lastEventNumber
-    ): Promise {
-        return $this->readEventsInternalAsync($connection, $resolveLinkTos, $userCredentials, $lastCommitPosition);
-    }
-
-    private function readEventsInternalAsync(
-        EventStoreConnection $connection,
-        bool $resolveLinkTos,
-        ?UserCredentials $userCredentials,
-        ?int $lastCommitPosition
-    ): Promise {
-        return call(function () use ($connection, $resolveLinkTos, $userCredentials, $lastCommitPosition): \Generator {
+    ): void {
+        async(function () use ($connection, $resolveLinkTos, $userCredentials, $lastCommitPosition): void {
             do {
-                $slice = yield $connection->readAllEventsForwardAsync(
+                $slice = $connection->readAllEventsForward(
                     $this->nextReadPosition,
                     $this->readBatchSize,
                     $resolveLinkTos,
                     $userCredentials
                 );
 
-                $shouldStopOrDone = yield $this->readEventsCallbackAsync($slice, $lastCommitPosition);
+                $shouldStopOrDone = $this->readEventsCallback($slice, $lastCommitPosition);
             } while (! $shouldStopOrDone);
-        });
+        })->await();
     }
 
-    /** @return Promise<bool> */
-    private function readEventsCallbackAsync(AllEventsSlice $slice, ?int $lastCommitPosition): Promise
+    private function readEventsCallback(AllEventsSlice $slice, ?int $lastCommitPosition): bool
     {
-        return call(function () use ($slice, $lastCommitPosition): \Generator {
-            $shouldStopOrDone = $this->shouldStop || yield $this->processEventsAsync($lastCommitPosition, $slice);
+        $shouldStopOrDone = $this->shouldStop || $this->processEvents($lastCommitPosition, $slice);
 
-            if ($shouldStopOrDone && $this->verbose) {
-                $this->log->debug(\sprintf(
-                    'Catch-up Subscription %s to %s: finished reading events, nextReadPosition = %s',
-                    $this->subscriptionName(),
-                    $this->isSubscribedToAll() ? '<all>' : $this->streamId(),
-                    (string) $this->nextReadPosition
-                ));
-            }
+        if ($shouldStopOrDone && $this->verbose) {
+            $this->log->debug(\sprintf(
+                'Catch-up Subscription %s to %s: finished reading events, nextReadPosition = %s',
+                $this->subscriptionName(),
+                $this->isSubscribedToAll() ? '<all>' : $this->streamId(),
+                (string) $this->nextReadPosition
+            ));
+        }
 
-            return $shouldStopOrDone;
-        });
+        return $shouldStopOrDone;
     }
 
-    /** @return Promise<bool> */
-    private function processEventsAsync(?int $lastCommitPosition, AllEventsSlice $slice): Promise
+    private function processEvents(?int $lastCommitPosition, AllEventsSlice $slice): bool
     {
-        return call(function () use ($lastCommitPosition, $slice): \Generator {
+        return async(function () use ($lastCommitPosition, $slice): bool {
             foreach ($slice->events() as $e) {
                 if (null === $e->originalPosition()) {
                     throw new \Exception(\sprintf(
@@ -132,7 +119,7 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription imp
                     ));
                 }
 
-                yield $this->tryProcessAsync($e);
+                $this->tryProcess($e);
             }
 
             $this->nextReadPosition = $slice->nextPosition();
@@ -143,43 +130,41 @@ class EventStoreAllCatchUpSubscription extends EventStoreCatchUpSubscription imp
 
             if (! $done && $slice->isEndOfStream()) {
                 // we are waiting for server to flush its data
-                yield new Delayed(1000);
+                delay(0.01);
             }
 
             return $done;
-        });
+        })->await();
     }
 
-    protected function tryProcessAsync(ResolvedEvent $e): Promise
+    protected function tryProcess(ResolvedEvent $e): void
     {
-        return call(function () use ($e): \Generator {
-            $processed = false;
+        $processed = false;
 
+        /** @psalm-suppress PossiblyNullReference */
+        if ($e->originalPosition()->greater($this->lastProcessedPosition)) {
+            try {
+                ($this->eventAppeared)($this, $e);
+            } catch (Exception $ex) {
+                $this->dropSubscription(SubscriptionDropReason::EventHandlerException, $ex);
+            }
+
+            $this->lastProcessedPosition = $e->originalPosition();
+            $processed = true;
+        }
+
+        if ($this->verbose) {
             /** @psalm-suppress PossiblyNullReference */
-            if ($e->originalPosition()->greater($this->lastProcessedPosition)) {
-                try {
-                    yield ($this->eventAppeared)($this, $e);
-                } catch (Exception $ex) {
-                    $this->dropSubscription(SubscriptionDropReason::eventHandlerException(), $ex);
-                }
-
-                $this->lastProcessedPosition = $e->originalPosition();
-                $processed = true;
-            }
-
-            if ($this->verbose) {
-                /** @psalm-suppress PossiblyNullReference */
-                $this->log->debug(\sprintf(
-                    'Catch-up Subscription %s to %s: %s event (%s, %d, %s @ %s)',
-                    $this->subscriptionName(),
-                    $this->isSubscribedToAll() ? '<all>' : $this->streamId(),
-                    $processed ? 'processed' : 'skipping',
-                    $e->originalEvent()->eventStreamId(),
-                    $e->originalEvent()->eventNumber(),
-                    $e->originalEvent()->eventType(),
-                    $e->originalPosition() ? $e->originalPosition()->__toString() : '<null>'
-                ));
-            }
-        });
+            $this->log->debug(\sprintf(
+                'Catch-up Subscription %s to %s: %s event (%s, %d, %s @ %s)',
+                $this->subscriptionName(),
+                $this->isSubscribedToAll() ? '<all>' : $this->streamId(),
+                $processed ? 'processed' : 'skipping',
+                $e->originalEvent()->eventStreamId(),
+                $e->originalEvent()->eventNumber(),
+                $e->originalEvent()->eventType(),
+                $e->originalPosition() ? $e->originalPosition()->__toString() : '<null>'
+            ));
+        }
     }
 }

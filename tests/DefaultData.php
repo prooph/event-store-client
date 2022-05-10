@@ -19,12 +19,12 @@ class DefaultData
 {
     public static function adminUsername(): string
     {
-        return SystemUsers::ADMIN;
+        return SystemUsers::Admin;
     }
 
     public static function adminPassword(): string
     {
-        return SystemUsers::DEFAULT_ADMIN_PASSWORD;
+        return SystemUsers::DefaultAdminPassword;
     }
 
     public static function adminCredentials(): UserCredentials

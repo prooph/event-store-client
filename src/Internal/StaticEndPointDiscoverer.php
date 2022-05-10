@@ -13,24 +13,23 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Amp\Promise;
-use Amp\Success;
 use Prooph\EventStore\EndPoint;
 
 /** @internal */
 final class StaticEndPointDiscoverer implements EndPointDiscoverer
 {
-    private Promise $promise;
+    private readonly NodeEndPoints $endpoints;
 
     public function __construct(EndPoint $endPoint, bool $isSsl)
     {
-        $this->promise = new Success(
-            new NodeEndPoints($isSsl ? null : $endPoint, $isSsl ? $endPoint : null)
+        $this->endpoints = new NodeEndPoints(
+            $isSsl ? null : $endPoint,
+            $isSsl ? $endPoint : null
         );
     }
 
-    public function discoverAsync(?EndPoint $failedTcpEndPoint): Promise
+    public function discover(?EndPoint $failedTcpEndPoint): NodeEndPoints
     {
-        return $this->promise;
+        return $this->endpoints;
     }
 }

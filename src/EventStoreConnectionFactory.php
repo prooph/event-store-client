@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\EventStoreConnection;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStoreClient\Internal\ClusterDnsEndPointDiscoverer;
 use Prooph\EventStoreClient\Internal\EventStoreNodeConnection;

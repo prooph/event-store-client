@@ -15,31 +15,27 @@ namespace Prooph\EventStoreClient\Internal\Message;
 
 use Throwable;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 class CloseConnectionMessage implements Message
 {
-    private string $reason;
-    private ?Throwable $exception;
-
-    public function __construct(string $reason, ?Throwable $exception = null)
+    public function __construct(private readonly string $reason, private readonly ?Throwable $exception = null)
     {
-        $this->reason = $reason;
-        $this->exception = $exception;
     }
 
-    /** @psalm-pure */
     public function reason(): string
     {
         return $this->reason;
     }
 
-    /** @psalm-pure */
     public function exception(): ?Throwable
     {
         return $this->exception;
     }
 
-    /** @psalm-pure */
     public function __toString(): string
     {
         return 'CloseConnectionMessage';

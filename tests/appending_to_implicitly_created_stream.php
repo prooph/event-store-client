@@ -13,237 +13,227 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Generator;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
 use ProophTest\EventStoreClient\Helper\EventsStream;
 use ProophTest\EventStoreClient\Helper\StreamWriter;
-use ProophTest\EventStoreClient\Helper\TailWriter;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 
 class appending_to_implicitly_created_stream extends EventStoreConnectionTestCase
 {
     /** @test */
-    public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0em1_idempotent(): Generator
+    public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0em1_idempotent(): void
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0em1_idempotent';
 
         $events = TestEvent::newAmount(6);
 
-        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NO_STREAM);
+        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NoStream);
 
-        $tailWriter = yield $writer->append($events);
-        \assert($tailWriter instanceof TailWriter);
-        $tailWriter->then($events[0], ExpectedVersion::NO_STREAM);
+        $tailWriter = $writer->append($events);
+        $tailWriter->then($events[0], ExpectedVersion::NoStream);
 
-        $total = yield EventsStream::count($this->connection, $stream);
+        $total = EventsStream::count($this->connection, $stream);
 
         $this->assertCount($total, $events);
     }
 
     /** @test */
-    public function sequence_0em1_1e0_2e1_3e2_4e3_4e4_0any_idempotent(): Generator
+    public function sequence_0em1_1e0_2e1_3e2_4e3_4e4_0any_idempotent(): void
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_4e4_0any_idempotent';
 
         $events = TestEvent::newAmount(6);
 
-        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NO_STREAM);
+        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NoStream);
 
-        $tailWriter = yield $writer->append($events);
-        \assert($tailWriter instanceof TailWriter);
-        yield $tailWriter->then($events[0], ExpectedVersion::ANY);
+        $tailWriter = $writer->append($events);
+        $tailWriter->then($events[0], ExpectedVersion::Any);
 
-        $total = yield EventsStream::count($this->connection, $stream);
+        $total = EventsStream::count($this->connection, $stream);
 
         $this->assertCount($total, $events);
     }
 
     /** @test */
-    public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e5_non_idempotent(): Generator
+    public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e5_non_idempotent(): void
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e5_non_idempotent';
 
         $events = TestEvent::newAmount(6);
 
-        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NO_STREAM);
+        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NoStream);
 
-        $first6 = yield $writer->append($events);
-        \assert($first6 instanceof TailWriter);
+        $first6 = $writer->append($events);
 
         $this->expectException(WrongExpectedVersion::class);
 
-        yield $first6->then($events[0], 6);
+        $first6->then($events[0], 6);
     }
 
     /** @test */
-    public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e4_wev(): Generator
+    public function sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e4_wev(): void
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_3e2_4e3_5e4_0e4_wev';
 
         $events = TestEvent::newAmount(6);
 
-        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NO_STREAM);
+        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NoStream);
 
-        $first6 = yield $writer->append($events);
-        \assert($first6 instanceof TailWriter);
+        $first6 = $writer->append($events);
 
         $this->expectException(WrongExpectedVersion::class);
 
-        yield $first6->then($events[0], 4);
+        $first6->then($events[0], 4);
     }
 
     /** @test */
-    public function sequence_0em1_0e0_non_idempotent(): Generator
+    public function sequence_0em1_0e0_non_idempotent(): void
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_0e0_non_idempotent';
 
         $events = [TestEvent::newTestEvent()];
 
-        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NO_STREAM);
+        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NoStream);
 
-        $tailWriter = yield $writer->append($events);
-        \assert($tailWriter instanceof TailWriter);
+        $tailWriter = $writer->append($events);
 
-        yield $tailWriter->then($events[0], 0);
+        $tailWriter->then($events[0], 0);
 
-        $total = yield EventsStream::count($this->connection, $stream);
+        $total = EventsStream::count($this->connection, $stream);
 
         $this->assertCount($total - 1, $events);
     }
 
     /** @test */
-    public function sequence_0em1_0any_idempotent(): Generator
+    public function sequence_0em1_0any_idempotent(): void
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_0any_idempotent';
 
         $events = [TestEvent::newTestEvent()];
 
-        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NO_STREAM);
+        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NoStream);
 
-        $tailWriter = yield $writer->append($events);
-        \assert($tailWriter instanceof TailWriter);
+        $tailWriter = $writer->append($events);
 
-        yield $tailWriter->then($events[0], ExpectedVersion::ANY);
+        $tailWriter->then($events[0], ExpectedVersion::Any);
 
-        $total = yield EventsStream::count($this->connection, $stream);
+        $total = EventsStream::count($this->connection, $stream);
 
         $this->assertCount($total, $events);
     }
 
     /** @test */
-    public function sequence_0em1_0em1_idempotent(): Generator
+    public function sequence_0em1_0em1_idempotent(): void
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_0em1_idempotent';
 
         $events = [TestEvent::newTestEvent()];
 
-        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NO_STREAM);
+        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NoStream);
 
-        $tailWriter = yield $writer->append($events);
-        \assert($tailWriter instanceof TailWriter);
+        $tailWriter = $writer->append($events);
 
-        yield $tailWriter->then($events[0], ExpectedVersion::NO_STREAM);
+        $tailWriter->then($events[0], ExpectedVersion::NoStream);
 
-        $total = yield EventsStream::count($this->connection, $stream);
+        $total = EventsStream::count($this->connection, $stream);
 
         $this->assertCount($total, $events);
     }
 
     /** @test */
-    public function sequence_0em1_1e0_2e1_1any_1any_idempotent(): Generator
+    public function sequence_0em1_1e0_2e1_1any_1any_idempotent(): void
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_0em1_1e0_2e1_1any_1any_idempotent';
 
         $events = TestEvent::newAmount(3);
 
-        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NO_STREAM);
+        $writer = new StreamWriter($this->connection, $stream, ExpectedVersion::NoStream);
 
-        $tailWriter = yield $writer->append($events);
-        \assert($tailWriter instanceof TailWriter);
+        $tailWriter = $writer->append($events);
 
-        $tailWriter = yield $tailWriter->then($events[1], ExpectedVersion::ANY);
+        $tailWriter = $tailWriter->then($events[1], ExpectedVersion::Any);
 
-        yield $tailWriter->then($events[1], ExpectedVersion::ANY);
+        $tailWriter->then($events[1], ExpectedVersion::Any);
 
-        $total = yield EventsStream::count($this->connection, $stream);
+        $total = EventsStream::count($this->connection, $stream);
 
         $this->assertCount($total, $events);
     }
 
     /** @test */
-    public function sequence_S_0em1_1em1_E_S_0em1_E_idempotent(): Generator
+    public function sequence_S_0em1_1em1_E_S_0em1_E_idempotent(): void
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_0em1_E_idempotent';
 
         $events = TestEvent::newAmount(2);
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [$events[0]]);
+        $this->connection->appendToStream($stream, ExpectedVersion::NoStream, $events);
+        $this->connection->appendToStream($stream, ExpectedVersion::NoStream, [$events[0]]);
 
-        $total = yield EventsStream::count($this->connection, $stream);
+        $total = EventsStream::count($this->connection, $stream);
 
         $this->assertCount($total, $events);
     }
 
     /** @test */
-    public function sequence_S_0em1_1em1_E_S_0any_E_idempotent(): Generator
+    public function sequence_S_0em1_1em1_E_S_0any_E_idempotent(): void
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_0any_E_idempotent';
 
         $events = TestEvent::newAmount(2);
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [$events[0]]);
+        $this->connection->appendToStream($stream, ExpectedVersion::NoStream, $events);
+        $this->connection->appendToStream($stream, ExpectedVersion::Any, [$events[0]]);
 
-        $total = yield EventsStream::count($this->connection, $stream);
+        $total = EventsStream::count($this->connection, $stream);
 
         $this->assertCount($total, $events);
     }
 
     /** @test */
-    public function sequence_S_0em1_1em1_E_S_1e0_E_idempotent(): Generator
+    public function sequence_S_0em1_1em1_E_S_1e0_E_idempotent(): void
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_1e0_E_idempotent';
 
         $events = TestEvent::newAmount(2);
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
-        yield $this->connection->appendToStreamAsync($stream, 0, [$events[1]]);
+        $this->connection->appendToStream($stream, ExpectedVersion::NoStream, $events);
+        $this->connection->appendToStream($stream, 0, [$events[1]]);
 
-        $total = yield EventsStream::count($this->connection, $stream);
+        $total = EventsStream::count($this->connection, $stream);
 
         $this->assertCount($total, $events);
     }
 
     /** @test */
-    public function sequence_S_0em1_1em1_E_S_1any_E_idempotent(): Generator
+    public function sequence_S_0em1_1em1_E_S_1any_E_idempotent(): void
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_1any_E_idempotent';
 
         $events = TestEvent::newAmount(2);
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [$events[1]]);
+        $this->connection->appendToStream($stream, ExpectedVersion::NoStream, $events);
+        $this->connection->appendToStream($stream, ExpectedVersion::Any, [$events[1]]);
 
-        $total = yield EventsStream::count($this->connection, $stream);
+        $total = EventsStream::count($this->connection, $stream);
 
         $this->assertCount($total, $events);
     }
 
     /** @test */
-    public function sequence_S_0em1_1em1_E_S_0em1_1em1_2em1_E_idempotancy_fail(): Generator
+    public function sequence_S_0em1_1em1_E_S_0em1_1em1_2em1_E_idempotancy_fail(): void
     {
         $stream = 'appending_to_implicitly_created_stream_sequence_S_0em1_1em1_E_S_0em1_1em1_2em1_E_idempotancy_fail';
 
         $events = TestEvent::newAmount(2);
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
+        $this->connection->appendToStream($stream, ExpectedVersion::NoStream, $events);
 
         $events[] = TestEvent::newTestEvent();
 
         $this->expectException(WrongExpectedVersion::class);
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
+        $this->connection->appendToStream($stream, ExpectedVersion::NoStream, $events);
     }
 }

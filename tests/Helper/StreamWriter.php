@@ -13,19 +13,17 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\Helper;
 
-use function Amp\call;
-use Amp\Promise;
-use Generator;
-use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventStoreConnection;
 use Prooph\EventStore\ExpectedVersion;
-use Prooph\EventStore\WriteResult;
 
 /** @internal */
 class StreamWriter
 {
     private EventStoreConnection $connection;
+
     private string $stream;
+
     private int $version;
 
     public function __construct(EventStoreConnection $connection, string $stream, int $version)
@@ -37,25 +35,21 @@ class StreamWriter
 
     /**
      * @param EventData[] $events
-     * @return Promise<TailWriter>
      */
-    public function append(array $events): Promise
+    public function append(array $events): TailWriter
     {
-        return call(function () use ($events): Generator {
-            foreach ($events as $key => $event) {
-                $expVer = $this->version === ExpectedVersion::ANY ? ExpectedVersion::ANY : $this->version + $key;
-                $result = yield $this->connection->appendToStreamAsync($this->stream, $expVer, [$event]);
-                \assert($result instanceof WriteResult);
-                $nextExpVer = $result->nextExpectedVersion();
+        foreach ($events as $key => $event) {
+            $expVer = $this->version === ExpectedVersion::Any ? ExpectedVersion::Any : $this->version + $key;
+            $result = $this->connection->appendToStream($this->stream, $expVer, [$event]);
+            $nextExpVer = $result->nextExpectedVersion();
 
-                if ($this->version !== ExpectedVersion::ANY
-                    && ($expVer + 1) !== $nextExpVer
-                ) {
-                    throw new \RuntimeException('Wrong next expected version');
-                }
+            if ($this->version !== ExpectedVersion::Any
+                && ($expVer + 1) !== $nextExpVer
+            ) {
+                throw new \RuntimeException('Wrong next expected version');
             }
+        }
 
-            return new TailWriter($this->connection, $this->stream);
-        });
+        return new TailWriter($this->connection, $this->stream);
     }
 }

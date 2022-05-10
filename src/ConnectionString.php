@@ -77,6 +77,7 @@ class ConnectionString
             switch ($type) {
                 case 'bool':
                     $filteredValue = \filter_var($value, \FILTER_VALIDATE_BOOLEAN);
+
                     break;
                 case 'int':
                     $filteredValue = \filter_var($value, \FILTER_VALIDATE_INT);
@@ -89,9 +90,11 @@ class ConnectionString
                             $value
                         ));
                     }
+
                     break;
                 case 'string':
                     $filteredValue = $value;
+
                     break;
                 case UserCredentials::class:
                     $exploded = \explode(':', $value);
@@ -104,6 +107,7 @@ class ConnectionString
                     }
 
                     $filteredValue = new UserCredentials($exploded[0], $exploded[1]);
+
                     break;
                 case GossipSeed::class:
                     $gossipSeeds = [];
@@ -132,6 +136,7 @@ class ConnectionString
                     }
 
                     $filteredValue = $gossipSeeds;
+
                     break;
                 default:
                     throw new UnexpectedValueException('Invalid connection config "' . $type . '" receveid');
@@ -141,6 +146,7 @@ class ConnectionString
                 if (\strtolower($property->getName()) === $key) {
                     $property->setAccessible(true);
                     $property->setValue($settings, $filteredValue);
+
                     break;
                 }
             }

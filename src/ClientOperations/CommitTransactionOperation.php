@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\InvalidTransaction;
@@ -37,25 +37,19 @@ use Psr\Log\LoggerInterface as Logger;
  */
 class CommitTransactionOperation extends AbstractOperation
 {
-    private bool $requireMaster;
-    private int $transactionId;
-
     public function __construct(
         Logger $logger,
-        Deferred $deferred,
-        bool $requireMaster,
-        int $transactionId,
+        DeferredFuture $deferred,
+        private readonly bool $requireMaster,
+        private readonly int $transactionId,
         ?UserCredentials $userCredentials
     ) {
-        $this->requireMaster = $requireMaster;
-        $this->transactionId = $transactionId;
-
         parent::__construct(
             $logger,
             $deferred,
             $userCredentials,
-            TcpCommand::transactionCommit(),
-            TcpCommand::transactionCommitCompleted(),
+            TcpCommand::TransactionCommit,
+            TcpCommand::TransactionCommitCompleted,
             TransactionCommitCompleted::class
         );
     }
@@ -79,33 +73,33 @@ class CommitTransactionOperation extends AbstractOperation
             case OperationResult::Success:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'Success');
+                return new InspectionResult(InspectionDecision::EndOperation, 'Success');
             case OperationResult::PrepareTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'PrepareTimeout');
+                return new InspectionResult(InspectionDecision::Retry, 'PrepareTimeout');
             case OperationResult::ForwardTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'ForwardTimeout');
+                return new InspectionResult(InspectionDecision::Retry, 'ForwardTimeout');
             case OperationResult::CommitTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'CommitTimeout');
+                return new InspectionResult(InspectionDecision::Retry, 'CommitTimeout');
             case OperationResult::WrongExpectedVersion:
                 $this->fail(new WrongExpectedVersion(\sprintf(
                     'Commit transaction failed due to WrongExpectedVersion. Transaction id: \'%s\'',
                     $this->transactionId
                 )));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'WrongExpectedVersion');
+                return new InspectionResult(InspectionDecision::EndOperation, 'WrongExpectedVersion');
             case OperationResult::StreamDeleted:
                 $this->fail(new StreamDeleted());
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'StreamDeleted');
+                return new InspectionResult(InspectionDecision::EndOperation, 'StreamDeleted');
             case OperationResult::InvalidTransaction:
                 $this->fail(new InvalidTransaction());
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'InvalidTransaction');
+                return new InspectionResult(InspectionDecision::EndOperation, 'InvalidTransaction');
             case OperationResult::AccessDenied:
                 $exception = new AccessDenied('Write access denied');
                 $this->fail($exception);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');
+                return new InspectionResult(InspectionDecision::EndOperation, 'AccessDenied');
             default:
                 throw new UnexpectedOperationResult();
         }
@@ -134,7 +128,8 @@ class CommitTransactionOperation extends AbstractOperation
 
     public function __toString(): string
     {
-        return \sprintf('TransactionId: %s, RequireMaster: %s',
+        return \sprintf(
+            'TransactionId: %s, RequireMaster: %s',
             $this->transactionId,
             $this->requireMaster ? 'yes' : 'no'
         );

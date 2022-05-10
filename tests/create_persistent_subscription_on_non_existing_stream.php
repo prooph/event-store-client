@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Success;
-use Generator;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
 
@@ -24,6 +22,7 @@ class create_persistent_subscription_on_non_existing_stream extends AsyncTestCas
     use SpecificationWithConnection;
 
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
 
     protected function setUp(): void
@@ -37,19 +36,14 @@ class create_persistent_subscription_on_non_existing_stream extends AsyncTestCas
             ->build();
     }
 
-    protected function when(): Generator
-    {
-        yield new Success();
-    }
-
     /**
      * @test
      * @doesNotPerformAssertions
      */
-    public function the_completion_succeeds(): Generator
+    public function the_completion_succeeds(): void
     {
-        yield $this->execute(function (): Generator {
-            yield $this->connection->createPersistentSubscriptionAsync(
+        $this->execute(function (): void {
+            $this->connection->createPersistentSubscription(
                 $this->stream,
                 'nonexistinggroup',
                 $this->settings,

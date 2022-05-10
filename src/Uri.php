@@ -21,33 +21,22 @@ class Uri
 {
     /**
      * Sub-delimiters used in user info, query strings and fragments.
-     * @const string
      */
-    private const CHAR_SUB_DELIMS = '!\$&\'\(\)\*\+,;=';
+    private const CharSubDelims = '!\$&\'\(\)\*\+,;=';
 
     /**
      * Unreserved characters used in user info, paths, query strings, and fragments.
-     * @const string
      */
-    private const CHAR_UNRESERVED = 'a-zA-Z0-9_\-\.~\pL';
+    private const CharUnreserved = 'a-zA-Z0-9_\-\.~\pL';
 
-    private const TCP_PORT_DEFAULT = 1113;
-
-    private string $scheme;
-    private ?UserCredentials $userCredentials;
-    private string $host;
-    private int $port;
+    private const DefaultTcpPort = 1113;
 
     public function __construct(
-        string $scheme,
-        string $host,
-        int $port,
-        ?UserCredentials $userCredentials = null
+        private readonly string $scheme,
+        private readonly string $host,
+        private readonly int $port,
+        private readonly ?UserCredentials $userCredentials = null
     ) {
-        $this->scheme = $scheme;
-        $this->host = $host;
-        $this->port = $port;
-        $this->userCredentials = $userCredentials;
     }
 
     public static function fromString(string $uri): self
@@ -62,7 +51,7 @@ class Uri
 
         $scheme = isset($parts['scheme']) ? self::filterScheme($parts['scheme']) : '';
         $host = isset($parts['host']) ? \strtolower($parts['host']) : '';
-        $port = isset($parts['port']) ? (int) $parts['port'] : self::TCP_PORT_DEFAULT;
+        $port = isset($parts['port']) ? (int) $parts['port'] : self::DefaultTcpPort;
         $userCredentials = null;
 
         if (isset($parts['user'])) {
@@ -75,25 +64,21 @@ class Uri
         return new self($scheme, $host, $port, $userCredentials);
     }
 
-    /** @psalm-pure */
     public function scheme(): string
     {
         return $this->scheme;
     }
 
-    /** @psalm-pure */
     public function userCredentials(): ?UserCredentials
     {
         return $this->userCredentials;
     }
 
-    /** @psalm-pure */
     public function host(): string
     {
         return $this->host;
     }
 
-    /** @psalm-pure */
     public function port(): int
     {
         return $this->port;
@@ -111,7 +96,7 @@ class Uri
         // Note the addition of `%` to initial charset; this allows `|` portion
         // to match and thus prevent double-encoding.
         return \preg_replace_callback(
-            '/(?:[^%' . self::CHAR_UNRESERVED . self::CHAR_SUB_DELIMS . ']+|%(?![A-Fa-f0-9]{2}))/u',
+            '/(?:[^%' . self::CharUnreserved . self::CharSubDelims . ']+|%(?![A-Fa-f0-9]{2}))/u',
             fn (array $matches): string => \rawurlencode((string) $matches[0]),
             $part
         );

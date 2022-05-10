@@ -30,7 +30,7 @@ abstract class TestWithNode extends AsyncTestCase
                 (string) \getenv('ES_HOST'),
                 (int) \getenv('ES_HTTP_PORT')
             ),
-            5000
+            5
         );
     }
 }

@@ -13,13 +13,11 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Amp\Success;
-use Generator;
-use Prooph\EventStore\Async\EventStorePersistentSubscription;
+use Amp\TimeoutCancellation;
 use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventStorePersistentSubscription;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
@@ -32,41 +30,47 @@ class update_existing_persistent_subscription_with_subscribers extends AsyncTest
     use SpecificationWithConnection;
 
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
-    private Deferred $dropped;
+
+    private DeferredFuture $dropped;
+
     private ?SubscriptionDropReason $reason;
+
     private ?Throwable $exception;
+
     private ?Throwable $caught = null;
 
-    protected function given(): Generator
+    protected function given(): void
     {
         $this->stream = Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()->build();
-        $this->dropped = new Deferred();
+        $this->dropped = new DeferredFuture();
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             [new EventData(null, 'whatever', true, '{"foo": 2}')]
         );
 
-        yield $this->connection->createPersistentSubscriptionAsync(
+        $this->connection->createPersistentSubscription(
             $this->stream,
             'existing',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        yield $this->connection->connectToPersistentSubscriptionAsync(
+        $this->connection->connectToPersistentSubscription(
             $this->stream,
             'existing',
-            fn (
+            function (
                 EventStorePersistentSubscription $subscription,
                 ResolvedEvent $resolvedEvent,
                 ?int $retryCount = null
-            ): Promise => new Success(),
+            ): void {
+            },
             function (
                 EventStorePersistentSubscription $subscription,
                 SubscriptionDropReason $reason,
@@ -74,15 +78,15 @@ class update_existing_persistent_subscription_with_subscribers extends AsyncTest
             ): void {
                 $this->reason = $reason;
                 $this->exception = $exception;
-                $this->dropped->resolve(true);
+                $this->dropped->complete(true);
             }
         );
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
         try {
-            yield $this->connection->updatePersistentSubscriptionAsync(
+            $this->connection->updatePersistentSubscription(
                 $this->stream,
                 'existing',
                 $this->settings,
@@ -94,22 +98,20 @@ class update_existing_persistent_subscription_with_subscribers extends AsyncTest
     }
 
     /** @test */
-    public function the_completion_succeeds(): Generator
+    public function the_completion_succeeds(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->assertNull($this->caught);
-
-            yield new Success();
         });
     }
 
     /** @test */
-    public function existing_subscriptions_are_dropped(): Generator
+    public function existing_subscriptions_are_dropped(): void
     {
-        yield $this->execute(function (): Generator {
-            $this->assertTrue(yield Promise\timeout($this->dropped->promise(), 5000));
+        $this->execute(function (): void {
+            $this->assertTrue($this->dropped->getFuture()->await(new TimeoutCancellation(5)));
             $this->assertInstanceOf(SubscriptionDropReason::class, $this->reason);
-            $this->assertTrue($this->reason->equals(SubscriptionDropReason::userInitiated()));
+            $this->assertSame(SubscriptionDropReason::UserInitiated, $this->reason);
             $this->assertNull($this->exception);
         });
     }

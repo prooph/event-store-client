@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Generator;
 use Prooph\EventStore\Projections\ProjectionDetails;
 use Prooph\EventStore\Util\Guid;
 
@@ -23,21 +22,23 @@ class when_enabling_projections extends AsyncTestCase
     use ProjectionSpecification;
 
     private string $projectionName;
+
     private string $streamName;
+
     private string $query;
 
-    public function given(): Generator
+    public function given(): void
     {
         $id = Guid::generateAsHex();
         $this->projectionName = 'when_enabling_projections-' . $id;
         $this->streamName = 'test-stream-' . $id;
 
-        yield $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');
-        yield $this->postEvent($this->streamName, 'testEvent', '{"A": 2}');
+        $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');
+        $this->postEvent($this->streamName, 'testEvent', '{"A": 2}');
 
         $this->query = $this->createStandardQuery($this->streamName);
 
-        yield $this->projectionsManager->createContinuousAsync(
+        $this->projectionsManager->createContinuous(
             $this->projectionName,
             $this->query,
             false,
@@ -45,26 +46,26 @@ class when_enabling_projections extends AsyncTestCase
             $this->credentials
         );
 
-        yield $this->projectionsManager->disableAsync(
+        $this->projectionsManager->disable(
             $this->projectionName,
             $this->credentials
         );
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->projectionsManager->enableAsync(
+        $this->projectionsManager->enable(
             $this->projectionName,
             $this->credentials
         );
     }
 
     /** @test */
-    public function should_run_the_projection(): Generator
+    public function should_run_the_projection(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             /** @var ProjectionDetails $projectionStatus */
-            $projectionStatus = yield $this->projectionsManager->getStatusAsync(
+            $projectionStatus = $this->projectionsManager->getStatus(
                 $this->projectionName,
                 $this->credentials
             );

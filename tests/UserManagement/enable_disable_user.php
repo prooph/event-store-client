@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use Generator;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\UserCommandFailed;
 use Prooph\EventStore\UserCredentials;
@@ -22,38 +21,38 @@ use ProophTest\EventStoreClient\DefaultData;
 class enable_disable_user extends TestWithUser
 {
     /** @test */
-    public function disable_empty_username_throws(): Generator
+    public function disable_empty_username_throws(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        yield $this->manager->disableAsync('', DefaultData::adminCredentials());
+        $this->manager->disable('', DefaultData::adminCredentials());
     }
 
     /** @test */
-    public function enable_empty_username_throws(): Generator
+    public function enable_empty_username_throws(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        yield $this->manager->enableAsync('', DefaultData::adminCredentials());
+        $this->manager->enable('', DefaultData::adminCredentials());
     }
 
     /** @test */
-    public function can_enable_disable_user(): Generator
+    public function can_enable_disable_user(): void
     {
-        yield $this->manager->disableAsync($this->username, DefaultData::adminCredentials());
+        $this->manager->disable($this->username, DefaultData::adminCredentials());
 
         $thrown = false;
 
         try {
-            yield $this->manager->disableAsync('foo', DefaultData::adminCredentials());
+            $this->manager->disable('foo', DefaultData::adminCredentials());
         } catch (UserCommandFailed $e) {
             $thrown = true;
         }
 
         $this->assertTrue($thrown, UserCommandFailed::class . ' was expected');
 
-        yield $this->manager->enableAsync($this->username, DefaultData::adminCredentials());
+        $this->manager->enable($this->username, DefaultData::adminCredentials());
 
-        yield $this->manager->getCurrentUserAsync(new UserCredentials($this->username, 'password'));
+        $this->manager->getCurrentUser(new UserCredentials($this->username, 'password'));
     }
 }

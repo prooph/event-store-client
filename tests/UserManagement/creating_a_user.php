@@ -14,20 +14,18 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient\UserManagement;
 
 use Exception;
-use Generator;
 use Prooph\EventStore\Exception\InvalidArgumentException;
-use Prooph\EventStore\UserManagement\UserDetails;
 use Prooph\EventStore\Util\Guid;
 use ProophTest\EventStoreClient\DefaultData;
 
 class creating_a_user extends TestWithNode
 {
     /** @test */
-    public function creating_a_user_with_empty_username_throws(): Generator
+    public function creating_a_user_with_empty_username_throws(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        yield $this->manager->createUserAsync(
+        $this->manager->createUser(
             '',
             'ouro',
             ['foo', 'bar'],
@@ -36,11 +34,11 @@ class creating_a_user extends TestWithNode
     }
 
     /** @test */
-    public function creating_a_user_with_empty_name_throws(): Generator
+    public function creating_a_user_with_empty_name_throws(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        yield $this->manager->createUserAsync(
+        $this->manager->createUser(
             'ouro',
             '',
             ['foo', 'bar'],
@@ -49,11 +47,11 @@ class creating_a_user extends TestWithNode
     }
 
     /** @test */
-    public function creating_a_user_with_empty_password_throws(): Generator
+    public function creating_a_user_with_empty_password_throws(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        yield $this->manager->createUserAsync(
+        $this->manager->createUser(
             'ouro',
             'ouro',
             ['foo', 'bar'],
@@ -62,19 +60,19 @@ class creating_a_user extends TestWithNode
     }
 
     /** @test */
-    public function fetching_user_with_empty_name_throws(): Generator
+    public function fetching_user_with_empty_name_throws(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        yield $this->manager->getUserAsync('', DefaultData::adminCredentials());
+        $this->manager->getUser('', DefaultData::adminCredentials());
     }
 
     /** @test */
-    public function creating_a_user_with_parameters_can_be_read(): Generator
+    public function creating_a_user_with_parameters_can_be_read(): void
     {
         $login = Guid::generateString();
 
-        yield $this->manager->createUserAsync(
+        $this->manager->createUser(
             $login,
             'ourofull',
             ['foo', 'bar'],
@@ -82,8 +80,7 @@ class creating_a_user extends TestWithNode
             DefaultData::adminCredentials()
         );
 
-        $user = yield $this->manager->getUserAsync($login, DefaultData::adminCredentials());
-        \assert($user instanceof UserDetails);
+        $user = $this->manager->getUser($login, DefaultData::adminCredentials());
 
         $this->assertSame($login, $user->loginName());
         $this->assertSame('ourofull', $user->fullName());

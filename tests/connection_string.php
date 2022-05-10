@@ -49,16 +49,16 @@ class connection_string extends TestCase
     /** @test */
     public function can_set_multiple_values(): void
     {
-        $settings = ConnectionString::getConnectionSettings('heartbeattimeout=5555;maxretries=55');
-        $this->assertSame(5555, $settings->heartbeatTimeout());
+        $settings = ConnectionString::getConnectionSettings('heartbeattimeout=4;maxretries=55');
+        $this->assertSame(4.0, $settings->heartbeatTimeout());
         $this->assertSame(55, $settings->maxRetries());
     }
 
     /** @test */
     public function can_set_mixed_case(): void
     {
-        $settings = ConnectionString::getConnectionSettings('heArtbeAtTimeout=5555');
-        $this->assertSame(5555, $settings->heartbeatTimeout());
+        $settings = ConnectionString::getConnectionSettings('heArtbeAtTimeout=4');
+        $this->assertSame(4.0, $settings->heartbeatTimeout());
     }
 
     /** @test */

@@ -18,11 +18,8 @@ use Prooph\EventStore\Util\DateTime;
 /** @internal */
 class StopWatch
 {
-    private int $started;
-
-    private function __construct(int $started)
+    private function __construct(private readonly int $started)
     {
-        $this->started = $started;
     }
 
     public static function startNew(): self

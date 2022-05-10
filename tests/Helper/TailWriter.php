@@ -13,16 +13,14 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\Helper;
 
-use function Amp\call;
-use Amp\Promise;
-use Generator;
-use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventStoreConnection;
 
 /** @internal */
 class TailWriter
 {
     private EventStoreConnection $connection;
+
     private string $stream;
 
     public function __construct(EventStoreConnection $connection, string $stream)
@@ -31,13 +29,10 @@ class TailWriter
         $this->stream = $stream;
     }
 
-    /** @return Promise<TailWriter> */
-    public function then(EventData $event, int $expectedVersion): Promise
+    public function then(EventData $event, int $expectedVersion): TailWriter
     {
-        return call(function () use ($event, $expectedVersion): Generator {
-            yield $this->connection->appendToStreamAsync($this->stream, $expectedVersion, [$event]);
+        $this->connection->appendToStream($this->stream, $expectedVersion, [$event]);
 
-            return $this;
-        });
+        return $this;
     }
 }

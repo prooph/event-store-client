@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
-use Amp\Promise;
+use Amp\Future;
 use Prooph\EventStoreClient\SystemData\InspectionResult;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Throwable;
@@ -21,7 +21,7 @@ use Throwable;
 /** @internal */
 interface ClientOperation
 {
-    public function promise(): Promise;
+    public function future(): Future;
 
     public function createNetworkPackage(string $correlationId): TcpPackage;
 

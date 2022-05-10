@@ -24,22 +24,26 @@ use Prooph\EventStore\Exception\InvalidArgumentException;
 class InspectionResult
 {
     private InspectionDecision $inspectionDecision;
+
     private string $description;
+
     private ?EndPoint $tcpEndPoint;
+
     private ?EndPoint $secureTcpEndPoint;
 
     public function __construct(
         InspectionDecision $decision,
         string $description,
         ?EndPoint $tcpEndPoint = null,
-        ?EndPoint $secureTcpEndPoint = null)
+        ?EndPoint $secureTcpEndPoint = null
+    )
     {
-        if ($decision->equals(InspectionDecision::reconnect())) {
+        if ($decision === InspectionDecision::Reconnect) {
             if (null === $tcpEndPoint) {
                 throw new InvalidArgumentException('TcpEndPoint is null for reconnect');
             }
         } elseif (null !== $tcpEndPoint) {
-            throw new InvalidArgumentException('TcpEndPoint is not null for decision ' . $decision->name());
+            throw new InvalidArgumentException('TcpEndPoint is not null for decision ' . $decision->name);
         }
 
         $this->inspectionDecision = $decision;

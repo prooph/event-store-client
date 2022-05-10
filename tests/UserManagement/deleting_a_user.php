@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use Generator;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\UserCommandFailed;
 use Prooph\EventStore\Transport\Http\HttpStatusCode;
@@ -24,14 +23,14 @@ use ProophTest\EventStoreClient\DefaultData;
 class deleting_a_user extends TestWithNode
 {
     /** @test */
-    public function deleting_non_existing_user_throws(): Generator
+    public function deleting_non_existing_user_throws(): void
     {
         $this->expectException(UserCommandFailed::class);
 
         try {
-            yield $this->manager->deleteUserAsync(Guid::generateString(), DefaultData::adminCredentials());
+            $this->manager->deleteUser(Guid::generateString(), DefaultData::adminCredentials());
         } catch (UserCommandFailed $e) {
-            $this->assertSame(HttpStatusCode::NOT_FOUND, $e->httpStatusCode());
+            $this->assertSame(HttpStatusCode::NotFound, $e->httpStatusCode());
 
             throw $e;
         }
@@ -41,28 +40,28 @@ class deleting_a_user extends TestWithNode
      * @test
      * @doesNotPerformAssertions
      */
-    public function deleting_created_user_deletes_it(): Generator
+    public function deleting_created_user_deletes_it(): void
     {
         $user = Guid::generateString();
 
-        yield $this->manager->createUserAsync($user, 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
-        yield $this->manager->deleteUserAsync($user, DefaultData::adminCredentials());
+        $this->manager->createUser($user, 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
+        $this->manager->deleteUser($user, DefaultData::adminCredentials());
     }
 
     /** @test */
-    public function deleting_empty_user_throws(): Generator
+    public function deleting_empty_user_throws(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        yield $this->manager->deleteUserAsync('', DefaultData::adminCredentials());
+        $this->manager->deleteUser('', DefaultData::adminCredentials());
     }
 
     /** @test */
-    public function can_delete_a_user(): Generator
+    public function can_delete_a_user(): void
     {
         $name = Guid::generateString();
 
-        yield $this->manager->createUserAsync(
+        $this->manager->createUser(
             $name,
             'ouro',
             ['foo', 'bar'],
@@ -70,14 +69,14 @@ class deleting_a_user extends TestWithNode
             DefaultData::adminCredentials()
         );
 
-        $x = yield $this->manager->getUserAsync($name, DefaultData::adminCredentials());
+        $x = $this->manager->getUser($name, DefaultData::adminCredentials());
 
         $this->assertInstanceOf(UserDetails::class, $x);
 
-        yield $this->manager->deleteUserAsync($name, DefaultData::adminCredentials());
+        $this->manager->deleteUser($name, DefaultData::adminCredentials());
 
         $this->expectException(UserCommandFailed::class);
 
-        yield $this->manager->getUserAsync($name, DefaultData::adminCredentials());
+        $this->manager->getUser($name, DefaultData::adminCredentials());
     }
 }

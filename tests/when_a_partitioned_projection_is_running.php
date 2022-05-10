@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Generator;
 use Prooph\EventStore\Util\Guid;
 
 final class when_a_partitioned_projection_is_running extends AsyncTestCase
@@ -22,23 +21,24 @@ final class when_a_partitioned_projection_is_running extends AsyncTestCase
     use ProjectionSpecification;
 
     private string $projectionName;
+
     private string $streamName;
 
-    public function given(): Generator
+    public function given(): void
     {
         $id = Guid::generateAsHex();
         $this->projectionName = 'when_getting_partition_information-' . $id;
         $this->streamName = 'test-stream-' . $id;
 
-        yield $this->postEvent($this->streamName, 'testEvent', '{"A": 1}', '{"username": "tesla"}');
-        yield $this->postEvent($this->streamName, 'testEvent', '{"A": 2}', '{"username": "nicola"}');
+        $this->postEvent($this->streamName, 'testEvent', '{"A": 1}', '{"username": "tesla"}');
+        $this->postEvent($this->streamName, 'testEvent', '{"A": 2}', '{"username": "nicola"}');
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
         $query = $this->createPartitionedQuery($this->streamName);
 
-        yield $this->projectionsManager->createContinuousAsync(
+        $this->projectionsManager->createContinuous(
             $this->projectionName,
             $query,
             false,
@@ -48,10 +48,10 @@ final class when_a_partitioned_projection_is_running extends AsyncTestCase
     }
 
     /** @test */
-    public function should_be_able_to_get_the_partition_state(): Generator
+    public function should_be_able_to_get_the_partition_state(): void
     {
-        yield $this->execute(function (): Generator {
-            $state = yield $this->projectionsManager->getPartitionStateAsync(
+        $this->execute(function (): void {
+            $state = $this->projectionsManager->getPartitionState(
                 $this->projectionName,
                 'nicola',
                 $this->credentials
@@ -62,10 +62,10 @@ final class when_a_partitioned_projection_is_running extends AsyncTestCase
     }
 
     /** @test */
-    public function should_be_able_to_get_the_partition_result(): Generator
+    public function should_be_able_to_get_the_partition_result(): void
     {
-        yield $this->execute(function (): Generator {
-            $result = yield $this->projectionsManager->getPartitionResultAsync(
+        $this->execute(function (): void {
+            $result = $this->projectionsManager->getPartitionResult(
                 $this->projectionName,
                 'nicola',
                 $this->credentials

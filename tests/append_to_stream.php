@@ -15,392 +15,368 @@ namespace ProophTest\EventStoreClient;
 
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
-use Amp\Http\Client\Response;
-use Generator;
-use Prooph\EventStore\ConditionalWriteResult;
 use Prooph\EventStore\ConditionalWriteStatus;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\StreamDeleted;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\ReadDirection;
-use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\StreamMetadata;
 use Prooph\EventStore\Util\Json;
-use Prooph\EventStore\WriteResult;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 
 class append_to_stream extends EventStoreConnectionTestCase
 {
     /** @test */
-    public function cannot_append_to_stream_without_name(): Generator
+    public function cannot_append_to_stream_without_name(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        yield $this->connection->appendToStreamAsync('', ExpectedVersion::ANY, []);
+        $this->connection->appendToStream('', ExpectedVersion::Any, []);
     }
 
     /** @test */
-    public function should_allow_appending_zero_events_to_stream_with_no_problems(): Generator
+    public function should_allow_appending_zero_events_to_stream_with_no_problems(): void
     {
         $stream1 = 'should_allow_appending_zero_events_to_stream_with_no_problems1';
         $stream2 = 'should_allow_appending_zero_events_to_stream_with_no_problems2';
 
-        $result = yield $this->connection->appendToStreamAsync($stream1, ExpectedVersion::ANY, []);
-        \assert($result instanceof WriteResult);
+        $result = $this->connection->appendToStream($stream1, ExpectedVersion::Any, []);
         $this->assertSame(-1, $result->nextExpectedVersion());
 
-        $result = yield $this->connection->appendToStreamAsync($stream1, ExpectedVersion::NO_STREAM, []);
+        $result = $this->connection->appendToStream($stream1, ExpectedVersion::NoStream, []);
         $this->assertSame(-1, $result->nextExpectedVersion());
 
-        $result = yield $this->connection->appendToStreamAsync($stream1, ExpectedVersion::ANY, []);
+        $result = $this->connection->appendToStream($stream1, ExpectedVersion::Any, []);
         $this->assertSame(-1, $result->nextExpectedVersion());
 
-        $result = yield $this->connection->appendToStreamAsync($stream1, ExpectedVersion::NO_STREAM, []);
+        $result = $this->connection->appendToStream($stream1, ExpectedVersion::NoStream, []);
         $this->assertSame(-1, $result->nextExpectedVersion());
 
-        $slice = yield $this->connection->readStreamEventsForwardAsync($stream1, 0, 2, false);
-        \assert($slice instanceof StreamEventsSlice);
+        $slice = $this->connection->readStreamEventsForward($stream1, 0, 2, false);
         $this->assertCount(0, $slice->events());
         $this->assertSame($stream1, $slice->stream());
         $this->assertSame(0, $slice->fromEventNumber());
-        $this->assertSame($slice->readDirection()->name(), ReadDirection::forward()->name());
+        $this->assertSame($slice->readDirection(), ReadDirection::Forward);
 
-        $result = yield $this->connection->appendToStreamAsync($stream2, ExpectedVersion::NO_STREAM, []);
+        $result = $this->connection->appendToStream($stream2, ExpectedVersion::NoStream, []);
         $this->assertSame(-1, $result->nextExpectedVersion());
 
-        $result = yield $this->connection->appendToStreamAsync($stream2, ExpectedVersion::ANY, []);
+        $result = $this->connection->appendToStream($stream2, ExpectedVersion::Any, []);
         $this->assertSame(-1, $result->nextExpectedVersion());
 
-        $result = yield $this->connection->appendToStreamAsync($stream2, ExpectedVersion::NO_STREAM, []);
+        $result = $this->connection->appendToStream($stream2, ExpectedVersion::NoStream, []);
         $this->assertSame(-1, $result->nextExpectedVersion());
 
-        $result = yield $this->connection->appendToStreamAsync($stream2, ExpectedVersion::ANY, []);
+        $result = $this->connection->appendToStream($stream2, ExpectedVersion::Any, []);
         $this->assertSame(-1, $result->nextExpectedVersion());
 
-        $slice = yield $this->connection->readStreamEventsForwardAsync($stream2, 0, 2, false);
+        $slice = $this->connection->readStreamEventsForward($stream2, 0, 2, false);
         $this->assertCount(0, $slice->events());
     }
 
     /** @test */
-    public function should_create_stream_with_no_stream_exp_ver_on_first_write_if_does_not_exist(): Generator
+    public function should_create_stream_with_no_stream_exp_ver_on_first_write_if_does_not_exist(): void
     {
         $stream = 'should_create_stream_with_no_stream_exp_ver_on_first_write_if_does_not_exist';
 
-        $result = yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
-        \assert($result instanceof WriteResult);
+        $result = $this->connection->appendToStream($stream, ExpectedVersion::NoStream, [TestEvent::newTestEvent()]);
         $this->assertSame(0, $result->nextExpectedVersion());
 
-        $slice = yield $this->connection->readStreamEventsForwardAsync($stream, 0, 2, false);
-        \assert($slice instanceof StreamEventsSlice);
+        $slice = $this->connection->readStreamEventsForward($stream, 0, 2, false);
 
         $this->assertCount(1, $slice->events());
     }
 
     /** @test */
-    public function should_create_stream_with_any_exp_ver_on_first_write_if_does_not_exist(): Generator
+    public function should_create_stream_with_any_exp_ver_on_first_write_if_does_not_exist(): void
     {
         $stream = 'should_create_stream_with_any_exp_ver_on_first_write_if_does_not_exist';
 
-        $result = yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
-        \assert($result instanceof WriteResult);
+        $result = $this->connection->appendToStream($stream, ExpectedVersion::Any, [TestEvent::newTestEvent()]);
         $this->assertSame(0, $result->nextExpectedVersion());
 
-        $slice = yield $this->connection->readStreamEventsForwardAsync($stream, 0, 2, false);
-        \assert($slice instanceof StreamEventsSlice);
+        $slice = $this->connection->readStreamEventsForward($stream, 0, 2, false);
         $this->assertCount(1, $slice->events());
     }
 
     /** @test */
-    public function multiple_idempotent_writes(): Generator
+    public function multiple_idempotent_writes(): void
     {
         $stream = 'multiple_idempotent_writes';
 
         $events = [TestEvent::newTestEvent(), TestEvent::newTestEvent(), TestEvent::newTestEvent(), TestEvent::newTestEvent()];
 
-        $result = yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::ANY, $events);
-        \assert($result instanceof WriteResult);
+        $result = $this->connection->appendToStream($stream, ExpectedVersion::Any, $events);
         $this->assertSame(3, $result->nextExpectedVersion());
 
-        $result = yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::ANY, $events);
+        $result = $this->connection->appendToStream($stream, ExpectedVersion::Any, $events);
         $this->assertSame(3, $result->nextExpectedVersion());
     }
 
     /** @test */
-    public function multiple_idempotent_writes_with_same_id_bug_case(): Generator
+    public function multiple_idempotent_writes_with_same_id_bug_case(): void
     {
         $stream = 'multiple_idempotent_writes_with_same_id_bug_case';
 
         $x = TestEvent::newTestEvent();
         $events = [$x, $x, $x, $x, $x, $x];
 
-        $result = yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::ANY, $events);
-        \assert($result instanceof WriteResult);
+        $result = $this->connection->appendToStream($stream, ExpectedVersion::Any, $events);
         $this->assertSame(5, $result->nextExpectedVersion());
     }
 
     /** @test */
-    public function in_wtf_multiple_case_of_multiple_writes_expected_version_any_per_all_same_id(): Generator
+    public function in_wtf_multiple_case_of_multiple_writes_expected_version_any_per_all_same_id(): void
     {
         $stream = 'in_wtf_multiple_case_of_multiple_writes_expected_version_any_per_all_same_id';
 
         $x = TestEvent::newTestEvent();
         $events = [$x, $x, $x, $x, $x, $x];
 
-        $result = yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::ANY, $events);
-        \assert($result instanceof WriteResult);
+        $result = $this->connection->appendToStream($stream, ExpectedVersion::Any, $events);
         $this->assertSame(5, $result->nextExpectedVersion());
 
-        $f = yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::ANY, $events);
-        \assert($f instanceof WriteResult);
+        $f = $this->connection->appendToStream($stream, ExpectedVersion::Any, $events);
         $this->assertSame(0, $f->nextExpectedVersion());
     }
 
     /** @test */
-    public function in_slightly_reasonable_multiple_case_of_multiple_writes_with_expected_version_per_all_same_id(): Generator
+    public function in_slightly_reasonable_multiple_case_of_multiple_writes_with_expected_version_per_all_same_id(): void
     {
         $stream = 'in_slightly_reasonable_multiple_case_of_multiple_writes_with_expected_version_per_all_same_id';
 
         $x = TestEvent::newTestEvent();
         $events = [$x, $x, $x, $x, $x, $x];
 
-        $result = yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
-        \assert($result instanceof WriteResult);
+        $result = $this->connection->appendToStream($stream, ExpectedVersion::NoStream, $events);
         $this->assertSame(5, $result->nextExpectedVersion());
 
-        $f = yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
-        \assert($f instanceof WriteResult);
+        $f = $this->connection->appendToStream($stream, ExpectedVersion::NoStream, $events);
         $this->assertSame(5, $f->nextExpectedVersion());
     }
 
     /** @test */
-    public function should_fail_writing_with_correct_exp_ver_to_deleted_stream(): Generator
+    public function should_fail_writing_with_correct_exp_ver_to_deleted_stream(): void
     {
         $stream = 'should_fail_writing_with_correct_exp_ver_to_deleted_stream';
 
-        yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
+        $this->connection->deleteStream($stream, ExpectedVersion::NoStream, true);
 
         $this->expectException(StreamDeleted::class);
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
+        $this->connection->appendToStream($stream, ExpectedVersion::NoStream, [TestEvent::newTestEvent()]);
     }
 
     /** @test */
-    public function should_return_log_position_when_writing(): Generator
+    public function should_return_log_position_when_writing(): void
     {
         $stream = 'should_return_log_position_when_writing';
 
-        $result = yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
-        \assert($result instanceof WriteResult);
+        $result = $this->connection->appendToStream($stream, ExpectedVersion::NoStream, [TestEvent::newTestEvent()]);
         $this->assertGreaterThan(0, $result->logPosition()->preparePosition());
         $this->assertGreaterThan(0, $result->logPosition()->commitPosition());
     }
 
     /** @test */
-    public function should_fail_writing_with_any_exp_ver_to_deleted_stream(): Generator
+    public function should_fail_writing_with_any_exp_ver_to_deleted_stream(): void
     {
         $stream = 'should_fail_writing_with_any_exp_ver_to_deleted_stream';
 
         try {
-            yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
+            $this->connection->deleteStream($stream, ExpectedVersion::NoStream, true);
         } catch (Throwable $e) {
             $this->fail($e->getMessage());
         }
 
         $this->expectException(StreamDeleted::class);
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
+        $this->connection->appendToStream($stream, ExpectedVersion::Any, [TestEvent::newTestEvent()]);
     }
 
     /** @test */
-    public function should_fail_writing_with_invalid_exp_ver_to_deleted_stream(): Generator
+    public function should_fail_writing_with_invalid_exp_ver_to_deleted_stream(): void
     {
         $stream = 'should_fail_writing_with_invalid_exp_ver_to_deleted_stream';
 
-        yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
+        $this->connection->deleteStream($stream, ExpectedVersion::NoStream, true);
 
         $this->expectException(StreamDeleted::class);
 
-        yield $this->connection->appendToStreamAsync($stream, 5, [TestEvent::newTestEvent()]);
+        $this->connection->appendToStream($stream, 5, [TestEvent::newTestEvent()]);
     }
 
     /**
      * @test
      * @doesNotPerformAssertions
      */
-    public function should_append_with_correct_exp_ver_to_existing_stream(): Generator
+    public function should_append_with_correct_exp_ver_to_existing_stream(): void
     {
         $stream = 'should_append_with_correct_exp_ver_to_existing_stream';
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
+        $this->connection->appendToStream($stream, ExpectedVersion::NoStream, [TestEvent::newTestEvent()]);
     }
 
     /** @test */
-    public function should_append_with_any_exp_ver_to_existing_stream(): Generator
+    public function should_append_with_any_exp_ver_to_existing_stream(): void
     {
         $stream = 'should_append_with_any_exp_ver_to_existing_stream';
 
-        $result = yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
-        \assert($result instanceof WriteResult);
+        $result = $this->connection->appendToStream($stream, ExpectedVersion::NoStream, [TestEvent::newTestEvent()]);
         $this->assertSame(0, $result->nextExpectedVersion());
 
-        $result = yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
+        $result = $this->connection->appendToStream($stream, ExpectedVersion::Any, [TestEvent::newTestEvent()]);
         $this->assertSame(1, $result->nextExpectedVersion());
     }
 
     /** @test */
-    public function should_fail_appending_with_wrong_exp_ver_to_existing_stream(): Generator
+    public function should_fail_appending_with_wrong_exp_ver_to_existing_stream(): void
     {
         $stream = 'should_fail_appending_with_wrong_exp_ver_to_existing_stream';
 
         $this->expectException(WrongExpectedVersion::class);
 
-        yield $this->connection->appendToStreamAsync($stream, 1, [TestEvent::newTestEvent()]);
+        $this->connection->appendToStream($stream, 1, [TestEvent::newTestEvent()]);
     }
 
     /**
      * @test
      * @doesNotPerformAssertions
      */
-    public function should_append_with_stream_exists_exp_ver_to_existing_stream(): Generator
+    public function should_append_with_stream_exists_exp_ver_to_existing_stream(): void
     {
         $stream = 'should_append_with_stream_exists_exp_ver_to_existing_stream';
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
+        $this->connection->appendToStream($stream, ExpectedVersion::NoStream, [TestEvent::newTestEvent()]);
+        $this->connection->appendToStream($stream, ExpectedVersion::StreamExists, [TestEvent::newTestEvent()]);
     }
 
     /**
      * @test
      * @doesNotPerformAssertions
      */
-    public function should_append_with_stream_exists_exp_ver_to_stream_with_multiple_events(): Generator
+    public function should_append_with_stream_exists_exp_ver_to_stream_with_multiple_events(): void
     {
         $stream = 'should_append_with_stream_exists_exp_ver_to_stream_with_multiple_events';
 
         for ($i = 0; $i < 5; $i++) {
-            yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
+            $this->connection->appendToStream($stream, ExpectedVersion::Any, [TestEvent::newTestEvent()]);
         }
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
+        $this->connection->appendToStream($stream, ExpectedVersion::StreamExists, [TestEvent::newTestEvent()]);
     }
 
     /**
      * @test
      * @doesNotPerformAssertions
      */
-    public function should_append_with_stream_exists_exp_ver_if_metadata_stream_exists(): Generator
+    public function should_append_with_stream_exists_exp_ver_if_metadata_stream_exists(): void
     {
         $stream = 'should_append_with_stream_exists_exp_ver_if_metadata_stream_exists';
 
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             new StreamMetadata(
                 10
             )
         );
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
+        $this->connection->appendToStream($stream, ExpectedVersion::StreamExists, [TestEvent::newTestEvent()]);
     }
 
     /** @test */
-    public function should_fail_appending_with_stream_exists_exp_ver_and_stream_does_not_exist(): Generator
+    public function should_fail_appending_with_stream_exists_exp_ver_and_stream_does_not_exist(): void
     {
         $stream = 'should_fail_appending_with_stream_exists_exp_ver_and_stream_does_not_exist';
 
         $this->expectException(WrongExpectedVersion::class);
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
+        $this->connection->appendToStream($stream, ExpectedVersion::StreamExists, [TestEvent::newTestEvent()]);
     }
 
     /** @test */
-    public function should_fail_appending_with_stream_exists_exp_ver_to_hard_deleted_stream(): Generator
+    public function should_fail_appending_with_stream_exists_exp_ver_to_hard_deleted_stream(): void
     {
         $stream = 'should_fail_appending_with_stream_exists_exp_ver_and_stream_does_not_exist';
 
-        yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
+        $this->connection->deleteStream($stream, ExpectedVersion::NoStream, true);
 
         $this->expectException(StreamDeleted::class);
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
+        $this->connection->appendToStream($stream, ExpectedVersion::StreamExists, [TestEvent::newTestEvent()]);
     }
 
     /** @test */
-    public function should_fail_appending_with_stream_exists_exp_ver_to_soft_deleted_stream(): Generator
+    public function should_fail_appending_with_stream_exists_exp_ver_to_soft_deleted_stream(): void
     {
         $stream = 'should_fail_appending_with_stream_exists_exp_ver_to_soft_deleted_stream';
 
-        yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, false);
+        $this->connection->deleteStream($stream, ExpectedVersion::NoStream, false);
 
         $this->expectException(StreamDeleted::class);
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::STREAM_EXISTS, [TestEvent::newTestEvent()]);
+        $this->connection->appendToStream($stream, ExpectedVersion::StreamExists, [TestEvent::newTestEvent()]);
     }
 
     /** @test */
-    public function can_append_multiple_events_at_once(): Generator
+    public function can_append_multiple_events_at_once(): void
     {
         $stream = 'can_append_multiple_events_at_once';
 
         $events = TestEvent::newAmount(100);
 
-        $result = yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, $events);
-        \assert($result instanceof WriteResult);
+        $result = $this->connection->appendToStream($stream, ExpectedVersion::NoStream, $events);
 
         $this->assertSame(99, $result->nextExpectedVersion());
     }
 
     /** @test */
-    public function returns_failure_status_when_conditionally_appending_with_version_mismatch(): Generator
+    public function returns_failure_status_when_conditionally_appending_with_version_mismatch(): void
     {
         $stream = 'returns_failure_status_when_conditionally_appending_with_version_mismatch';
 
-        $result = yield $this->connection->conditionalAppendToStreamAsync($stream, 7, [TestEvent::newTestEvent()]);
-        \assert($result instanceof ConditionalWriteResult);
+        $result = $this->connection->conditionalAppendToStream($stream, 7, [TestEvent::newTestEvent()]);
 
-        $this->assertTrue($result->status()->equals(ConditionalWriteStatus::versionMismatch()));
+        $this->assertSame($result->status(), ConditionalWriteStatus::VersionMismatch);
     }
 
     /** @test */
-    public function returns_success_status_when_conditionally_appending_with_matching_version(): Generator
+    public function returns_success_status_when_conditionally_appending_with_matching_version(): void
     {
         $stream = 'returns_success_status_when_conditionally_appending_with_matching_version';
 
-        $result = yield $this->connection->conditionalAppendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
-        \assert($result instanceof ConditionalWriteResult);
+        $result = $this->connection->conditionalAppendToStream($stream, ExpectedVersion::Any, [TestEvent::newTestEvent()]);
 
-        $this->assertTrue($result->status()->equals(ConditionalWriteStatus::succeeded()));
+        $this->assertSame($result->status(), ConditionalWriteStatus::Succeeded);
         $this->assertNotNull($result->logPosition());
         $this->assertNotNull($result->nextExpectedVersion());
     }
 
     /** @test */
-    public function returns_failure_status_when_conditionally_appending_to_a_deleted_stream(): Generator
+    public function returns_failure_status_when_conditionally_appending_to_a_deleted_stream(): void
     {
         $stream = 'returns_failure_status_when_conditionally_appending_to_a_deleted_stream';
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
+        $this->connection->appendToStream($stream, ExpectedVersion::Any, [TestEvent::newTestEvent()]);
 
-        yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::ANY, true);
+        $this->connection->deleteStream($stream, ExpectedVersion::Any, true);
 
-        $result = yield $this->connection->conditionalAppendToStreamAsync($stream, ExpectedVersion::ANY, [TestEvent::newTestEvent()]);
-        \assert($result instanceof ConditionalWriteResult);
+        $result = $this->connection->conditionalAppendToStream($stream, ExpectedVersion::Any, [TestEvent::newTestEvent()]);
 
-        $this->assertTrue($result->status()->equals(ConditionalWriteStatus::streamDeleted()));
+        $this->assertSame($result->status(), ConditionalWriteStatus::StreamDeleted);
     }
 
     /** @test */
-    public function writes_predefined_event_id(): Generator
+    public function writes_predefined_event_id(): void
     {
         $stream = 'writes_predefined_event_id';
 
         $event = TestEvent::newTestEvent();
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::ANY, [$event]);
+        $this->connection->appendToStream($stream, ExpectedVersion::Any, [$event]);
 
-        $events = yield $this->connection->readStreamEventsBackwardAsync($stream, -1, 1);
-        \assert($events instanceof StreamEventsSlice);
+        $events = $this->connection->readStreamEventsBackward($stream, -1, 1);
 
         $readEvent = $events->events()[0]->event();
 
@@ -429,13 +405,11 @@ class append_to_stream extends EventStoreConnectionTestCase
 
         $httpClient = HttpClientBuilder::buildDefault();
 
-        $response = yield $httpClient->request($request);
-
-        \assert($response instanceof Response);
+        $response = $httpClient->request($request);
 
         $this->assertSame(200, $response->getStatus());
 
-        $body = yield $response->getBody()->read();
+        $body = $response->getBody()->read();
 
         $json = Json::decode($body);
 

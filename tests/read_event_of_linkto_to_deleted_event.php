@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Success;
-use Generator;
 use Prooph\EventStore\EventReadResult;
 use Prooph\EventStore\EventReadStatus;
 
@@ -25,9 +23,9 @@ class read_event_of_linkto_to_deleted_event extends AsyncTestCase
 
     private EventReadResult $read;
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        $this->read = yield $this->connection->readEventAsync(
+        $this->read = $this->connection->readEvent(
             $this->linkedStreamName,
             0,
             true
@@ -35,32 +33,26 @@ class read_event_of_linkto_to_deleted_event extends AsyncTestCase
     }
 
     /** @test */
-    public function the_linked_event_is_returned(): Generator
+    public function the_linked_event_is_returned(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->assertNotNull($this->read->event()->link());
-
-            yield new Success();
         });
     }
 
     /** @test */
-    public function the_deleted_event_is_not_resolved(): Generator
+    public function the_deleted_event_is_not_resolved(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->assertNull($this->read->event()->event());
-
-            yield new Success();
         });
     }
 
     /** @test */
-    public function the_status_is_success(): Generator
+    public function the_status_is_success(): void
     {
-        yield $this->execute(function (): Generator {
-            $this->assertTrue(EventReadStatus::success()->equals($this->read->status()));
-
-            yield new Success();
+        $this->execute(function (): void {
+            $this->assertSame(EventReadStatus::Success, $this->read->status());
         });
     }
 }

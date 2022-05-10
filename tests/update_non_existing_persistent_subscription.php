@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Success;
-use Generator;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
@@ -25,26 +23,25 @@ class update_non_existing_persistent_subscription extends AsyncTestCase
     use SpecificationWithConnection;
 
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
 
-    protected function given(): Generator
+    protected function given(): void
     {
         $this->stream = Guid::generateAsHex();
         $this->settings = PersistentSubscriptionSettings::create()
             ->doNotResolveLinkTos()
             ->startFromCurrent()
             ->build();
-
-        yield new Success();
     }
 
     /** @test */
-    public function the_completion_fails_with_not_found(): Generator
+    public function the_completion_fails_with_not_found(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->expectException(InvalidOperationException::class);
 
-            yield $this->connection->updatePersistentSubscriptionAsync(
+            $this->connection->updatePersistentSubscription(
                 $this->stream,
                 'existing',
                 $this->settings,

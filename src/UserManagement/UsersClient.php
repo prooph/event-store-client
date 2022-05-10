@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\UserManagement;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\Http\Client\Response;
-use Amp\Promise;
-use JsonException;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\UnexpectedValueException;
 use Prooph\EventStore\Transport\Http\EndpointExtensions;
@@ -36,24 +34,22 @@ use Throwable;
 /** @internal */
 class UsersClient
 {
-    private HttpClient $client;
-    private int $operationTimeout;
-    private string $httpSchema;
+    private readonly HttpClient $client;
+
+    private readonly EndpointExtensions $httpSchema;
 
     public function __construct(int $operationTimeout, bool $tlsTerminatedEndpoint, bool $verifyPeer)
     {
         $this->client = new HttpClient($operationTimeout, $verifyPeer);
-        $this->operationTimeout = $operationTimeout;
-        $this->httpSchema = $tlsTerminatedEndpoint ? EndpointExtensions::HTTPS_SCHEMA : EndpointExtensions::HTTP_SCHEMA;
+        $this->httpSchema = EndpointExtensions::useHttps($tlsTerminatedEndpoint);
     }
 
-    /** @return Promise<void> */
     public function enable(
         EndPoint $endPoint,
         string $login,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return $this->sendPost(
+    ): void {
+        $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -62,17 +58,16 @@ class UsersClient
             ),
             '',
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
     }
 
-    /** @return Promise<void> */
     public function disable(
         EndPoint $endPoint,
         string $login,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return $this->sendPost(
+    ): void {
+        $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -81,17 +76,16 @@ class UsersClient
             ),
             '',
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
     }
 
-    /** @return Promise<void> */
     public function delete(
         EndPoint $endPoint,
         string $login,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return $this->sendDelete(
+    ): void {
+        $this->sendDelete(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -99,120 +93,64 @@ class UsersClient
                 \urlencode($login)
             ),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
     }
 
     /**
-     * @return Promise<list<UserDetails>>
-     *
-     * @psalm-suppress MixedReturnTypeCoercion
+     * @return list<UserDetails>
      */
     public function listAll(
         EndPoint $endPoint,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        $deferred = new Deferred();
-
-        $promise = $this->sendGet(
+    ): array {
+        $body = $this->sendGet(
             EndpointExtensions::rawUrlToHttpUrl($endPoint, $this->httpSchema, '/users/'),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
 
-        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
-            if ($exception) {
-                $deferred->fail($exception);
+        if ('' === $body) {
+            throw new UnexpectedValueException('No content received');
+        }
 
-                return;
-            }
+        $data = Json::decode($body);
 
-            if (null === $body) {
-                $deferred->fail(new UnexpectedValueException('No content received'));
-
-                return;
-            }
-
-            try {
-                $data = Json::decode($body);
-            } catch (JsonException $e) {
-                $deferred->fail($e);
-
-                return;
-            }
-
-            /** @psalm-suppress MixedArgument */
-            $deferred->resolve(\array_map(
-                fn (array $entry): UserDetails => UserDetails::fromArray($entry),
-                $data['data']
-            ));
-        });
-
-        return $deferred->promise();
+        return \array_map(
+            fn (array $entry): UserDetails => UserDetails::fromArray($entry),
+            $data['data']
+        );
     }
 
-    /**
-     * @return Promise<UserDetails>
-     *
-     * @psalm-suppress MixedReturnTypeCoercion
-     */
     public function getCurrentUser(
         EndPoint $endPoint,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        $deferred = new Deferred();
-
-        $promise = $this->sendGet(
+    ): UserDetails {
+        $body = $this->sendGet(
             EndpointExtensions::rawUrlToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
                 '/users/$current'
             ),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
 
-        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
-            if ($exception) {
-                $deferred->fail($exception);
+        if ('' === $body) {
+            throw new UnexpectedValueException('No content received');
+        }
 
-                return;
-            }
+        $data = Json::decode($body);
 
-            if (null === $body) {
-                $deferred->fail(new UnexpectedValueException('No content received'));
-
-                return;
-            }
-
-            try {
-                $data = Json::decode($body);
-            } catch (JsonException $e) {
-                $deferred->fail($e);
-
-                return;
-            }
-
-            /** @psalm-suppress MixedArgument */
-            $deferred->resolve(UserDetails::fromArray($data['data']));
-        });
-
-        return $deferred->promise();
+        return UserDetails::fromArray($data['data']);
     }
 
-    /**
-     * @return Promise<UserDetails>
-     *
-     * @psalm-suppress MixedReturnTypeCoercion
-     */
     public function getUser(
         EndPoint $endPoint,
         string $login,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        $deferred = new Deferred();
-
-        $promise = $this->sendGet(
+    ): UserDetails {
+        $body = $this->sendGet(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -220,44 +158,24 @@ class UsersClient
                 \urlencode($login)
             ),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
 
-        $promise->onResolve(function (?Throwable $exception, ?string $body) use ($deferred): void {
-            if ($exception) {
-                $deferred->fail($exception);
+        if ('' === $body) {
+            throw new UnexpectedValueException('No content received');
+        }
 
-                return;
-            }
+        $data = Json::decode($body);
 
-            if (null === $body) {
-                $deferred->fail(new UnexpectedValueException('No content received'));
-
-                return;
-            }
-
-            try {
-                $data = Json::decode($body);
-            } catch (JsonException $e) {
-                $deferred->fail($e);
-
-                return;
-            }
-
-            /** @psalm-suppress MixedArgument */
-            $deferred->resolve(UserDetails::fromArray($data['data']));
-        });
-
-        return $deferred->promise();
+        return UserDetails::fromArray($data['data']);
     }
 
-    /** @return Promise<void> */
     public function createUser(
         EndPoint $endPoint,
         UserCreationInformation $newUser,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return $this->sendPost(
+    ): void {
+        $this->sendPost(
             EndpointExtensions::rawUrlToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -265,18 +183,17 @@ class UsersClient
             ),
             Json::encode($newUser),
             $userCredentials,
-            HttpStatusCode::CREATED
+            HttpStatusCode::Created
         );
     }
 
-    /** @return Promise<void> */
     public function updateUser(
         EndPoint $endPoint,
         string $login,
         UserUpdateInformation $updatedUser,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return $this->sendPut(
+    ): void {
+        $this->sendPut(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -285,18 +202,17 @@ class UsersClient
             ),
             Json::encode($updatedUser),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
     }
 
-    /** @return Promise<void> */
     public function changePassword(
         EndPoint $endPoint,
         string $login,
         ChangePasswordDetails $changePasswordDetails,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return $this->sendPost(
+    ): void {
+        $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -305,18 +221,17 @@ class UsersClient
             ),
             Json::encode($changePasswordDetails),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
     }
 
-    /** @return Promise<void> */
     public function resetPassword(
         EndPoint $endPoint,
         string $login,
         ResetPasswordDetails $resetPasswordDetails,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return $this->sendPost(
+    ): void {
+        $this->sendPost(
             EndpointExtensions::formatStringToHttpUrl(
                 $endPoint,
                 $this->httpSchema,
@@ -325,30 +240,25 @@ class UsersClient
             ),
             Json::encode($resetPasswordDetails),
             $userCredentials,
-            HttpStatusCode::OK
+            HttpStatusCode::Ok
         );
     }
 
-    /**
-     * @return Promise<string>
-     *
-     * @psalm-suppress MixedReturnTypeCoercion
-     */
     private function sendGet(
         string $url,
         ?UserCredentials $userCredentials,
         int $expectedCode
-    ): Promise {
-        $deferred = new Deferred();
+    ): string {
+        $deferred = new DeferredFuture();
 
         $this->client->get(
             $url,
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve($response->getBody()->buffer());
+                    $deferred->complete($response->getBody()->buffer());
                 } else {
-                    $deferred->fail(new UserCommandFailed(
+                    $deferred->error(new UserCommandFailed(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for GET on %s',
@@ -360,33 +270,28 @@ class UsersClient
                 }
             },
             function (Throwable $exception) use ($deferred): void {
-                $deferred->fail($exception);
+                $deferred->error($exception);
             }
         );
 
-        return $deferred->promise();
+        return $deferred->getFuture()->await();
     }
 
-    /**
-     * @return Promise<void>
-     *
-     * @psalm-suppress MixedReturnTypeCoercion
-     */
     private function sendDelete(
         string $url,
         ?UserCredentials $userCredentials,
         int $expectedCode
-    ): Promise {
-        $deferred = new Deferred();
+    ): void {
+        $deferred = new DeferredFuture();
 
         $this->client->delete(
             $url,
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve($response->getBody()->buffer());
+                    $deferred->complete($response->getBody()->buffer());
                 } else {
-                    $deferred->fail(new UserCommandFailed(
+                    $deferred->error(new UserCommandFailed(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for DELETE on %s',
@@ -398,25 +303,20 @@ class UsersClient
                 }
             },
             function (Throwable $exception) use ($deferred): void {
-                $deferred->fail($exception);
+                $deferred->error($exception);
             }
         );
 
-        return $deferred->promise();
+        $deferred->getFuture()->await();
     }
 
-    /**
-     * @return Promise<void>
-     *
-     * @psalm-suppress MixedReturnTypeCoercion
-     */
     private function sendPut(
         string $url,
         string $content,
         ?UserCredentials $userCredentials,
         int $expectedCode
-    ): Promise {
-        $deferred = new Deferred();
+    ): void {
+        $deferred = new DeferredFuture();
 
         $this->client->put(
             $url,
@@ -425,9 +325,9 @@ class UsersClient
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve();
+                    $deferred->complete();
                 } else {
-                    $deferred->fail(new UserCommandFailed(
+                    $deferred->error(new UserCommandFailed(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for PUT on %s',
@@ -439,25 +339,20 @@ class UsersClient
                 }
             },
             function (Throwable $exception) use ($deferred): void {
-                $deferred->fail($exception);
+                $deferred->error($exception);
             }
         );
 
-        return $deferred->promise();
+        $deferred->getFuture()->await();
     }
 
-    /**
-     * @return Promise<void>
-     *
-     * @psalm-suppress MixedReturnTypeCoercion
-     */
     private function sendPost(
         string $url,
         string $content,
         ?UserCredentials $userCredentials,
         int $expectedCode
-    ): Promise {
-        $deferred = new Deferred();
+    ): void {
+        $deferred = new DeferredFuture();
 
         $this->client->post(
             $url,
@@ -466,11 +361,11 @@ class UsersClient
             $userCredentials,
             function (Response $response) use ($deferred, $expectedCode, $url): void {
                 if ($response->getStatus() === $expectedCode) {
-                    $deferred->resolve();
-                } elseif ($response->getStatus() === HttpStatusCode::CONFLICT) {
-                    $deferred->fail(new UserCommandConflict($response->getStatus(), $response->getReason()));
+                    $deferred->complete();
+                } elseif ($response->getStatus() === HttpStatusCode::Conflict) {
+                    $deferred->error(new UserCommandConflict($response->getStatus(), $response->getReason()));
                 } else {
-                    $deferred->fail(new UserCommandFailed(
+                    $deferred->error(new UserCommandFailed(
                         $response->getStatus(),
                         \sprintf(
                             'Server returned %d (%s) for POST on %s',
@@ -482,10 +377,10 @@ class UsersClient
                 }
             },
             function (Throwable $exception) use ($deferred): void {
-                $deferred->fail($exception);
+                $deferred->error($exception);
             }
         );
 
-        return $deferred->promise();
+        $deferred->getFuture()->await();
     }
 }

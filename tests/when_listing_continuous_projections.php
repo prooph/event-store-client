@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Success;
-use Generator;
 use Prooph\EventStore\Projections\ProjectionDetails;
 use Prooph\EventStore\Util\Guid;
 
@@ -25,35 +23,35 @@ class when_listing_continuous_projections extends AsyncTestCase
 
     /** @var ProjectionDetails[] */
     private array $result;
+
     private string $projectionName;
 
-    protected function given(): Generator
+    protected function given(): void
     {
         $this->projectionName = Guid::generateAsHex();
-        yield $this->createContinuousProjection($this->projectionName);
+        $this->createContinuousProjection($this->projectionName);
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        $this->result = yield $this->projectionsManager->listContinuousAsync($this->credentials);
+        $this->result = $this->projectionsManager->listContinuous($this->credentials);
     }
 
     /** @test */
-    public function should_return_continuous_projections(): Generator
+    public function should_return_continuous_projections(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $found = false;
 
             foreach ($this->result as $value) {
                 if ($value->effectiveName() === $this->projectionName) {
                     $found = true;
+
                     break;
                 }
             }
 
             $this->assertTrue($found);
-
-            yield new Success();
         });
     }
 }

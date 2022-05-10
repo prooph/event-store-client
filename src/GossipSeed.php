@@ -22,22 +22,15 @@ use Prooph\EventStore\EndPoint;
  */
 class GossipSeed
 {
-    private EndPoint $endPoint;
-    private string $hostHeader;
-
-    public function __construct(EndPoint $endPoint, string $hostHeader = '')
+    public function __construct(private readonly EndPoint $endPoint, private readonly string $hostHeader = '')
     {
-        $this->endPoint = $endPoint;
-        $this->hostHeader = $hostHeader;
     }
 
-    /** @psalm-pure */
     public function endPoint(): EndPoint
     {
         return $this->endPoint;
     }
 
-    /** @psalm-pure */
     public function hostHeader(): string
     {
         return $this->hostHeader;

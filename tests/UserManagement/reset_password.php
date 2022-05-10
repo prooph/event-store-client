@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use Generator;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\UserCommandFailed;
 use Prooph\EventStore\Transport\Http\HttpStatusCode;
@@ -23,25 +22,25 @@ use ProophTest\EventStoreClient\DefaultData;
 class reset_password extends TestWithUser
 {
     /** @test */
-    public function empty_username_throws(): Generator
+    public function empty_username_throws(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        yield $this->manager->resetPasswordAsync('', 'foo', DefaultData::adminCredentials());
+        $this->manager->resetPassword('', 'foo', DefaultData::adminCredentials());
     }
 
     /** @test */
-    public function empty_password_throws(): Generator
+    public function empty_password_throws(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        yield $this->manager->resetPasswordAsync($this->username, '', DefaultData::adminCredentials());
+        $this->manager->resetPassword($this->username, '', DefaultData::adminCredentials());
     }
 
     /** @test */
-    public function can_reset_password(): Generator
+    public function can_reset_password(): void
     {
-        yield $this->manager->resetPasswordAsync(
+        $this->manager->resetPassword(
             $this->username,
             'foo',
             DefaultData::adminCredentials()
@@ -50,14 +49,14 @@ class reset_password extends TestWithUser
         $this->expectException(UserCommandFailed::class);
 
         try {
-            yield $this->manager->changePasswordAsync(
+            $this->manager->changePassword(
                 $this->username,
                 'password',
                 'foobar',
                 new UserCredentials($this->username, 'password')
             );
         } catch (UserCommandFailed $e) {
-            $this->assertSame(HttpStatusCode::UNAUTHORIZED, $e->httpStatusCode());
+            $this->assertSame(HttpStatusCode::Unauthorized, $e->httpStatusCode());
 
             throw $e;
         }

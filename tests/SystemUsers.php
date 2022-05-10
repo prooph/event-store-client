@@ -15,7 +15,9 @@ namespace ProophTest\EventStoreClient;
 
 class SystemUsers
 {
-    public const ADMIN = 'admin';
-    public const OPERATIONS = 'ops';
-    public const DEFAULT_ADMIN_PASSWORD = 'changeit';
+    public const Admin = 'admin';
+
+    public const Operations = 'ops';
+
+    public const DefaultAdminPassword = 'changeit';
 }

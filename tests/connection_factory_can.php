@@ -25,11 +25,15 @@ use Prooph\EventStoreClient\Uri;
 
 final class connection_factory_can extends TestCase
 {
-    private const CONNECTION_NAME = 'test-conn';
-    private const CLUSTER_DNS = 'escluster.net';
-    private const CONNECT_TIMEOUT = 1000;
-    private const MAX_DISCOVER_ATTEMPTS = 3;
-    private const EXTERNAL_GOSSIP_PORT = 2112;
+    private const ConnectionName = 'test-conn';
+
+    private const ClusterDNS = 'escluster.net';
+
+    private const ConnectTimeout = 1;
+
+    private const MaxDiscoverAttempts = 3;
+
+    private const ExternalGossipPort = 2112;
 
     /** @test */
     public function create_from_uri_with_discover_scheme(): void
@@ -37,7 +41,7 @@ final class connection_factory_can extends TestCase
         $conn = Factory::createFromUri(
             Uri::fromString('discover://eventstore:2113'),
             null,
-            self::CONNECTION_NAME
+            self::ConnectionName
         );
 
         $connectionSettings = ConnectionSettings::default();
@@ -45,11 +49,11 @@ final class connection_factory_can extends TestCase
             'eventstore',
             10,
             2113,
-            self::CONNECT_TIMEOUT,
+            self::ConnectTimeout,
             false
         );
 
-        $this->assertSame(self::CONNECTION_NAME, $conn->connectionName());
+        $this->assertSame(self::ConnectionName, $conn->connectionName());
         $this->assertEquals($clusterSettings, $conn->clusterSettings());
         $this->assertEquals($connectionSettings, $conn->connectionSettings());
     }
@@ -73,12 +77,12 @@ final class connection_factory_can extends TestCase
         $conn = Factory::createFromUri(
             Uri::fromString('tcp://eventstore:1113'),
             null,
-            self::CONNECTION_NAME
+            self::ConnectionName
         );
 
         $connectionSettings = ConnectionSettings::default();
 
-        $this->assertSame(self::CONNECTION_NAME, $conn->connectionName());
+        $this->assertSame(self::ConnectionName, $conn->connectionName());
         $this->assertEquals($connectionSettings, $conn->connectionSettings());
     }
 
@@ -111,25 +115,25 @@ final class connection_factory_can extends TestCase
     {
         $connectionSettings = ConnectionSettings::create()
             ->setGossipSeeds($this->getGossipSeeds())
-            ->setMaxDiscoverAttempts(self::MAX_DISCOVER_ATTEMPTS)
-            ->setGossipTimeout(self::CONNECT_TIMEOUT)
+            ->setMaxDiscoverAttempts(self::MaxDiscoverAttempts)
+            ->setGossipTimeout(self::ConnectTimeout)
             ->preferRandomNode()
             ->build();
 
         $clusterSettings = ClusterSettings::fromGossipSeeds(
             $this->getGossipSeeds(),
-            self::MAX_DISCOVER_ATTEMPTS,
-            self::CONNECT_TIMEOUT,
+            self::MaxDiscoverAttempts,
+            self::ConnectTimeout,
             true
         );
 
         $conn = Factory::createFromUri(
             null,
             $connectionSettings,
-            self::CONNECTION_NAME
+            self::ConnectionName
         );
 
-        $this->assertSame(self::CONNECTION_NAME, $conn->connectionName());
+        $this->assertSame(self::ConnectionName, $conn->connectionName());
         $this->assertSame($connectionSettings, $conn->connectionSettings());
         $this->assertEquals($clusterSettings, $conn->clusterSettings());
     }
@@ -149,7 +153,7 @@ final class connection_factory_can extends TestCase
         $conn = Factory::createFromConnectionString(
             'ConnectTo=tcp://admin:changeit@eventstore:1113; HeartBeatTimeout=500',
             null,
-            self::CONNECTION_NAME
+            self::ConnectionName
         );
 
         $connectionSettings = ConnectionSettings::create()
@@ -159,7 +163,7 @@ final class connection_factory_can extends TestCase
             )
             ->build();
 
-        $this->assertSame(self::CONNECTION_NAME, $conn->connectionName());
+        $this->assertSame(self::ConnectionName, $conn->connectionName());
         $this->assertEquals($connectionSettings, $conn->connectionSettings());
     }
 
@@ -169,7 +173,7 @@ final class connection_factory_can extends TestCase
         $conn = Factory::createFromConnectionString(
             'GossipSeeds=192.168.0.2:1111,192.168.0.3:1111; HeartBeatTimeout=500',
             null,
-            self::CONNECTION_NAME
+            self::ConnectionName
         );
 
         $connectionSettings = ConnectionSettings::create()
@@ -180,7 +184,7 @@ final class connection_factory_can extends TestCase
             ])
             ->build();
 
-        $this->assertSame(self::CONNECTION_NAME, $conn->connectionName());
+        $this->assertSame(self::ConnectionName, $conn->connectionName());
         $this->assertEquals($connectionSettings, $conn->connectionSettings());
     }
 
@@ -211,21 +215,21 @@ final class connection_factory_can extends TestCase
     {
         $connectionSettings = ConnectionSettings::default();
         $clusterSettings = ClusterSettings::fromClusterDns(
-            self::CLUSTER_DNS,
-            self::MAX_DISCOVER_ATTEMPTS,
-            self::EXTERNAL_GOSSIP_PORT,
-            self::CONNECT_TIMEOUT,
+            self::ClusterDNS,
+            self::MaxDiscoverAttempts,
+            self::ExternalGossipPort,
+            self::ConnectTimeout,
             true
         );
 
         $conn = Factory::createFromClusterSettings(
             $connectionSettings,
             $clusterSettings,
-            self::CONNECTION_NAME
+            self::ConnectionName
         );
 
         $this->assertSame($clusterSettings, $conn->clusterSettings());
-        $this->assertSame(self::CONNECTION_NAME, $conn->connectionName());
+        $this->assertSame(self::ConnectionName, $conn->connectionName());
         $this->assertSame($connectionSettings, $conn->connectionSettings());
     }
 
@@ -235,19 +239,19 @@ final class connection_factory_can extends TestCase
         $connectionSettings = ConnectionSettings::default();
         $clusterSettings = ClusterSettings::fromGossipSeeds(
             $this->getGossipSeeds(),
-            self::MAX_DISCOVER_ATTEMPTS,
-            self::CONNECT_TIMEOUT,
+            self::MaxDiscoverAttempts,
+            self::ConnectTimeout,
             true
         );
 
         $conn = Factory::createFromClusterSettings(
             $connectionSettings,
             $clusterSettings,
-            self::CONNECTION_NAME
+            self::ConnectionName
         );
 
         $this->assertSame($clusterSettings, $conn->clusterSettings());
-        $this->assertSame(self::CONNECTION_NAME, $conn->connectionName());
+        $this->assertSame(self::ConnectionName, $conn->connectionName());
         $this->assertSame($connectionSettings, $conn->connectionSettings());
     }
 
@@ -260,10 +264,10 @@ final class connection_factory_can extends TestCase
 
         $conn = Factory::createFromSettings(
             $connectionSettings,
-            self::CONNECTION_NAME
+            self::ConnectionName
         );
 
-        $this->assertSame(self::CONNECTION_NAME, $conn->connectionName());
+        $this->assertSame(self::ConnectionName, $conn->connectionName());
         $this->assertSame($connectionSettings, $conn->connectionSettings());
     }
 
@@ -290,10 +294,10 @@ final class connection_factory_can extends TestCase
         $conn = Factory::createFromEndPoint(
             $this->getEndpoint(),
             $connectionSettings,
-            self::CONNECTION_NAME
+            self::ConnectionName
         );
 
-        $this->assertSame(self::CONNECTION_NAME, $conn->connectionName());
+        $this->assertSame(self::ConnectionName, $conn->connectionName());
         $this->assertSame($connectionSettings, $conn->connectionSettings());
     }
 
@@ -303,10 +307,10 @@ final class connection_factory_can extends TestCase
         $conn = Factory::createFromEndPoint(
             $this->getEndpoint(),
             null,
-            self::CONNECTION_NAME
+            self::ConnectionName
         );
 
-        $this->assertSame(self::CONNECTION_NAME, $conn->connectionName());
+        $this->assertSame(self::ConnectionName, $conn->connectionName());
         $this->assertEquals(ConnectionSettings::default(), $conn->connectionSettings());
     }
 

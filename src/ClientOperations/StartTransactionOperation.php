@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Google\Protobuf\Internal\Message;
-use Prooph\EventStore\Async\EventStoreTransaction;
-use Prooph\EventStore\Async\Internal\EventStoreTransactionConnection;
+use Prooph\EventStore\EventStoreTransaction;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\InvalidTransaction;
 use Prooph\EventStore\Exception\StreamDeleted;
 use Prooph\EventStore\Exception\UnexpectedOperationResult;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
+use Prooph\EventStore\Internal\EventStoreTransactionConnection;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\Messages\ClientMessages\OperationResult;
 use Prooph\EventStoreClient\Messages\ClientMessages\TransactionStart;
@@ -37,31 +37,21 @@ use Psr\Log\LoggerInterface as Logger;
  */
 class StartTransactionOperation extends AbstractOperation
 {
-    private bool $requireMaster;
-    private string $stream;
-    private int $expectedVersion;
-    protected EventStoreTransactionConnection $parentConnection;
-
     public function __construct(
         Logger $logger,
-        Deferred $deferred,
-        bool $requireMaster,
-        string $stream,
-        int $expectedVersion,
-        EventStoreTransactionConnection $parentConnection,
+        DeferredFuture $deferred,
+        private readonly bool $requireMaster,
+        private readonly string $stream,
+        private readonly int $expectedVersion,
+        private readonly EventStoreTransactionConnection $parentConnection,
         ?UserCredentials $userCredentials
     ) {
-        $this->requireMaster = $requireMaster;
-        $this->stream = $stream;
-        $this->expectedVersion = $expectedVersion;
-        $this->parentConnection = $parentConnection;
-
         parent::__construct(
             $logger,
             $deferred,
             $userCredentials,
-            TcpCommand::transactionStart(),
-            TcpCommand::transactionStartCompleted(),
+            TcpCommand::TransactionStart,
+            TcpCommand::TransactionStartCompleted,
             TransactionStartCompleted::class
         );
     }
@@ -86,32 +76,32 @@ class StartTransactionOperation extends AbstractOperation
             case OperationResult::Success:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'Success');
+                return new InspectionResult(InspectionDecision::EndOperation, 'Success');
             case OperationResult::PrepareTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'PrepareTimeout');
+                return new InspectionResult(InspectionDecision::Retry, 'PrepareTimeout');
             case OperationResult::CommitTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'CommitTimeout');
+                return new InspectionResult(InspectionDecision::Retry, 'CommitTimeout');
             case OperationResult::ForwardTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'ForwardTimeout');
+                return new InspectionResult(InspectionDecision::Retry, 'ForwardTimeout');
             case OperationResult::WrongExpectedVersion:
                 $this->fail(WrongExpectedVersion::with(
                     $this->stream,
                     $this->expectedVersion
                 ));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'WrongExpectedVersion');
+                return new InspectionResult(InspectionDecision::EndOperation, 'WrongExpectedVersion');
             case OperationResult::StreamDeleted:
                 $this->fail(StreamDeleted::with($this->stream));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'StreamDeleted');
+                return new InspectionResult(InspectionDecision::EndOperation, 'StreamDeleted');
             case OperationResult::InvalidTransaction:
                 $this->fail(new InvalidTransaction());
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'InvalidTransaction');
+                return new InspectionResult(InspectionDecision::EndOperation, 'InvalidTransaction');
             case OperationResult::AccessDenied:
                 $this->fail(AccessDenied::toStream($this->stream));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');
+                return new InspectionResult(InspectionDecision::EndOperation, 'AccessDenied');
             default:
                 throw new UnexpectedOperationResult();
         }

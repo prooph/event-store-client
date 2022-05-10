@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-use Amp\ByteStream\ResourceOutputStream;
+use Amp\ByteStream\WritableResourceStream;
 use Amp\File\File;
 use Amp\Log\ConsoleFormatter;
 use Amp\Log\StreamHandler;
@@ -33,29 +33,52 @@ use Psr\Log\NullLogger;
 class ConnectionSettingsBuilder
 {
     private Logger $log;
+
     private bool $verboseLogging = false;
-    private int $maxQueueSize = Consts::DEFAULT_MAX_QUEUE_SIZE;
-    private int $maxConcurrentItems = Consts::DEFAULT_MAX_CONCURRENT_ITEMS;
-    private int $maxRetries = Consts::DEFAULT_MAX_OPERATIONS_RETRY;
-    private int $maxReconnections = Consts::DEFAULT_MAX_RECONNECTIONS;
-    private bool $requireMaster = Consts::DEFAULT_REQUIRE_MASTER;
-    private int $reconnectionDelay = Consts::DEFAULT_RECONNECTION_DELAY;
-    private int $operationTimeout = Consts::DEFAULT_OPERATION_TIMEOUT;
-    private int $operationTimeoutCheckPeriod = Consts::DEFAULT_OPERATION_TIMEOUT_CHECK_PERIOD;
+
+    private int $maxQueueSize = Consts::DefaultMaxQueueSize;
+
+    private int $maxConcurrentItems = Consts::DefaultMaxConcurrentItems;
+
+    private int $maxRetries = Consts::DefaultMaxOperationsRetry;
+
+    private int $maxReconnections = Consts::DefaultMaxReconnections;
+
+    private bool $requireMaster = Consts::DefaultRequireMaster;
+
+    private float $reconnectionDelay = Consts::DefaultReconnectionDelay;
+
+    private float $operationTimeout = Consts::DefaultOperationTimeout;
+
+    private float $operationTimeoutCheckPeriod = Consts::DefaultOperationTimeoutPeriod;
+
     private ?UserCredentials $defaultUserCredentials = null;
+
     private bool $useSslConnection = false;
+
     private string $targetHost = '';
+
     private bool $validateServer = true;
+
     private bool $failOnNoServerResponse = true;
-    private int $heartbeatInterval = 750;
-    private int $heartbeatTimeout = 1500;
-    private int $clientConnectionTimeout = 1000;
+
+    private float $heartbeatInterval = 0.75;
+
+    private float $heartbeatTimeout = 1.5;
+
+    private float $clientConnectionTimeout = 1;
+
     private string $clusterDns = '';
-    private int $maxDiscoverAttempts = Consts::DEFAULT_MAX_CLUSTER_DISCOVER_ATTEMPTS;
-    private int $gossipExternalHttpPort = Consts::DEFAULT_CLUSTER_MANAGER_EXTERNAL_HTTP_PORT;
-    private int $gossipTimeout = 1000;
+
+    private int $maxDiscoverAttempts = Consts::DefaultMaxClusterDiscoverAttempts;
+
+    private int $gossipExternalHttpPort = Consts::DefaultClusterManagerExternalHttpPort;
+
+    private float $gossipTimeout = 1;
+
     /** @var list<GossipSeed> */
     private array $gossipSeeds = [];
+
     private bool $preferRandomNode = false;
 
     /** @internal */
@@ -73,7 +96,7 @@ class ConnectionSettingsBuilder
             ));
         }
 
-        $logHandler = new StreamHandler(new ResourceOutputStream(\STDOUT));
+        $logHandler = new StreamHandler(new WritableResourceStream(\STDOUT));
         $logHandler->setFormatter(new ConsoleFormatter("[%datetime%] %channel%.%level_name%: %message%\r\n"));
 
         $this->log = new MonoLog('event-store-client');
@@ -197,7 +220,7 @@ class ConnectionSettingsBuilder
         return $this;
     }
 
-    public function setReconnectionDelayTo(int $reconnectionDelay): self
+    public function setReconnectionDelayTo(float $reconnectionDelay): self
     {
         if ($reconnectionDelay < 0) {
             throw new InvalidArgumentException('Delay must be positive');
@@ -268,7 +291,7 @@ class ConnectionSettingsBuilder
         return $this;
     }
 
-    public function setHeartbeatTimeout(int $timeout): self
+    public function setHeartbeatTimeout(float $timeout): self
     {
         if ($timeout < 0) {
             throw new InvalidArgumentException('Timeout must be positive');
@@ -279,7 +302,7 @@ class ConnectionSettingsBuilder
         return $this;
     }
 
-    public function withConnectionTimeoutOf(int $timeout): self
+    public function withConnectionTimeoutOf(float $timeout): self
     {
         if ($timeout < 0) {
             throw new InvalidArgumentException('Timeout must be positive');
@@ -315,7 +338,7 @@ class ConnectionSettingsBuilder
         return $this;
     }
 
-    public function setGossipTimeout(int $timeout): self
+    public function setGossipTimeout(float $timeout): self
     {
         if ($timeout < 0) {
             throw new InvalidArgumentException('Timeout must be positive');

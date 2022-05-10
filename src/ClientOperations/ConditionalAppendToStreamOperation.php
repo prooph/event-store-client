@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\ConditionalWriteResult;
 use Prooph\EventStore\ConditionalWriteStatus;
@@ -39,32 +39,30 @@ use Psr\Log\LoggerInterface as Logger;
  */
 class ConditionalAppendToStreamOperation extends AbstractOperation
 {
-    private bool $requireMaster;
-    private string $stream;
-    private int $expectedVersion;
-    /** @var list<EventData> */
-    private array $events;
-
+    /**
+     * @param Logger $logger
+     * @param DeferredFuture $deferred
+     * @param bool $requireMaster
+     * @param string $stream
+     * @param int $expectedVersion
+     * @param list<EventData> $events
+     * @param UserCredentials|null $userCredentials
+     */
     public function __construct(
         Logger $logger,
-        Deferred $deferred,
-        bool $requireMaster,
-        string $stream,
-        int $expectedVersion,
-        array $events,
+        DeferredFuture $deferred,
+        private readonly bool $requireMaster,
+        private readonly string $stream,
+        private readonly int $expectedVersion,
+        private readonly array $events,
         ?UserCredentials $userCredentials
     ) {
-        $this->requireMaster = $requireMaster;
-        $this->stream = $stream;
-        $this->expectedVersion = $expectedVersion;
-        $this->events = $events;
-
         parent::__construct(
             $logger,
             $deferred,
             $userCredentials,
-            TcpCommand::writeEvents(),
-            TcpCommand::writeEventsCompleted(),
+            TcpCommand::WriteEvents,
+            TcpCommand::WriteEventsCompleted,
             WriteEventsCompleted::class
         );
     }
@@ -95,31 +93,31 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
             case OperationResult::Success:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'Success');
+                return new InspectionResult(InspectionDecision::EndOperation, 'Success');
             case OperationResult::PrepareTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'PrepareTimeout');
+                return new InspectionResult(InspectionDecision::Retry, 'PrepareTimeout');
             case OperationResult::ForwardTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'ForwardTimeout');
+                return new InspectionResult(InspectionDecision::Retry, 'ForwardTimeout');
             case OperationResult::CommitTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'CommitTimeout');
+                return new InspectionResult(InspectionDecision::Retry, 'CommitTimeout');
             case OperationResult::WrongExpectedVersion:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'ExpectedVersionMismatch');
+                return new InspectionResult(InspectionDecision::EndOperation, 'ExpectedVersionMismatch');
             case OperationResult::StreamDeleted:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'StreamDeleted');
+                return new InspectionResult(InspectionDecision::EndOperation, 'StreamDeleted');
             case OperationResult::InvalidTransaction:
                 $exception = new InvalidTransaction();
                 $this->fail($exception);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'InvalidTransaction');
+                return new InspectionResult(InspectionDecision::EndOperation, 'InvalidTransaction');
             case OperationResult::AccessDenied:
                 $exception = AccessDenied::toStream($this->stream);
                 $this->fail($exception);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');
+                return new InspectionResult(InspectionDecision::EndOperation, 'AccessDenied');
             default:
                 throw new UnexpectedOperationResult();
         }
@@ -128,11 +126,11 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
     protected function transformResponse(Message $response): ConditionalWriteResult
     {
         if ($response->getResult() === OperationResult::WrongExpectedVersion) {
-            return ConditionalWriteResult::fail(ConditionalWriteStatus::versionMismatch());
+            return ConditionalWriteResult::fail(ConditionalWriteStatus::VersionMismatch);
         }
 
         if ($response->getResult() === OperationResult::StreamDeleted) {
-            return ConditionalWriteResult::fail(ConditionalWriteStatus::streamDeleted());
+            return ConditionalWriteResult::fail(ConditionalWriteStatus::StreamDeleted);
         }
 
         /** @psalm-suppress DocblockTypeContradiction */
@@ -152,7 +150,8 @@ class ConditionalAppendToStreamOperation extends AbstractOperation
 
     public function __toString(): string
     {
-        return \sprintf('Stream: %s, ExpectedVersion: %d, RequireMaster: %s',
+        return \sprintf(
+            'Stream: %s, ExpectedVersion: %d, RequireMaster: %s',
             $this->stream,
             $this->expectedVersion,
             $this->requireMaster ? 'yes' : 'no'

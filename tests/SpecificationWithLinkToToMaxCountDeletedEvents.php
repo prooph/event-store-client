@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Generator;
 use Prooph\EventStore\Common\SystemEventTypes;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
@@ -26,51 +25,52 @@ trait SpecificationWithLinkToToMaxCountDeletedEvents
     use SpecificationWithConnection;
 
     protected string $linkedStreamName;
+
     protected string $deletedStreamName;
 
-    protected function given(): Generator
+    protected function given(): void
     {
         $creds = DefaultData::adminCredentials();
 
         $this->deletedStreamName = Guid::generateAsHex();
         $this->linkedStreamName = Guid::generateAsHex();
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->deletedStreamName,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             [
                 new EventData(EventId::generate(), 'testing1', true, \json_encode(['foo' => 4])),
             ],
             $creds
         );
 
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $this->deletedStreamName,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             new StreamMetadata(2)
         );
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->deletedStreamName,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             [
                 new EventData(EventId::generate(), 'testing2', true, \json_encode(['foo' => 4])),
             ]
         );
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->deletedStreamName,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             [
                 new EventData(EventId::generate(), 'testing3', true, \json_encode(['foo' => 4])),
             ]
         );
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->linkedStreamName,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             [
-                new EventData(EventId::generate(), SystemEventTypes::LINK_TO, false, '0@' . $this->deletedStreamName),
+                new EventData(EventId::generate(), SystemEventTypes::LinkTo->value, false, '0@' . $this->deletedStreamName),
             ],
             $creds
         );

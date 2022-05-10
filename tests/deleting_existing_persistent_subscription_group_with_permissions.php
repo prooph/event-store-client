@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Generator;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
 
@@ -23,6 +22,7 @@ class deleting_existing_persistent_subscription_group_with_permissions extends A
     use SpecificationWithConnection;
 
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
 
     protected function setUp(): void
@@ -36,9 +36,9 @@ class deleting_existing_persistent_subscription_group_with_permissions extends A
             ->build();
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->connection->createPersistentSubscriptionAsync(
+        $this->connection->createPersistentSubscription(
             $this->stream,
             'groupname123',
             $this->settings,
@@ -50,10 +50,10 @@ class deleting_existing_persistent_subscription_group_with_permissions extends A
      * @test
      * @doesNotPerformAssertions
      */
-    public function the_delete_of_group_succeeds(): Generator
+    public function the_delete_of_group_succeeds(): void
     {
-        yield $this->execute(function (): Generator {
-            yield $this->connection->deletePersistentSubscriptionAsync(
+        $this->execute(function (): void {
+            $this->connection->deletePersistentSubscription(
                 $this->stream,
                 'groupname123',
                 DefaultData::adminCredentials()

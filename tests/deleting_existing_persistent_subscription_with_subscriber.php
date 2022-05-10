@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Amp\Success;
-use Generator;
-use Prooph\EventStore\Async\EventStorePersistentSubscription;
+use Amp\TimeoutCancellation;
+use Prooph\EventStore\EventStorePersistentSubscription;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropReason;
@@ -30,8 +28,10 @@ class deleting_existing_persistent_subscription_with_subscriber extends AsyncTes
     use SpecificationWithConnection;
 
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
-    private Deferred $called;
+
+    private DeferredFuture $called;
 
     protected function setUp(): void
     {
@@ -42,41 +42,40 @@ class deleting_existing_persistent_subscription_with_subscriber extends AsyncTes
             ->doNotResolveLinkTos()
             ->startFromCurrent()
             ->build();
-        $this->called = new Deferred();
+        $this->called = new DeferredFuture();
     }
 
-    protected function given(): Generator
+    protected function given(): void
     {
-        yield $this->connection->createPersistentSubscriptionAsync(
+        $this->connection->createPersistentSubscription(
             $this->stream,
             'groupname123',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        yield $this->connection->connectToPersistentSubscriptionAsync(
+        $this->connection->connectToPersistentSubscription(
             $this->stream,
             'groupname123',
             function (
                 EventStorePersistentSubscription $subscription,
                 ResolvedEvent $resolvedEvent,
                 ?int $retryCount = null
-            ): Promise {
-                return new Success();
+            ): void {
             },
             function (
                 EventStorePersistentSubscription $subscription,
                 SubscriptionDropReason $reason,
                 ?Throwable $exception = null
             ): void {
-                $this->called->resolve(true);
+                $this->called->complete(true);
             }
         );
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->connection->deletePersistentSubscriptionAsync(
+        $this->connection->deletePersistentSubscription(
             $this->stream,
             'groupname123',
             DefaultData::adminCredentials()
@@ -84,10 +83,10 @@ class deleting_existing_persistent_subscription_with_subscriber extends AsyncTes
     }
 
     /** @test */
-    public function the_subscription_is_dropped(): Generator
+    public function the_subscription_is_dropped(): void
     {
-        yield $this->execute(function (): Generator {
-            $value = yield Promise\timeout($this->called->promise(), 5000);
+        $this->execute(function (): void {
+            $value = $this->called->getFuture()->await(new TimeoutCancellation(5));
             $this->assertTrue($value);
         });
     }
