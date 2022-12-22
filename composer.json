@@ -22,23 +22,23 @@
   "require": {
     "php": "^8.1",
     "ext-json": "*",
-    "amphp/amp": "^3.0-beta",
-    "amphp/http-client": "^5-dev",
-    "amphp/byte-stream": "^2.0-beta",
-    "amphp/socket": "^2.0-beta",
-    "google/protobuf": "^3.19.3",
+    "amphp/amp": "^3.0",
+    "amphp/http-client": "^v5.0.0-beta.6",
+    "amphp/byte-stream": "^v2.0.0-beta.13",
+    "amphp/socket": "^v2.0.0-beta.7",
+    "google/protobuf": "^v3.21.12",
     "prooph/event-store": "dev-master",
-    "psr/log": "^2.0"
+    "psr/log": "^3.0"
   },
   "require-dev": {
-    "amphp/file": "^3.0",
-    "amphp/log": "^v2.0-beta",
-    "amphp/parallel": "^v2.x-dev",
-    "amphp/phpunit-util": "^3.0-beta",
-    "doctrine/instantiator": "^1.4",
+    "amphp/file": "^3.0.0-beta.5",
+    "amphp/log": "^v2.0.0-beta.1",
+    "amphp/parallel": "^v2.0.0-beta.4",
+    "amphp/phpunit-util": "^3.0",
+    "doctrine/instantiator": "^1.4.1",
     "php-coveralls/php-coveralls": "^2.5.2",
-    "phpspec/prophecy": "^1.15",
-    "phpunit/phpunit": "^9.5",
+    "phpspec/prophecy": "^1.16",
+    "phpunit/phpunit": "^9.5.27",
     "prooph/php-cs-fixer-config": "^0.5.0"
   },
   "suggest": {
