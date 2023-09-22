@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\Helper;
 
-use Amp\Cache\Cache;
 use Amp\Cancellation;
 use Amp\Parallel\Worker\Task;
 use Amp\Sync\Channel;
@@ -31,16 +30,12 @@ class ParallelTransactionTask implements Task
         $this->metadata = $metadata;
     }
 
-    public function run(Channel $channel, Cache $cache, Cancellation $cancellation): mixed
+    public function run(Channel $channel, Cancellation $cancellation): bool
     {
         $store = TestConnection::create();
-
         $store->connect();
 
-        $transaction = $store->startTransaction(
-            $this->stream,
-            ExpectedVersion::Any
-        );
+        $transaction = $store->startTransaction($this->stream, ExpectedVersion::Any);
 
         for ($i = 0; $i < 250; $i++) {
             $transaction->write(
@@ -49,7 +44,6 @@ class ParallelTransactionTask implements Task
         }
 
         $transaction->commit();
-
         $store->close();
 
         return true;
