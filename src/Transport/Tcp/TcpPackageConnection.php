@@ -17,7 +17,7 @@ use Amp\Socket\ClientTlsContext;
 use function Amp\Socket\connect;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\ConnectException;
-use Amp\Socket\EncryptableSocket;
+use Amp\Socket\ResourceSocket;
 use Closure;
 use Exception;
 use Prooph\EventStore\EndPoint;
@@ -36,7 +36,7 @@ class TcpPackageConnection
 
     private readonly string $targetHost;
 
-    private ?EncryptableSocket $connection = null;
+    private ?ResourceSocket $connection = null;
 
     private bool $isClosed = true;
 
