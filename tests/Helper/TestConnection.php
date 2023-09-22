@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\Helper;
 
-use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\EventStoreConnection;
 use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\ConnectionSettingsBuilder;

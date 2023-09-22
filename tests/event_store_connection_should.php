@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Amp\Success;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\Position;
@@ -48,7 +46,7 @@ class event_store_connection_should extends AsyncTestCase
     }
 
     /** @test */
-    public function throw_invalid_operation_on_every_api_call_if_connect_was_not_called(): \Generator
+    public function throw_invalid_operation_on_every_api_call_if_connect_was_not_called(): void
     {
         $connection = TestConnection::create();
 
@@ -56,63 +54,62 @@ class event_store_connection_should extends AsyncTestCase
         $events = TestEvent::newAmount(1);
 
         try {
-            yield $connection->deleteStreamAsync($s, 0);
+            $connection->deleteStream($s, 0);
             $this->fail('No exception thrown on DeleteStreamAsync');
         } catch (Throwable $e) {
             $this->assertInstanceOf(InvalidOperationException::class, $e);
         }
 
         try {
-            yield $connection->appendToStreamAsync($s, 0, $events);
+            $connection->appendToStream($s, 0, $events);
             $this->fail('No exception thrown on AppendToStreamAsync');
         } catch (Throwable $e) {
             $this->assertInstanceOf(InvalidOperationException::class, $e);
         }
 
         try {
-            yield $connection->readStreamEventsForwardAsync($s, 0, 1);
+            $connection->readStreamEventsForward($s, 0, 1);
             $this->fail('No exception thrown on ReadStreamEventsForwardAsync');
         } catch (Throwable $e) {
             $this->assertInstanceOf(InvalidOperationException::class, $e);
         }
 
         try {
-            yield $connection->readStreamEventsBackwardAsync($s, 0, 1);
+            $connection->readStreamEventsBackward($s, 0, 1);
             $this->fail('No exception thrown on ReadStreamEventsBackwardAsync');
         } catch (Throwable $e) {
             $this->assertInstanceOf(InvalidOperationException::class, $e);
         }
 
         try {
-            yield $connection->readAllEventsForwardAsync(Position::start(), 1);
+            $connection->readAllEventsForward(Position::start(), 1);
             $this->fail('No exception thrown on ReadAllEventsForwardAsync');
         } catch (Throwable $e) {
             $this->assertInstanceOf(InvalidOperationException::class, $e);
         }
 
         try {
-            yield $connection->readAllEventsBackwardAsync(Position::end(), 1);
+            $connection->readAllEventsBackward(Position::end(), 1);
             $this->fail('No exception thrown on ReadAllEventsBackwardAsync');
         } catch (Throwable $e) {
             $this->assertInstanceOf(InvalidOperationException::class, $e);
         }
 
         try {
-            yield $connection->startTransactionAsync($s, 0);
+            $connection->startTransaction($s, 0);
             $this->fail('No exception thrown on StartTransactionAsync');
         } catch (Throwable $e) {
             $this->assertInstanceOf(InvalidOperationException::class, $e);
         }
 
         try {
-            yield $connection->subscribeToStreamAsync(
+            $connection->subscribeToStream(
                 $s,
                 false,
                 function (
                     EventStoreSubscription $subscription,
                     ResolvedEvent $resolvedEvent
-                ): Promise {
-                    return new Success();
+                ): void {
                 }
             );
 
@@ -122,13 +119,12 @@ class event_store_connection_should extends AsyncTestCase
         }
 
         try {
-            yield $connection->subscribeToAllAsync(
+            $connection->subscribeToAll(
                 false,
                 function (
                     EventStoreSubscription $subscription,
                     ResolvedEvent $resolvedEvent
-                ): Promise {
-                    return new Success();
+                ): void {
                 }
             );
 

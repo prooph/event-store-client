@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\DeleteResult;
 use Prooph\EventStore\Exception\AccessDenied;
@@ -37,31 +37,21 @@ use Psr\Log\LoggerInterface as Logger;
  */
 class DeleteStreamOperation extends AbstractOperation
 {
-    private bool $requireMaster;
-    private string $stream;
-    private int $expectedVersion;
-    private bool $hardDelete;
-
     public function __construct(
         Logger $logger,
-        Deferred $deferred,
-        bool $requireMaster,
-        string $stream,
-        int $expectedVersion,
-        bool $hardDelete,
+        DeferredFuture $deferred,
+        private readonly bool $requireMaster,
+        private readonly string $stream,
+        private readonly int $expectedVersion,
+        private readonly bool $hardDelete,
         ?UserCredentials $userCredentials
     ) {
-        $this->requireMaster = $requireMaster;
-        $this->stream = $stream;
-        $this->expectedVersion = $expectedVersion;
-        $this->hardDelete = $hardDelete;
-
         parent::__construct(
             $logger,
             $deferred,
             $userCredentials,
-            TcpCommand::deleteStream(),
-            TcpCommand::deleteStreamCompleted(),
+            TcpCommand::DeleteStream,
+            TcpCommand::DeleteStreamCompleted,
             DeleteStreamCompleted::class
         );
     }
@@ -87,35 +77,35 @@ class DeleteStreamOperation extends AbstractOperation
             case OperationResult::Success:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'Success');
+                return new InspectionResult(InspectionDecision::EndOperation, 'Success');
             case OperationResult::PrepareTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'PrepareTimeout');
+                return new InspectionResult(InspectionDecision::Retry, 'PrepareTimeout');
             case OperationResult::CommitTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'CommitTimeout');
+                return new InspectionResult(InspectionDecision::Retry, 'CommitTimeout');
             case OperationResult::ForwardTimeout:
-                return new InspectionResult(InspectionDecision::retry(), 'ForwardTimeout');
+                return new InspectionResult(InspectionDecision::Retry, 'ForwardTimeout');
             case OperationResult::WrongExpectedVersion:
                 $this->fail(WrongExpectedVersion::with(
                     $this->stream,
                     $this->expectedVersion
                 ));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'WrongExpectedVersion');
+                return new InspectionResult(InspectionDecision::EndOperation, 'WrongExpectedVersion');
             case OperationResult::StreamDeleted:
                 $exception = StreamDeleted::with($this->stream);
                 $this->fail($exception);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'StreamDeleted');
+                return new InspectionResult(InspectionDecision::EndOperation, 'StreamDeleted');
             case OperationResult::InvalidTransaction:
                 $exception = new InvalidTransaction();
                 $this->fail($exception);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'InvalidTransaction');
+                return new InspectionResult(InspectionDecision::EndOperation, 'InvalidTransaction');
             case OperationResult::AccessDenied:
                 $exception = AccessDenied::toStream($this->stream);
                 $this->fail($exception);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');
+                return new InspectionResult(InspectionDecision::EndOperation, 'AccessDenied');
             default:
                 throw new UnexpectedOperationResult();
         }
@@ -143,7 +133,8 @@ class DeleteStreamOperation extends AbstractOperation
 
     public function __toString(): string
     {
-        return \sprintf('Stream: %s, ExpectedVersion: %d, RequireMaster: %s, HardDelete: %s',
+        return \sprintf(
+            'Stream: %s, ExpectedVersion: %d, RequireMaster: %s, HardDelete: %s',
             $this->stream,
             $this->expectedVersion,
             $this->requireMaster ? 'yes' : 'no',

@@ -20,30 +20,23 @@ namespace Prooph\EventStoreClient\Internal;
  */
 class HeartbeatInfo
 {
-    private int $lastPackageNumber;
-    private bool $isIntervalStage;
-    private int $timestamp;
-
-    public function __construct(int $lastPackageNumber, bool $isIntervalStage, int $timestamp)
-    {
-        $this->lastPackageNumber = $lastPackageNumber;
-        $this->isIntervalStage = $isIntervalStage;
-        $this->timestamp = $timestamp;
+    public function __construct(
+        private readonly int $lastPackageNumber,
+        private readonly bool $isIntervalStage,
+        private readonly int $timestamp
+    ) {
     }
 
-    /** @psalm-pure */
     public function lastPackageNumber(): int
     {
         return $this->lastPackageNumber;
     }
 
-    /** @psalm-pure */
     public function isIntervalStage(): bool
     {
         return $this->isIntervalStage;
     }
 
-    /** @psalm-pure */
     public function timestamp(): int
     {
         return $this->timestamp;

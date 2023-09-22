@@ -13,88 +13,79 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Delayed;
-use Generator;
+use function Amp\delay;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\Exception\StreamDeleted;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
-use Prooph\EventStore\RawStreamMetadataResult;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SliceReadStatus;
-use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\StreamMetadata;
-use Prooph\EventStore\StreamMetadataResult;
-use Prooph\EventStore\WriteResult;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 use Throwable;
 
 class soft_delete extends EventStoreConnectionTestCase
 {
     /** @test */
-    public function soft_deleted_stream_returns_no_stream_and_no_events_on_read(): Generator
+    public function soft_deleted_stream_returns_no_stream_and_no_events_on_read(): void
     {
         $stream = 'soft_deleted_stream_returns_no_stream_and_no_events_on_read';
 
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             TestEvent::newAmount(2)
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(1, $result->nextExpectedVersion());
 
-        yield $this->connection->deleteStreamAsync($stream, 1);
+        $this->connection->deleteStream($stream, 1);
 
-        $result = yield $this->connection->readStreamEventsForwardAsync(
+        $result = $this->connection->readStreamEventsForward(
             $stream,
             0,
             100,
             false
         );
-        \assert($result instanceof StreamEventsSlice);
 
-        $this->assertTrue(SliceReadStatus::streamNotFound()->equals($result->status()));
+        $this->assertSame(SliceReadStatus::StreamNotFound, $result->status());
         $this->assertCount(0, $result->events());
         $this->assertSame(1, $result->lastEventNumber());
     }
 
     /** @test */
-    public function soft_deleted_stream_allows_recreation_when_expver_any(): Generator
+    public function soft_deleted_stream_allows_recreation_when_expver_any(): void
     {
         $stream = 'soft_deleted_stream_allows_recreation_when_expver_any';
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             TestEvent::newAmount(2)
         );
 
-        yield $this->connection->deleteStreamAsync($stream, 1);
+        $this->connection->deleteStream($stream, 1);
 
         $events = TestEvent::newAmount(3);
 
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             $events
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(4, $result->nextExpectedVersion());
 
-        yield new Delayed(100); // wait for server to update stream
+        delay(0.1); // wait for server to update stream
 
-        $result = yield $this->connection->readStreamEventsForwardAsync(
+        $result = $this->connection->readStreamEventsForward(
             $stream,
             0,
             100,
             false
         );
-        \assert($result instanceof StreamEventsSlice);
 
-        $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
+        $this->assertSame(SliceReadStatus::Success, $result->status());
         $this->assertSame(4, $result->lastEventNumber());
         $this->assertCount(3, $result->events());
 
@@ -117,48 +108,45 @@ class soft_delete extends EventStoreConnectionTestCase
 
         $this->assertSame([2, 3, 4], $actualNumbers);
 
-        $meta = yield $this->connection->getStreamMetadataAsync($stream);
-        \assert($meta instanceof StreamMetadataResult);
+        $meta = $this->connection->getStreamMetadata($stream);
 
         $this->assertSame(2, $meta->streamMetadata()->truncateBefore());
         $this->assertSame(1, $meta->metastreamVersion());
     }
 
     /** @test */
-    public function soft_deleted_stream_allows_recreation_when_expver_no_stream(): Generator
+    public function soft_deleted_stream_allows_recreation_when_expver_no_stream(): void
     {
         $stream = 'soft_deleted_stream_allows_recreation_when_expver_no_stream';
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             TestEvent::newAmount(2)
         );
 
-        yield $this->connection->deleteStreamAsync($stream, 1);
+        $this->connection->deleteStream($stream, 1);
 
         $events = TestEvent::newAmount(3);
 
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             $events
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(4, $result->nextExpectedVersion());
 
-        yield new Delayed(100); // wait for server to update stream
+        delay(0.1); // wait for server to update stream
 
-        $result = yield $this->connection->readStreamEventsForwardAsync(
+        $result = $this->connection->readStreamEventsForward(
             $stream,
             0,
             100,
             false
         );
-        \assert($result instanceof StreamEventsSlice);
 
-        $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
+        $this->assertSame(SliceReadStatus::Success, $result->status());
         $this->assertSame(4, $result->lastEventNumber());
         $this->assertCount(3, $result->events());
 
@@ -181,48 +169,45 @@ class soft_delete extends EventStoreConnectionTestCase
 
         $this->assertSame([2, 3, 4], $actualNumbers);
 
-        $meta = yield $this->connection->getStreamMetadataAsync($stream);
-        \assert($meta instanceof StreamMetadataResult);
+        $meta = $this->connection->getStreamMetadata($stream);
 
         $this->assertSame(2, $meta->streamMetadata()->truncateBefore());
         $this->assertSame(1, $meta->metastreamVersion());
     }
 
     /** @test */
-    public function soft_deleted_stream_allows_recreation_when_expver_is_exact(): Generator
+    public function soft_deleted_stream_allows_recreation_when_expver_is_exact(): void
     {
         $stream = 'soft_deleted_stream_allows_recreation_when_expver_is_exact';
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             TestEvent::newAmount(2)
         );
 
-        yield $this->connection->deleteStreamAsync($stream, 1);
+        $this->connection->deleteStream($stream, 1);
 
         $events = TestEvent::newAmount(3);
 
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $stream,
             1,
             $events
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(4, $result->nextExpectedVersion());
 
-        yield new Delayed(100); // wait for server to update stream
+        delay(0.1); // wait for server to update stream
 
-        $result = yield $this->connection->readStreamEventsForwardAsync(
+        $result = $this->connection->readStreamEventsForward(
             $stream,
             0,
             100,
             false
         );
-        \assert($result instanceof StreamEventsSlice);
 
-        $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
+        $this->assertSame(SliceReadStatus::Success, $result->status());
         $this->assertSame(4, $result->lastEventNumber());
         $this->assertCount(3, $result->events());
 
@@ -245,30 +230,28 @@ class soft_delete extends EventStoreConnectionTestCase
 
         $this->assertSame([2, 3, 4], $actualNumbers);
 
-        $meta = yield $this->connection->getStreamMetadataAsync($stream);
-        \assert($meta instanceof StreamMetadataResult);
+        $meta = $this->connection->getStreamMetadata($stream);
 
         $this->assertSame(2, $meta->streamMetadata()->truncateBefore());
         $this->assertSame(1, $meta->metastreamVersion());
     }
 
     /** @test */
-    public function soft_deleted_stream_when_recreated_preserves_metadata_except_truncatebefore(): Generator
+    public function soft_deleted_stream_when_recreated_preserves_metadata_except_truncatebefore(): void
     {
         $stream = 'soft_deleted_stream_when_recreated_preserves_metadata_except_truncatebefore';
 
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             TestEvent::newAmount(2)
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(1, $result->nextExpectedVersion());
 
-        $result = yield $this->connection->setStreamMetadataAsync(
+        $result = $this->connection->setStreamMetadata(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             StreamMetadata::create()
                 ->setTruncateBefore(\PHP_INT_MAX)
                 ->setMaxCount(100)
@@ -278,32 +261,29 @@ class soft_delete extends EventStoreConnectionTestCase
                 ->setCustomProperty('key3', 'some value')
                 ->build()
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(0, $result->nextExpectedVersion());
 
         $events = TestEvent::newAmount(3);
 
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $stream,
             1,
             $events
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(4, $result->nextExpectedVersion());
 
-        yield new Delayed(100); // wait for server to update stream
+        delay(0.1); // wait for server to update stream
 
-        $result = yield $this->connection->readStreamEventsForwardAsync(
+        $result = $this->connection->readStreamEventsForward(
             $stream,
             0,
             100,
             false
         );
-        \assert($result instanceof StreamEventsSlice);
 
-        $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
+        $this->assertSame(SliceReadStatus::Success, $result->status());
         $this->assertSame(4, $result->lastEventNumber());
         $this->assertCount(3, $result->events());
 
@@ -314,8 +294,7 @@ class soft_delete extends EventStoreConnectionTestCase
 
         $this->assertSame([2, 3, 4], $actualNumbers);
 
-        $meta = yield $this->connection->getStreamMetadataAsync($stream);
-        \assert($meta instanceof StreamMetadataResult);
+        $meta = $this->connection->getStreamMetadata($stream);
 
         $this->assertSame(1, $meta->metastreamVersion());
         $this->assertSame(2, $meta->streamMetadata()->truncateBefore());
@@ -327,75 +306,70 @@ class soft_delete extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function soft_deleted_stream_can_be_hard_deleted(): Generator
+    public function soft_deleted_stream_can_be_hard_deleted(): void
     {
         $stream = 'soft_deleted_stream_can_be_deleted';
 
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             TestEvent::newAmount(2)
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(1, $result->nextExpectedVersion());
 
-        yield $this->connection->deleteStreamAsync($stream, 1);
-        yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::ANY, true);
+        $this->connection->deleteStream($stream, 1);
+        $this->connection->deleteStream($stream, ExpectedVersion::Any, true);
 
-        $result = yield $this->connection->readStreamEventsForwardAsync(
+        $result = $this->connection->readStreamEventsForward(
             $stream,
             0,
             100,
             false
         );
-        \assert($result instanceof StreamEventsSlice);
 
-        $this->assertTrue(SliceReadStatus::streamDeleted()->equals($result->status()));
+        $this->assertSame(SliceReadStatus::StreamDeleted, $result->status());
 
-        $meta = yield $this->connection->getStreamMetadataAsync($stream);
-        \assert($meta instanceof StreamMetadataResult);
+        $meta = $this->connection->getStreamMetadata($stream);
 
         $this->assertTrue($meta->isStreamDeleted());
 
         $this->expectException(StreamDeleted::class);
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             TestEvent::newAmount(1)
         );
     }
 
     /** @test */
-    public function soft_deleted_stream_allows_recreation_only_for_first_write(): Generator
+    public function soft_deleted_stream_allows_recreation_only_for_first_write(): void
     {
         $stream = 'soft_deleted_stream_allows_recreation_only_for_first_write';
 
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             TestEvent::newAmount(2)
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(1, $result->nextExpectedVersion());
 
-        yield $this->connection->deleteStreamAsync($stream, 1);
+        $this->connection->deleteStream($stream, 1);
 
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             TestEvent::newAmount(3)
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(4, $result->nextExpectedVersion());
 
         try {
-            yield $this->connection->appendToStreamAsync(
+            $this->connection->appendToStream(
                 $stream,
-                ExpectedVersion::NO_STREAM,
+                ExpectedVersion::NoStream,
                 TestEvent::newAmount(1)
             );
 
@@ -404,15 +378,14 @@ class soft_delete extends EventStoreConnectionTestCase
             $this->assertInstanceOf(WrongExpectedVersion::class, $e);
         }
 
-        $result = yield $this->connection->readStreamEventsForwardAsync(
+        $result = $this->connection->readStreamEventsForward(
             $stream,
             0,
             100,
             false
         );
-        \assert($result instanceof StreamEventsSlice);
 
-        $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
+        $this->assertSame(SliceReadStatus::Success, $result->status());
         $this->assertSame(4, $result->lastEventNumber());
         $this->assertCount(3, $result->events());
 
@@ -423,56 +396,51 @@ class soft_delete extends EventStoreConnectionTestCase
 
         $this->assertSame([2, 3, 4], $actualNumbers);
 
-        $meta = yield $this->connection->getStreamMetadataAsync($stream);
-        \assert($meta instanceof StreamMetadataResult);
+        $meta = $this->connection->getStreamMetadata($stream);
 
         $this->assertSame(2, $meta->streamMetadata()->truncateBefore());
         $this->assertSame(1, $meta->metastreamVersion());
     }
 
     /** @test */
-    public function soft_deleted_stream_appends_both_concurrent_writes_when_expver_any(): Generator
+    public function soft_deleted_stream_appends_both_concurrent_writes_when_expver_any(): void
     {
         $stream = 'soft_deleted_stream_appends_both_concurrent_writes_when_expver_any';
 
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             TestEvent::newAmount(2)
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(1, $result->nextExpectedVersion());
 
-        yield $this->connection->deleteStreamAsync($stream, 1);
+        $this->connection->deleteStream($stream, 1);
 
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             TestEvent::newAmount(3)
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(4, $result->nextExpectedVersion());
 
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             TestEvent::newAmount(2)
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(6, $result->nextExpectedVersion());
 
-        $result = yield $this->connection->readStreamEventsForwardAsync(
+        $result = $this->connection->readStreamEventsForward(
             $stream,
             0,
             100,
             false
         );
-        \assert($result instanceof StreamEventsSlice);
 
-        $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
+        $this->assertSame(SliceReadStatus::Success, $result->status());
         $this->assertSame(6, $result->lastEventNumber());
         $this->assertCount(5, $result->events());
 
@@ -483,21 +451,20 @@ class soft_delete extends EventStoreConnectionTestCase
 
         $this->assertSame([2, 3, 4, 5, 6], $actualNumbers);
 
-        $meta = yield $this->connection->getStreamMetadataAsync($stream);
-        \assert($meta instanceof StreamMetadataResult);
+        $meta = $this->connection->getStreamMetadata($stream);
 
         $this->assertSame(2, $meta->streamMetadata()->truncateBefore());
         $this->assertSame(1, $meta->metastreamVersion());
     }
 
     /** @test */
-    public function setting_json_metadata_on_empty_soft_deleted_stream_recreates_stream_not_overriding_metadata(): Generator
+    public function setting_json_metadata_on_empty_soft_deleted_stream_recreates_stream_not_overriding_metadata(): void
     {
         $stream = 'setting_json_metadata_on_empty_soft_deleted_stream_recreates_stream_not_overriding_metadata';
 
-        yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, false);
+        $this->connection->deleteStream($stream, ExpectedVersion::NoStream, false);
 
-        $result = yield $this->connection->setStreamMetadataAsync(
+        $result = $this->connection->setStreamMetadata(
             $stream,
             0,
             StreamMetadata::create()
@@ -509,26 +476,23 @@ class soft_delete extends EventStoreConnectionTestCase
                 ->setCustomProperty('key3', 'some value')
                 ->build()
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(1, $result->nextExpectedVersion());
 
-        yield new Delayed(100); // wait for server to update stream
+        delay(0.1); // wait for server to update stream
 
-        $result = yield $this->connection->readStreamEventsForwardAsync(
+        $result = $this->connection->readStreamEventsForward(
             $stream,
             0,
             100,
             false
         );
-        \assert($result instanceof StreamEventsSlice);
 
-        $this->assertTrue(SliceReadStatus::streamNotFound()->equals($result->status()));
+        $this->assertSame(SliceReadStatus::StreamNotFound, $result->status());
         $this->assertSame(-1, $result->lastEventNumber());
         $this->assertCount(0, $result->events());
 
-        $meta = yield $this->connection->getStreamMetadataAsync($stream);
-        \assert($meta instanceof StreamMetadataResult);
+        $meta = $this->connection->getStreamMetadata($stream);
 
         $this->assertSame(2, $meta->metastreamVersion());
         $this->assertSame(0, $meta->streamMetadata()->truncateBefore());
@@ -540,22 +504,21 @@ class soft_delete extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function setting_json_metadata_on_nonempty_soft_deleted_stream_recreates_stream_not_overriding_metadata(): Generator
+    public function setting_json_metadata_on_nonempty_soft_deleted_stream_recreates_stream_not_overriding_metadata(): void
     {
         $stream = 'setting_json_metadata_on_nonempty_soft_deleted_stream_recreates_stream_not_overriding_metadata';
 
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             TestEvent::newAmount(2)
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(1, $result->nextExpectedVersion());
 
-        yield $this->connection->deleteStreamAsync($stream, 1, false);
+        $this->connection->deleteStream($stream, 1, false);
 
-        $result = yield $this->connection->setStreamMetadataAsync(
+        $result = $this->connection->setStreamMetadata(
             $stream,
             0,
             StreamMetadata::create()
@@ -567,26 +530,23 @@ class soft_delete extends EventStoreConnectionTestCase
                 ->setCustomProperty('key3', 'some value')
                 ->build()
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(1, $result->nextExpectedVersion());
 
-        yield new Delayed(100); // wait for server to update stream
+        delay(0.1); // wait for server to update stream
 
-        $result = yield $this->connection->readStreamEventsForwardAsync(
+        $result = $this->connection->readStreamEventsForward(
             $stream,
             0,
             100,
             false
         );
-        \assert($result instanceof StreamEventsSlice);
 
-        $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
+        $this->assertSame(SliceReadStatus::Success, $result->status());
         $this->assertSame(1, $result->lastEventNumber());
         $this->assertCount(0, $result->events());
 
-        $meta = yield $this->connection->getStreamMetadataAsync($stream);
-        \assert($meta instanceof StreamMetadataResult);
+        $meta = $this->connection->getStreamMetadata($stream);
 
         $this->assertSame(2, $meta->metastreamVersion());
         $this->assertSame(2, $meta->streamMetadata()->truncateBefore());
@@ -598,71 +558,64 @@ class soft_delete extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function setting_nonjson_metadata_on_empty_soft_deleted_stream_recreates_stream_keeping_original_metadata(): Generator
+    public function setting_nonjson_metadata_on_empty_soft_deleted_stream_recreates_stream_keeping_original_metadata(): void
     {
         $stream = 'setting_nonjson_metadata_on_empty_soft_deleted_stream_recreates_stream_overriding_metadata';
         $metadata = \random_bytes(256);
 
-        yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, false);
+        $this->connection->deleteStream($stream, ExpectedVersion::NoStream, false);
 
-        $result = yield $this->connection->setRawStreamMetadataAsync($stream, 0, $metadata);
-        \assert($result instanceof WriteResult);
+        $result = $this->connection->setRawStreamMetadata($stream, 0, $metadata);
 
         $this->assertSame(1, $result->nextExpectedVersion());
 
-        yield new Delayed(100); // wait for server to update stream
+        delay(0.1); // wait for server to update stream
 
-        $result = yield $this->connection->readStreamEventsForwardAsync($stream, 0, 100, false);
-        \assert($result instanceof StreamEventsSlice);
+        $result = $this->connection->readStreamEventsForward($stream, 0, 100, false);
 
-        $this->assertTrue(SliceReadStatus::streamNotFound()->equals($result->status()));
+        $this->assertSame(SliceReadStatus::StreamNotFound, $result->status());
         $this->assertSame(-1, $result->lastEventNumber());
         $this->assertCount(0, $result->events());
 
-        $meta = yield $this->connection->getRawStreamMetadataAsync($stream);
-        \assert($meta instanceof RawStreamMetadataResult);
+        $meta = $this->connection->getRawStreamMetadata($stream);
 
         $this->assertSame(1, $meta->metastreamVersion());
         $this->assertSame($metadata, $meta->streamMetadata());
     }
 
     /** @test */
-    public function setting_nonjson_metadata_on_nonempty_soft_deleted_stream_recreates_stream_keeping_original_metadata(): Generator
+    public function setting_nonjson_metadata_on_nonempty_soft_deleted_stream_recreates_stream_keeping_original_metadata(): void
     {
         $stream = 'setting_nonjson_metadata_on_nonempty_soft_deleted_stream_recreates_stream_overriding_metadata';
         $metadata = \random_bytes(256);
 
-        $result = yield $this->connection->appendToStreamAsync(
+        $result = $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             TestEvent::newAmount(2)
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(1, $result->nextExpectedVersion());
 
-        yield $this->connection->deleteStreamAsync($stream, 1, false);
+        $this->connection->deleteStream($stream, 1, false);
 
-        $result = yield $this->connection->setRawStreamMetadataAsync(
+        $result = $this->connection->setRawStreamMetadata(
             $stream,
             0,
             $metadata
         );
-        \assert($result instanceof WriteResult);
 
         $this->assertSame(1, $result->nextExpectedVersion());
 
-        yield new Delayed(100); // wait for server to update stream
+        delay(0.1); // wait for server to update stream
 
-        $result = yield $this->connection->readStreamEventsForwardAsync($stream, 0, 100, false);
-        \assert($result instanceof StreamEventsSlice);
+        $result = $this->connection->readStreamEventsForward($stream, 0, 100, false);
 
-        $this->assertTrue(SliceReadStatus::success()->equals($result->status()));
+        $this->assertSame(SliceReadStatus::Success, $result->status());
         $this->assertSame(1, $result->lastEventNumber());
         $this->assertCount(2, $result->events());
 
-        $meta = yield $this->connection->getRawStreamMetadataAsync($stream);
-        \assert($meta instanceof RawStreamMetadataResult);
+        $meta = $this->connection->getRawStreamMetadata($stream);
 
         $this->assertSame(1, $meta->metastreamVersion());
         $this->assertSame($metadata, $meta->streamMetadata());

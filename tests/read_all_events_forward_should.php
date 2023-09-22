@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Generator;
-use Prooph\EventStore\AllEventsSlice;
 use Prooph\EventStore\Common\SystemRoles;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\Exception\InvalidArgumentException;
@@ -36,21 +34,23 @@ class read_all_events_forward_should extends AsyncTestCase
 
     /** @var EventData[] */
     private array $testEvents;
+
     private Position $from;
+
     private string $stream;
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             '$all',
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             new StreamMetadata(
                 null,
                 null,
                 null,
                 null,
                 new StreamAcl(
-                    [SystemRoles::ALL],
+                    [SystemRoles::All],
                     [],
                     [],
                     [],
@@ -60,21 +60,20 @@ class read_all_events_forward_should extends AsyncTestCase
             DefaultData::adminCredentials()
         );
 
-        $result = yield $this->connection->readAllEventsBackwardAsync(Position::end(), 1, false);
-        \assert($result instanceof AllEventsSlice);
+        $result = $this->connection->readAllEventsBackward(Position::end(), 1, false);
 
         $this->from = $result->nextPosition();
         $this->testEvents = TestEvent::newAmount(20);
         $this->stream = 'read_all_events_forward_should-' . Guid::generateAsHex();
 
-        yield $this->connection->appendToStreamAsync($this->stream, ExpectedVersion::NO_STREAM, $this->testEvents);
+        $this->connection->appendToStream($this->stream, ExpectedVersion::NoStream, $this->testEvents);
     }
 
-    protected function end(): Generator
+    protected function end(): void
     {
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             '$all',
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             new StreamMetadata(),
             DefaultData::adminCredentials()
         );
@@ -83,11 +82,10 @@ class read_all_events_forward_should extends AsyncTestCase
     }
 
     /** @test */
-    public function return_empty_slice_if_asked_to_read_from_end(): Generator
+    public function return_empty_slice_if_asked_to_read_from_end(): void
     {
-        yield $this->execute(function (): Generator {
-            $read = yield $this->connection->readAllEventsForwardAsync(Position::end(), 1, false);
-            \assert($read instanceof AllEventsSlice);
+        $this->execute(function (): void {
+            $read = $this->connection->readAllEventsForward(Position::end(), 1, false);
 
             $this->assertTrue($read->isEndOfStream());
             $this->assertCount(0, $read->events());
@@ -95,11 +93,10 @@ class read_all_events_forward_should extends AsyncTestCase
     }
 
     /** @test */
-    public function return_events_in_same_order_as_written(): Generator
+    public function return_events_in_same_order_as_written(): void
     {
-        yield $this->execute(function (): Generator {
-            $read = yield $this->connection->readAllEventsForwardAsync($this->from, \count($this->testEvents) + 10, false);
-            \assert($read instanceof AllEventsSlice);
+        $this->execute(function (): void {
+            $read = $this->connection->readAllEventsForward($this->from, \count($this->testEvents) + 10, false);
 
             $events = \array_map(
                 fn (ResolvedEvent $e): RecordedEvent => $e->event(),
@@ -107,21 +104,20 @@ class read_all_events_forward_should extends AsyncTestCase
             );
 
             $this->assertTrue(EventDataComparer::allEqual($this->testEvents, $events));
-            $this->assertTrue($read->readDirection()->equals(ReadDirection::forward()));
+            $this->assertSame($read->readDirection(), ReadDirection::Forward);
         });
     }
 
     /** @test */
-    public function be_able_to_read_all_one_by_one_until_end_of_stream(): Generator
+    public function be_able_to_read_all_one_by_one_until_end_of_stream(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $all = [];
             $position = $this->from;
             $slice = null;
 
             while (true) {
-                $slice = yield $this->connection->readAllEventsForwardAsync($position, 1, false);
-                \assert($slice instanceof AllEventsSlice);
+                $slice = $this->connection->readAllEventsForward($position, 1, false);
 
                 if ($slice->isEndOfStream()) {
                     break;
@@ -139,15 +135,14 @@ class read_all_events_forward_should extends AsyncTestCase
     }
 
     /** @test */
-    public function be_able_to_read_events_slice_at_time(): Generator
+    public function be_able_to_read_events_slice_at_time(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $all = [];
             $position = $this->from;
 
             do {
-                $slice = yield $this->connection->readAllEventsForwardAsync($position, 5, false);
-                \assert($slice instanceof AllEventsSlice);
+                $slice = $this->connection->readAllEventsForward($position, 5, false);
 
                 foreach ($slice->events() as $event) {
                     $all[] = $event->event();
@@ -163,11 +158,10 @@ class read_all_events_forward_should extends AsyncTestCase
     }
 
     /** @test */
-    public function return_partial_slice_if_not_enough_events(): Generator
+    public function return_partial_slice_if_not_enough_events(): void
     {
-        yield $this->execute(function (): Generator {
-            $read = yield $this->connection->readAllEventsForwardAsync($this->from, 30, false);
-            \assert($read instanceof AllEventsSlice);
+        $this->execute(function (): void {
+            $read = $this->connection->readAllEventsForward($this->from, 30, false);
 
             $this->assertLessThan(30, \count($read->events()));
 
@@ -181,12 +175,12 @@ class read_all_events_forward_should extends AsyncTestCase
     }
 
     /** @test */
-    public function throw_when_got_int_max_value_as_maxcount(): Generator
+    public function throw_when_got_int_max_value_as_maxcount(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->expectException(InvalidArgumentException::class);
 
-            $this->connection->readAllEventsForwardAsync(Position::start(), \PHP_INT_MAX, false);
+            $this->connection->readAllEventsForward(Position::start(), \PHP_INT_MAX, false);
         });
     }
 }

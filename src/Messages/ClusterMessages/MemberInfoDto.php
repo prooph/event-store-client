@@ -20,40 +20,54 @@ use Ramsey\Uuid\Uuid;
 class MemberInfoDto
 {
     private string $instanceId;
+
     private string $timeStamp;
+
     private VNodeState $state;
+
     private bool $isAlive;
 
     private string $internalTcpIp;
+
     private int $internalTcpPort;
+
     private int $internalSecureTcpPort;
 
     private string $externalTcpIp;
+
     private int $externalTcpPort;
+
     private int $externalSecureTcpPort;
 
     // 20.x cluster info
     public string $httpEndPointIp;
+
     public int $httpEndPointPort;
 
     // 5.x cluster info
     public string $externalHttpIp;
+
     public int $externalHttpPort;
 
     private int $lastCommitPosition;
+
     private int $writerCheckpoint;
+
     private int $chaserCheckpoint;
 
     private int $epochPosition;
+
     private int $epochNumber;
+
     private string $epochId;
+
     private int $nodePriority;
 
     public function __construct(array $data = [])
     {
         foreach ($data as $key => $value) {
             if ($key === 'state') {
-                $this->state = VNodeState::fromName($value);
+                $this->state = VNodeState::from($value);
             } elseif (\property_exists($this, $key)) {
                 $this->{$key} = $value;
             }

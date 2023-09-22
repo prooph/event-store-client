@@ -22,53 +22,60 @@ use Prooph\EventStore\Exception\InvalidArgumentException;
  */
 class TcpPackage
 {
-    public const COMMAND_OFFSET = 0;
-    public const FLAG_OFFSET = self::COMMAND_OFFSET + 1;
-    public const CORRELATION_OFFSET = self::FLAG_OFFSET + 1;
-    public const AUTH_OFFSET = self::CORRELATION_OFFSET + 16;
+    public const CommandOffset = 0;
 
-    public const MANDATORY_SIZE = self::AUTH_OFFSET;
+    public const FlagOffset = self::CommandOffset + 1;
 
-    public const DATA_OFFSET = 4;
+    public const CorrelationOffset = self::FlagOffset + 1;
 
-    private TcpCommand $command;
-    private TcpFlags $flags;
-    private string $correlationId;
-    private string $data;
-    private ?string $login;
-    private ?string $password;
+    public const AuthOffset = self::CorrelationOffset + 16;
+
+    public const MandatorySize = self::AuthOffset;
+
+    public const DataOffset = 4;
+
+    private readonly TcpCommand $command;
+
+    private readonly TcpFlags $flags;
+
+    private readonly string $correlationId;
+
+    private readonly string $data;
+
+    private readonly ?string $login;
+
+    private readonly ?string $password;
 
     /**
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedOperand
+     * @psalm-pure
      */
     public static function fromRawData(string $bytes): TcpPackage
     {
-        list('m' => $messageLength, 'c' => $command, 'f' => $flags) = \unpack('Vm/Cc/Cf/', $bytes, self::COMMAND_OFFSET);
+        list('m' => $messageLength, 'c' => $command, 'f' => $flags) = \unpack('Vm/Cc/Cf/', $bytes, self::CommandOffset);
 
-        if ($messageLength < self::MANDATORY_SIZE) {
+        if ($messageLength < self::MandatorySize) {
             throw new InvalidArgumentException('RawData too short, length: ' . $messageLength);
         }
 
-        $headerSize = self::MANDATORY_SIZE;
-        $command = TcpCommand::fromValue($command);
-        $flags = TcpFlags::fromValue($flags);
+        $headerSize = self::MandatorySize;
+        $command = TcpCommand::from($command);
+        $flags = TcpFlags::from($flags);
         $login = null;
         $pass = null;
 
-        list('c' => $correlationId) = \unpack('H32c', $bytes, self::DATA_OFFSET + self::CORRELATION_OFFSET);
+        list('c' => $correlationId) = \unpack('H32c', $bytes, self::DataOffset + self::CorrelationOffset);
 
-        if ($flags->equals(TcpFlags::authenticated())) {
-            list('l' => $loginLen) = \unpack('Cl/', $bytes, self::AUTH_OFFSET + self::DATA_OFFSET);
-            list('l' => $login) = \unpack('a' . $loginLen . 'l/', $bytes, self::AUTH_OFFSET + self::DATA_OFFSET + 1);
+        if ($flags === TcpFlags::Authenticated) {
+            list('l' => $loginLen) = \unpack('Cl/', $bytes, self::AuthOffset + self::DataOffset);
+            list('l' => $login) = \unpack('a' . $loginLen . 'l/', $bytes, self::AuthOffset + self::DataOffset + 1);
 
-            list('p' => $passLen) = \unpack('Cp/', $bytes, self::AUTH_OFFSET + self::DATA_OFFSET + 1 + $loginLen);
-            list('p' => $pass) = \unpack('a' . $passLen . 'p/', $bytes, self::AUTH_OFFSET + self::DATA_OFFSET + 2 + $loginLen);
+            list('p' => $passLen) = \unpack('Cp/', $bytes, self::AuthOffset + self::DataOffset + 1 + $loginLen);
+            list('p' => $pass) = \unpack('a' . $passLen . 'p/', $bytes, self::AuthOffset + self::DataOffset + 2 + $loginLen);
 
             $headerSize += 1 + $loginLen + 1 + $passLen;
         }
 
-        list('d' => $data) = \unpack('a' . ($messageLength - $headerSize) . 'd/', $bytes, self::DATA_OFFSET + $headerSize);
+        list('d' => $data) = \unpack('a' . ($messageLength - $headerSize) . 'd/', $bytes, self::DataOffset + $headerSize);
 
         return new self($command, $flags, $correlationId, $data, $login, $pass);
     }
@@ -81,7 +88,7 @@ class TcpPackage
         ?string $login = null,
         ?string $password = null
     ) {
-        if ($flags->equals(TcpFlags::authenticated())) {
+        if ($flags === TcpFlags::Authenticated) {
             if (null === $login) {
                 throw new InvalidArgumentException('Login not provided for authorized TcpPackage');
             }
@@ -107,15 +114,14 @@ class TcpPackage
         $this->password = $password;
     }
 
-    /** @psalm-pure */
     public function asBytes(): string
     {
         $dataLen = \strlen($this->data);
-        $headerSize = self::MANDATORY_SIZE;
+        $headerSize = self::MandatorySize;
         $messageLen = $headerSize + $dataLen;
 
         /** @psalm-suppress ImpureMethodCall */
-        if ($this->flags->equals(TcpFlags::authenticated())) {
+        if ($this->flags === TcpFlags::Authenticated) {
             $loginLen = \strlen((string) $this->login);
             $passLen = \strlen((string) $this->password);
 
@@ -136,8 +142,8 @@ class TcpPackage
             return \pack(
                 'VCCH32Ca' . $loginLen . 'Ca' . $passLen . 'a' . $dataLen,
                 $messageLen + 2 + $loginLen + $passLen,
-                $this->command->value(),
-                TcpFlags::AUTHENTICATED,
+                $this->command->value,
+                TcpFlags::Authenticated->value,
                 $this->correlationId,
                 $loginLen,
                 $this->login,
@@ -150,44 +156,38 @@ class TcpPackage
         return \pack(
             'VCCH32a' . $dataLen,
             $messageLen,
-            $this->command->value(),
-            TcpFlags::NONE,
+            $this->command->value,
+            TcpFlags::None->value,
             $this->correlationId,
             $this->data
         );
     }
 
-    /** @psalm-pure */
     public function command(): TcpCommand
     {
         return $this->command;
     }
 
-    /** @psalm-pure */
     public function flags(): TcpFlags
     {
         return $this->flags;
     }
 
-    /** @psalm-pure */
     public function correlationId(): string
     {
         return $this->correlationId;
     }
 
-    /** @psalm-pure */
     public function data(): string
     {
         return $this->data;
     }
 
-    /** @psalm-pure */
     public function login(): ?string
     {
         return $this->login;
     }
 
-    /** @psalm-pure */
     public function password(): ?string
     {
         return $this->password;

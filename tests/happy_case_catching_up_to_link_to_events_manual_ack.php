@@ -13,16 +13,14 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Deferred;
+use Amp\CancelledException;
+use Amp\DeferredFuture;
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Amp\Success;
-use Amp\TimeoutException;
-use Generator;
-use Prooph\EventStore\Async\EventStorePersistentSubscription;
+use Amp\TimeoutCancellation;
 use Prooph\EventStore\Common\SystemEventTypes;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
+use Prooph\EventStore\EventStorePersistentSubscription;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
@@ -33,12 +31,15 @@ class happy_case_catching_up_to_link_to_events_manual_ack extends AsyncTestCase
     use SpecificationWithConnection;
 
     private string $streamName;
+
     private string $groupName;
 
-    private const BUFFER_COUNT = 10;
-    private const EVENT_WRITE_COUNT = self::BUFFER_COUNT * 2;
+    private const BufferCount = 10;
 
-    private Deferred $eventsReceived;
+    private const EventWriteCount = self::BufferCount * 2;
+
+    private DeferredFuture $eventsReceived;
+
     private int $eventReceivedCount = 0;
 
     protected function setUp(): void
@@ -47,57 +48,50 @@ class happy_case_catching_up_to_link_to_events_manual_ack extends AsyncTestCase
 
         $this->streamName = Guid::generateAsHex();
         $this->groupName = Guid::generateAsHex();
-        $this->eventsReceived = new Deferred();
-    }
-
-    protected function when(): Generator
-    {
-        yield new Success();
+        $this->eventsReceived = new DeferredFuture();
     }
 
     /** @test */
-    public function test(): Generator
+    public function test(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $settings = PersistentSubscriptionSettings::create()
                 ->startFromBeginning()
                 ->resolveLinkTos()
                 ->build();
 
-            for ($i = 0; $i < self::EVENT_WRITE_COUNT; $i++) {
+            for ($i = 0; $i < self::EventWriteCount; $i++) {
                 $eventData = new EventData(EventId::generate(), 'SomeEvent', false, '', '');
 
-                yield $this->connection->appendToStreamAsync(
+                $this->connection->appendToStream(
                     $this->streamName . 'original',
-                    ExpectedVersion::ANY,
+                    ExpectedVersion::Any,
                     [$eventData],
                     DefaultData::adminCredentials()
                 );
             }
 
-            yield $this->connection->createPersistentSubscriptionAsync(
+            $this->connection->createPersistentSubscription(
                 $this->streamName,
                 $this->groupName,
                 $settings,
                 DefaultData::adminCredentials()
             );
 
-            yield $this->connection->connectToPersistentSubscriptionAsync(
+            $this->connection->connectToPersistentSubscription(
                 $this->streamName,
                 $this->groupName,
                 function (
                     EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
-                ): Promise {
+                ): void {
                     $subscription->acknowledge($resolvedEvent);
                     $this->eventReceivedCount++;
 
-                    if (++$this->eventReceivedCount === self::EVENT_WRITE_COUNT) {
-                        $this->eventsReceived->resolve(true);
+                    if (++$this->eventReceivedCount === self::EventWriteCount) {
+                        $this->eventsReceived->complete(true);
                     }
-
-                    return new Success();
                 },
                 null,
                 10,
@@ -105,27 +99,26 @@ class happy_case_catching_up_to_link_to_events_manual_ack extends AsyncTestCase
                 DefaultData::adminCredentials()
             );
 
-            for ($i = 0; $i < self::EVENT_WRITE_COUNT; $i++) {
+            for ($i = 0; $i < self::EventWriteCount; $i++) {
                 $eventData = new EventData(
                     null,
-                    SystemEventTypes::LINK_TO,
+                    SystemEventTypes::LinkTo->value,
                     false,
                     $i . '@' . $this->streamName . 'original'
                 );
 
-                yield $this->connection->appendToStreamAsync(
+                $this->connection->appendToStream(
                     $this->streamName,
-                    ExpectedVersion::ANY,
+                    ExpectedVersion::Any,
                     [$eventData],
                     DefaultData::adminCredentials()
                 );
             }
 
             try {
-                $result = yield Promise\timeout($this->eventsReceived->promise(), 5000);
-
+                $result = $this->eventsReceived->getFuture()->await(new TimeoutCancellation(5));
                 $this->assertTrue($result);
-            } catch (TimeoutException $e) {
+            } catch (CancelledException $e) {
                 $this->fail('Timed out waiting for events');
             }
         });

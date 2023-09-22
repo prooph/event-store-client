@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Google\Protobuf\Internal\Message;
-use Prooph\EventStore\Common\SystemConsumerStrategies;
+use Prooph\EventStore\Common\SystemConsumerStrategy;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\Exception\UnexpectedOperationResult;
@@ -37,28 +37,20 @@ use Psr\Log\LoggerInterface as Logger;
  */
 class CreatePersistentSubscriptionOperation extends AbstractOperation
 {
-    private string $stream;
-    private string $groupName;
-    private PersistentSubscriptionSettings $settings;
-
     public function __construct(
         Logger $logger,
-        Deferred $deferred,
-        string $stream,
-        string $groupNameName,
-        PersistentSubscriptionSettings $settings,
+        DeferredFuture $deferred,
+        private readonly string $stream,
+        private readonly string $groupName,
+        private readonly PersistentSubscriptionSettings $settings,
         ?UserCredentials $userCredentials
     ) {
-        $this->stream = $stream;
-        $this->groupName = $groupNameName;
-        $this->settings = $settings;
-
         parent::__construct(
             $logger,
             $deferred,
             $userCredentials,
-            TcpCommand::createPersistentSubscription(),
-            TcpCommand::createPersistentSubscriptionCompleted(),
+            TcpCommand::CreatePersistentSubscription,
+            TcpCommand::CreatePersistentSubscriptionCompleted,
             CreatePersistentSubscriptionCompleted::class
         );
     }
@@ -76,12 +68,12 @@ class CreatePersistentSubscriptionOperation extends AbstractOperation
         $message->setReadBatchSize($this->settings->readBatchSize());
         $message->setBufferSize($this->settings->bufferSize());
         $message->setMaxRetryCount($this->settings->maxRetryCount());
-        $message->setPreferRoundRobin($this->settings->namedConsumerStrategy() === SystemConsumerStrategies::ROUND_ROBIN);
+        $message->setPreferRoundRobin($this->settings->namedConsumerStrategy() === SystemConsumerStrategy::RoundRobin);
         $message->setCheckpointAfterTime($this->settings->checkPointAfterMilliseconds());
         $message->setCheckpointMaxCount($this->settings->maxCheckPointCount());
         $message->setCheckpointMinCount($this->settings->minCheckPointCount());
         $message->setSubscriberMaxCount($this->settings->maxSubscriberCount());
-        $message->setNamedConsumerStrategy($this->settings->namedConsumerStrategy());
+        $message->setNamedConsumerStrategy($this->settings->namedConsumerStrategy()->name);
 
         return $message;
     }
@@ -96,7 +88,7 @@ class CreatePersistentSubscriptionOperation extends AbstractOperation
             case CreatePersistentSubscriptionResult::Success:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'Success');
+                return new InspectionResult(InspectionDecision::EndOperation, 'Success');
             case CreatePersistentSubscriptionResult::Fail:
                 $this->fail(new InvalidOperationException(\sprintf(
                     'Subscription group \'%s\' on stream \'%s\' failed \'%s\'',
@@ -105,11 +97,11 @@ class CreatePersistentSubscriptionOperation extends AbstractOperation
                     $response->getReason()
                 )));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'Fail');
+                return new InspectionResult(InspectionDecision::EndOperation, 'Fail');
             case CreatePersistentSubscriptionResult::AccessDenied:
                 $this->fail(AccessDenied::toStream($this->stream));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');
+                return new InspectionResult(InspectionDecision::EndOperation, 'AccessDenied');
             case CreatePersistentSubscriptionResult::AlreadyExists:
                 $this->fail(new InvalidOperationException(\sprintf(
                     'Subscription group \'%s\' on stream \'%s\' already exists',
@@ -117,7 +109,7 @@ class CreatePersistentSubscriptionOperation extends AbstractOperation
                     $this->stream
                 )));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'AlreadyExists');
+                return new InspectionResult(InspectionDecision::EndOperation, 'AlreadyExists');
             default:
                 throw new UnexpectedOperationResult();
         }
@@ -130,7 +122,7 @@ class CreatePersistentSubscriptionOperation extends AbstractOperation
     protected function transformResponse(Message $response): PersistentSubscriptionCreateResult
     {
         return new PersistentSubscriptionCreateResult(
-            PersistentSubscriptionCreateStatus::success()
+            PersistentSubscriptionCreateStatus::Success
         );
     }
 

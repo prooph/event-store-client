@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\AllEventsSlice;
 use Prooph\EventStore\Exception\AccessDenied;
@@ -37,31 +37,21 @@ use Psr\Log\LoggerInterface as Logger;
  */
 class ReadAllEventsBackwardOperation extends AbstractOperation
 {
-    private bool $requireMaster;
-    private Position $position;
-    private int $maxCount;
-    private bool $resolveLinkTos;
-
     public function __construct(
         Logger $logger,
-        Deferred $deferred,
-        bool $requireMaster,
-        Position $position,
-        int $maxCount,
-        bool $resolveLinkTos,
+        DeferredFuture $deferred,
+        private readonly bool $requireMaster,
+        private readonly Position $position,
+        private readonly int $maxCount,
+        private readonly bool $resolveLinkTos,
         ?UserCredentials $userCredentials
     ) {
-        $this->requireMaster = $requireMaster;
-        $this->position = $position;
-        $this->maxCount = $maxCount;
-        $this->resolveLinkTos = $resolveLinkTos;
-
         parent::__construct(
             $logger,
             $deferred,
             $userCredentials,
-            TcpCommand::readAllEventsBackward(),
-            TcpCommand::readAllEventsBackwardCompleted(),
+            TcpCommand::ReadAllEventsBackward,
+            TcpCommand::ReadAllEventsBackwardCompleted,
             ReadAllEventsCompleted::class
         );
     }
@@ -88,16 +78,16 @@ class ReadAllEventsBackwardOperation extends AbstractOperation
             case ReadAllResult::Success:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'Success');
+                return new InspectionResult(InspectionDecision::EndOperation, 'Success');
             case ReadAllResult::Error:
                 $this->fail(new ServerError($response->getError()));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'Error');
+                return new InspectionResult(InspectionDecision::EndOperation, 'Error');
             case
             ReadAllResult::AccessDenied:
                 $this->fail(AccessDenied::toAllStream());
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');
+                return new InspectionResult(InspectionDecision::EndOperation, 'AccessDenied');
             default:
                 throw new ServerError('Unexpected ReadAllResult');
         }
@@ -123,7 +113,7 @@ class ReadAllEventsBackwardOperation extends AbstractOperation
         }
 
         return new AllEventsSlice(
-            ReadDirection::backward(),
+            ReadDirection::Backward,
             new Position((int) $response->getCommitPosition(), (int) $response->getPreparePosition()),
             new Position((int) $response->getNextCommitPosition(), (int) $response->getNextPreparePosition()),
             $resolvedEvents
@@ -137,7 +127,8 @@ class ReadAllEventsBackwardOperation extends AbstractOperation
 
     public function __toString(): string
     {
-        return \sprintf('Position: %s, MaxCount: %d, ResolveLinkTos: %s, RequireMaster: %s',
+        return \sprintf(
+            'Position: %s, MaxCount: %d, ResolveLinkTos: %s, RequireMaster: %s',
             (string) $this->position,
             $this->maxCount,
             $this->resolveLinkTos ? 'yes' : 'no',

@@ -59,7 +59,7 @@ class EventMessageConverter
         );
     }
 
-    public static function convertResolvedEventMessageToResolvedEvent(? ResolvedEventMessage $message): ?ResolvedEvent
+    public static function convertResolvedEventMessageToResolvedEvent(?ResolvedEventMessage $message): ?ResolvedEvent
     {
         if (null === $message) {
             return null;

@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Success;
-use Generator;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
 
@@ -24,6 +22,7 @@ class create_persistent_subscription_with_dont_timeout extends AsyncTestCase
     use SpecificationWithConnection;
 
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
 
     protected function setUp(): void
@@ -38,11 +37,6 @@ class create_persistent_subscription_with_dont_timeout extends AsyncTestCase
             ->build();
     }
 
-    protected function when(): Generator
-    {
-        yield new Success();
-    }
-
     /** @test */
     public function the_message_timeout_should_be_zero(): void
     {
@@ -53,10 +47,10 @@ class create_persistent_subscription_with_dont_timeout extends AsyncTestCase
      * @test
      * @doesNotPerformAssertions
      */
-    public function the_subscription_is_created_without_error(): Generator
+    public function the_subscription_is_created_without_error(): void
     {
-        yield $this->execute(function (): Generator {
-            yield $this->connection->createPersistentSubscriptionAsync(
+        $this->execute(function (): void {
+            $this->connection->createPersistentSubscription(
                 $this->stream,
                 'dont-timeout',
                 $this->settings,

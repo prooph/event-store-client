@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use Generator;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\UserManagement\UserDetails;
 use Prooph\EventStoreClient\UserManagement\UsersManager;
@@ -22,11 +21,11 @@ use ProophTest\EventStoreClient\DefaultData;
 class list_users extends TestWithNode
 {
     /** @test */
-    public function list_all_users_works(): Generator
+    public function list_all_users_works(): void
     {
-        yield $this->manager->createUserAsync('ouro', 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
+        $this->manager->createUser('ouro', 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
 
-        $users = yield $this->manager->listAllAsync(DefaultData::adminCredentials());
+        $users = $this->manager->listAll(DefaultData::adminCredentials());
         /** @var UserDetails[] $users */
 
         $this->assertGreaterThanOrEqual(3, \count($users));
@@ -55,23 +54,23 @@ class list_users extends TestWithNode
     }
 
     /** @test */
-    public function list_all_users_falls_back_to_default_credentials(): Generator
+    public function list_all_users_falls_back_to_default_credentials(): void
     {
         $manager = new UsersManager(
             new EndPoint(
                 (string) \getenv('ES_HOST'),
                 (int) \getenv('ES_HTTP_PORT')
             ),
-            5000,
+            5,
             false,
             false,
             DefaultData::adminCredentials()
         );
 
-        yield $manager->createUserAsync('ouro2', 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
+        $manager->createUser('ouro2', 'ourofull', ['foo', 'bar'], 'ouro', DefaultData::adminCredentials());
 
         /** @var UserDetails[] $users */
-        $users = yield $manager->listAllAsync();
+        $users = $manager->listAll();
 
         $this->assertGreaterThanOrEqual(3, $users);
 

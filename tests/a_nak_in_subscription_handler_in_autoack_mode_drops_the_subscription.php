@@ -13,15 +13,14 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Deferred;
+use Amp\CancelledException;
+use Amp\DeferredFuture;
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Amp\TimeoutException;
+use Amp\TimeoutCancellation;
 use Exception;
-use Generator;
-use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
+use Prooph\EventStore\EventStorePersistentSubscription;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
@@ -34,10 +33,15 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
     use SpecificationWithConnection;
 
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
-    private Deferred $resetEvent;
+
+    private DeferredFuture $resetEvent;
+
     private ?\Throwable $exception;
+
     private SubscriptionDropReason $reason;
+
     private string $group;
 
     protected function setUp(): void
@@ -49,13 +53,13 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
             ->doNotResolveLinkTos()
             ->startFromBeginning()
             ->build();
-        $this->resetEvent = new Deferred();
+        $this->resetEvent = new DeferredFuture();
         $this->group = 'naktest';
     }
 
-    protected function given(): Generator
+    protected function given(): void
     {
-        yield $this->connection->createPersistentSubscriptionAsync(
+        $this->connection->createPersistentSubscription(
             $this->stream,
             $this->group,
             $this->settings,
@@ -68,17 +72,17 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
         ): void {
             $this->reason = $reason;
             $this->exception = $exception;
-            $this->resetEvent->resolve(true);
+            $this->resetEvent->complete(true);
         };
 
-        yield $this->connection->connectToPersistentSubscriptionAsync(
+        $this->connection->connectToPersistentSubscription(
             $this->stream,
             $this->group,
             function (
                 EventStorePersistentSubscription $subscription,
                 ResolvedEvent $resolvedEvent,
                 ?int $retryCount = null
-            ): Promise {
+            ): void {
                 throw new \Exception('test');
             },
             function (
@@ -94,11 +98,11 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
         );
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             [
                 new EventData(EventId::generate(), 'test', true, '{"foo: "bar"}'),
             ],
@@ -107,17 +111,17 @@ class a_nak_in_subscription_handler_in_autoack_mode_drops_the_subscription exten
     }
 
     /** @test */
-    public function the_subscription_gets_dropped(): Generator
+    public function the_subscription_gets_dropped(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             try {
-                $result = yield Promise\timeout($this->resetEvent->promise(), 5000);
+                $result = $this->resetEvent->getFuture()->await(new TimeoutCancellation(5));
 
                 $this->assertTrue($result);
-                $this->assertTrue($this->reason->equals(SubscriptionDropReason::eventHandlerException()));
+                $this->assertSame(SubscriptionDropReason::EventHandlerException, $this->reason);
                 $this->assertInstanceOf(Exception::class, $this->exception);
                 $this->assertSame('test', $this->exception->getMessage());
-            } catch (TimeoutException $e) {
+            } catch (CancelledException $e) {
                 $this->fail('Timed out');
             }
         });

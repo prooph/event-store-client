@@ -54,9 +54,9 @@ Loop::run(function () {
             return new Success();
         },
         function (
-                EventStoreSubscription $subscription,
-                SubscriptionDropReason $reason,
-                ?Throwable $exception = null
+            EventStoreSubscription $subscription,
+            SubscriptionDropReason $reason,
+            ?Throwable $exception = null
         ): void {
             echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
 

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Generator;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
 
@@ -23,6 +22,7 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
     use SpecificationWithConnection;
 
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
 
     protected function setUp(): void
@@ -36,9 +36,9 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
             ->build();
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->connection->createPersistentSubscriptionAsync(
+        $this->connection->createPersistentSubscription(
             $this->stream,
             'group3211',
             $this->settings,
@@ -50,10 +50,10 @@ class can_create_duplicate_persistent_subscription_group_name_on_different_strea
      * @test
      * @doesNotPerformAssertions
      */
-    public function the_completion_succeeds(): Generator
+    public function the_completion_succeeds(): void
     {
-        yield $this->execute(function (): Generator {
-            yield $this->connection->createPersistentSubscriptionAsync(
+        $this->execute(function (): void {
+            $this->connection->createPersistentSubscription(
                 'someother' . $this->stream,
                 'group3211',
                 $this->settings,

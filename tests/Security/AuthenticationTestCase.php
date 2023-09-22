@@ -13,102 +13,106 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\Security;
 
-use function Amp\call;
-use Amp\Deferred;
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Amp\Success;
 use Closure;
-use Generator;
-use Prooph\EventStore\Async\EventStoreConnection;
-use Prooph\EventStore\Async\EventStoreTransaction;
+use Prooph\EventStore\AllEventsSlice;
 use Prooph\EventStore\Common\SystemRoles;
+use Prooph\EventStore\DeleteResult;
 use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventReadResult;
+use Prooph\EventStore\EventStoreConnection;
 use Prooph\EventStore\EventStoreSubscription;
+use Prooph\EventStore\EventStoreTransaction;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\Position;
+use Prooph\EventStore\RawStreamMetadataResult;
 use Prooph\EventStore\ResolvedEvent;
+use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\StreamMetadata;
 use Prooph\EventStore\SystemSettings;
 use Prooph\EventStore\UserCredentials;
+use Prooph\EventStore\WriteResult;
 use Prooph\EventStoreClient\UserManagement\UsersManager;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 
 abstract class AuthenticationTestCase extends AsyncTestCase
 {
     protected ?EventStoreConnection $connection;
+
     protected ?UserCredentials $userCredentials = null;
 
-    protected function setUpAsync(): Generator
+    protected function setUp(): void
     {
+        parent::setUp();
+
         $manager = new UsersManager(
             TestConnection::httpEndPoint(),
-            5000,
+            5,
             false,
             false,
             $this->adminUser()
         );
 
-        yield $manager->createUserAsync(
+        $manager->createUser(
             'user1',
             'Test User 1',
             [],
             'pa$$1'
         );
 
-        yield $manager->createUserAsync(
+        $manager->createUser(
             'user2',
             'Test User 2',
             [],
             'pa$$2'
         );
 
-        yield $manager->createUserAsync(
+        $manager->createUser(
             'adm',
             'Administrator User',
-            [SystemRoles::ADMINS],
+            [SystemRoles::Admins],
             'admpa$$'
         );
 
         $connection = TestConnection::create($this->adminUser());
-        yield $connection->connectAsync();
+        $connection->connect();
 
-        yield $connection->setStreamMetadataAsync(
+        $connection->setStreamMetadata(
             'noacl-stream',
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()->build()
         );
-        yield $connection->setStreamMetadataAsync(
+        $connection->setStreamMetadata(
             'read-stream',
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()->setReadRoles('user1')->build()
         );
-        yield $connection->setStreamMetadataAsync(
+        $connection->setStreamMetadata(
             'write-stream',
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()->setWriteRoles('user1')->build()
         );
-        yield $connection->setStreamMetadataAsync(
+        $connection->setStreamMetadata(
             'metaread-stream',
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()->setMetadataReadRoles('user1')->build()
         );
-        yield $connection->setStreamMetadataAsync(
+        $connection->setStreamMetadata(
             'metawrite-stream',
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()->setMetadataWriteRoles('user1')->build()
         );
 
-        yield $connection->setStreamMetadataAsync(
+        $connection->setStreamMetadata(
             '$all',
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()->setReadRoles('user1')->build(),
             new UserCredentials('adm', 'admpa$$')
         );
 
-        yield $connection->setStreamMetadataAsync(
+        $connection->setStreamMetadata(
             '$system-acl',
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()
                 ->setReadRoles('user1')
                 ->setWriteRoles('user1')
@@ -117,36 +121,36 @@ abstract class AuthenticationTestCase extends AsyncTestCase
                 ->build(),
             new UserCredentials('adm', 'admpa$$')
         );
-        yield $connection->setStreamMetadataAsync(
+        $connection->setStreamMetadata(
             '$system-adm',
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()
-                ->setReadRoles(SystemRoles::ADMINS)
-                ->setWriteRoles(SystemRoles::ADMINS)
-                ->setMetadataReadRoles(SystemRoles::ADMINS)
-                ->setMetadataWriteRoles(SystemRoles::ADMINS)
+                ->setReadRoles(SystemRoles::Admins)
+                ->setWriteRoles(SystemRoles::Admins)
+                ->setMetadataReadRoles(SystemRoles::Admins)
+                ->setMetadataWriteRoles(SystemRoles::Admins)
                 ->build(),
             new UserCredentials('adm', 'admpa$$')
         );
 
-        yield $connection->setStreamMetadataAsync(
+        $connection->setStreamMetadata(
             'normal-all',
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()
-                ->setReadRoles(SystemRoles::ALL)
-                ->setWriteRoles(SystemRoles::ALL)
-                ->setMetadataReadRoles(SystemRoles::ALL)
-                ->setMetadataWriteRoles(SystemRoles::ALL)
+                ->setReadRoles(SystemRoles::All)
+                ->setWriteRoles(SystemRoles::All)
+                ->setMetadataReadRoles(SystemRoles::All)
+                ->setMetadataWriteRoles(SystemRoles::All)
                 ->build()
         );
-        yield $connection->setStreamMetadataAsync(
+        $connection->setStreamMetadata(
             '$system-all',
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()
-                ->setReadRoles(SystemRoles::ALL)
-                ->setWriteRoles(SystemRoles::ALL)
-                ->setMetadataReadRoles(SystemRoles::ALL)
-                ->setMetadataWriteRoles(SystemRoles::ALL)
+                ->setReadRoles(SystemRoles::All)
+                ->setWriteRoles(SystemRoles::All)
+                ->setMetadataReadRoles(SystemRoles::All)
+                ->setMetadataWriteRoles(SystemRoles::All)
                 ->build(),
             new UserCredentials('adm', 'admpa$$')
         );
@@ -155,44 +159,44 @@ abstract class AuthenticationTestCase extends AsyncTestCase
 
         $this->connection = TestConnection::create($this->userCredentials);
 
-        yield $this->connection->connectAsync();
+        $this->connection->connect();
     }
 
-    protected function tearDownAsync(): Generator
+    protected function tearDown(): void
     {
         $this->userCredentials = null;
         $this->connection->close();
 
         $manager = new UsersManager(
             TestConnection::httpEndPoint(),
-            5000,
+            5,
             false,
             false,
             $this->adminUser()
         );
 
-        yield $manager->deleteUserAsync('user1');
-        yield $manager->deleteUserAsync('user2');
-        yield $manager->deleteUserAsync('adm');
+        $manager->deleteUser('user1');
+        $manager->deleteUser('user2');
+        $manager->deleteUser('adm');
 
         $connection = TestConnection::create($this->adminUser());
-        yield $connection->connectAsync();
+        $connection->connect();
 
-        yield $connection->setStreamMetadataAsync(
+        $connection->setStreamMetadata(
             '$all',
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()->build(),
             $this->adminUser()
         );
 
-        yield $connection->setStreamMetadataAsync(
+        $connection->setStreamMetadata(
             '$system-acl',
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             StreamMetadata::create()->build(),
             $this->adminUser()
         );
 
-        yield $connection->setSystemSettingsAsync(
+        $connection->setSystemSettings(
             new SystemSettings(),
             $this->adminUser()
         );
@@ -200,9 +204,9 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         $connection->close();
     }
 
-    protected function readEvent(string $streamId, ?string $login, ?string $password): Promise
+    protected function readEvent(string $streamId, ?string $login, ?string $password): EventReadResult
     {
-        return $this->connection->readEventAsync(
+        return $this->connection->readEvent(
             $streamId,
             -1,
             false,
@@ -212,9 +216,9 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         );
     }
 
-    protected function readStreamForward(string $streamId, ?string $login, ?string $password): Promise
+    protected function readStreamForward(string $streamId, ?string $login, ?string $password): StreamEventsSlice
     {
-        return $this->connection->readStreamEventsForwardAsync(
+        return $this->connection->readStreamEventsForward(
             $streamId,
             0,
             1,
@@ -225,9 +229,9 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         );
     }
 
-    protected function readStreamBackward(string $streamId, ?string $login, ?string $password): Promise
+    protected function readStreamBackward(string $streamId, ?string $login, ?string $password): StreamEventsSlice
     {
-        return $this->connection->readStreamEventsBackwardAsync(
+        return $this->connection->readStreamEventsBackward(
             $streamId,
             0,
             1,
@@ -238,11 +242,11 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         );
     }
 
-    protected function writeStream(string $streamId, ?string $login, ?string $password): Promise
+    protected function writeStream(string $streamId, ?string $login, ?string $password): WriteResult
     {
-        return $this->connection->appendToStreamAsync(
+        return $this->connection->appendToStream(
             $streamId,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             $this->createEvents(),
             null === $login && null === $password
                 ? null
@@ -250,21 +254,20 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         );
     }
 
-    /** @return Promise<EventStoreTransaction> */
-    protected function transStart(string $streamId, ?string $login, ?string $password): Promise
+    protected function transStart(string $streamId, ?string $login, ?string $password): EventStoreTransaction
     {
-        return $this->connection->startTransactionAsync(
+        return $this->connection->startTransaction(
             $streamId,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             null === $login && null === $password
                 ? null
                 : new UserCredentials($login, $password)
         );
     }
 
-    protected function readAllForward(?string $login, ?string $password): Promise
+    protected function readAllForward(?string $login, ?string $password): AllEventsSlice
     {
-        return $this->connection->readAllEventsForwardAsync(
+        return $this->connection->readAllEventsForward(
             Position::start(),
             1,
             false,
@@ -274,9 +277,9 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         );
     }
 
-    protected function readAllBackward(?string $login, ?string $password): Promise
+    protected function readAllBackward(?string $login, ?string $password): AllEventsSlice
     {
-        return $this->connection->readAllEventsBackwardAsync(
+        return $this->connection->readAllEventsBackward(
             Position::end(),
             1,
             false,
@@ -286,9 +289,9 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         );
     }
 
-    protected function readMeta(string $streamId, ?string $login, ?string $password): Promise
+    protected function readMeta(string $streamId, ?string $login, ?string $password): RawStreamMetadataResult
     {
-        return $this->connection->getRawStreamMetadataAsync(
+        return $this->connection->getRawStreamMetadata(
             $streamId,
             null === $login && null === $password
                 ? null
@@ -296,11 +299,11 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         );
     }
 
-    protected function writeMeta(string $streamId, ?string $login, ?string $password, ?string $metawriteRole): Promise
+    protected function writeMeta(string $streamId, ?string $login, ?string $password, ?string $metawriteRole): WriteResult
     {
-        return $this->connection->setStreamMetadataAsync(
+        return $this->connection->setStreamMetadata(
             $streamId,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             null === $metawriteRole
                 ? StreamMetadata::create()
                     ->build()
@@ -316,16 +319,15 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         );
     }
 
-    protected function subscribeToStream(string $streamId, ?string $login, ?string $password): Promise
+    protected function subscribeToStream(string $streamId, ?string $login, ?string $password): EventStoreSubscription
     {
-        return $this->connection->subscribeToStreamAsync(
+        return $this->connection->subscribeToStream(
             $streamId,
             false,
             function (
                 EventStoreSubscription $subscription,
                 ResolvedEvent $resolvedEvent
-            ): Promise {
-                return new Success();
+            ): void {
             },
             null,
             null === $login && null === $password
@@ -334,15 +336,14 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         );
     }
 
-    protected function subscribeToAll(?string $login, ?string $password): Promise
+    protected function subscribeToAll(?string $login, ?string $password): EventStoreSubscription
     {
-        return $this->connection->subscribeToAllAsync(
+        return $this->connection->subscribeToAll(
             false,
             function (
                 EventStoreSubscription $subscription,
                 ResolvedEvent $resolvedEvent
-            ): Promise {
-                return new Success();
+            ): void {
             },
             null,
             null === $login && null === $password
@@ -351,32 +352,25 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         );
     }
 
-    /** @return Promise<string> */
-    protected function createStreamWithMeta(StreamMetadata $metadata, ?string $streamPrefix = null): Promise
+    protected function createStreamWithMeta(StreamMetadata $metadata, ?string $streamPrefix = null): string
     {
         $stream = ($streamPrefix ?? '') . $this->getName();
 
-        $deferred = new Deferred();
-
-        $promise = $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             $metadata,
             new UserCredentials('adm', 'admpa$$')
         );
 
-        $promise->onResolve(function () use ($deferred, $stream): void {
-            $deferred->resolve($stream);
-        });
-
-        return $deferred->promise();
+        return $stream;
     }
 
-    protected function deleteStream(string $streamId, ?string $login, ?string $password): Promise
+    protected function deleteStream(string $streamId, ?string $login, ?string $password): DeleteResult
     {
-        return $this->connection->deleteStreamAsync(
+        return $this->connection->deleteStream(
             $streamId,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             true,
             null === $login && null === $password
                 ? null
@@ -398,26 +392,11 @@ abstract class AuthenticationTestCase extends AsyncTestCase
         ];
     }
 
-    protected function expectExceptionFromCallback(string $expectedException, Closure $callback): Promise
+    protected function expectExceptionFromCallback(string $expectedException, Closure $callback): void
     {
-        return call(function () use ($expectedException, $callback): Generator {
-            $this->expectException($expectedException);
+        $this->expectException($expectedException);
 
-            yield $callback();
-        });
-    }
-
-    protected function expectNoExceptionFromCallback(Closure $callback): Promise
-    {
-        $deferred = new Deferred();
-
-        $promise = $callback();
-        $promise->onResolve(function ($e, $r) use ($deferred): void {
-            $this->assertNull($e);
-            $deferred->resolve($r);
-        });
-
-        return $deferred->promise();
+        $callback();
     }
 
     private function adminUser(): UserCredentials

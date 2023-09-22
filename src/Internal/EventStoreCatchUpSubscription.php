@@ -13,18 +13,15 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use function Amp\call;
-use Amp\Deferred;
-use Amp\Loop;
-use Amp\Promise;
-use Amp\Success;
+use function Amp\async;
+use Amp\DeferredFuture;
+use Amp\TimeoutCancellation;
 use Closure;
 use Exception;
-use Generator;
-use Prooph\EventStore\Async\ClientConnectionEventArgs;
-use Prooph\EventStore\Async\EventStoreCatchUpSubscription as AsyncEventStoreCatchUpSubscription;
-use Prooph\EventStore\Async\EventStoreConnection;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
+use Prooph\EventStore\ClientConnectionEventArgs;
+use Prooph\EventStore\EventStoreCatchUpSubscription as EventStoreCatchUpSubscriptionInterface;
+use Prooph\EventStore\EventStoreConnection;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\Internal\DropData;
 use Prooph\EventStore\ListenerHandler;
@@ -32,41 +29,66 @@ use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
 use Psr\Log\LoggerInterface as Logger;
+use Revolt\EventLoop;
 use SplQueue;
 use Throwable;
 
-abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSubscription
+abstract class EventStoreCatchUpSubscription implements EventStoreCatchUpSubscriptionInterface
 {
+    protected const AllStream = '<all>';
+
     private ResolvedEvent $dropSubscriptionEvent;
+
     private bool $isSubscribedToAll;
+
     private string $streamId;
+
     private string $subscriptionName;
+
     protected Logger $log;
+
     private EventStoreConnection $connection;
+
     private bool $resolveLinkTos;
+
     private ?UserCredentials $userCredentials;
+
     protected int $readBatchSize;
+
     protected int $maxPushQueueSize;
-    /** @var Closure(EventStoreCatchUpSubscription, ResolvedEvent): Promise */
+
+    /** @var Closure(EventStoreCatchUpSubscription, ResolvedEvent): void */
     protected Closure $eventAppeared;
+
     /** @var null|Closure(EventStoreCatchUpSubscription): void  */
     private ?Closure $liveProcessingStarted;
+
     /** @var null|Closure(EventStoreCatchUpSubscription, SubscriptionDropReason, null|Throwable): void */
     private ?Closure $subscriptionDropped;
+
     protected bool $verbose;
+
     /** @var SplQueue<ResolvedEvent> */
     private SplQueue $liveQueue;
+
     private ?EventStoreSubscription $subscription = null;
+
     private ?DropData $dropData = null;
+
     private bool $allowProcessing = false;
+
     private bool $isProcessing = false;
+
     protected bool $shouldStop = false;
+
     private bool $isDropped = false;
-    private Deferred $stopped;
+
+    private DeferredFuture $stopped;
+
     private ListenerHandler $connectListener;
 
     /**
-     * @param Closure(EventStoreCatchUpSubscription, ResolvedEvent): Promise $eventAppeared
+     * @param Closure(EventStoreCatchUpSubscription, ResolvedEvent): void $eventAppeared
      * @param null|Closure(EventStoreCatchUpSubscription): void $liveProcessingStarted
      * @param null|Closure(EventStoreCatchUpSubscription, SubscriptionDropReason, null|Throwable): void $subscriptionDropped
      *
@@ -99,8 +121,8 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
         $this->subscriptionName = $settings->subscriptionName();
         $this->connectListener = new ListenerHandler(function (): void {
         });
-        $this->stopped = new Deferred();
-        $this->stopped->resolve(true);
+        $this->stopped = new DeferredFuture();
+        $this->stopped->complete(true);
     }
 
     public function isSubscribedToAll(): bool
@@ -118,51 +140,51 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
         return $this->subscriptionName;
     }
 
-    abstract protected function readEventsTillAsync(
+    abstract protected function readEventsTill(
         EventStoreConnection $connection,
         bool $resolveLinkTos,
         ?UserCredentials $userCredentials,
         ?int $lastCommitPosition,
         ?int $lastEventNumber
-    ): Promise;
+    ): void;
 
-    abstract protected function tryProcessAsync(ResolvedEvent $e): Promise;
+    abstract protected function tryProcess(ResolvedEvent $e): void;
 
     /** @internal */
-    public function startAsync(): Promise
+    public function start(): void
     {
         if ($this->verbose) {
             $this->log->debug(\sprintf(
                 'Catch-up Subscription %s to %s: starting...',
                 $this->subscriptionName,
-                $this->isSubscribedToAll ? '<all>' : $this->streamId
+                $this->isSubscribedToAll ? self::AllStream : $this->streamId
             ));
         }
 
-        return $this->runSubscriptionAsync();
+        $this->runSubscription();
     }
 
-    public function stop(?int $timeout = null): Promise
+    public function stop(?float $timeout = null): void
     {
         if ($this->verbose) {
             $this->log->debug(\sprintf(
                 'Catch-up Subscription %s to %s: requesting stop...',
                 $this->subscriptionName,
-                $this->isSubscribedToAll ? '<all>' : $this->streamId
+                $this->isSubscribedToAll ? self::AllStream : $this->streamId
             ));
             $this->log->debug(\sprintf(
                 'Catch-up Subscription %s to %s: unhooking from connection.Connected',
                 $this->subscriptionName,
-                $this->isSubscribedToAll ? '<all>' : $this->streamId
+                $this->isSubscribedToAll ? self::AllStream : $this->streamId
             ));
         }
 
         $this->connection->detach($this->connectListener);
         $this->shouldStop = true;
-        $this->enqueueSubscriptionDropNotification(SubscriptionDropReason::userInitiated(), null);
+        $this->enqueueSubscriptionDropNotification(SubscriptionDropReason::UserInitiated, null);
 
         if (null === $timeout) {
-            return new Success();
+            return;
         }
 
         if ($this->verbose) {
@@ -172,7 +194,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
             ));
         }
 
-        return Promise\timeoutWithDefault($this->stopped->promise(), $timeout);
+        $this->stopped->getFuture()->await(new TimeoutCancellation($timeout));
     }
 
     private function onReconnect(ClientConnectionEventArgs $clientConnectionEventArgs): void
@@ -181,83 +203,76 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
             $this->log->debug(\sprintf(
                 'Catch-up Subscription %s to %s: recovering after reconnection',
                 $this->subscriptionName,
-                $this->isSubscribedToAll ? '<all>' : $this->streamId
+                $this->isSubscribedToAll ? self::AllStream : $this->streamId
             ));
             $this->log->debug(\sprintf(
                 'Catch-up Subscription %s to %s: unhooking from connection.Connected',
                 $this->subscriptionName,
-                $this->isSubscribedToAll ? '<all>' : $this->streamId
+                $this->isSubscribedToAll ? self::AllStream : $this->streamId
             ));
         }
 
         $this->connection->detach($this->connectListener);
 
-        Loop::defer(function (): Generator {
-            yield $this->runSubscriptionAsync();
+        EventLoop::defer(function (): void {
+            $this->runSubscription();
         });
     }
 
-    private function runSubscriptionAsync(): Promise
-    {
-        return $this->loadHistoricalEventsAsync();
-    }
-
-    private function loadHistoricalEventsAsync(): Promise
+    private function runSubscription(): void
     {
         if ($this->verbose) {
             $this->log->debug(\sprintf(
                 'Catch-up Subscription %s to %s: running...',
                 $this->subscriptionName,
-                $this->isSubscribedToAll ? '<all>' : $this->streamId
+                $this->isSubscribedToAll ? self::AllStream : $this->streamId
             ));
         }
 
-        $this->stopped = new Deferred();
+        $this->stopped = new DeferredFuture();
         $this->allowProcessing = false;
 
-        return call(function (): Generator {
+        async(function (): void {
             if (! $this->shouldStop) {
                 if ($this->verbose) {
                     $this->log->debug(\sprintf(
                         'Catch-up Subscription %s to %s: pulling events...',
                         $this->subscriptionName,
-                        $this->isSubscribedToAll ? '<all>' : $this->streamId
+                        $this->isSubscribedToAll ? self::AllStream : $this->streamId
                     ));
                 }
 
                 try {
-                    yield $this->readEventsTillAsync($this->connection, $this->resolveLinkTos, $this->userCredentials, null, null);
-                    yield $this->subscribeToStreamAsync();
+                    $this->readEventsTill($this->connection, $this->resolveLinkTos, $this->userCredentials, null, null);
+                    $this->subscribeToStream();
                 } catch (Exception $ex) {
-                    $this->dropSubscription(SubscriptionDropReason::catchUpError(), $ex);
+                    $this->dropSubscription(SubscriptionDropReason::CatchUpError, $ex);
 
                     throw $ex;
                 }
             } else {
-                $this->dropSubscription(SubscriptionDropReason::userInitiated(), null);
+                $this->dropSubscription(SubscriptionDropReason::UserInitiated, null);
             }
-
-            return new Success($this);
-        });
+        })->await();
     }
 
-    private function subscribeToStreamAsync(): Promise
+    private function subscribeToStream(): void
     {
-        return call(function (): Generator {
+        async(function (): void {
             if (! $this->shouldStop) {
                 if ($this->verbose) {
                     $this->log->debug(\sprintf(
                         'Catch-up Subscription %s to %s: subscribing...',
                         $this->subscriptionName,
-                        $this->isSubscribedToAll ? '<all>' : $this->streamId
+                        $this->isSubscribedToAll ? self::AllStream : $this->streamId
                     ));
                 }
 
                 $eventAppeared = function (
                     EventStoreSubscription $subscription,
                     ResolvedEvent $resolvedEvent
-                ): Promise {
-                    return $this->enqueuePushedEvent($subscription, $resolvedEvent);
+                ): void {
+                    $this->enqueuePushedEvent($subscription, $resolvedEvent);
                 };
 
                 $subscriptionDropped = function (
@@ -269,13 +284,13 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
                 };
 
                 $subscription = empty($this->streamId)
-                    ? yield $this->connection->subscribeToAllAsync(
+                    ? $this->connection->subscribeToAll(
                         $this->resolveLinkTos,
                         $eventAppeared,
                         $subscriptionDropped,
                         $this->userCredentials
                     )
-                    : yield $this->connection->subscribeToStreamAsync(
+                    : $this->connection->subscribeToStream(
                         $this->streamId,
                         $this->resolveLinkTos,
                         $eventAppeared,
@@ -285,44 +300,42 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
 
                 $this->subscription = $subscription;
 
-                yield $this->readMissedHistoricEventsAsync();
+                $this->readMissedHistoricEvents();
             } else {
-                $this->dropSubscription(SubscriptionDropReason::userInitiated(), null);
+                $this->dropSubscription(SubscriptionDropReason::UserInitiated, null);
             }
-        });
+        })->await();
     }
 
-    private function readMissedHistoricEventsAsync(): Promise
+    private function readMissedHistoricEvents(): void
     {
-        return call(function (): Generator {
-            if (! $this->shouldStop) {
-                if ($this->verbose) {
-                    $this->log->debug(\sprintf(
+        if (! $this->shouldStop) {
+            if ($this->verbose) {
+                $this->log->debug(\sprintf(
                     'Catch-up Subscription %s to %s: pulling events (if left)...',
-                        $this->subscriptionName,
-                        $this->isSubscribedToAll ? '<all>' : $this->streamId
-                    ));
-                }
-
-                /** @psalm-suppress PossiblyNullReference */
-                yield $this->readEventsTillAsync(
-                    $this->connection,
-                    $this->resolveLinkTos,
-                    $this->userCredentials,
-                    $this->subscription->lastCommitPosition(),
-                    $this->subscription->lastEventNumber()
-                );
-                $this->startLiveProcessing();
-            } else {
-                $this->dropSubscription(SubscriptionDropReason::userInitiated(), null);
+                    $this->subscriptionName,
+                    $this->isSubscribedToAll ? self::AllStream : $this->streamId
+                ));
             }
-        });
+
+            /** @psalm-suppress PossiblyNullReference */
+            $this->readEventsTill(
+                $this->connection,
+                $this->resolveLinkTos,
+                $this->userCredentials,
+                $this->subscription->lastCommitPosition(),
+                $this->subscription->lastEventNumber()
+            );
+            $this->startLiveProcessing();
+        } else {
+            $this->dropSubscription(SubscriptionDropReason::UserInitiated, null);
+        }
     }
 
     private function startLiveProcessing(): void
     {
         if ($this->shouldStop) {
-            $this->dropSubscription(SubscriptionDropReason::userInitiated(), null);
+            $this->dropSubscription(SubscriptionDropReason::UserInitiated, null);
 
             return;
         }
@@ -331,7 +344,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
             $this->log->debug(\sprintf(
                 'Catch-up Subscription %s to %s: processing live events...',
                 $this->subscriptionName,
-                $this->isSubscribedToAll ? '<all>' : $this->streamId
+                $this->isSubscribedToAll ? self::AllStream : $this->streamId
             ));
         }
 
@@ -343,7 +356,7 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
             $this->log->debug(\sprintf(
                 'Catch-up Subscription %s to %s: hooking to connection.Connected',
                 $this->subscriptionName,
-                $this->isSubscribedToAll ? '<all>' : $this->streamId
+                $this->isSubscribedToAll ? self::AllStream : $this->streamId
             ));
         }
 
@@ -356,14 +369,14 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
         $this->ensureProcessingPushQueue();
     }
 
-    private function enqueuePushedEvent(EventStoreSubscription $subscription, ResolvedEvent $e): Promise
+    private function enqueuePushedEvent(EventStoreSubscription $subscription, ResolvedEvent $e): void
     {
         if ($this->verbose) {
             /** @psalm-suppress PossiblyNullReference */
             $this->log->debug(\sprintf(
                 'Catch-up Subscription %s to %s: event appeared (%s, %s, %s, @ %s)',
                 $this->subscriptionName,
-                $this->isSubscribedToAll ? '<all>' : $this->streamId,
+                $this->isSubscribedToAll ? self::AllStream : $this->streamId,
                 $e->originalStreamName(),
                 $e->originalEventNumber(),
                 $e->originalEvent()->eventType(),
@@ -372,10 +385,10 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
         }
 
         if ($this->liveQueue->count() >= $this->maxPushQueueSize) {
-            $this->enqueueSubscriptionDropNotification(SubscriptionDropReason::processingQueueOverflow(), null);
+            $this->enqueueSubscriptionDropNotification(SubscriptionDropReason::ProcessingQueueOverflow, null);
             $subscription->unsubscribe();
 
-            return new Success();
+            return;
         }
 
         $this->liveQueue->enqueue($e);
@@ -383,14 +396,12 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
         if ($this->allowProcessing) {
             $this->ensureProcessingPushQueue();
         }
-
-        return new Success();
     }
 
     private function serverSubscriptionDropped(
         SubscriptionDropReason $reason,
-        ?Throwable $exception): void
-    {
+        ?Throwable $exception
+    ): void {
         $this->enqueueSubscriptionDropNotification($reason, $exception);
     }
 
@@ -415,21 +426,24 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
         if (! $this->isProcessing) {
             $this->isProcessing = true;
 
-            Loop::defer(function (): Generator {
-                yield $this->processLiveQueueAsync();
+            EventLoop::defer(function (): void {
+                $this->processLiveQueue();
             });
         }
     }
 
-    private function processLiveQueueAsync(): Promise
+    private function processLiveQueue(): void
     {
-        return call(function (): Generator {
+        async(function (): void {
             do {
                 while (! $this->liveQueue->isEmpty()) {
                     $e = $this->liveQueue->dequeue();
 
                     if ($e === $this->dropSubscriptionEvent) {
-                        $this->dropData ??= new DropData(SubscriptionDropReason::unknown(), new \Exception('Drop reason not specified'));
+                        $this->dropData ??= new DropData(
+                            SubscriptionDropReason::Unknown,
+                            new \Exception('Drop reason not specified')
+                        );
                         $this->dropSubscription($this->dropData->reason(), $this->dropData->error());
 
                         $this->isProcessing = false;
@@ -438,16 +452,16 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
                     }
 
                     try {
-                        yield $this->tryProcessAsync($e);
+                        $this->tryProcess($e);
                     } catch (Exception $ex) {
                         $this->log->debug(\sprintf(
                             'Catch-up Subscription %s to %s: Exception occurred in subscription %s',
                             $this->subscriptionName,
-                            $this->isSubscribedToAll ? '<all>' : $this->streamId,
+                            $this->isSubscribedToAll ? self::AllStream : $this->streamId,
                             $ex->getMessage()
                         ));
 
-                        $this->dropSubscription(SubscriptionDropReason::eventHandlerException(), $ex);
+                        $this->dropSubscription(SubscriptionDropReason::EventHandlerException, $ex);
 
                         return;
                     }
@@ -455,33 +469,33 @@ abstract class EventStoreCatchUpSubscription implements AsyncEventStoreCatchUpSu
             } while ($this->liveQueue->count() > 0);
 
             $this->isProcessing = false;
-        });
+        })->await();
     }
 
     protected function dropSubscription(SubscriptionDropReason $reason, ?Throwable $error): void
     {
-        if (! $this->isDropped) {
-            $this->isDropped = true;
-
-            if ($this->verbose) {
-                $this->log->debug(\sprintf(
-                    'Catch-up Subscription %s to %s: dropped subscription, reason: %s %s',
-                    $this->subscriptionName,
-                    $this->isSubscribedToAll ? '<all>' : $this->streamId,
-                    $reason->name(),
-                    null === $error ? '' : $error->getMessage()
-                ));
-            }
-
-            if ($this->subscription) {
-                $this->subscription->unsubscribe();
-            }
-
-            if ($this->subscriptionDropped) {
-                ($this->subscriptionDropped)($this, $reason, $error);
-            }
-
-            $this->stopped->resolve(true);
+        if ($this->isDropped) {
+            return;
         }
+
+        $this->isDropped = true;
+
+        if ($this->verbose) {
+            $this->log->debug(\sprintf(
+                'Catch-up Subscription %s to %s: dropped subscription, reason: %s %s',
+                $this->subscriptionName,
+                $this->isSubscribedToAll ? self::AllStream : $this->streamId,
+                $reason->name(),
+                null === $error ? '' : $error->getMessage()
+            ));
+        }
+
+        $this->subscription?->unsubscribe();
+
+        if ($this->subscriptionDropped) {
+            ($this->subscriptionDropped)($this, $reason, $error);
+        }
+
+        $this->stopped->complete(true);
     }
 }

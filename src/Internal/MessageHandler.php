@@ -30,12 +30,10 @@ class MessageHandler
 
     public function handle(Message $message): void
     {
-        $name = \get_class($message);
-
-        if (! isset($this->handlers[$name])) {
-            throw new RuntimeException('No handler found for ' . $name);
+        if (! isset($this->handlers[$message::class])) {
+            throw new RuntimeException('No handler found for ' . $message::class);
         }
 
-        $this->handlers[$name]($message);
+        $this->handlers[$message::class]($message);
     }
 }

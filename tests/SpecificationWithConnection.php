@@ -13,51 +13,38 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
-use Amp\Promise;
-use Amp\Success;
 use Closure;
-use Generator;
-use Prooph\EventStore\Async\EventStoreConnection;
+use Prooph\EventStore\EventStoreConnection;
 use ProophTest\EventStoreClient\Helper\TestConnection;
 
 trait SpecificationWithConnection
 {
     protected EventStoreConnection $connection;
 
-    protected function given(): Generator
+    protected function given(): void
     {
-        yield new Success();
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield new Success();
     }
 
-    protected function execute(Closure $test): Promise
+    protected function execute(Closure $test): void
     {
-        return call(function () use ($test): Generator {
-            $this->connection = TestConnection::create();
+        $this->connection = TestConnection::create();
+        $this->connection->connect();
 
-            yield $this->connection->connectAsync();
-
-            try {
-                yield from $this->given();
-
-                yield from $this->when();
-
-                yield from $test();
-            } finally {
-                yield from $this->end();
-            }
-        });
+        try {
+            $this->given();
+            $this->when();
+            $test();
+        } finally {
+            $this->end();
+        }
     }
 
-    protected function end(): Generator
+    protected function end(): void
     {
         $this->connection->close();
-
-        yield new Success();
     }
 }

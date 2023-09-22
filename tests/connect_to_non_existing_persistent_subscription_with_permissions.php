@@ -14,10 +14,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Amp\Success;
-use Generator;
-use Prooph\EventStore\Async\EventStorePersistentSubscription;
+use Prooph\EventStore\EventStorePersistentSubscription;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\ResolvedEvent;
 use Throwable;
@@ -28,17 +25,18 @@ class connect_to_non_existing_persistent_subscription_with_permissions extends A
 
     private Throwable $exception;
 
-    protected function when(): Generator
+    protected function when(): void
     {
         try {
-            yield $this->connection->connectToPersistentSubscriptionAsync(
+            $this->connection->connectToPersistentSubscription(
                 'nonexisting2',
                 'foo',
-                fn (
+                function (
                     EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
-                ): Promise => new Success()
+                ): void {
+                }
             );
 
             $this->fail('should have thrown');
@@ -48,13 +46,11 @@ class connect_to_non_existing_persistent_subscription_with_permissions extends A
     }
 
     /** @test */
-    public function the_subscription_fails_to_connect_with_invalid_argument_exception(): Generator
+    public function the_subscription_fails_to_connect_with_invalid_argument_exception(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->assertNotNull($this->exception);
             $this->assertInstanceOf(InvalidArgumentException::class, $this->exception);
-
-            yield new Success();
         });
     }
 }

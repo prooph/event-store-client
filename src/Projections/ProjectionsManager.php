@@ -13,83 +13,78 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Projections;
 
-use Amp\Promise;
-use Prooph\EventStore\Async\Projections\ProjectionsManager as AsyncProjectionsManager;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\Exception\InvalidArgumentException;
+use Prooph\EventStore\Projections\ProjectionDetails;
+use Prooph\EventStore\Projections\ProjectionsManager as ProjectionsManagerInterface;
+use Prooph\EventStore\Projections\ProjectionStatistics;
+use Prooph\EventStore\Projections\Query;
+use Prooph\EventStore\Projections\State;
 use Prooph\EventStore\UserCredentials;
 
-class ProjectionsManager implements AsyncProjectionsManager
+class ProjectionsManager implements ProjectionsManagerInterface
 {
-    private ProjectionsClient $client;
-    private EndPoint $httpEndPoint;
-    private ?UserCredentials $defaultUserCredentials;
+    private readonly ProjectionsClient $client;
 
     public function __construct(
-        EndPoint $httpEndPoint,
+        private readonly EndPoint $httpEndPoint,
         int $operationTimeout,
         bool $tlsTerminatedEndpoint = false,
         bool $verifyPeer = true,
-        ?UserCredentials $defaultUserCredentials = null
+        private readonly ?UserCredentials $defaultUserCredentials = null
     ) {
         $this->client = new ProjectionsClient($operationTimeout, $tlsTerminatedEndpoint, $verifyPeer);
-        $this->httpEndPoint = $httpEndPoint;
-        $this->defaultUserCredentials = $defaultUserCredentials;
     }
 
-    /** {@inheritdoc} */
-    public function enableAsync(string $name, ?UserCredentials $userCredentials = null): Promise
+    public function enable(string $name, ?UserCredentials $userCredentials = null): void
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
         }
 
-        return $this->client->enable(
+        $this->client->enable(
             $this->httpEndPoint,
             $name,
             $userCredentials ?? $this->defaultUserCredentials
         );
     }
 
-    /** {@inheritdoc} */
-    public function disableAsync(string $name, ?UserCredentials $userCredentials = null): Promise
+    public function disable(string $name, ?UserCredentials $userCredentials = null): void
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
         }
 
-        return $this->client->disable(
+        $this->client->disable(
             $this->httpEndPoint,
             $name,
             $userCredentials ?? $this->defaultUserCredentials
         );
     }
 
-    /** {@inheritdoc} */
-    public function abortAsync(string $name, ?UserCredentials $userCredentials = null): Promise
+    public function abort(string $name, ?UserCredentials $userCredentials = null): void
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
         }
 
-        return $this->client->abort(
+        $this->client->abort(
             $this->httpEndPoint,
             $name,
             $userCredentials ?? $this->defaultUserCredentials
         );
     }
 
-    /** {@inheritdoc} */
-    public function createOneTimeAsync(
+    public function createOneTime(
         string $query,
         string $type = 'JS',
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): void {
         if ('' === $query) {
             throw new InvalidArgumentException('Query is required');
         }
 
-        return $this->client->createOneTime(
+        $this->client->createOneTime(
             $this->httpEndPoint,
             $query,
             $type,
@@ -97,13 +92,12 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /** {@inheritdoc} */
-    public function createTransientAsync(
+    public function createTransient(
         string $name,
         string $query,
         string $type = 'JS',
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): void {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
         }
@@ -112,7 +106,7 @@ class ProjectionsManager implements AsyncProjectionsManager
             throw new InvalidArgumentException('Query is required');
         }
 
-        return $this->client->createTransient(
+        $this->client->createTransient(
             $this->httpEndPoint,
             $name,
             $query,
@@ -121,14 +115,13 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /** {@inheritdoc} */
-    public function createContinuousAsync(
+    public function createContinuous(
         string $name,
         string $query,
         bool $trackEmittedStreams = false,
         string $type = 'JS',
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): void {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
         }
@@ -137,7 +130,7 @@ class ProjectionsManager implements AsyncProjectionsManager
             throw new InvalidArgumentException('Query is required');
         }
 
-        return $this->client->createContinuous(
+        $this->client->createContinuous(
             $this->httpEndPoint,
             $name,
             $query,
@@ -147,8 +140,8 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /** {@inheritdoc} */
-    public function listAllAsync(?UserCredentials $userCredentials = null): Promise
+    /** @inheritDoc */
+    public function listAll(?UserCredentials $userCredentials = null): array
     {
         return $this->client->listAll(
             $this->httpEndPoint,
@@ -156,8 +149,8 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /** {@inheritdoc} */
-    public function listOneTimeAsync(?UserCredentials $userCredentials = null): Promise
+    /** @inheritdoc */
+    public function listOneTime(?UserCredentials $userCredentials = null): array
     {
         return $this->client->listOneTime(
             $this->httpEndPoint,
@@ -165,8 +158,8 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /** {@inheritdoc} */
-    public function listContinuousAsync(?UserCredentials $userCredentials = null): Promise
+    /** @inheritdoc */
+    public function listContinuous(?UserCredentials $userCredentials = null): array
     {
         return $this->client->listContinuous(
             $this->httpEndPoint,
@@ -174,8 +167,8 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /** {@inheritdoc} */
-    public function getStatusAsync(string $name, ?UserCredentials $userCredentials = null): Promise
+    /** @inheritdoc */
+    public function getStatus(string $name, ?UserCredentials $userCredentials = null): ProjectionDetails
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -188,8 +181,8 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /** {@inheritdoc} */
-    public function getStateAsync(string $name, ?UserCredentials $userCredentials = null): Promise
+    /** @inheritdoc */
+    public function getState(string $name, ?UserCredentials $userCredentials = null): State
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -202,12 +195,12 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /** {@inheritdoc} */
-    public function getPartitionStateAsync(
+    /** @inheritdoc */
+    public function getPartitionState(
         string $name,
         string $partition,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): State {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
         }
@@ -224,8 +217,8 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /** {@inheritdoc} */
-    public function getResultAsync(string $name, ?UserCredentials $userCredentials = null): Promise
+    /** @inheritdoc */
+    public function getResult(string $name, ?UserCredentials $userCredentials = null): State
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -238,12 +231,12 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /** {@inheritdoc} */
-    public function getPartitionResultAsync(
+    /** @inheritdoc */
+    public function getPartitionResult(
         string $name,
         string $partition,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): State {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
         }
@@ -260,8 +253,8 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /** {@inheritdoc} */
-    public function getStatisticsAsync(string $name, ?UserCredentials $userCredentials = null): Promise
+    /** @inheritdoc */
+    public function getStatistics(string $name, ?UserCredentials $userCredentials = null): ProjectionStatistics
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -274,8 +267,8 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /** {@inheritdoc} */
-    public function getQueryAsync(string $name, ?UserCredentials $userCredentials = null): Promise
+    /** @inheritdoc */
+    public function getQuery(string $name, ?UserCredentials $userCredentials = null): Query
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
@@ -288,13 +281,12 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /** {@inheritdoc} */
-    public function updateQueryAsync(
+    public function updateQuery(
         string $name,
         string $query,
         ?bool $emitEnabled = null,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): void {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
         }
@@ -303,7 +295,7 @@ class ProjectionsManager implements AsyncProjectionsManager
             throw new InvalidArgumentException('Query is required');
         }
 
-        return $this->client->updateQuery(
+        $this->client->updateQuery(
             $this->httpEndPoint,
             $name,
             $query,
@@ -312,17 +304,16 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /** {@inheritdoc} */
-    public function deleteAsync(
+    public function delete(
         string $name,
         bool $deleteEmittedStreams = false,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): void {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
         }
 
-        return $this->client->delete(
+        $this->client->delete(
             $this->httpEndPoint,
             $name,
             $deleteEmittedStreams,
@@ -330,14 +321,13 @@ class ProjectionsManager implements AsyncProjectionsManager
         );
     }
 
-    /** {@inheritdoc} */
-    public function resetAsync(string $name, ?UserCredentials $userCredentials = null): Promise
+    public function reset(string $name, ?UserCredentials $userCredentials = null): void
     {
         if ('' === $name) {
             throw new InvalidArgumentException('Name is required');
         }
 
-        return $this->client->reset(
+        $this->client->reset(
             $this->httpEndPoint,
             $name,
             $userCredentials ?? $this->defaultUserCredentials

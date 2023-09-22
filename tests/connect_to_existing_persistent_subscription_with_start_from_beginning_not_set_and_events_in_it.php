@@ -13,15 +13,12 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use function Amp\call;
-use Amp\Deferred;
+use Amp\CancelledException;
+use Amp\DeferredFuture;
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Amp\Success;
-use Amp\TimeoutException;
-use Generator;
-use Prooph\EventStore\Async\EventStorePersistentSubscription;
+use Amp\TimeoutCancellation;
 use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventStorePersistentSubscription;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
@@ -32,9 +29,12 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
     use SpecificationWithConnection;
 
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
+
     private string $group = 'startinbeginning1';
-    private Deferred $resetEvent;
+
+    private DeferredFuture $resetEvent;
 
     protected function setUp(): void
     {
@@ -45,14 +45,14 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
             ->doNotResolveLinkTos()
             ->startFromCurrent()
             ->build();
-        $this->resetEvent = new Deferred();
+        $this->resetEvent = new DeferredFuture();
     }
 
-    protected function given(): Generator
+    protected function given(): void
     {
-        yield $this->writeEvents();
+        $this->writeEvents();
 
-        yield $this->connection->createPersistentSubscriptionAsync(
+        $this->connection->createPersistentSubscription(
             $this->stream,
             $this->group,
             $this->settings,
@@ -61,19 +61,17 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
 
         $deferred = $this->resetEvent;
 
-        yield $this->connection->connectToPersistentSubscriptionAsync(
+        $this->connection->connectToPersistentSubscription(
             $this->stream,
             $this->group,
             function (
                 EventStorePersistentSubscription $subscription,
                 ResolvedEvent $resolvedEvent,
                 ?int $retryCount = null
-            ) use ($deferred): Promise {
+            ) use ($deferred): void {
                 if ($resolvedEvent->originalEventNumber() === 0) {
-                    $deferred->resolve(true);
+                    $deferred->complete(true);
                 }
-
-                return new Success();
             },
             null,
             10,
@@ -82,31 +80,28 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
         );
     }
 
-    private function writeEvents(): Promise
+    private function writeEvents(): void
     {
-        return call(function (): Generator {
-            for ($i = 0; $i < 10; $i++) {
-                yield $this->connection->appendToStreamAsync(
-                    $this->stream,
-                    ExpectedVersion::ANY,
-                    [new EventData(null, 'test', true, '{"foo":"bar"}')],
-                    DefaultData::adminCredentials()
-                );
-            }
-        });
+        for ($i = 0; $i < 10; $i++) {
+            $this->connection->appendToStream(
+                $this->stream,
+                ExpectedVersion::Any,
+                [new EventData(null, 'test', true, '{"foo":"bar"}')],
+                DefaultData::adminCredentials()
+            );
+        }
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->writeEvents();
+        $this->writeEvents();
     }
 
     /** @test */
-    public function the_subscription_gets_no_events(): Generator
+    public function the_subscription_gets_no_events(): void
     {
-        yield $this->execute(function (): Generator {
-            $this->expectException(TimeoutException::class);
-            yield Promise\timeout($this->resetEvent->promise(), 1000);
-        });
+        $this->expectException(CancelledException::class);
+
+        $this->resetEvent->getFuture()->await(new TimeoutCancellation(1));
     }
 }

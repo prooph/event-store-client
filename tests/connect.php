@@ -13,15 +13,14 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Deferred;
-use Amp\Delayed;
+use Amp\CancelledException;
+use Amp\DeferredFuture;
+use function Amp\delay;
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Amp\TimeoutException;
-use Generator;
-use Prooph\EventStore\Async\ClientClosedEventArgs;
-use Prooph\EventStore\Async\EventStoreConnection;
+use Amp\TimeoutCancellation;
+use Prooph\EventStore\ClientClosedEventArgs;
 use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\EventStoreConnection;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStoreClient\ConnectionSettings;
@@ -43,24 +42,24 @@ class connect extends AsyncTestCase
      * @test
      * @doesNotPerformAssertions
      */
-    public function should_not_throw_exception_when_server_is_down(): Generator
+    public function should_not_throw_exception_when_server_is_down(): void
     {
         $connection = EventStoreConnectionFactory::createFromEndPoint(
             $this->blackhole
         );
 
-        yield $connection->connectAsync();
+        $connection->connect();
 
-        yield new Delayed(50); // wait for loop to finish
+        delay(0.05); // wait for loop to finish
     }
 
     /** @test */
-    public function should_throw_exception_when_trying_to_reopen_closed_connection(): Generator
+    public function should_throw_exception_when_trying_to_reopen_closed_connection(): void
     {
-        $closed = new Deferred();
+        $closed = new DeferredFuture();
         $settings = ConnectionSettings::create()
             ->limitReconnectionsTo(0)
-            ->withConnectionTimeoutOf(10000)
+            ->withConnectionTimeoutOf(10)
             ->setReconnectionDelayTo(0)
             ->failOnNoServerResponse()
             ->build();
@@ -71,29 +70,29 @@ class connect extends AsyncTestCase
         );
 
         $connection->onClosed(function () use ($closed): void {
-            $closed->resolve(true);
+            $closed->complete(true);
         });
 
-        yield $connection->connectAsync();
+        $connection->connect();
 
         try {
-            yield Promise\timeout($closed->promise(), 120000);
-        } catch (TimeoutException $e) {
+            $closed->getFuture()->await(new TimeoutCancellation(120));
+        } catch (CancelledException $e) {
             $this->fail('Connection timeout took too long');
         }
 
         $this->expectException(InvalidOperationException::class);
 
-        yield $connection->connectAsync();
+        $connection->connect();
     }
 
     /** @test */
-    public function should_close_connection_after_configured_amount_of_failed_reconnections(): Generator
+    public function should_close_connection_after_configured_amount_of_failed_reconnections(): void
     {
-        $closed = new Deferred();
+        $closed = new DeferredFuture();
         $settings = ConnectionSettings::create()
             ->limitReconnectionsTo(1)
-            ->withConnectionTimeoutOf(10000)
+            ->withConnectionTimeoutOf(10)
             ->setReconnectionDelayTo(0)
             ->failOnNoServerResponse()
             ->build();
@@ -107,19 +106,19 @@ class connect extends AsyncTestCase
             $this->assertInstanceOf(EventStoreConnection::class, $args->connection());
             $this->assertSame('Reconnection limit reached', $args->reason());
 
-            $closed->resolve(true);
+            $closed->complete(true);
         });
 
-        yield $connection->connectAsync();
+        $connection->connect();
 
         try {
-            yield Promise\timeout($closed->promise(), 120000);
-        } catch (TimeoutException $e) {
+            $closed->getFuture()->await(new TimeoutCancellation(50));
+        } catch (CancelledException $e) {
             $this->fail('Connection timeout took too long');
         }
 
         $this->expectException(InvalidOperationException::class);
 
-        yield $connection->appendToStreamAsync('stream', ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
+        $connection->appendToStream('stream', ExpectedVersion::NoStream, [TestEvent::newTestEvent()]);
     }
 }

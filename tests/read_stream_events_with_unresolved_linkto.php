@@ -14,13 +14,11 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Generator;
 use Prooph\EventStore\Common\SystemEventTypes;
 use Prooph\EventStore\Common\SystemRoles;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\SliceReadStatus;
-use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\StreamMetadata;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 
@@ -30,69 +28,69 @@ class read_stream_events_with_unresolved_linkto extends AsyncTestCase
 
     /** @var EventData[] */
     private array $testEvents;
+
     private string $stream;
+
     private string $links;
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             '$all',
-            ExpectedVersion::ANY,
-            StreamMetadata::create()->setReadRoles(SystemRoles::ALL)->build(),
+            ExpectedVersion::Any,
+            StreamMetadata::create()->setReadRoles(SystemRoles::All)->build(),
             DefaultData::adminCredentials()
         );
 
         $this->testEvents = TestEvent::newAmount(20);
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             $this->testEvents
         );
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->links,
-            ExpectedVersion::NO_STREAM,
-            [new EventData(null, SystemEventTypes::LINK_TO, false, '0@read_stream_events_with_unresolved_linkto')]
+            ExpectedVersion::NoStream,
+            [new EventData(null, SystemEventTypes::LinkTo->value, false, '0@read_stream_events_with_unresolved_linkto')]
         );
 
-        yield $this->connection->deleteStreamAsync($this->stream, ExpectedVersion::ANY);
+        $this->connection->deleteStream($this->stream, ExpectedVersion::Any);
     }
 
     /** @test */
-    public function ensure_deleted_stream(): Generator
+    public function ensure_deleted_stream(): void
     {
         $this->stream = 'read_stream_events_with_unresolved_linkto_1';
         $this->links = 'read_stream_events_with_unresolved_linkto_links_1';
 
-        yield $this->execute(function (): Generator {
-            $res = yield $this->connection->readStreamEventsForwardAsync(
+        $this->execute(function (): void {
+            $res = $this->connection->readStreamEventsForward(
                 $this->stream,
                 0,
                 100,
                 false
             );
-            \assert($res instanceof StreamEventsSlice);
 
-            $this->assertTrue(SliceReadStatus::streamNotFound()->equals($res->status()));
+            $this->assertSame(SliceReadStatus::StreamNotFound, $res->status());
             $this->assertCount(0, $res->events());
         });
     }
 
     /** @test */
-    public function returns_unresolved_linkto(): Generator
+    public function returns_unresolved_linkto(): void
     {
         $this->stream = 'read_stream_events_with_unresolved_linkto_2';
         $this->links = 'read_stream_events_with_unresolved_linkto_links_2';
 
-        yield $this->execute(function (): Generator {
-            $read = yield $this->connection->readStreamEventsForwardAsync(
+        $this->execute(function (): void {
+            $read = $this->connection->readStreamEventsForward(
                 $this->links,
                 0,
                 1,
                 true
             );
-            \assert($read instanceof StreamEventsSlice);
 
             $this->assertCount(1, $read->events());
             $this->assertNull($read->events()[0]->event());

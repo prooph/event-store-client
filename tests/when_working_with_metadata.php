@@ -14,24 +14,22 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Prooph\EventStore\ExpectedVersion;
-use Prooph\EventStore\RawStreamMetadataResult;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 
 class when_working_with_metadata extends EventStoreConnectionTestCase
 {
     /** @test */
-    public function when_getting_metadata_for_an_existing_stream_and_no_metadata_exists(): \Generator
+    public function when_getting_metadata_for_an_existing_stream_and_no_metadata_exists(): void
     {
         $stream = 'when_getting_metadata_for_an_existing_stream_and_no_metadata_exists';
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             [TestEvent::newTestEvent()]
         );
 
-        $meta = yield $this->connection->getRawStreamMetadataAsync($stream);
-        \assert($meta instanceof RawStreamMetadataResult);
+        $meta = $this->connection->getRawStreamMetadata($stream);
 
         $this->assertSame($stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());

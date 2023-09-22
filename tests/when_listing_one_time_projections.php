@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Success;
-use Generator;
 use Prooph\EventStore\Projections\ProjectionDetails;
 
 class when_listing_one_time_projections extends AsyncTestCase
@@ -25,23 +23,21 @@ class when_listing_one_time_projections extends AsyncTestCase
     /** @var ProjectionDetails[] */
     private array $result;
 
-    protected function given(): Generator
+    protected function given(): void
     {
-        yield $this->createOneTimeProjection();
+        $this->createOneTimeProjection();
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        $this->result = yield $this->projectionsManager->listOneTimeAsync($this->credentials);
+        $this->result = $this->projectionsManager->listOneTime($this->credentials);
     }
 
     /** @test */
-    public function should_return_continuous_projections(): Generator
+    public function should_return_continuous_projections(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->assertNotEmpty($this->result);
-
-            yield new Success();
         });
     }
 }

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Generator;
 use Prooph\EventStore\Util\Guid;
 
 class when_creating_one_time_projection extends AsyncTestCase
@@ -22,22 +21,23 @@ class when_creating_one_time_projection extends AsyncTestCase
     use ProjectionSpecification;
 
     private string $streamName;
+
     private string $query;
 
-    public function given(): Generator
+    public function given(): void
     {
         $id = Guid::generateAsHex();
         $this->streamName = 'test-stream-' . $id;
 
-        yield $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');
-        yield $this->postEvent($this->streamName, 'testEvent', '{"A": 2}');
+        $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');
+        $this->postEvent($this->streamName, 'testEvent', '{"A": 2}');
 
         $this->query = $this->createStandardQuery($this->streamName);
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->projectionsManager->createOneTimeAsync(
+        $this->projectionsManager->createOneTime(
             $this->query,
             'JS',
             $this->credentials
@@ -45,10 +45,10 @@ class when_creating_one_time_projection extends AsyncTestCase
     }
 
     /** @test */
-    public function should_create_projection(): Generator
+    public function should_create_projection(): void
     {
-        yield $this->execute(function (): Generator {
-            $projections = yield $this->projectionsManager->listOneTimeAsync(
+        $this->execute(function (): void {
+            $projections = $this->projectionsManager->listOneTime(
                 $this->credentials
             );
 

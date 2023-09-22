@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal\Message;
 
-use Amp\Deferred;
-use Amp\Promise;
+use Amp\DeferredFuture;
 use Closure;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ResolvedEvent;
@@ -22,72 +21,51 @@ use Prooph\EventStore\SubscriptionDropReason;
 use Prooph\EventStore\UserCredentials;
 use Throwable;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 class StartSubscriptionMessage implements Message
 {
-    private Deferred $deferred;
-    private string $streamId;
-    private bool $resolveTo;
-    private ?UserCredentials $userCredentials;
-    /** @var Closure(EventStoreSubscription, ResolvedEvent): Promise */
-    private Closure $eventAppeared;
-    /** @var null|Closure(EventStoreSubscription, SubscriptionDropReason, null|Throwable): void */
-    private ?Closure $subscriptionDropped;
-    private int $maxRetries;
-    private int $timeout;
-
     /**
-     * @param Closure(EventStoreSubscription, ResolvedEvent): Promise $eventAppeared
+     * @param Closure(EventStoreSubscription, ResolvedEvent): void $eventAppeared
      * @param null|Closure(EventStoreSubscription, SubscriptionDropReason, null|Throwable): void $subscriptionDropped
      */
     public function __construct(
-        Deferred $deferred,
-        string $streamId,
-        bool $resolveTo,
-        ?UserCredentials $userCredentials,
-        Closure $eventAppeared,
-        ?Closure $subscriptionDropped,
-        int $maxRetries,
-        int $timeout
+        private readonly DeferredFuture $deferred,
+        private readonly string $streamId,
+        private readonly bool $resolveTo,
+        private readonly ?UserCredentials $userCredentials,
+        private readonly Closure $eventAppeared,
+        private readonly ?Closure $subscriptionDropped,
+        private readonly int $maxRetries,
+        private readonly float $timeout
     ) {
-        $this->deferred = $deferred;
-        $this->streamId = $streamId;
-        $this->resolveTo = $resolveTo;
-        $this->userCredentials = $userCredentials;
-        $this->eventAppeared = $eventAppeared;
-        $this->subscriptionDropped = $subscriptionDropped;
-        $this->maxRetries = $maxRetries;
-        $this->timeout = $timeout;
     }
 
-    /** @psalm-pure */
-    public function deferred(): Deferred
+    public function deferred(): DeferredFuture
     {
         return $this->deferred;
     }
 
-    /** @psalm-pure */
     public function streamId(): string
     {
         return $this->streamId;
     }
 
-    /** @psalm-pure */
     public function resolveTo(): bool
     {
         return $this->resolveTo;
     }
 
-    /** @psalm-pure */
     public function userCredentials(): ?UserCredentials
     {
         return $this->userCredentials;
     }
 
     /**
-     * @return Closure(EventStoreSubscription, ResolvedEvent): Promise
-     *
-     * @psalm-pure
+     * @return Closure(EventStoreSubscription, ResolvedEvent): void
      */
     public function eventAppeared(): Closure
     {
@@ -96,27 +74,22 @@ class StartSubscriptionMessage implements Message
 
     /**
      * @return null|Closure(EventStoreSubscription, SubscriptionDropReason, null|Throwable): void
-     *
-     * @psalm-pure
      */
     public function subscriptionDropped(): ?Closure
     {
         return $this->subscriptionDropped;
     }
 
-    /** @psalm-pure */
     public function maxRetries(): int
     {
         return $this->maxRetries;
     }
 
-    /** @psalm-pure */
-    public function timeout(): int
+    public function timeout(): float
     {
         return $this->timeout;
     }
 
-    /** @psalm-pure */
     public function __toString(): string
     {
         return 'StartSubscriptionMessage';

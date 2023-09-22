@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use Amp\Promise;
 use Prooph\EventStore\Util\Guid;
 use ProophTest\EventStoreClient\DefaultData;
 
@@ -26,11 +25,8 @@ abstract class TestWithUser extends TestWithNode
         parent::setUp();
 
         $this->username = Guid::generateString();
-    }
 
-    protected function setUpAsync(): Promise
-    {
-        return $this->manager->createUserAsync(
+        $this->manager->createUser(
             $this->username,
             'name',
             ['foo', 'admins'],

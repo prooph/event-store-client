@@ -19,7 +19,6 @@ use Amp\Http\Client\HttpClient as AmpHttpClient;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Interceptor\SetRequestTimeout;
 use Amp\Http\Client\Request;
-use Amp\Http\Client\Response;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\ConnectContext;
 use Closure;
@@ -30,7 +29,7 @@ use Throwable;
 /** @internal  */
 class HttpClient
 {
-    private AmpHttpClient $httpClient;
+    private readonly AmpHttpClient $httpClient;
 
     public function __construct(int $operationTimeout, bool $verifyPeer)
     {
@@ -55,7 +54,7 @@ class HttpClient
         Closure $onException
     ): void {
         $this->receive(
-            HttpMethod::GET,
+            HttpMethod::Get,
             $url,
             $userCredentials,
             $onSuccess,
@@ -72,7 +71,7 @@ class HttpClient
         Closure $onException
     ): void {
         $this->send(
-            HttpMethod::POST,
+            HttpMethod::Post,
             $url,
             $body,
             $contentType,
@@ -89,7 +88,7 @@ class HttpClient
         Closure $onException
     ): void {
         $this->receive(
-            HttpMethod::DELETE,
+            HttpMethod::Delete,
             $url,
             $userCredentials,
             $onSuccess,
@@ -106,7 +105,7 @@ class HttpClient
         Closure $onException
     ): void {
         $this->send(
-            HttpMethod::PUT,
+            HttpMethod::Put,
             $url,
             $body,
             $contentType,
@@ -134,17 +133,7 @@ class HttpClient
             $request->setHeader('Host', $hostHeader);
         }
 
-        $this->httpClient->request($request)->onResolve(
-            function (?Throwable $e, ?Response $response) use ($onSuccess, $onException): void {
-                if ($e) {
-                    $onException($e);
-                }
-
-                if ($response) {
-                    $onSuccess($response);
-                }
-            }
-        );
+        $this->handleRequest($request, $onSuccess, $onException);
     }
 
     private function send(
@@ -166,17 +155,7 @@ class HttpClient
         $request->setHeader('Content-Length', (string) \strlen($body));
         $request->setBody($body);
 
-        $this->httpClient->request($request)->onResolve(
-            function (?Throwable $e, ?Response $response) use ($onSuccess, $onException): void {
-                if ($e) {
-                    $onException($e);
-                }
-
-                if ($response) {
-                    $onSuccess($response);
-                }
-            }
-        );
+        $this->handleRequest($request, $onSuccess, $onException);
     }
 
     private function addAuthenticationHeader(
@@ -192,5 +171,18 @@ class HttpClient
         $encodedCredentials = \base64_encode($httpAuthentication);
 
         $request->setHeader('Authorization', 'Basic ' . $encodedCredentials);
+    }
+
+    private function handleRequest(Request $request, Closure $onSuccess, Closure $onException): void
+    {
+        try {
+            $response = $this->httpClient->request($request);
+        } catch (Throwable $e) {
+            $onException($e);
+
+            return;
+        }
+
+        $onSuccess($response);
     }
 }

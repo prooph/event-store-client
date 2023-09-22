@@ -13,40 +13,62 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Promise;
-use Amp\Success;
 use Closure;
-use Prooph\EventStore\Async\ClientAuthenticationFailedEventArgs;
-use Prooph\EventStore\Async\ClientClosedEventArgs;
-use Prooph\EventStore\Async\ClientConnectionEventArgs;
-use Prooph\EventStore\Async\ClientErrorEventArgs;
-use Prooph\EventStore\Async\ClientReconnectingEventArgs;
-use Prooph\EventStore\Async\EventStoreConnection;
-use Prooph\EventStore\Async\EventStorePersistentSubscription;
-use Prooph\EventStore\Async\EventStoreTransaction;
-use Prooph\EventStore\Async\Internal\EventHandler;
+use Prooph\EventStore\AllEventsSlice;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
+use Prooph\EventStore\ClientAuthenticationFailedEventArgs;
+use Prooph\EventStore\ClientClosedEventArgs;
+use Prooph\EventStore\ClientConnectionEventArgs;
+use Prooph\EventStore\ClientErrorEventArgs;
+use Prooph\EventStore\ClientReconnectingEventArgs;
+use Prooph\EventStore\ConditionalWriteResult;
+use Prooph\EventStore\DeleteResult;
+use Prooph\EventStore\EventReadResult;
+use Prooph\EventStore\EventStoreAllCatchUpSubscription;
+use Prooph\EventStore\EventStoreConnection;
+use Prooph\EventStore\EventStorePersistentSubscription;
+use Prooph\EventStore\EventStoreStreamCatchUpSubscription;
+use Prooph\EventStore\EventStoreSubscription;
+use Prooph\EventStore\EventStoreTransaction;
+use Prooph\EventStore\Internal\EventHandler;
 use Prooph\EventStore\ListenerHandler;
+use Prooph\EventStore\PersistentSubscriptionCreateResult;
+use Prooph\EventStore\PersistentSubscriptionDeleteResult;
 use Prooph\EventStore\PersistentSubscriptionSettings;
+use Prooph\EventStore\PersistentSubscriptionUpdateResult;
 use Prooph\EventStore\Position;
+use Prooph\EventStore\RawStreamMetadataResult;
+use Prooph\EventStore\StreamEventsSlice;
 use Prooph\EventStore\StreamMetadata;
+use Prooph\EventStore\StreamMetadataResult;
 use Prooph\EventStore\SystemSettings;
 use Prooph\EventStore\UserCredentials;
+use Prooph\EventStore\WriteResult;
 use Prooph\EventStoreClient\ClusterSettings;
 use Prooph\EventStoreClient\ConnectionSettings;
 
 /** @internal */
 class FakeEventStoreConnection implements EventStoreConnection
 {
-    private Closure $readAllEventsForwardAsync;
-    private Closure $readStreamEventsForwardAsync;
-    private Closure $subscribeToStreamAsync;
-    private Closure $subscribeToAllAsync;
+    private Closure $readAllEventsForward;
+
+    private Closure $readStreamEventsForward;
+
+    private Closure $subscribeToStream;
+
+    private Closure $subscribeToAll;
+
     private EventHandler $eventHandler;
 
     public function __construct()
     {
-        $this->readAllEventsForwardAsync = fn (Position $position, int $start, int $count, ?UserCredentials $credentials): Promise => new Success();
+        $this->readAllEventsForward = function (
+            Position $position,
+            int $start,
+            int $count,
+            ?UserCredentials $credentials
+        ): void {
+        };
 
         $this->eventHandler = new EventHandler();
     }
@@ -66,7 +88,7 @@ class FakeEventStoreConnection implements EventStoreConnection
         return null;
     }
 
-    public function connectAsync(): Promise
+    public function connect(): void
     {
         throw new \RuntimeException('Not implemented');
     }
@@ -76,50 +98,50 @@ class FakeEventStoreConnection implements EventStoreConnection
         throw new \RuntimeException('Not implemented');
     }
 
-    public function deleteStreamAsync(
+    public function deleteStream(
         string $stream,
         int $expectedVersion,
         bool $hardDelete = false,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): DeleteResult {
         throw new \RuntimeException('Not implemented');
     }
 
-    public function appendToStreamAsync(
+    public function appendToStream(
         string $stream,
         int $expectedVersion,
         array $events = [],
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): WriteResult {
         throw new \RuntimeException('Not implemented');
     }
 
-    public function conditionalAppendToStreamAsync(
+    public function conditionalAppendToStream(
         string $stream,
         int $expectedVersion,
         array $events = [],
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): ConditionalWriteResult {
         throw new \RuntimeException('Not implemented');
     }
 
-    public function readEventAsync(
+    public function readEvent(
         string $stream,
         int $eventNumber,
         bool $resolveLinkTos = true,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): EventReadResult {
         throw new \RuntimeException('Not implemented');
     }
 
-    public function readStreamEventsForwardAsync(
+    public function readStreamEventsForward(
         string $stream,
         int $start,
         int $count,
         bool $resolveLinkTos = true,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return ($this->readStreamEventsForwardAsync)(
+    ): StreamEventsSlice {
+        return ($this->readStreamEventsForward)(
             $stream,
             $start,
             $count,
@@ -128,23 +150,23 @@ class FakeEventStoreConnection implements EventStoreConnection
         );
     }
 
-    public function readStreamEventsBackwardAsync(
+    public function readStreamEventsBackward(
         string $stream,
         int $start,
         int $count,
         bool $resolveLinkTos = true,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): StreamEventsSlice {
         throw new \RuntimeException('Not implemented');
     }
 
-    public function readAllEventsForwardAsync(
+    public function readAllEventsForward(
         Position $position,
         int $count,
         bool $resolveLinkTos = true,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return ($this->readAllEventsForwardAsync)(
+    ): AllEventsSlice {
+        return ($this->readAllEventsForward)(
             $position,
             $count,
             $resolveLinkTos,
@@ -152,53 +174,53 @@ class FakeEventStoreConnection implements EventStoreConnection
         );
     }
 
-    public function readAllEventsBackwardAsync(
+    public function readAllEventsBackward(
         Position $position,
         int $count,
         bool $resolveLinkTos = true,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): AllEventsSlice {
         throw new \RuntimeException('Not implemented');
     }
 
-    public function setStreamMetadataAsync(
+    public function setStreamMetadata(
         string $stream,
         int $expectedMetaStreamVersion,
         ?StreamMetadata $metadata = null,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): WriteResult {
         throw new \RuntimeException('Not implemented');
     }
 
-    public function setRawStreamMetadataAsync(
+    public function setRawStreamMetadata(
         string $stream,
         int $expectedMetaStreamVersion,
         string $metadata = '',
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): WriteResult {
         throw new \RuntimeException('Not implemented');
     }
 
-    public function getStreamMetadataAsync(string $stream, ?UserCredentials $userCredentials = null): Promise
+    public function getStreamMetadata(string $stream, ?UserCredentials $userCredentials = null): StreamMetadataResult
     {
         throw new \RuntimeException('Not implemented');
     }
 
-    public function getRawStreamMetadataAsync(string $stream, ?UserCredentials $userCredentials = null): Promise
+    public function getRawStreamMetadata(string $stream, ?UserCredentials $userCredentials = null): RawStreamMetadataResult
     {
         throw new \RuntimeException('Not implemented');
     }
 
-    public function setSystemSettingsAsync(SystemSettings $settings, ?UserCredentials $userCredentials = null): Promise
+    public function setSystemSettings(SystemSettings $settings, ?UserCredentials $userCredentials = null): WriteResult
     {
         throw new \RuntimeException('Not implemented');
     }
 
-    public function startTransactionAsync(
+    public function startTransaction(
         string $stream,
         int $expectedVersion,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): EventStoreTransaction {
         throw new \RuntimeException('Not implemented');
     }
 
@@ -209,40 +231,40 @@ class FakeEventStoreConnection implements EventStoreConnection
         throw new \RuntimeException('Not implemented');
     }
 
-    public function createPersistentSubscriptionAsync(
+    public function createPersistentSubscription(
         string $stream,
         string $groupName,
         PersistentSubscriptionSettings $settings,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): PersistentSubscriptionCreateResult {
         throw new \RuntimeException('Not implemented');
     }
 
-    public function updatePersistentSubscriptionAsync(
+    public function updatePersistentSubscription(
         string $stream,
         string $groupName,
         PersistentSubscriptionSettings $settings,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): PersistentSubscriptionUpdateResult {
         throw new \RuntimeException('Not implemented');
     }
 
-    public function deletePersistentSubscriptionAsync(
+    public function deletePersistentSubscription(
         string $stream,
         string $groupName,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): PersistentSubscriptionDeleteResult {
         throw new \RuntimeException('Not implemented');
     }
 
-    public function subscribeToStreamAsync(
+    public function subscribeToStream(
         string $stream,
         bool $resolveLinkTos,
         Closure $eventAppeared,
         ?Closure $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return ($this->subscribeToStreamAsync)(
+    ): EventStoreSubscription {
+        return ($this->subscribeToStream)(
             $stream,
             $eventAppeared,
             $subscriptionDropped,
@@ -250,7 +272,7 @@ class FakeEventStoreConnection implements EventStoreConnection
         );
     }
 
-    public function subscribeToStreamFromAsync(
+    public function subscribeToStreamFrom(
         string $stream,
         ?int $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
@@ -258,17 +280,17 @@ class FakeEventStoreConnection implements EventStoreConnection
         ?Closure $liveProcessingStarted = null,
         ?Closure $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): EventStoreStreamCatchUpSubscription {
         throw new \RuntimeException('Not implemented');
     }
 
-    public function subscribeToAllAsync(
+    public function subscribeToAll(
         bool $resolveLinkTos,
         Closure $eventAppeared,
         ?Closure $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
-    ): Promise {
-        return ($this->subscribeToAllAsync)(
+    ): EventStoreSubscription {
+        return ($this->subscribeToAll)(
             $resolveLinkTos,
             $eventAppeared,
             $subscriptionDropped,
@@ -276,14 +298,14 @@ class FakeEventStoreConnection implements EventStoreConnection
         );
     }
 
-    public function subscribeToAllFromAsync(
+    public function subscribeToAllFrom(
         ?Position $lastCheckpoint,
         ?CatchUpSubscriptionSettings $settings,
         Closure $eventAppeared,
         ?Closure $liveProcessingStarted = null,
         ?Closure $subscriptionDropped = null,
         ?UserCredentials $userCredentials = null
-    ): Promise {
+    ): EventStoreAllCatchUpSubscription {
         throw new \RuntimeException('Not implemented');
     }
 
@@ -296,18 +318,6 @@ class FakeEventStoreConnection implements EventStoreConnection
         bool $autoAck = true,
         ?UserCredentials $userCredentials = null
     ): EventStorePersistentSubscription {
-        throw new \RuntimeException('Not implemented');
-    }
-
-    public function connectToPersistentSubscriptionAsync(
-        string $stream,
-        string $groupName,
-        Closure $eventAppeared,
-        ?Closure $subscriptionDropped = null,
-        int $bufferSize = 10,
-        bool $autoAck = true,
-        ?UserCredentials $userCredentials = null
-    ): Promise {
         throw new \RuntimeException('Not implemented');
     }
 
@@ -376,23 +386,23 @@ class FakeEventStoreConnection implements EventStoreConnection
         $this->eventHandler->detach($handler);
     }
 
-    public function handleReadStreamEventsForwardAsync(Closure $callback): void
+    public function handleReadStreamEventsForward(Closure $callback): void
     {
-        $this->readStreamEventsForwardAsync = $callback;
+        $this->readStreamEventsForward = $callback;
     }
 
-    public function handleReadAllEventsForwardAsync(Closure $callback): void
+    public function handleReadAllEventsForward(Closure $callback): void
     {
-        $this->readAllEventsForwardAsync = $callback;
+        $this->readAllEventsForward = $callback;
     }
 
-    public function handleSubscribeToStreamAsync(Closure $callback): void
+    public function handleSubscribeToStream(Closure $callback): void
     {
-        $this->subscribeToStreamAsync = $callback;
+        $this->subscribeToStream = $callback;
     }
 
-    public function handleSubscribeToAllAsync(Closure $callback): void
+    public function handleSubscribeToAll(Closure $callback): void
     {
-        $this->subscribeToAllAsync = $callback;
+        $this->subscribeToAll = $callback;
     }
 }

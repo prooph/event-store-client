@@ -14,10 +14,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Amp\Success;
-use Generator;
-use Prooph\EventStore\Async\EventStorePersistentSubscription;
+use Prooph\EventStore\EventStorePersistentSubscription;
 use Prooph\EventStore\Exception\MaximumSubscribersReached;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
@@ -29,9 +26,13 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends As
     use SpecificationWithConnection;
 
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
+
     private Throwable $exception;
+
     private string $group = 'startinbeginning1';
+
     private ?EventStorePersistentSubscription $firstSubscription;
 
     protected function setUp(): void
@@ -46,26 +47,24 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends As
             ->build();
     }
 
-    protected function given(): Generator
+    protected function given(): void
     {
-        yield $this->connection->createPersistentSubscriptionAsync(
+        $this->connection->createPersistentSubscription(
             $this->stream,
             $this->group,
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        $this->firstSubscription = yield $this->connection->connectToPersistentSubscriptionAsync(
+        $this->firstSubscription = $this->connection->connectToPersistentSubscription(
             $this->stream,
             $this->group,
             function (
                 EventStorePersistentSubscription $subscription,
                 ResolvedEvent $resolvedEvent,
                 ?int $retryCount = null
-            ): Promise {
+            ): void {
                 $subscription->acknowledge($resolvedEvent);
-
-                return new Success();
             },
             null,
             10,
@@ -74,20 +73,18 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends As
         );
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
         try {
-            yield $this->connection->connectToPersistentSubscriptionAsync(
+            $this->connection->connectToPersistentSubscription(
                 $this->stream,
                 $this->group,
                 function (
                     EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
-                ): Promise {
+                ): void {
                     $subscription->acknowledge($resolvedEvent);
-
-                    return new Success();
                 },
                 null,
                 10,
@@ -100,21 +97,18 @@ class connect_to_existing_persistent_subscription_with_max_one_client extends As
     }
 
     /** @test */
-    public function the_first_subscription_connects_successfully(): Generator
+    public function the_first_subscription_connects_successfully(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->assertNotNull($this->firstSubscription);
-
-            yield new Success();
         });
     }
 
     /** @test */
-    public function the_second_subscription_throws_maximum_subscribers_reached_exception(): Generator
+    public function the_second_subscription_throws_maximum_subscribers_reached_exception(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->assertInstanceOf(MaximumSubscribersReached::class, $this->exception);
-            yield new Success();
         });
     }
 }

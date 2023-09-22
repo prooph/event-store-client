@@ -13,26 +13,23 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Amp\Deferred;
-use Amp\Loop;
-use Amp\Promise;
+use Amp\DeferredFuture;
 use Closure;
 use Exception;
-use Generator;
-use Prooph\EventStore\Async\ClientAuthenticationFailedEventArgs;
-use Prooph\EventStore\Async\ClientClosedEventArgs;
-use Prooph\EventStore\Async\ClientConnectionEventArgs;
-use Prooph\EventStore\Async\ClientErrorEventArgs;
-use Prooph\EventStore\Async\ClientReconnectingEventArgs;
-use Prooph\EventStore\Async\EventStoreConnection;
-use Prooph\EventStore\Async\Internal\EventHandler;
+use Prooph\EventStore\ClientAuthenticationFailedEventArgs;
+use Prooph\EventStore\ClientClosedEventArgs;
+use Prooph\EventStore\ClientConnectionEventArgs;
+use Prooph\EventStore\ClientErrorEventArgs;
+use Prooph\EventStore\ClientReconnectingEventArgs;
 use Prooph\EventStore\EndPoint;
+use Prooph\EventStore\EventStoreConnection;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\Exception\CannotEstablishConnection;
 use Prooph\EventStore\Exception\EventStoreConnectionException;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\Exception\ObjectDisposed;
 use Prooph\EventStore\Internal\Consts;
+use Prooph\EventStore\Internal\EventHandler;
 use Prooph\EventStore\ListenerHandler;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\SubscriptionDropReason;
@@ -58,43 +55,62 @@ use Prooph\EventStoreClient\SystemData\TcpCommand;
 use Prooph\EventStoreClient\SystemData\TcpFlags;
 use Prooph\EventStoreClient\SystemData\TcpPackage;
 use Prooph\EventStoreClient\Transport\Tcp\TcpPackageConnection;
+use Revolt\EventLoop;
 use Throwable;
 
 /** @internal */
 class EventStoreConnectionLogicHandler
 {
-    private const CLIENT_VERSION = 1;
+    private const ClientVersion = 1;
 
-    private EventStoreConnection $esConnection;
+    private readonly EventStoreConnection $esConnection;
+
     private ?TcpPackageConnection $connection = null;
-    private ConnectionSettings $settings;
+
+    private readonly ConnectionSettings $settings;
+
     private ConnectionState $state;
+
     private ConnectingPhase $connectingPhase;
+
     /** @psalm-suppress PropertyNotSetInConstructor */
     private EndPointDiscoverer $endPointDiscoverer;
-    private MessageHandler $handler;
-    private OperationsManager $operations;
-    private SubscriptionsManager $subscriptions;
-    private EventHandler $eventHandler;
+
+    private readonly MessageHandler $handler;
+
+    private readonly OperationsManager $operations;
+
+    private readonly SubscriptionsManager $subscriptions;
+
+    private readonly EventHandler $eventHandler;
+
     private StopWatch $stopWatch;
+
     private string $timerTickWatcherId = '';
+
     private ?ReconnectionInfo $reconnInfo = null;
+
     /** @psalm-suppress PropertyNotSetInConstructor */
     private HeartbeatInfo $heartbeatInfo;
+
     /** @psalm-suppress PropertyNotSetInConstructor */
     private AuthInfo $authInfo;
+
     /** @psalm-suppress PropertyNotSetInConstructor */
     private IdentifyInfo $identityInfo;
+
     private bool $wasConnected = false;
+
     private int $packageNumber = 0;
-    private int $lastTimeoutsTimeStamp;
+
+    private float $lastTimeoutsTimeStamp;
 
     public function __construct(EventStoreConnection $connection, ConnectionSettings $settings)
     {
         $this->esConnection = $connection;
         $this->settings = $settings;
-        $this->state = ConnectionState::init();
-        $this->connectingPhase = ConnectingPhase::invalid();
+        $this->state = ConnectionState::Init;
+        $this->connectingPhase = ConnectingPhase::Invalid;
         $this->handler = new MessageHandler();
         $this->operations = new OperationsManager($connection->connectionName(), $settings);
         $this->subscriptions = new SubscriptionsManager($connection->connectionName(), $settings);
@@ -179,83 +195,76 @@ class EventStoreConnectionLogicHandler
         $this->handler->handle($message);
     }
 
-    private function startConnection(Deferred $deferred, EndPointDiscoverer $endPointDiscoverer): void
+    private function startConnection(DeferredFuture $deferred, EndPointDiscoverer $endPointDiscoverer): void
     {
         $this->logDebug('startConnection');
 
-        switch ($this->state->value()) {
-            case ConnectionState::INIT:
-                $this->timerTickWatcherId = Loop::repeat(Consts::TIMER_PERIOD, function (): void {
+        switch ($this->state) {
+            case ConnectionState::Init:
+                $this->timerTickWatcherId = EventLoop::repeat(Consts::TimerPeriod, function (): void {
                     $this->timerTick();
                 });
+                EventLoop::unreference($this->timerTickWatcherId);
                 $this->endPointDiscoverer = $endPointDiscoverer;
-                $this->state = ConnectionState::connecting();
-                $this->connectingPhase = ConnectingPhase::reconnecting();
+                $this->state = ConnectionState::Connecting;
+                $this->connectingPhase = ConnectingPhase::Reconnecting;
                 $this->discoverEndPoint($deferred);
+
                 break;
-            case ConnectionState::CONNECTING:
-            case ConnectionState::CONNECTED:
-                $deferred->fail(new InvalidOperationException(\sprintf(
+            case ConnectionState::Connecting:
+            case ConnectionState::Connected:
+                $deferred->error(new InvalidOperationException(\sprintf(
                     'EventStoreNodeConnection \'%s\' is already active',
                     $this->esConnection->connectionName()
                 )));
+
                 break;
-            case ConnectionState::CLOSED:
-                $deferred->fail(new ObjectDisposed(\sprintf(
+            case ConnectionState::Closed:
+                $deferred->error(new ObjectDisposed(\sprintf(
                     'EventStoreNodeConnection \'%s\' is closed',
                     $this->esConnection->connectionName()
                 )));
+
                 break;
         }
     }
 
-    private function discoverEndPoint(?Deferred $deferred): void
+    private function discoverEndPoint(?DeferredFuture $deferred): void
     {
         $this->logDebug('discoverEndPoint');
 
-        if (! $this->state->equals(ConnectionState::connecting())) {
+        if ($this->state !== ConnectionState::Connecting) {
             return;
         }
 
-        if (! $this->connectingPhase->equals(ConnectingPhase::reconnecting())) {
+        if ($this->connectingPhase !== ConnectingPhase::Reconnecting) {
             return;
         }
 
-        $this->connectingPhase = ConnectingPhase::endPointDiscovery();
+        $this->connectingPhase = ConnectingPhase::EndPointDiscovery;
 
-        $promise = $this->endPointDiscoverer->discoverAsync(
-            null !== $this->connection
-                ? $this->connection->remoteEndPoint()
-                : null
-        );
+        try {
+            $endpoints = $this->endPointDiscoverer->discover($this->connection?->remoteEndPoint());
+        } catch (Throwable $e) {
+            $this->enqueueMessage(new CloseConnectionMessage(
+                'Failed to resolve TCP end point to which to connect',
+                $e
+            ));
 
-        $promise->onResolve(function (?Throwable $e, ?NodeEndPoints $endpoints = null) use ($deferred): void {
-            if ($e) {
-                $this->enqueueMessage(new CloseConnectionMessage(
-                    'Failed to resolve TCP end point to which to connect',
-                    $e
-                ));
+            $deferred?->error(new CannotEstablishConnection('Cannot resolve target end point'));
 
-                if ($deferred) {
-                    $deferred->fail(new CannotEstablishConnection('Cannot resolve target end point'));
-                }
+            return;
+        }
 
-                return;
-            }
+        $this->enqueueMessage(new EstablishTcpConnectionMessage($endpoints));
 
-            /** @psalm-suppress PossiblyNullArgument */
-            $this->enqueueMessage(new EstablishTcpConnectionMessage($endpoints));
-
-            if ($deferred) {
-                $deferred->resolve(null);
-            }
-        });
+        $deferred?->complete();
     }
 
     /** @throws Exception */
     private function closeConnection(string $reason, ?Throwable $exception = null): void
     {
-        if ($this->state->equals(ConnectionState::closed())) {
+        if ($this->state === ConnectionState::Closed) {
             if ($exception) {
                 $this->logDebug('CloseConnection IGNORED because is ESConnection is CLOSED, reason %s, exception %s', $reason, $exception->getMessage());
             } else {
@@ -267,10 +276,10 @@ class EventStoreConnectionLogicHandler
 
         $this->logDebug('CloseConnection, reason %s, exception %s', $reason, $exception ? $exception->getMessage() : '<none>');
 
-        $this->state = ConnectionState::closed();
+        $this->state = ConnectionState::Closed;
 
         if ($this->timerTickWatcherId) {
-            Loop::cancel($this->timerTickWatcherId);
+            EventLoop::cancel($this->timerTickWatcherId);
         }
 
         $this->operations->cleanUp();
@@ -301,50 +310,48 @@ class EventStoreConnectionLogicHandler
 
         $this->logDebug('EstablishTcpConnection to [%s]', (string) $endPoint);
 
-        if (! $this->state->equals(ConnectionState::connecting())
-            || ! $this->connectingPhase->equals(ConnectingPhase::endPointDiscovery())
+        if ($this->state !== ConnectionState::Connecting
+            || $this->connectingPhase !== ConnectingPhase::EndPointDiscovery
         ) {
             return;
         }
 
-        $this->connectingPhase = ConnectingPhase::connectionEstablishing();
+        $this->connectingPhase = ConnectingPhase::ConnectionEstablishing;
 
-        Loop::defer(function () use ($endPoint): Generator {
-            $this->connection = new TcpPackageConnection(
-                $this->settings->log(),
-                $endPoint,
-                Guid::generateAsHex(),
-                $this->settings->useSslConnection(),
-                $this->settings->targetHost(),
-                $this->settings->validateServer(),
-                $this->settings->clientConnectionTimeout(),
-                function (TcpPackageConnection $connection, TcpPackage $package): void {
-                    $this->enqueueMessage(new HandleTcpPackageMessage($connection, $package));
-                },
-                function (TcpPackageConnection $connection, Throwable $exception): void {
-                    $this->enqueueMessage(new TcpConnectionErrorMessage($connection, $exception));
-                },
-                function (TcpPackageConnection $connection): void {
-                    $this->enqueueMessage(new TcpConnectionEstablishedMessage($connection));
-                },
-                function (TcpPackageConnection $connection, Throwable $exception): void {
-                    $this->enqueueMessage(new TcpConnectionClosedMessage($connection, $exception));
-                }
-            );
-
-            yield $this->connection->connectAsync();
-
-            if (! $this->connection->isClosed()) {
-                $this->connection->startReceiving();
+        $this->connection = new TcpPackageConnection(
+            $this->settings->log(),
+            $endPoint,
+            Guid::generateAsHex(),
+            $this->settings->useSslConnection(),
+            $this->settings->targetHost(),
+            $this->settings->validateServer(),
+            $this->settings->clientConnectionTimeout(),
+            function (TcpPackageConnection $connection, TcpPackage $package): void {
+                $this->enqueueMessage(new HandleTcpPackageMessage($connection, $package));
+            },
+            function (TcpPackageConnection $connection, Throwable $exception): void {
+                $this->enqueueMessage(new TcpConnectionErrorMessage($connection, $exception));
+            },
+            function (TcpPackageConnection $connection): void {
+                $this->enqueueMessage(new TcpConnectionEstablishedMessage($connection));
+            },
+            function (TcpPackageConnection $connection, Throwable $exception): void {
+                $this->enqueueMessage(new TcpConnectionClosedMessage($connection, $exception));
             }
-        });
+        );
+
+        $this->connection->connect();
+
+        if (! $this->connection->isClosed()) {
+            $this->connection->startReceiving();
+        }
     }
 
     /** @throws \Exception */
     public function tcpConnectionError(TcpPackageConnection $tcpPackageConnection, Throwable $exception): void
     {
         if ($this->connection !== $tcpPackageConnection
-            || $this->state->equals(ConnectionState::closed())
+            || $this->state === ConnectionState::Closed
         ) {
             return;
         }
@@ -374,15 +381,16 @@ class EventStoreConnectionLogicHandler
     /** @throws \Exception */
     private function tcpConnectionClosed(TcpPackageConnection $connection): void
     {
-        if ($this->state->equals(ConnectionState::init())) {
+        if ($this->state === ConnectionState::Init) {
             throw new \Exception();
         }
 
         if ($this->connection !== $connection
-            || $this->state->equals(ConnectionState::closed())
+            || $this->state === ConnectionState::Closed
         ) {
-            $this->logDebug('IGNORED (state: %s, internal conn.ID: {1:B}, conn.ID: %s): TCP connection to [%s] closed',
-                (string) $this->state,
+            $this->logDebug(
+                'IGNORED (state: %s, internal conn.ID: {1:B}, conn.ID: %s): TCP connection to [%s] closed',
+                $this->state->name,
                 null === $this->connection ? Guid::empty() : $this->connection->connectionId(),
                 $connection->connectionId(),
                 (string) $connection->remoteEndPoint()
@@ -391,8 +399,8 @@ class EventStoreConnectionLogicHandler
             return;
         }
 
-        $this->state = ConnectionState::connecting();
-        $this->connectingPhase = ConnectingPhase::reconnecting();
+        $this->state = ConnectionState::Connecting;
+        $this->connectingPhase = ConnectingPhase::Reconnecting;
 
         $this->logDebug(
             'TCP connection to [%s, %s] closed',
@@ -418,12 +426,13 @@ class EventStoreConnectionLogicHandler
     private function tcpConnectionEstablished(TcpPackageConnection $connection): void
     {
         /** @psalm-suppress PossiblyNullReference */
-        if (! $this->state->equals(ConnectionState::connecting())
+        if ($this->state !== ConnectionState::Connecting
             || $this->connection !== $connection
             || $this->connection->isClosed()
         ) {
-            $this->logDebug('IGNORED (state %s, internal conn.Id %s, conn.Id %s, conn.closed %s): TCP connection to [%s] established',
-                (string) $this->state,
+            $this->logDebug(
+                'IGNORED (state %s, internal conn.Id %s, conn.Id %s, conn.closed %s): TCP connection to [%s] established',
+                $this->state->name,
                 null === $this->connection ? Guid::empty() : $this->connection->connectionId(),
                 $connection->connectionId(),
                 $connection->isClosed() ? 'yes' : 'no',
@@ -443,7 +452,7 @@ class EventStoreConnectionLogicHandler
         $this->heartbeatInfo = new HeartbeatInfo($this->packageNumber, true, $elapsed);
 
         if ($this->settings->defaultUserCredentials() !== null) {
-            $this->connectingPhase = ConnectingPhase::authentication();
+            $this->connectingPhase = ConnectingPhase::Authentication;
 
             $this->authInfo = new AuthInfo(Guid::generateAsHex(), $elapsed);
 
@@ -457,8 +466,8 @@ class EventStoreConnectionLogicHandler
 
             /** @psalm-suppress PossiblyNullReference */
             $this->connection->enqueueSend(new TcpPackage(
-                TcpCommand::authenticate(),
-                TcpFlags::authenticated(),
+                TcpCommand::Authenticate,
+                TcpFlags::Authenticated,
                 $this->authInfo->correlationId(),
                 '',
                 $login,
@@ -471,17 +480,17 @@ class EventStoreConnectionLogicHandler
 
     private function goToIdentifyState(): void
     {
-        $this->connectingPhase = ConnectingPhase::identification();
+        $this->connectingPhase = ConnectingPhase::Identification;
         $this->identityInfo = new IdentifyInfo(Guid::generateAsHex(), $this->stopWatch->elapsed());
 
         $message = new IdentifyClient();
-        $message->setVersion(self::CLIENT_VERSION);
+        $message->setVersion(self::ClientVersion);
         $message->setConnectionName($this->esConnection->connectionName());
 
         /** @psalm-suppress PossiblyNullReference */
         $this->connection->enqueueSend(new TcpPackage(
-            TcpCommand::identifyClient(),
-            TcpFlags::none(),
+            TcpCommand::IdentifyClient,
+            TcpFlags::None,
             $this->identityInfo->correlationId(),
             $message->serializeToString()
         ));
@@ -489,8 +498,8 @@ class EventStoreConnectionLogicHandler
 
     private function goToConnectedState(): void
     {
-        $this->state = ConnectionState::connected();
-        $this->connectingPhase = ConnectingPhase::connected();
+        $this->state = ConnectionState::Connected;
+        $this->connectingPhase = ConnectingPhase::Connected;
         $this->wasConnected = true;
 
         /** @psalm-suppress PossiblyNullReference */
@@ -508,12 +517,13 @@ class EventStoreConnectionLogicHandler
     {
         $elapsed = $this->stopWatch->elapsed();
 
-        switch ($this->state->value()) {
-            case ConnectionState::INIT:
+        switch ($this->state) {
+            case ConnectionState::Init:
+            case ConnectionState::Closed:
                 break;
-            case ConnectionState::CONNECTING:
+            case ConnectionState::Connecting:
                 /** @psalm-suppress PossiblyNullReference */
-                if ($this->connectingPhase->equals(ConnectingPhase::reconnecting())
+                if ($this->connectingPhase === ConnectingPhase::Reconnecting
                     && $elapsed - $this->reconnInfo->timestamp() >= $this->settings->reconnectionDelay()
                 ) {
                     $this->logDebug('TimerTick checking reconnection...');
@@ -530,26 +540,26 @@ class EventStoreConnectionLogicHandler
                     }
                 }
 
-                if ($this->connectingPhase->equals(ConnectingPhase::authentication())
+                if ($this->connectingPhase === ConnectingPhase::Authentication
                     && $elapsed - $this->authInfo->timestamp() >= $this->settings->operationTimeout()
                 ) {
                     $this->raiseAuthenticationFailed('Authentication timed out');
                     $this->goToIdentifyState();
                 }
 
-                if ($this->connectingPhase->equals(ConnectingPhase::identification())
+                if ($this->connectingPhase === ConnectingPhase::Identification
                     && $elapsed - $this->identityInfo->timestamp() >= $this->settings->operationTimeout()
                 ) {
                     $this->logDebug('Timed out waiting for client to be identified');
                     $this->closeTcpConnection();
                 }
 
-                if ($this->connectingPhase->value() > ConnectingPhase::CONNECTION_ESTABLISHING) {
+                if ($this->connectingPhase->value > ConnectingPhase::ConnectionEstablishing->value) {
                     $this->manageHeartbeats();
                 }
 
                 break;
-            case ConnectionState::CONNECTED:
+            case ConnectionState::Connected:
                 /** @psalm-suppress PossiblyNullArgument */
                 if ($elapsed - $this->lastTimeoutsTimeStamp >= $this->settings->operationTimeoutCheckPeriod()) {
                     $this->reconnInfo = new ReconnectionInfo(0, $elapsed);
@@ -561,8 +571,6 @@ class EventStoreConnectionLogicHandler
                 $this->manageHeartbeats();
 
                 break;
-            case ConnectionState::CLOSED:
-                break;
         }
     }
 
@@ -570,7 +578,7 @@ class EventStoreConnectionLogicHandler
     private function manageHeartbeats(): void
     {
         if (null === $this->connection) {
-            throw new \Exception();
+            throw new \Exception('Cannot manage heartbeats when no connection available');
         }
 
         $timeout = $this->heartbeatInfo->isIntervalStage() ? $this->settings->heartbeatInterval() : $this->settings->heartbeatTimeout();
@@ -591,8 +599,8 @@ class EventStoreConnectionLogicHandler
 
         if ($this->heartbeatInfo->isIntervalStage()) {
             $this->connection->enqueueSend(new TcpPackage(
-                TcpCommand::heartbeatRequestCommand(),
-                TcpFlags::none(),
+                TcpCommand::HeartbeatRequestCommand,
+                TcpFlags::None,
                 Guid::generateAsHex()
             ));
 
@@ -611,18 +619,19 @@ class EventStoreConnectionLogicHandler
         }
     }
 
-    private function startOperation(ClientOperation $operation, int $maxRetries, int $timeout): void
+    private function startOperation(ClientOperation $operation, int $maxRetries, float $timeout): void
     {
-        switch ($this->state->value()) {
-            case ConnectionState::INIT:
+        switch ($this->state) {
+            case ConnectionState::Init:
                 $operation->fail(new InvalidOperationException(
                     \sprintf(
                         'EventStoreNodeConnection \'%s\' is not active',
                         $this->esConnection->connectionName()
                     )
                 ));
+
                 break;
-            case ConnectionState::CONNECTING:
+            case ConnectionState::Connecting:
                 $this->logDebug(
                     'StartOperation enqueue %s, %s, %s, %s',
                     $operation->name(),
@@ -631,8 +640,9 @@ class EventStoreConnectionLogicHandler
                     (string) $timeout
                 );
                 $this->operations->enqueueOperation(new OperationItem($operation, $maxRetries, $timeout));
+
                 break;
-            case ConnectionState::CONNECTED:
+            case ConnectionState::Connected:
                 $this->logDebug(
                     'StartOperation schedule %s, %s, %s, %s',
                     $operation->name(),
@@ -642,34 +652,39 @@ class EventStoreConnectionLogicHandler
                 );
                 /** @psalm-suppress PossiblyNullArgument */
                 $this->operations->scheduleOperation(new OperationItem($operation, $maxRetries, $timeout), $this->connection);
+
                 break;
-            case ConnectionState::CLOSED:
+            case ConnectionState::Closed:
                 $operation->fail(new ObjectDisposed(\sprintf(
                     'EventStoreNodeConnection \'%s\' is closed',
                     $this->esConnection->connectionName()
                 )));
+
                 break;
         }
     }
 
     private function startSubscription(StartSubscriptionMessage $message): void
     {
-        switch ($this->state->value()) {
-            case ConnectionState::INIT:
-                $message->deferred()->fail(new InvalidOperationException(\sprintf(
+        switch ($this->state) {
+            case ConnectionState::Init:
+                $message->deferred()->error(new InvalidOperationException(\sprintf(
                     'EventStoreNodeConnection \'%s\' is not active',
                     $this->esConnection->connectionName()
                 )));
+
                 break;
-            case ConnectionState::CONNECTING:
-            case ConnectionState::CONNECTED:
+            case ConnectionState::Connecting:
+            case ConnectionState::Connected:
                 $operation = new VolatileSubscriptionOperation(
                     $this->settings->log(),
                     $message->deferred(),
                     $message->streamId(),
                     $message->resolveTo(),
                     $message->userCredentials(),
-                    fn (EventStoreSubscription $subscription, ResolvedEvent $resolvedEvent): Promise => ($message->eventAppeared())($subscription, $resolvedEvent),
+                    function (EventStoreSubscription $subscription, ResolvedEvent $resolvedEvent) use ($message): void {
+                        ($message->eventAppeared())($subscription, $resolvedEvent);
+                    },
                     function (EventStoreSubscription $subscription, SubscriptionDropReason $reason, ?Throwable $exception = null) use ($message): void {
                         $subscriptionDroppedHandler = $message->subscriptionDropped();
 
@@ -683,7 +698,7 @@ class EventStoreConnectionLogicHandler
 
                 $this->logDebug(
                     'StartSubscription %s %s, %s, MaxRetries: %d, Timeout: %d',
-                    $this->state->equals(ConnectionState::connected()) ? 'fire' : 'enqueue',
+                    $this->state === ConnectionState::Connected ? 'fire' : 'enqueue',
                     $operation->name(),
                     (string) $operation,
                     (string) $message->maxRetries(),
@@ -692,7 +707,7 @@ class EventStoreConnectionLogicHandler
 
                 $subscription = new SubscriptionItem($operation, $message->maxRetries(), $message->timeout());
 
-                if ($this->state->equals(ConnectionState::connecting())) {
+                if ($this->state === ConnectionState::Connecting) {
                     $this->subscriptions->enqueueSubscription($subscription);
                 } else {
                     /** @psalm-suppress PossiblyNullArgument */
@@ -700,26 +715,28 @@ class EventStoreConnectionLogicHandler
                 }
 
                 break;
-            case ConnectionState::CLOSED:
-                $message->deferred()->fail(new ObjectDisposed(\sprintf(
+            case ConnectionState::Closed:
+                $message->deferred()->error(new ObjectDisposed(\sprintf(
                     'EventStoreNodeConnection \'%s\' is closed',
                     $this->esConnection->connectionName()
                 )));
+
                 break;
         }
     }
 
     private function startPersistentSubscription(StartPersistentSubscriptionMessage $message): void
     {
-        switch ($this->state->value()) {
-            case ConnectionState::INIT:
-                $message->deferred()->fail(new InvalidOperationException(\sprintf(
+        switch ($this->state) {
+            case ConnectionState::Init:
+                $message->deferred()->error(new InvalidOperationException(\sprintf(
                     'EventStoreNodeConnection \'%s\' is not active',
                     $this->esConnection->connectionName()
                 )));
+
                 break;
-            case ConnectionState::CONNECTING:
-            case ConnectionState::CONNECTED:
+            case ConnectionState::Connecting:
+            case ConnectionState::Connected:
                 $operation = new ConnectToPersistentSubscriptionOperation(
                     $this->settings->log(),
                     $message->deferred(),
@@ -735,7 +752,7 @@ class EventStoreConnectionLogicHandler
 
                 $this->logDebug(
                     'StartSubscription %s %s, %s, MaxRetries: %d, Timeout: %d',
-                    $this->state->equals(ConnectionState::connected()) ? 'fire' : 'enqueue',
+                    $this->state === ConnectionState::Connected ? 'fire' : 'enqueue',
                     $operation->name(),
                     (string) $operation,
                     (string) $message->maxRetries(),
@@ -744,7 +761,7 @@ class EventStoreConnectionLogicHandler
 
                 $subscription = new SubscriptionItem($operation, $message->maxRetries(), $message->timeout());
 
-                if ($this->state->equals(ConnectionState::connecting())) {
+                if ($this->state === ConnectionState::Connecting) {
                     $this->subscriptions->enqueueSubscription($subscription);
                 } else {
                     /** @psalm-suppress PossiblyNullArgument */
@@ -752,11 +769,12 @@ class EventStoreConnectionLogicHandler
                 }
 
                 break;
-            case ConnectionState::CLOSED:
-                $message->deferred()->fail(new ObjectDisposed(\sprintf(
+            case ConnectionState::Closed:
+                $message->deferred()->error(new ObjectDisposed(\sprintf(
                     'EventStoreNodeConnection \'%s\' is closed',
                     $this->esConnection->connectionName()
                 )));
+
                 break;
         }
     }
@@ -765,13 +783,13 @@ class EventStoreConnectionLogicHandler
     private function handleTcpPackage(TcpPackageConnection $connection, TcpPackage $package): void
     {
         if ($this->connection !== $connection
-            || $this->state->equals(ConnectionState::closed())
-            || $this->state->equals(ConnectionState::init())
+            || $this->state === ConnectionState::Closed
+            || $this->state === ConnectionState::Init
         ) {
             $this->logDebug(
                 'IGNORED: HandleTcpPackage connId %s, package %s, %s',
                 $connection->connectionId(),
-                (string) $package->command(),
+                $package->command()->name,
                 $package->correlationId()
             );
 
@@ -782,34 +800,34 @@ class EventStoreConnectionLogicHandler
         $this->logDebug(
             'HandleTcpPackage connId %s, package %s, %s',
             $this->connection->connectionId(),
-            (string) $package->command(),
+            $package->command()->name,
             $package->correlationId()
         );
 
         ++$this->packageNumber;
 
-        if ($package->command()->equals(TcpCommand::heartbeatResponseCommand())) {
+        if ($package->command() === TcpCommand::HeartbeatResponseCommand) {
             return;
         }
 
-        if ($package->command()->equals(TcpCommand::heartbeatRequestCommand())) {
+        if ($package->command() === TcpCommand::HeartbeatRequestCommand) {
             $this->connection->enqueueSend(new TcpPackage(
-                TcpCommand::heartbeatResponseCommand(),
-                TcpFlags::none(),
+                TcpCommand::HeartbeatResponseCommand,
+                TcpFlags::None,
                 $package->correlationId()
             ));
 
             return;
         }
 
-        if ($package->command()->equals(TcpCommand::authenticated())
-            || $package->command()->equals(TcpCommand::notAuthenticatedException())
+        if ($package->command() === TcpCommand::Authenticated
+            || $package->command() === TcpCommand::NotAuthenticatedException
         ) {
-            if ($this->state->equals(ConnectionState::connecting())
-                && $this->connectingPhase->equals(ConnectingPhase::authentication())
+            if ($this->state === ConnectionState::Connecting
+                && $this->connectingPhase === ConnectingPhase::Authentication
                 && $this->authInfo->correlationId() === $package->correlationId()
             ) {
-                if ($package->command()->equals(TcpCommand::notAuthenticatedException())) {
+                if ($package->command() === TcpCommand::NotAuthenticatedException) {
                     $this->raiseAuthenticationFailed('Not authenticated');
                 }
 
@@ -819,8 +837,8 @@ class EventStoreConnectionLogicHandler
             }
         }
 
-        if ($package->command()->equals(TcpCommand::clientIdentified())
-            && $this->state->equals(ConnectionState::connecting())
+        if ($package->command() === TcpCommand::ClientIdentified
+            && $this->state === ConnectionState::Connecting
             && $this->identityInfo->correlationId() === $package->correlationId()
         ) {
             $this->goToConnectedState();
@@ -828,7 +846,7 @@ class EventStoreConnectionLogicHandler
             return;
         }
 
-        if ($package->command()->equals(TcpCommand::badRequest())
+        if ($package->command() === TcpCommand::BadRequest
             && $package->correlationId() === ''
         ) {
             $exception = new EventStoreConnectionException('Bad request received from server');
@@ -842,27 +860,30 @@ class EventStoreConnectionLogicHandler
 
             $this->logDebug(
                 'HandleTcpPackage OPERATION DECISION %s (%s), %s',
-                (string) $result->decision(),
+                $result->decision()->name,
                 $result->description(),
                 (string) $operation
             );
 
-            switch ($result->decision()->value()) {
-                case InspectionDecision::DO_NOTHING:
+            switch ($result->decision()) {
+                case InspectionDecision::DoNothing:
                     break;
-                case InspectionDecision::END_OPERATION:
+                case InspectionDecision::EndOperation:
                     $this->operations->removeOperation($operation);
+
                     break;
-                case InspectionDecision::RETRY:
+                case InspectionDecision::Retry:
                     $this->operations->scheduleOperationRetry($operation);
+
                     break;
-                case InspectionDecision::RECONNECT:
+                case InspectionDecision::Reconnect:
                     $this->reconnectTo(new NodeEndPoints($result->tcpEndPoint(), $result->secureTcpEndPoint()));
                     $this->operations->scheduleOperationRetry($operation);
+
                     break;
             }
 
-            if ($this->state->equals(ConnectionState::connected())) {
+            if ($this->state === ConnectionState::Connected) {
                 $this->operations->tryScheduleWaitingOperations($connection);
             }
         } elseif ($subscription = $this->subscriptions->getActiveSubscription($package->correlationId())) {
@@ -871,33 +892,37 @@ class EventStoreConnectionLogicHandler
             $this->logDebug(
                 'HandleTcpPackage %s SUBSCRIPTION DECISION %s (%s), %s',
                 $package->correlationId(),
-                (string) $result->decision(),
+                $result->decision()->name,
                 $result->description(),
                 (string) $operation
             );
 
-            switch ($result->decision()->value()) {
-                case InspectionDecision::DO_NOTHING:
+            switch ($result->decision()) {
+                case InspectionDecision::DoNothing:
                     break;
-                case InspectionDecision::END_OPERATION:
+                case InspectionDecision::EndOperation:
                     $this->subscriptions->removeSubscription($subscription);
+
                     break;
-                case InspectionDecision::RETRY:
+                case InspectionDecision::Retry:
                     $this->subscriptions->scheduleSubscriptionRetry($subscription);
+
                     break;
-                case InspectionDecision::RECONNECT:
+                case InspectionDecision::Reconnect:
                     $this->reconnectTo(new NodeEndPoints($result->tcpEndPoint(), $result->secureTcpEndPoint()));
                     $this->subscriptions->scheduleSubscriptionRetry($subscription);
+
                     break;
-                case InspectionDecision::SUBSCRIBED:
+                case InspectionDecision::Subscribed:
                     $subscription->setIsSubscribed(true);
+
                     break;
             }
         } else {
             $this->logDebug(
                 'HandleTcpPackage UNMAPPED PACKAGE with CorrelationId %s, Command: %s',
                 $package->correlationId(),
-                (string) $package->command()
+                $package->command()->name
             );
         }
     }
@@ -916,7 +941,7 @@ class EventStoreConnectionLogicHandler
         }
 
         /** @psalm-suppress PossiblyNullReference */
-        if (! $this->state->equals(ConnectionState::connected())
+        if ($this->state !== ConnectionState::Connected
             || $this->connection->remoteEndPoint()->equals($endPoint)
         ) {
             return;
@@ -936,8 +961,8 @@ class EventStoreConnectionLogicHandler
 
         $this->closeTcpConnection();
 
-        $this->state = ConnectionState::connecting();
-        $this->connectingPhase = ConnectingPhase::endPointDiscovery();
+        $this->state = ConnectionState::Connecting;
+        $this->connectingPhase = ConnectingPhase::EndPointDiscovery;
 
         $this->establishTcpConnection($endPoints);
     }

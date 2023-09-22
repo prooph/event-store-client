@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Deferred;
+use Amp\CancelledException;
+use Amp\DeferredFuture;
 use Amp\PHPUnit\AsyncTestCase;
-use function Amp\Promise\timeout;
-use Amp\TimeoutException;
+use Amp\TimeoutCancellation;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStoreClient\ConnectionSettingsBuilder;
 use Prooph\EventStoreClient\EventStoreConnectionFactory;
@@ -27,13 +27,13 @@ class not_connected_tests extends AsyncTestCase
      * @test
      * @doesNotPerformAssertions
      */
-    public function should_timeout_connection_after_configured_amount_time_on_connect(): \Generator
+    public function should_timeout_connection_after_configured_amount_time_on_connect(): void
     {
         $settingsBuilder = (new ConnectionSettingsBuilder())
             ->limitReconnectionsTo(0)
             ->setReconnectionDelayTo(0)
             ->failOnNoServerResponse()
-            ->withConnectionTimeoutOf(1000);
+            ->withConnectionTimeoutOf(1);
 
         $ip = '8.8.8.8'; //NOTE: This relies on Google DNS server being configured to swallow nonsense traffic
         $port = 4567;
@@ -44,7 +44,7 @@ class not_connected_tests extends AsyncTestCase
             'test-connection'
         );
 
-        $deferred = new Deferred();
+        $deferred = new DeferredFuture();
 
         $connection->onConnected(function (): void {
             \var_dump('connected');
@@ -63,14 +63,14 @@ class not_connected_tests extends AsyncTestCase
         });
 
         $connection->onClosed(function () use ($deferred): void {
-            $deferred->resolve();
+            $deferred->complete();
         });
 
-        yield $connection->connectAsync();
+        $connection->connect();
 
         try {
-            yield timeout($deferred->promise(), 5000);
-        } catch (TimeoutException $e) {
+            $deferred->getFuture()->await(new TimeoutCancellation(5));
+        } catch (CancelledException $e) {
             $this->fail('Connection timeout took too long');
         }
 

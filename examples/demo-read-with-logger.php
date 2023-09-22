@@ -70,8 +70,13 @@ Loop::run(function () {
 
     \var_dump(\get_class($m));
 
-    $r = yield $connection->setStreamMetadataAsync('foo-bar', ExpectedVersion::ANY, new StreamMetadata(
-        null, null, null, null, null, [
+    $r = yield $connection->setStreamMetadataAsync('foo-bar', ExpectedVersion::Any, new StreamMetadata(
+        null,
+        null,
+        null,
+        null,
+        null,
+        [
             'foo' => 'bar',
         ]
     ));
@@ -82,7 +87,7 @@ Loop::run(function () {
 
     \var_dump(\get_class($m));
 
-    $wr = yield $connection->appendToStreamAsync('foo-bar', ExpectedVersion::ANY, [
+    $wr = yield $connection->appendToStreamAsync('foo-bar', ExpectedVersion::Any, [
         new EventData(EventId::generate(), 'test-type', false, 'jfkhksdfhsds', 'meta'),
         new EventData(EventId::generate(), 'test-type2', false, 'kldjfls', 'meta'),
         new EventData(EventId::generate(), 'test-type3', false, 'aaa', 'meta'),

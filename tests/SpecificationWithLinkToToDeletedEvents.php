@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Generator;
 use Prooph\EventStore\Common\SystemEventTypes;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\ExpectedVersion;
@@ -24,31 +23,32 @@ trait SpecificationWithLinkToToDeletedEvents
     use SpecificationWithConnection;
 
     protected string $linkedStreamName;
+
     protected string $deletedStreamName;
 
-    protected function given(): Generator
+    protected function given(): void
     {
         $creds = DefaultData::adminCredentials();
         $this->linkedStreamName = Guid::generateAsHex();
         $this->deletedStreamName = Guid::generateAsHex();
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->deletedStreamName,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             [new EventData(null, 'testing', true, '{"foo":"bar"}')],
             $creds
         );
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->linkedStreamName,
-            ExpectedVersion::ANY,
-            [new EventData(null, SystemEventTypes::LINK_TO, false, '0@' . $this->deletedStreamName)],
+            ExpectedVersion::Any,
+            [new EventData(null, SystemEventTypes::LinkTo->value, false, '0@' . $this->deletedStreamName)],
             $creds
         );
 
-        yield $this->connection->deleteStreamAsync(
+        $this->connection->deleteStream(
             $this->deletedStreamName,
-            ExpectedVersion::ANY
+            ExpectedVersion::Any
         );
     }
 }

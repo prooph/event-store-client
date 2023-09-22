@@ -13,14 +13,12 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Amp\Success;
-use Generator;
-use Prooph\EventStore\Async\EventStorePersistentSubscription;
+use Amp\TimeoutCancellation;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
+use Prooph\EventStore\EventStorePersistentSubscription;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionNakEventAction;
 use Prooph\EventStore\PersistentSubscriptionSettings;
@@ -32,10 +30,15 @@ class connect_to_persistent_subscription_with_retries extends AsyncTestCase
     use SpecificationWithConnection;
 
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
-    private Deferred $resetEvent;
+
+    private DeferredFuture $resetEvent;
+
     private EventId $eventId;
+
     private ?int $retryCount;
+
     private string $group = 'retries';
 
     protected function setUp(): void
@@ -47,40 +50,38 @@ class connect_to_persistent_subscription_with_retries extends AsyncTestCase
             ->doNotResolveLinkTos()
             ->startFromBeginning()
             ->build();
-        $this->resetEvent = new Deferred();
+        $this->resetEvent = new DeferredFuture();
         $this->eventId = EventId::generate();
     }
 
-    protected function given(): Generator
+    protected function given(): void
     {
-        yield $this->connection->createPersistentSubscriptionAsync(
+        $this->connection->createPersistentSubscription(
             $this->stream,
             'agroupname55',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        yield $this->connection->connectToPersistentSubscriptionAsync(
+        $this->connection->connectToPersistentSubscription(
             $this->stream,
             'agroupname55',
             function (
                 EventStorePersistentSubscription $subscription,
                 ResolvedEvent $resolvedEvent,
                 ?int $retryCount = null
-            ): Promise {
+            ): void {
                 if ($retryCount > 4) {
                     $this->retryCount = $retryCount;
                     $subscription->acknowledge($resolvedEvent);
-                    $this->resetEvent->resolve(true);
+                    $this->resetEvent->complete(true);
                 } else {
                     $subscription->fail(
                         $resolvedEvent,
-                        PersistentSubscriptionNakEventAction::retry(),
+                        PersistentSubscriptionNakEventAction::Retry,
                         'Not yet tried enough times'
                     );
                 }
-
-                return new Success();
             },
             null,
             10,
@@ -89,21 +90,21 @@ class connect_to_persistent_subscription_with_retries extends AsyncTestCase
         );
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             [new EventData($this->eventId, 'test', true, '{"foo":"bar"}')],
             DefaultData::adminCredentials()
         );
     }
 
     /** @test */
-    public function events_are_retried_until_success(): Generator
+    public function events_are_retried_until_success(): void
     {
-        yield $this->execute(function (): Generator {
-            $value = yield Promise\timeout($this->resetEvent->promise(), 10000);
+        $this->execute(function (): void {
+            $value = $this->resetEvent->getFuture()->await(new TimeoutCancellation(10));
             $this->assertTrue($value);
             $this->assertSame(5, $this->retryCount);
         });

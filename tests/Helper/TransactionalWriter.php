@@ -13,15 +13,13 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\Helper;
 
-use function Amp\call;
-use Amp\Promise;
-use Generator;
-use Prooph\EventStore\Async\EventStoreConnection;
+use Prooph\EventStore\EventStoreConnection;
 
 /** @internal */
 class TransactionalWriter
 {
     private EventStoreConnection $connection;
+
     private string $stream;
 
     public function __construct(EventStoreConnection $connection, string $stream)
@@ -30,19 +28,13 @@ class TransactionalWriter
         $this->stream = $stream;
     }
 
-    /**
-     * @param int $expectedVersion
-     * @return Promise<OngoingTransaction>
-     */
-    public function startTransaction(int $expectedVersion): Promise
+    public function startTransaction(int $expectedVersion): OngoingTransaction
     {
-        return call(function () use ($expectedVersion): Generator {
-            $transaction = yield $this->connection->startTransactionAsync(
-                $this->stream,
-                $expectedVersion
-            );
+        $transaction = $this->connection->startTransaction(
+            $this->stream,
+            $expectedVersion
+        );
 
-            return new OngoingTransaction($transaction);
-        });
+        return new OngoingTransaction($transaction);
     }
 }

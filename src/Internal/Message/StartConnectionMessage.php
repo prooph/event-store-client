@@ -13,34 +13,32 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal\Message;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Prooph\EventStoreClient\Internal\EndPointDiscoverer;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 class StartConnectionMessage implements Message
 {
-    private Deferred $deferred;
-    private EndPointDiscoverer $endPointDiscoverer;
-
-    public function __construct(Deferred $deferred, EndPointDiscoverer $endPointDiscoverer)
-    {
-        $this->deferred = $deferred;
-        $this->endPointDiscoverer = $endPointDiscoverer;
+    public function __construct(
+        private readonly DeferredFuture $deferred,
+        private readonly EndPointDiscoverer $endPointDiscoverer
+    ) {
     }
 
-    /** @psalm-pure */
-    public function deferred(): Deferred
+    public function deferred(): DeferredFuture
     {
         return $this->deferred;
     }
 
-    /** @psalm-pure */
     public function endPointDiscoverer(): EndPointDiscoverer
     {
         return $this->endPointDiscoverer;
     }
 
-    /** @psalm-pure */
     public function __toString(): string
     {
         return 'StartConnectionMessage';

@@ -13,13 +13,11 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Amp\Success;
-use Generator;
-use Prooph\EventStore\Async\EventStorePersistentSubscription;
+use Amp\TimeoutCancellation;
 use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventStorePersistentSubscription;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionNakEventAction;
 use Prooph\EventStore\PersistentSubscriptionSettings;
@@ -31,12 +29,15 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends AsyncTes
     use SpecificationWithConnection;
 
     private string $streamName;
+
     private string $groupName;
 
-    public const BUFFER_COUNT = 10;
-    public const EVENT_WRITE_COUNT = self::BUFFER_COUNT * 2;
+    public const BufferCount = 10;
 
-    private Deferred $eventsReceived;
+    public const EventWriteCount = self::BufferCount * 2;
+
+    private DeferredFuture $eventsReceived;
+
     private int $eventReceivedCount = 0;
 
     protected function setUp(): void
@@ -45,47 +46,44 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends AsyncTes
 
         $this->streamName = Guid::generateAsHex();
         $this->groupName = Guid::generateAsHex();
-        $this->eventsReceived = new Deferred();
+        $this->eventsReceived = new DeferredFuture();
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield new Success();
     }
 
     /**
      * @doesNotPerformAssertions
      */
-    public function test(): Generator
+    public function test(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $settings = PersistentSubscriptionSettings::create()
                 ->startFromCurrent()
                 ->resolveLinkTos()
                 ->build();
 
-            yield $this->connection->createPersistentSubscriptionAsync(
+            $this->connection->createPersistentSubscription(
                 $this->streamName,
                 $this->groupName,
                 $settings,
                 DefaultData::adminCredentials()
             );
 
-            yield $this->connection->connectToPersistentSubscriptionAsync(
+            $this->connection->connectToPersistentSubscription(
                 $this->streamName,
                 $this->groupName,
                 function (
                     EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
-                ): Promise {
-                    $subscription->fail($resolvedEvent, PersistentSubscriptionNakEventAction::park(), 'fail');
+                ): void {
+                    $subscription->fail($resolvedEvent, PersistentSubscriptionNakEventAction::Park, 'fail');
 
-                    if (++$this->eventReceivedCount === when_writing_and_subscribing_to_normal_events_manual_nack::EVENT_WRITE_COUNT) {
-                        $this->eventsReceived->resolve(true);
+                    if (++$this->eventReceivedCount === when_writing_and_subscribing_to_normal_events_manual_nack::EventWriteCount) {
+                        $this->eventsReceived->complete(true);
                     }
-
-                    return new Success();
                 },
                 null,
                 10,
@@ -93,18 +91,18 @@ class when_writing_and_subscribing_to_normal_events_manual_nack extends AsyncTes
                 DefaultData::adminCredentials()
             );
 
-            for ($i = 0; $i < self::EVENT_WRITE_COUNT; $i++) {
+            for ($i = 0; $i < self::EventWriteCount; $i++) {
                 $eventData = new EventData(null, 'SomeEvent', false);
 
-                yield $this->connection->appendToStreamAsync(
+                $this->connection->appendToStream(
                     $this->streamName,
-                    ExpectedVersion::ANY,
+                    ExpectedVersion::Any,
                     [$eventData],
                     DefaultData::adminCredentials()
                 );
             }
 
-            yield Promise\timeout($this->eventsReceived->promise(), 5000);
+            $this->eventsReceived->getFuture()->await(new TimeoutCancellation(5));
         });
     }
 }

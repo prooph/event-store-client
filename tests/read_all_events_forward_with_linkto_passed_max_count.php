@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Success;
-use Generator;
 use Prooph\EventStore\StreamEventsSlice;
 
 class read_all_events_forward_with_linkto_passed_max_count extends AsyncTestCase
@@ -24,18 +22,16 @@ class read_all_events_forward_with_linkto_passed_max_count extends AsyncTestCase
 
     private StreamEventsSlice $read;
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        $this->read = yield $this->connection->readStreamEventsForwardAsync($this->linkedStreamName, 0, 1, true);
+        $this->read = $this->connection->readStreamEventsForward($this->linkedStreamName, 0, 1, true);
     }
 
     /** @test */
-    public function one_event_is_read(): Generator
+    public function one_event_is_read(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->assertCount(1, $this->read->events());
-
-            yield new Success();
         });
     }
 }

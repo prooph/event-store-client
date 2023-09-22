@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Generator;
 use Prooph\EventStore\Exception\StreamDeleted;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
 use Prooph\EventStore\ExpectedVersion;
-use Prooph\EventStore\RawStreamMetadataResult;
 use ProophTest\EventStoreClient\Helper\TestEvent;
 
 class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
@@ -32,15 +30,14 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function setting_empty_metadata_works(): Generator
+    public function setting_empty_metadata_works(): void
     {
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $this->stream,
-            ExpectedVersion::NO_STREAM
+            ExpectedVersion::NoStream
         );
 
-        $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
-        \assert($meta instanceof RawStreamMetadataResult);
+        $meta = $this->connection->getRawStreamMetadata($this->stream);
         $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
         $this->assertSame(0, $meta->metastreamVersion());
@@ -48,27 +45,25 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function setting_metadata_few_times_returns_last_metadata(): Generator
+    public function setting_metadata_few_times_returns_last_metadata(): void
     {
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $this->stream,
-            ExpectedVersion::NO_STREAM
+            ExpectedVersion::NoStream
         );
 
-        $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
-        \assert($meta instanceof RawStreamMetadataResult);
+        $meta = $this->connection->getRawStreamMetadata($this->stream);
         $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
         $this->assertSame(0, $meta->metastreamVersion());
         $this->assertSame('', $meta->streamMetadata());
 
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $this->stream,
             0
         );
 
-        $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
-        \assert($meta instanceof RawStreamMetadataResult);
+        $meta = $this->connection->getRawStreamMetadata($this->stream);
         $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
         $this->assertSame(1, $meta->metastreamVersion());
@@ -76,38 +71,36 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function trying_to_set_metadata_with_wrong_expected_version_fails(): Generator
+    public function trying_to_set_metadata_with_wrong_expected_version_fails(): void
     {
         $this->expectException(WrongExpectedVersion::class);
 
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $this->stream,
             5
         );
     }
 
     /** @test */
-    public function setting_metadata_with_expected_version_any_works(): Generator
+    public function setting_metadata_with_expected_version_any_works(): void
     {
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $this->stream,
-            ExpectedVersion::ANY
+            ExpectedVersion::Any
         );
 
-        $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
-        \assert($meta instanceof RawStreamMetadataResult);
+        $meta = $this->connection->getRawStreamMetadata($this->stream);
         $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
         $this->assertSame(0, $meta->metastreamVersion());
         $this->assertSame('', $meta->streamMetadata());
 
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $this->stream,
-            ExpectedVersion::ANY
+            ExpectedVersion::Any
         );
 
-        $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
-        \assert($meta instanceof RawStreamMetadataResult);
+        $meta = $this->connection->getRawStreamMetadata($this->stream);
         $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
         $this->assertSame(1, $meta->metastreamVersion());
@@ -115,15 +108,14 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function setting_metadata_for_not_existing_stream_works(): Generator
+    public function setting_metadata_for_not_existing_stream_works(): void
     {
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $this->stream,
-            ExpectedVersion::NO_STREAM
+            ExpectedVersion::NoStream
         );
 
-        $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
-        \assert($meta instanceof RawStreamMetadataResult);
+        $meta = $this->connection->getRawStreamMetadata($this->stream);
         $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
         $this->assertSame(0, $meta->metastreamVersion());
@@ -131,21 +123,20 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function setting_metadata_for_existing_stream_works(): Generator
+    public function setting_metadata_for_existing_stream_works(): void
     {
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             TestEvent::newAmount(2)
         );
 
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $this->stream,
-            ExpectedVersion::NO_STREAM
+            ExpectedVersion::NoStream
         );
 
-        $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
-        \assert($meta instanceof RawStreamMetadataResult);
+        $meta = $this->connection->getRawStreamMetadata($this->stream);
         $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
         $this->assertSame(0, $meta->metastreamVersion());
@@ -153,27 +144,26 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function setting_metadata_for_deleted_stream_throws_stream_deleted_exception(): Generator
+    public function setting_metadata_for_deleted_stream_throws_stream_deleted_exception(): void
     {
-        yield $this->connection->deleteStreamAsync(
+        $this->connection->deleteStream(
             $this->stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             true
         );
 
         $this->expectException(StreamDeleted::class);
 
-        yield $this->connection->setStreamMetadataAsync(
+        $this->connection->setStreamMetadata(
             $this->stream,
-            ExpectedVersion::NO_STREAM
+            ExpectedVersion::NoStream
         );
     }
 
     /** @test */
-    public function getting_metadata_for_nonexisting_stream_returns_empty_string(): Generator
+    public function getting_metadata_for_nonexisting_stream_returns_empty_string(): void
     {
-        $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
-        \assert($meta instanceof RawStreamMetadataResult);
+        $meta = $this->connection->getRawStreamMetadata($this->stream);
         $this->assertSame($this->stream, $meta->stream());
         $this->assertFalse($meta->isStreamDeleted());
         $this->assertSame(-1, $meta->metastreamVersion());
@@ -181,17 +171,16 @@ class when_working_with_raw_stream_metadata extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function getting_metadata_for_deleted_stream_returns_empty_string_and_signals_stream_deletion(): Generator
+    public function getting_metadata_for_deleted_stream_returns_empty_string_and_signals_stream_deletion(): void
     {
-        yield $this->connection->setStreamMetadataAsync($this->stream, ExpectedVersion::NO_STREAM);
+        $this->connection->setStreamMetadata($this->stream, ExpectedVersion::NoStream);
 
-        yield $this->connection->deleteStreamAsync($this->stream, ExpectedVersion::NO_STREAM, true);
+        $this->connection->deleteStream($this->stream, ExpectedVersion::NoStream, true);
 
-        $meta = yield $this->connection->getRawStreamMetadataAsync($this->stream);
-        \assert($meta instanceof RawStreamMetadataResult);
+        $meta = $this->connection->getRawStreamMetadata($this->stream);
         $this->assertSame($this->stream, $meta->stream());
         $this->assertTrue($meta->isStreamDeleted());
-        $this->assertSame(EventNumber::DELETED_STREAM, $meta->metastreamVersion());
+        $this->assertSame(EventNumber::DeleteStream, $meta->metastreamVersion());
         $this->assertSame('', $meta->streamMetadata());
     }
 }

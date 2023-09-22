@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\PersistentSubscriptionSettings;
@@ -21,7 +20,7 @@ use Prooph\EventStore\PersistentSubscriptionSettings;
 class create_persistent_subscription_with_too_big_checkpoint_after extends TestCase
 {
     /** @test */
-    public function the_build_fails_with_argument_exception(): Generator
+    public function the_build_fails_with_argument_exception(): void
     {
         $this->expectException(InvalidArgumentException::class);
 

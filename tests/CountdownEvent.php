@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Deferred;
-use Amp\Promise;
+use Amp\CancelledException;
+use Amp\DeferredFuture;
+use Amp\TimeoutCancellation;
 use InvalidArgumentException;
 use Prooph\EventStore\Exception\RuntimeException;
 
@@ -22,7 +23,8 @@ use Prooph\EventStore\Exception\RuntimeException;
 class CountdownEvent
 {
     private int $counter;
-    private Deferred $deferred;
+
+    private DeferredFuture $deferred;
 
     public function __construct(int $counter)
     {
@@ -31,7 +33,7 @@ class CountdownEvent
         }
 
         $this->counter = $counter;
-        $this->deferred = new Deferred();
+        $this->deferred = new DeferredFuture();
     }
 
     public function signal(): void
@@ -43,25 +45,16 @@ class CountdownEvent
         --$this->counter;
 
         if (0 === $this->counter) {
-            $this->deferred->resolve(true);
+            $this->deferred->complete(true);
         }
     }
 
-    public function wait(int $timeout): Promise
+    public function wait(int $timeout): bool
     {
-        $promise = Promise\timeout($this->deferred->promise(), $timeout);
-
-        $deferred = new Deferred();
-        $newPromise = $deferred->promise();
-
-        $promise->onResolve(function (?\Throwable $exception = null, $result) use ($deferred): void {
-            if ($exception) {
-                $deferred->resolve(false);
-            } else {
-                $deferred->resolve(true);
-            }
-        });
-
-        return $newPromise;
+        try {
+            return $this->deferred->getFuture()->await(new TimeoutCancellation($timeout));
+        } catch (CancelledException $e) {
+            return false;
+        }
     }
 }

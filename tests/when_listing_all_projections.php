@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Success;
-use Generator;
 use Prooph\EventStore\Projections\ProjectionDetails;
 
 class when_listing_all_projections extends AsyncTestCase
@@ -25,18 +23,16 @@ class when_listing_all_projections extends AsyncTestCase
     /** @var ProjectionDetails[] */
     private array $result;
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        $this->result = yield $this->projectionsManager->listAllAsync($this->credentials);
+        $this->result = $this->projectionsManager->listAll($this->credentials);
     }
 
     /** @test */
-    public function should_return_all_projections(): Generator
+    public function should_return_all_projections(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->assertNotEmpty($this->result);
-
-            yield new Success();
         });
     }
 }

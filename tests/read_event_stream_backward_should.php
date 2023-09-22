@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Generator;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\RecordedEvent;
@@ -27,13 +26,13 @@ use ProophTest\EventStoreClient\Helper\TestEvent;
 class read_event_stream_backward_should extends EventStoreConnectionTestCase
 {
     /** @test */
-    public function throw_if_count_le_zero(): Generator
+    public function throw_if_count_le_zero(): void
     {
         $stream = 'read_event_stream_backward_should_throw_if_count_le_zero';
 
         $this->expectException(InvalidArgumentException::class);
 
-        $this->connection->readStreamEventsBackwardAsync(
+        $this->connection->readStreamEventsBackward(
             $stream,
             0,
             0,
@@ -42,97 +41,92 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function notify_using_status_code_if_stream_not_found(): Generator
+    public function notify_using_status_code_if_stream_not_found(): void
     {
         $stream = 'read_event_stream_backward_should_notify_using_status_code_if_stream_not_found';
 
-        $read = yield $this->connection->readStreamEventsBackwardAsync(
+        $read = $this->connection->readStreamEventsBackward(
             $stream,
-            StreamPosition::END,
+            StreamPosition::End->value,
             1,
             false
         );
-        \assert($read instanceof StreamEventsSlice);
 
-        $this->assertTrue(SliceReadStatus::streamNotFound()->equals($read->status()));
+        $this->assertSame(SliceReadStatus::StreamNotFound, $read->status());
     }
 
     /** @test */
-    public function notify_using_status_code_if_stream_was_deleted(): Generator
+    public function notify_using_status_code_if_stream_was_deleted(): void
     {
         $stream = 'read_event_stream_backward_should_notify_using_status_code_if_stream_was_deleted';
 
-        yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
+        $this->connection->deleteStream($stream, ExpectedVersion::NoStream, true);
 
-        $read = yield $this->connection->readStreamEventsBackwardAsync(
+        $read = $this->connection->readStreamEventsBackward(
             $stream,
-            StreamPosition::END,
+            StreamPosition::End->value,
             1,
             false
         );
-        \assert($read instanceof StreamEventsSlice);
 
-        $this->assertTrue(SliceReadStatus::streamDeleted()->equals($read->status()));
+        $this->assertSame(SliceReadStatus::StreamDeleted, $read->status());
     }
 
     /** @test */
-    public function return_no_events_when_called_on_empty_stream(): Generator
+    public function return_no_events_when_called_on_empty_stream(): void
     {
         $stream = 'read_event_stream_backward_should_return_single_event_when_called_on_empty_stream';
 
-        $read = yield $this->connection->readStreamEventsBackwardAsync(
+        $read = $this->connection->readStreamEventsBackward(
             $stream,
-            StreamPosition::END,
+            StreamPosition::End->value,
             1,
             false
         );
-        \assert($read instanceof StreamEventsSlice);
 
         $this->assertCount(0, $read->events());
     }
 
     /** @test */
-    public function return_partial_slice_if_no_enough_events_in_stream(): Generator
+    public function return_partial_slice_if_no_enough_events_in_stream(): void
     {
         $stream = 'read_event_stream_backward_should_return_partial_slice_if_no_enough_events_in_stream';
 
         $testEvents = TestEvent::newAmount(10);
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             $testEvents
         );
 
-        $read = yield $this->connection->readStreamEventsBackwardAsync(
+        $read = $this->connection->readStreamEventsBackward(
             $stream,
             1,
             5,
             false
         );
-        \assert($read instanceof StreamEventsSlice);
 
         $this->assertCount(2, $read->events());
     }
 
     /** @test */
-    public function return_events_reversed_compared_to_written(): Generator
+    public function return_events_reversed_compared_to_written(): void
     {
         $stream = 'read_event_stream_backward_should_return_events_reversed_compared_to_written';
 
         $testEvents = TestEvent::newAmount(10);
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             $testEvents
         );
 
-        $read = yield $this->connection->readStreamEventsBackwardAsync(
+        $read = $this->connection->readStreamEventsBackward(
             $stream,
-            StreamPosition::END,
+            StreamPosition::End->value,
             10,
             false
         );
-        \assert($read instanceof StreamEventsSlice);
 
         $events = \array_map(
             fn (ResolvedEvent $e): RecordedEvent => $e->event(),
@@ -143,18 +137,18 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function be_able_to_read_single_event_from_arbitrary_position(): Generator
+    public function be_able_to_read_single_event_from_arbitrary_position(): void
     {
         $stream = 'read_event_stream_backward_should_be_able_to_read_single_event_from_arbitrary_position';
 
         $testEvents = TestEvent::newAmount(10);
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             $testEvents
         );
 
-        $read = yield $this->connection->readStreamEventsBackwardAsync(
+        $read = $this->connection->readStreamEventsBackward(
             $stream,
             7,
             1,
@@ -166,20 +160,20 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function be_able_to_read_first_event(): Generator
+    public function be_able_to_read_first_event(): void
     {
         $stream = 'read_event_stream_backward_should_be_able_to_read_first_event';
 
         $testEvents = TestEvent::newAmount(10);
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             $testEvents
         );
 
-        $read = yield $this->connection->readStreamEventsBackwardAsync(
+        $read = $this->connection->readStreamEventsBackward(
             $stream,
-            StreamPosition::START,
+            StreamPosition::Start->value,
             1,
             false
         );
@@ -189,20 +183,20 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function be_able_to_read_last_event(): Generator
+    public function be_able_to_read_last_event(): void
     {
         $stream = 'read_event_stream_backward_should_be_able_to_read_last_event';
 
         $testEvents = TestEvent::newAmount(10);
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             $testEvents
         );
 
-        $read = yield $this->connection->readStreamEventsBackwardAsync(
+        $read = $this->connection->readStreamEventsBackward(
             $stream,
-            StreamPosition::END,
+            StreamPosition::End->value,
             1,
             false
         );
@@ -212,18 +206,18 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function be_able_to_read_slice_from_arbitrary_position(): Generator
+    public function be_able_to_read_slice_from_arbitrary_position(): void
     {
         $stream = 'read_event_stream_backward_should_be_able_to_read_slice_from_arbitrary_position';
 
         $testEvents = TestEvent::newAmount(10);
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $stream,
-            ExpectedVersion::NO_STREAM,
+            ExpectedVersion::NoStream,
             $testEvents
         );
 
-        $read = yield $this->connection->readStreamEventsBackwardAsync(
+        $read = $this->connection->readStreamEventsBackward(
             $stream,
             3,
             2,
@@ -243,13 +237,13 @@ class read_event_stream_backward_should extends EventStoreConnectionTestCase
     }
 
     /** @test */
-    public function throw_when_got_int_max_value_as_maxcount(): Generator
+    public function throw_when_got_int_max_value_as_maxcount(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->connection->readStreamEventsBackwardAsync(
+        $this->connection->readStreamEventsBackward(
             'foo',
-            StreamPosition::START,
+            StreamPosition::Start->value,
             \PHP_INT_MAX,
             false
         );

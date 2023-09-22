@@ -14,10 +14,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Amp\Success;
-use Generator;
-use Prooph\EventStore\Async\EventStorePersistentSubscription;
+use Prooph\EventStore\EventStorePersistentSubscription;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
@@ -26,8 +23,10 @@ class connect_to_existing_persistent_subscription_with_permissions extends Async
 {
     use SpecificationWithConnection;
 
-    private Promise $sub;
+    private EventStorePersistentSubscription $sub;
+
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
 
     protected function setUp(): void
@@ -41,31 +40,32 @@ class connect_to_existing_persistent_subscription_with_permissions extends Async
             ->build();
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->connection->createPersistentSubscriptionAsync(
+        $this->connection->createPersistentSubscription(
             $this->stream,
             'agroupname17',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        $this->sub = $this->connection->connectToPersistentSubscriptionAsync(
+        $this->sub = $this->connection->connectToPersistentSubscription(
             $this->stream,
             'agroupname17',
-            fn (
+            function (
                 EventStorePersistentSubscription $subscription,
                 ResolvedEvent $resolvedEvent,
                 ?int $retryCount = null
-            ): Promise => new Success()
+            ): void {
+            }
         );
     }
 
     /** @test */
-    public function the_subscription_suceeds(): Generator
+    public function the_subscription_succeeds(): void
     {
-        yield $this->execute(function (): Generator {
-            $this->assertNotNull(yield $this->sub);
+        $this->execute(function (): void {
+            $this->assertNotNull($this->sub);
         });
     }
 }

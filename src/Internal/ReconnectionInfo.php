@@ -20,22 +20,17 @@ namespace Prooph\EventStoreClient\Internal;
  */
 class ReconnectionInfo
 {
-    private int $reconnectionAttempt;
-    private int $timestamp;
-
-    public function __construct(int $reconnectionAttempt, int $timestamp)
-    {
-        $this->reconnectionAttempt = $reconnectionAttempt;
-        $this->timestamp = $timestamp;
+    public function __construct(
+        private readonly int $reconnectionAttempt,
+        private readonly int $timestamp
+    ) {
     }
 
-    /** @psalm-pure */
     public function reconnectionAttempt(): int
     {
         return $this->reconnectionAttempt;
     }
 
-    /** @psalm-pure */
     public function timestamp(): int
     {
         return $this->timestamp;

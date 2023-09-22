@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Generator;
 use Prooph\EventStore\Projections\Query;
 use Prooph\EventStore\Util\Guid;
 
@@ -23,21 +22,23 @@ class when_updating_a_projection_query extends AsyncTestCase
     use ProjectionSpecification;
 
     private string $projectionName;
+
     private string $streamName;
+
     private string $newQuery;
 
-    protected function given(): Generator
+    protected function given(): void
     {
         $this->projectionName = 'when_updating_a_projection_query';
         $this->streamName = 'test-stream-' . Guid::generateAsHex();
 
-        yield $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');
-        yield $this->postEvent($this->streamName, 'testEvent', '{"A": 2}');
+        $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');
+        $this->postEvent($this->streamName, 'testEvent', '{"A": 2}');
 
         $originalQuery = $this->createStandardQuery($this->streamName);
         $this->newQuery = $this->createStandardQuery('DifferentStream');
 
-        yield $this->projectionsManager->createContinuousAsync(
+        $this->projectionsManager->createContinuous(
             $this->projectionName,
             $originalQuery,
             false,
@@ -46,9 +47,9 @@ class when_updating_a_projection_query extends AsyncTestCase
         );
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->projectionsManager->updateQueryAsync(
+        $this->projectionsManager->updateQuery(
             $this->projectionName,
             $this->newQuery,
             false,
@@ -57,10 +58,10 @@ class when_updating_a_projection_query extends AsyncTestCase
     }
 
     /** @test */
-    public function should_update_the_projection_query(): Generator
+    public function should_update_the_projection_query(): void
     {
-        yield $this->execute(function (): Generator {
-            $query = yield $this->projectionsManager->getQueryAsync(
+        $this->execute(function (): void {
+            $query = $this->projectionsManager->getQuery(
                 $this->projectionName,
                 $this->credentials
             );

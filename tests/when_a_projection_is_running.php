@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Generator;
 use Prooph\EventStore\Projections\Query;
 use Prooph\EventStore\Projections\State;
 use Prooph\EventStore\Util\Guid;
@@ -24,24 +23,26 @@ class when_a_projection_is_running extends AsyncTestCase
     use ProjectionSpecification;
 
     private string $projectionName;
+
     private string $streamName;
+
     private string $query;
 
-    public function given(): Generator
+    public function given(): void
     {
         $id = Guid::generateAsHex();
         $this->projectionName = 'when_getting_projection_information-' . $id;
         $this->streamName = 'test-stream-' . $id;
 
-        yield $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');
-        yield $this->postEvent($this->streamName, 'testEvent', '{"A": 2}');
+        $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');
+        $this->postEvent($this->streamName, 'testEvent', '{"A": 2}');
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
         $this->query = $this->createStandardQuery($this->streamName);
 
-        yield $this->projectionsManager->createContinuousAsync(
+        $this->projectionsManager->createContinuous(
             $this->projectionName,
             $this->query,
             false,
@@ -51,10 +52,10 @@ class when_a_projection_is_running extends AsyncTestCase
     }
 
     /** @test */
-    public function should_be_able_to_get_the_projection_state(): Generator
+    public function should_be_able_to_get_the_projection_state(): void
     {
-        yield $this->execute(function (): Generator {
-            $state = yield $this->projectionsManager->getStateAsync(
+        $this->execute(function (): void {
+            $state = $this->projectionsManager->getState(
                 $this->projectionName,
                 $this->credentials
             );
@@ -64,10 +65,10 @@ class when_a_projection_is_running extends AsyncTestCase
     }
 
     /** @test */
-    public function should_be_able_to_get_the_projection_status(): Generator
+    public function should_be_able_to_get_the_projection_status(): void
     {
-        yield $this->execute(function (): Generator {
-            $status = yield $this->projectionsManager->getStatusAsync(
+        $this->execute(function (): void {
+            $status = $this->projectionsManager->getStatus(
                 $this->projectionName,
                 $this->credentials
             );
@@ -77,10 +78,10 @@ class when_a_projection_is_running extends AsyncTestCase
     }
 
     /** @test */
-    public function should_be_able_to_get_the_projection_result(): Generator
+    public function should_be_able_to_get_the_projection_result(): void
     {
-        yield $this->execute(function (): Generator {
-            $result = yield $this->projectionsManager->getResultAsync(
+        $this->execute(function (): void {
+            $result = $this->projectionsManager->getResult(
                 $this->projectionName,
                 $this->credentials
             );
@@ -92,10 +93,10 @@ class when_a_projection_is_running extends AsyncTestCase
     }
 
     /** @test */
-    public function should_be_able_to_get_the_projection_query(): Generator
+    public function should_be_able_to_get_the_projection_query(): void
     {
-        yield $this->execute(function (): Generator {
-            $query = yield $this->projectionsManager->getQueryAsync(
+        $this->execute(function (): void {
+            $query = $this->projectionsManager->getQuery(
                 $this->projectionName,
                 $this->credentials
             );
@@ -105,10 +106,10 @@ class when_a_projection_is_running extends AsyncTestCase
     }
 
     /** @test */
-    public function should_be_able_to_get_the_projection_statistics(): Generator
+    public function should_be_able_to_get_the_projection_statistics(): void
     {
-        yield $this->execute(function (): Generator {
-            $statistics = yield $this->projectionsManager->getStatisticsAsync(
+        $this->execute(function (): void {
+            $statistics = $this->projectionsManager->getStatistics(
                 $this->projectionName,
                 $this->credentials
             );

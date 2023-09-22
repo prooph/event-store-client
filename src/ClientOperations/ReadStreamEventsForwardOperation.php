@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\ClientOperations;
 
-use Amp\Deferred;
+use Amp\DeferredFuture;
 use Google\Protobuf\Internal\Message;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\ServerError;
@@ -37,34 +37,22 @@ use Psr\Log\LoggerInterface as Logger;
  */
 class ReadStreamEventsForwardOperation extends AbstractOperation
 {
-    private bool $requireMaster;
-    private string $stream;
-    private int $fromEventNumber;
-    private int $maxCount;
-    private bool $resolveLinkTos;
-
     public function __construct(
         Logger $logger,
-        Deferred $deferred,
-        bool $requireMaster,
-        string $stream,
-        int $fromEventNumber,
-        int $maxCount,
-        bool $resolveLinkTos,
+        DeferredFuture $deferred,
+        private readonly bool $requireMaster,
+        private readonly string $stream,
+        private readonly int $fromEventNumber,
+        private readonly int $maxCount,
+        private readonly bool $resolveLinkTos,
         ?UserCredentials $userCredentials
     ) {
-        $this->requireMaster = $requireMaster;
-        $this->stream = $stream;
-        $this->fromEventNumber = $fromEventNumber;
-        $this->maxCount = $maxCount;
-        $this->resolveLinkTos = $resolveLinkTos;
-
         parent::__construct(
             $logger,
             $deferred,
             $userCredentials,
-            TcpCommand::readStreamEventsForward(),
-            TcpCommand::readStreamEventsForwardCompleted(),
+            TcpCommand::ReadStreamEventsForward,
+            TcpCommand::ReadStreamEventsForwardCompleted,
             ReadStreamEventsCompleted::class
         );
     }
@@ -91,23 +79,23 @@ class ReadStreamEventsForwardOperation extends AbstractOperation
             case ReadStreamResult::Success:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'Success');
+                return new InspectionResult(InspectionDecision::EndOperation, 'Success');
             case ReadStreamResult::StreamDeleted:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'StreamDeleted');
+                return new InspectionResult(InspectionDecision::EndOperation, 'StreamDeleted');
             case ReadStreamResult::NoStream:
                 $this->succeed($response);
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'NoStream');
+                return new InspectionResult(InspectionDecision::EndOperation, 'NoStream');
             case ReadStreamResult::Error:
                 $this->fail(new ServerError($response->getError()));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'Error');
+                return new InspectionResult(InspectionDecision::EndOperation, 'Error');
             case ReadStreamResult::AccessDenied:
                 $this->fail(AccessDenied::toStream($this->stream));
 
-                return new InspectionResult(InspectionDecision::endOperation(), 'AccessDenied');
+                return new InspectionResult(InspectionDecision::EndOperation, 'AccessDenied');
             default:
                 throw new ServerError('Unexpected ReadStreamResult');
         }
@@ -130,10 +118,10 @@ class ReadStreamEventsForwardOperation extends AbstractOperation
         }
 
         return new StreamEventsSlice(
-            SliceReadStatus::byValue($response->getResult()),
+            SliceReadStatus::from($response->getResult()),
             $this->stream,
             $this->fromEventNumber,
-            ReadDirection::forward(),
+            ReadDirection::Forward,
             $resolvedEvents,
             (int) $response->getNextEventNumber(),
             (int) $response->getLastEventNumber(),

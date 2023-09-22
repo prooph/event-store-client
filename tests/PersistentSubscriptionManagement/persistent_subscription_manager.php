@@ -13,18 +13,13 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\PersistentSubscriptionManagement;
 
-use Amp\Delayed;
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Promise;
-use Amp\Success;
-use Generator;
-use Prooph\EventStore\Async\EventStorePersistentSubscription;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventData;
+use Prooph\EventStore\EventStorePersistentSubscription;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\PersistentSubscriptionNakEventAction;
-use Prooph\EventStore\PersistentSubscriptions\PersistentSubscriptionDetails;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\ResolvedEvent;
 use Prooph\EventStore\Util\Guid;
@@ -38,8 +33,11 @@ class persistent_subscription_manager extends AsyncTestCase
     use SpecificationWithConnection;
 
     private PersistentSubscriptionsManager $manager;
+
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
+
     private EventStorePersistentSubscription $sub;
 
     protected function setUp(): void
@@ -63,32 +61,33 @@ class persistent_subscription_manager extends AsyncTestCase
             ->build();
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->connection->createPersistentSubscriptionAsync(
+        $this->connection->createPersistentSubscription(
             $this->stream,
             'existing',
             $this->settings,
             DefaultData::adminCredentials()
         );
 
-        $this->sub = yield $this->connection->connectToPersistentSubscriptionAsync(
+        $this->sub = $this->connection->connectToPersistentSubscription(
             $this->stream,
             'existing',
-            fn (
+            function (
                 EventStorePersistentSubscription $subscription,
                 ResolvedEvent $resolvedEvent,
                 ?int $retryCount = null
-            ): Promise => new Success(),
+            ): void {
+            },
             null,
             10,
             true,
             DefaultData::adminCredentials()
         );
 
-        yield $this->connection->appendToStreamAsync(
+        $this->connection->appendToStream(
             $this->stream,
-            ExpectedVersion::ANY,
+            ExpectedVersion::Any,
             [
                 new EventData(null, 'whatever', true, \json_encode(['foo' => 2])),
                 new EventData(null, 'whatever', true, \json_encode(['bar' => 3])),
@@ -97,11 +96,10 @@ class persistent_subscription_manager extends AsyncTestCase
     }
 
     /** @test */
-    public function can_describe_persistent_subscription(): Generator
+    public function can_describe_persistent_subscription(): void
     {
-        yield $this->execute(function (): Generator {
-            $details = yield $this->manager->describe($this->stream, 'existing');
-            \assert($details instanceof PersistentSubscriptionDetails);
+        $this->execute(function (): void {
+            $details = $this->manager->describe($this->stream, 'existing');
 
             $this->assertSame($this->stream, $details->eventStreamId());
             $this->assertSame('existing', $details->groupName());
@@ -112,36 +110,36 @@ class persistent_subscription_manager extends AsyncTestCase
     }
 
     /** @test */
-    public function cannot_describe_persistent_subscription_with_empty_stream_name(): Generator
+    public function cannot_describe_persistent_subscription_with_empty_stream_name(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->expectException(InvalidArgumentException::class);
             $this->manager->describe('', 'existing');
         });
     }
 
     /** @test */
-    public function cannot_describe_persistent_subscription_with_empty_group_name(): Generator
+    public function cannot_describe_persistent_subscription_with_empty_group_name(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->expectException(InvalidArgumentException::class);
             $this->manager->describe($this->stream, '');
         });
     }
 
     /** @test */
-    public function can_list_all_persistent_subscriptions(): Generator
+    public function can_list_all_persistent_subscriptions(): void
     {
-        yield $this->execute(function (): Generator {
-            $list = yield $this->manager->list();
+        $this->execute(function (): void {
+            $list = $this->manager->list();
 
             $found = false;
             foreach ($list as $details) {
-                \assert($details instanceof PersistentSubscriptionDetails);
                 if ($details->eventStreamId() === $this->stream
                     && $details->groupName() === 'existing'
                 ) {
                     $found = true;
+
                     break;
                 }
             }
@@ -151,18 +149,18 @@ class persistent_subscription_manager extends AsyncTestCase
     }
 
     /** @test */
-    public function can_list_all_persistent_subscriptions_using_empty_string(): Generator
+    public function can_list_all_persistent_subscriptions_using_empty_string(): void
     {
-        yield $this->execute(function (): Generator {
-            $list = yield $this->manager->list('');
+        $this->execute(function (): void {
+            $list = $this->manager->list('');
 
             $found = false;
             foreach ($list as $details) {
-                \assert($details instanceof PersistentSubscriptionDetails);
                 if ($details->eventStreamId() === $this->stream
                     && $details->groupName() === 'existing'
                 ) {
                     $found = true;
+
                     break;
                 }
             }
@@ -172,19 +170,18 @@ class persistent_subscription_manager extends AsyncTestCase
     }
 
     /** @test */
-    public function can_list_persistent_subscriptions_for_stream(): Generator
+    public function can_list_persistent_subscriptions_for_stream(): void
     {
-        yield $this->execute(function (): Generator {
-            $list = yield $this->manager->list($this->stream);
+        $this->execute(function (): void {
+            $list = $this->manager->list($this->stream);
 
             $found = false;
             foreach ($list as $details) {
-                \assert($details instanceof PersistentSubscriptionDetails);
-
                 $this->assertSame($this->stream, $details->eventStreamId());
 
                 if ($details->groupName() === 'existing') {
                     $found = true;
+
                     break;
                 }
             }
@@ -194,26 +191,25 @@ class persistent_subscription_manager extends AsyncTestCase
     }
 
     /** @test */
-    public function can_replay_parked_messages(): Generator
+    public function can_replay_parked_messages(): void
     {
-        yield $this->execute(function (): Generator {
-            yield $this->sub->stop();
+        $this->setTimeout(10);
+        $this->execute(function (): void {
+            $this->sub->stop();
 
-            $this->sub = yield $this->connection->connectToPersistentSubscriptionAsync(
+            $this->sub = $this->connection->connectToPersistentSubscription(
                 $this->stream,
                 'existing',
                 function (
                     EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
-                ): Promise {
+                ): void {
                     $subscription->fail(
                         $resolvedEvent,
-                        PersistentSubscriptionNakEventAction::park(),
+                        PersistentSubscriptionNakEventAction::Park,
                         'testing'
                     );
-
-                    return new Success();
                 },
                 null,
                 10,
@@ -221,40 +217,36 @@ class persistent_subscription_manager extends AsyncTestCase
                 DefaultData::adminCredentials()
             );
 
-            yield $this->connection->appendToStreamAsync(
+            $this->connection->appendToStream(
                 $this->stream,
-                ExpectedVersion::ANY,
+                ExpectedVersion::Any,
                 [
                     new EventData(null, 'whatever', true, \json_encode(['foo' => 2])),
                     new EventData(null, 'whatever', true, \json_encode(['bar' => 3])),
                 ]
             );
 
-            $this->sub->stop();
+            $this->sub->stop(1);
 
-            yield new Delayed(1000); // wait for subscription to drop
-
-            yield $this->manager->replayParkedMessages($this->stream, 'existing', DefaultData::adminCredentials());
+            $this->manager->replayParkedMessages($this->stream, 'existing', DefaultData::adminCredentials());
 
             $event = new CountdownEvent(2);
 
-            yield $this->connection->connectToPersistentSubscriptionAsync(
+            $this->connection->connectToPersistentSubscription(
                 $this->stream,
                 'existing',
                 function (
                     EventStorePersistentSubscription $subscription,
                     ResolvedEvent $resolvedEvent,
                     ?int $retryCount = null
-                ) use ($event): Promise {
+                ) use ($event): void {
                     $subscription->fail(
                         $resolvedEvent,
-                        PersistentSubscriptionNakEventAction::park(),
+                        PersistentSubscriptionNakEventAction::Park,
                         'testing'
                     );
 
                     $event->signal();
-
-                    return new Success();
                 },
                 null,
                 10,
@@ -262,23 +254,23 @@ class persistent_subscription_manager extends AsyncTestCase
                 DefaultData::adminCredentials()
             );
 
-            $this->assertTrue(yield $event->wait(5000));
+            $this->assertTrue($event->wait(5));
         });
     }
 
     /** @test */
-    public function cannot_replay_parked_with_empty_stream_name(): Generator
+    public function cannot_replay_parked_with_empty_stream_name(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->expectException(InvalidArgumentException::class);
             $this->manager->replayParkedMessages('', 'existing');
         });
     }
 
     /** @test */
-    public function cannot_replay_parked_with_empty_group_name(): Generator
+    public function cannot_replay_parked_with_empty_group_name(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->expectException(InvalidArgumentException::class);
             $this->manager->replayParkedMessages($this->stream, '');
         });

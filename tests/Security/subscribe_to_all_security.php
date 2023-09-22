@@ -13,39 +13,50 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\Security;
 
-use Generator;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\Exception\NotAuthenticated;
 
 class subscribe_to_all_security extends AuthenticationTestCase
 {
     /** @test */
-    public function subscribing_to_all_with_not_existing_credentials_is_not_authenticated(): Generator
+    public function subscribing_to_all_with_not_existing_credentials_is_not_authenticated(): void
     {
-        yield $this->expectExceptionFromCallback(NotAuthenticated::class, fn () => $this->subscribeToAll('badlogin', 'badpass'));
+        $this->expectException(NotAuthenticated::class);
+
+        $this->subscribeToAll('badlogin', 'badpass');
     }
 
     /** @test */
-    public function subscribing_to_all_with_no_credentials_is_denied(): Generator
+    public function subscribing_to_all_with_no_credentials_is_denied(): void
     {
-        yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->subscribeToAll(null, null));
+        $this->expectException(AccessDenied::class);
+
+        $this->subscribeToAll(null, null);
     }
 
     /** @test */
-    public function subscribing_to_all_with_not_authorized_user_credentials_is_denied(): Generator
+    public function subscribing_to_all_with_not_authorized_user_credentials_is_denied(): void
     {
-        yield $this->expectExceptionFromCallback(AccessDenied::class, fn () => $this->subscribeToAll('user2', 'pa$$2'));
+        $this->expectException(AccessDenied::class);
+
+        $this->subscribeToAll('user2', 'pa$$2');
     }
 
-    /** @test */
-    public function subscribing_to_all_with_authorized_user_credentials_succeeds(): Generator
+    /**
+     * @test
+     * @doesNotPerformAssertions
+     */
+    public function subscribing_to_all_with_authorized_user_credentials_succeeds(): void
     {
-        yield $this->expectNoExceptionFromCallback(fn () => $this->subscribeToAll('user1', 'pa$$1'));
+        $this->subscribeToAll('user1', 'pa$$1');
     }
 
-    /** @test */
-    public function subscribing_to_all_with_admin_user_credentials_succeeds(): Generator
+    /**
+     * @test
+     * @doesNotPerformAssertions
+     */
+    public function subscribing_to_all_with_admin_user_credentials_succeeds(): void
     {
-        yield $this->expectNoExceptionFromCallback(fn () => $this->subscribeToAll('adm', 'admpa$$'));
+        $this->subscribeToAll('adm', 'admpa$$');
     }
 }

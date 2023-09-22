@@ -13,17 +13,14 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use Generator;
-use Prooph\EventStore\UserManagement\UserDetails;
 use ProophTest\EventStoreClient\DefaultData;
 
 class get_current_user extends TestWithNode
 {
     /** @test */
-    public function returns_the_current_user(): Generator
+    public function returns_the_current_user(): void
     {
-        $user = yield $this->manager->getCurrentUserAsync(DefaultData::adminCredentials());
-        \assert($user instanceof UserDetails);
+        $user = $this->manager->getCurrentUser(DefaultData::adminCredentials());
 
         $this->assertSame('admin', $user->loginName());
         $this->assertSame('Event Store Administrator', $user->fullName());

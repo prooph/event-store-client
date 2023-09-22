@@ -13,36 +13,34 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Deferred;
-use Amp\Promise;
-use function Amp\Promise\timeout;
-use Amp\Success;
-use Amp\TimeoutException;
+use Amp\CancelledException;
+use Amp\DeferredFuture;
+use Amp\TimeoutCancellation;
 use Closure;
-use Generator;
-use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
+use Prooph\EventStore\EventStoreCatchUpSubscription;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\ResolvedEvent;
 
 class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnectionTestCase
 {
-    private const TIMEOUT = 10000;
+    private const Timeout = 10;
 
     private string $streamName = 'TestStream';
+
     private CatchUpSubscriptionSettings $settings;
 
-    protected function setUpAsync(): Generator
+    protected function setUp(): void
     {
-        yield from parent::setUpAsync();
+        parent::setUp();
 
         //Create 500 events
         for ($i = 0; $i < 5; $i++) {
-            yield $this->connection->appendToStreamAsync(
+            $this->connection->appendToStream(
                 $this->streamName,
-                ExpectedVersion::ANY,
+                ExpectedVersion::Any,
                 $this->createOneHundredEvents()
             );
         }
@@ -63,11 +61,11 @@ class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnecti
     }
 
     /** @test */
-    public function catchupSubscriptionToAllHandlesManyEventsWithSmallBatchSize(): Generator
+    public function catchupSubscriptionToAllHandlesManyEventsWithSmallBatchSize(): void
     {
-        $deferred = new Deferred();
+        $deferred = new DeferredFuture();
 
-        yield $this->connection->subscribeToAllFromAsync(
+        $this->connection->subscribeToAllFrom(
             null,
             $this->settings,
             $this->eventAppearedResolver(),
@@ -77,20 +75,19 @@ class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnecti
         );
 
         try {
-            $result = yield timeout($deferred->promise(), self::TIMEOUT);
-
+            $result = $deferred->getFuture()->await(new TimeoutCancellation(self::Timeout));
             $this->assertTrue($result);
-        } catch (TimeoutException $e) {
+        } catch (CancelledException $e) {
             $this->fail('Timed out waiting for test to complete');
         }
     }
 
     /** @test */
-    public function catchupSubscriptionToStreamHandlesManyEventsWithSmallBatchSize(): Generator
+    public function catchupSubscriptionToStreamHandlesManyEventsWithSmallBatchSize(): void
     {
-        $deferred = new Deferred();
+        $deferred = new DeferredFuture();
 
-        yield $this->connection->subscribeToStreamFromAsync(
+        $this->connection->subscribeToStreamFrom(
             $this->streamName,
             null,
             $this->settings,
@@ -101,10 +98,9 @@ class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnecti
         );
 
         try {
-            $result = yield timeout($deferred->promise(), self::TIMEOUT);
-
+            $result = $deferred->getFuture()->await(new TimeoutCancellation(self::Timeout));
             $this->assertTrue($result);
-        } catch (TimeoutException $e) {
+        } catch (CancelledException $e) {
             $this->fail('Timed out waiting for test to complete');
         }
     }
@@ -114,16 +110,15 @@ class catch_up_subscription_handles_small_batch_sizes extends EventStoreConnecti
         return function (
             EventStoreCatchUpSubscription $subscription,
             ResolvedEvent $resolvedEvent
-        ): Promise {
-            return new Success();
+        ): void {
         };
     }
 
     private function liveProcessingStartedResolver(
-        Deferred $deferred
+        DeferredFuture $deferred
     ): Closure {
         return function (EventStoreCatchUpSubscription $subscription) use ($deferred): void {
-            $deferred->resolve(true);
+            $deferred->complete(true);
         };
     }
 }

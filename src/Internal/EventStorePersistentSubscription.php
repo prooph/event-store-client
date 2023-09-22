@@ -13,17 +13,14 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use function Amp\call;
-use Amp\Deferred;
-use Amp\Delayed;
-use Amp\Loop;
-use Amp\Promise;
-use Amp\Success;
+use function Amp\async;
+use Amp\DeferredFuture;
+use function Amp\delay;
+use Amp\TimeoutCancellation;
 use Closure;
 use Exception;
-use Generator;
-use Prooph\EventStore\Async\EventStorePersistentSubscription as AsyncEventStorePersistentSubscription;
 use Prooph\EventStore\EventId;
+use Prooph\EventStore\EventStorePersistentSubscription as EventStorePersistentSubscriptionInterface;
 use Prooph\EventStore\Exception\RuntimeException;
 use Prooph\EventStore\Internal\DropData;
 use Prooph\EventStore\Internal\PersistentEventStoreSubscription;
@@ -36,76 +33,58 @@ use Prooph\EventStore\UserCredentials;
 use Prooph\EventStoreClient\ConnectionSettings;
 use Prooph\EventStoreClient\Internal\Message\StartPersistentSubscriptionMessage;
 use Psr\Log\LoggerInterface as Logger;
+use Revolt\EventLoop;
 use SplQueue;
 use Throwable;
 
-class EventStorePersistentSubscription implements AsyncEventStorePersistentSubscription
+/** @internal */
+class EventStorePersistentSubscription implements EventStorePersistentSubscriptionInterface
 {
-    private EventStoreConnectionLogicHandler $handler;
     private ResolvedEvent $dropSubscriptionEvent;
-    private string $subscriptionId;
-    private string $streamId;
-    /** @var Closure(EventStorePersistentSubscription, ResolvedEvent, null|int): Promise $eventAppeared */
-    private Closure $eventAppeared;
-    /** @var null|Closure(EventStorePersistentSubscription, SubscriptionDropReason, null|Throwable): void $subscriptionDropped */
-    private ?Closure $subscriptionDropped;
-    private ?UserCredentials $userCredentials;
-    private Logger $log;
-    private bool $verbose;
-    private ConnectionSettings $settings;
-    private bool $autoAck;
+
     private ?PersistentEventStoreSubscription $subscription = null;
+
     /** @var SplQueue */
     private $queue;
+
     private bool $isProcessing = false;
+
     private ?DropData $dropData = null;
+
     private bool $isDropped = false;
-    private int $bufferSize;
-    private Deferred $stopped;
+
+    private DeferredFuture $stopped;
 
     /**
      * @internal
      *
-     * @param Closure(EventStorePersistentSubscription, ResolvedEvent, null|int): Promise $eventAppeared
+     * @param Closure(EventStorePersistentSubscription, ResolvedEvent, null|int): void $eventAppeared
      * @param null|Closure(EventStorePersistentSubscription, SubscriptionDropReason, null|Throwable): void $subscriptionDropped
      */
     public function __construct(
-        string $subscriptionId,
-        string $streamId,
-        Closure $eventAppeared,
-        ?Closure $subscriptionDropped,
-        ?UserCredentials $userCredentials,
-        Logger $logger,
-        bool $verboseLogging,
-        ConnectionSettings $settings,
-        EventStoreConnectionLogicHandler $handler,
-        int $bufferSize = 10,
-        bool $autoAck = true
+        private readonly string $subscriptionId,
+        private readonly string $streamId,
+        private readonly Closure $eventAppeared,
+        private readonly ?Closure $subscriptionDropped,
+        private readonly ?UserCredentials $userCredentials,
+        private readonly Logger $log,
+        private readonly bool $verbose,
+        private readonly ConnectionSettings $settings,
+        private readonly EventStoreConnectionLogicHandler $handler,
+        private readonly int $bufferSize = 10,
+        private readonly bool $autoAck = true
     ) {
         $this->dropSubscriptionEvent = new ResolvedEvent(null, null, null);
-        $this->subscriptionId = $subscriptionId;
-        $this->streamId = $streamId;
-        $this->eventAppeared = $eventAppeared;
-        $this->subscriptionDropped = $subscriptionDropped;
-        $this->userCredentials = $userCredentials;
-        $this->log = $logger;
-        $this->verbose = $verboseLogging;
-        $this->settings = $settings;
-        $this->bufferSize = $bufferSize;
-        $this->autoAck = $autoAck;
         $this->queue = new SplQueue();
-        $this->stopped = new Deferred();
-        $this->stopped->resolve(true);
-        $this->handler = $handler;
+        $this->stopped = new DeferredFuture();
+        $this->stopped->complete(true);
     }
 
     /**
      * @internal
      *
-     * @param Closure(EventStorePersistentSubscription, ResolvedEvent, null|int): Promise $eventAppeared
+     * @param Closure(EventStorePersistentSubscription, ResolvedEvent, null|int): void $eventAppeared
      * @param null|Closure(EventStorePersistentSubscription, SubscriptionDropReason, null|Throwable): void $subscriptionDropped
-     *
-     * @return Promise<PersistentEventStoreSubscription>
      */
     public function startSubscription(
         string $subscriptionId,
@@ -115,8 +94,8 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
         Closure $onEventAppeared,
         ?Closure $onSubscriptionDropped,
         ConnectionSettings $settings
-    ): Promise {
-        $deferred = new Deferred();
+    ): PersistentEventStoreSubscription {
+        $deferred = new DeferredFuture();
 
         $this->handler->enqueueMessage(new StartPersistentSubscriptionMessage(
             $deferred,
@@ -130,52 +109,36 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
             $settings->operationTimeout()
         ));
 
-        return $deferred->promise();
+        return $deferred->getFuture()->await();
     }
 
     /**
      * @internal
-     *
-     * @return Promise<self>
      */
-    public function start(): Promise
+    public function start(): void
     {
-        $this->stopped = new Deferred();
+        $this->stopped = new DeferredFuture();
 
-        $eventAppeared = fn (PersistentEventStoreSubscription $subscription, PersistentSubscriptionResolvedEvent $resolvedEvent): Promise => $this->onEventAppeared($resolvedEvent);
-
-        $subscriptionDropped = function (
-            PersistentEventStoreSubscription $subscription,
-            SubscriptionDropReason $reason,
-            ?Throwable $exception
-        ): void {
-            $this->onSubscriptionDropped($reason, $exception);
-        };
-
-        $promise = $this->startSubscription(
+        $this->subscription = $this->startSubscription(
             $this->subscriptionId,
             $this->streamId,
             $this->bufferSize,
             $this->userCredentials,
-            $eventAppeared,
-            $subscriptionDropped,
+            function (
+                PersistentEventStoreSubscription $subscription,
+                PersistentSubscriptionResolvedEvent $resolvedEvent
+            ): void {
+                $this->onEventAppeared($resolvedEvent);
+            },
+            function (
+                PersistentEventStoreSubscription $subscription,
+                SubscriptionDropReason $reason,
+                ?Throwable $exception
+            ): void {
+                $this->onSubscriptionDropped($reason, $exception);
+            },
             $this->settings
         );
-
-        $deferred = new Deferred();
-
-        $promise->onResolve(function (?Throwable $exception, $result) use ($deferred) {
-            if ($exception) {
-                $deferred->fail($exception);
-
-                return;
-            }
-
-            $this->subscription = $result;
-            $deferred->resolve($this);
-        });
-
-        return $deferred->promise();
     }
 
     /**
@@ -275,7 +238,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
         $this->subscription->notifyEventsFailed($eventIds, $action, $reason);
     }
 
-    public function stop(?int $timeout = null): Promise
+    public function stop(?float $timeout = null): void
     {
         if ($this->verbose) {
             $this->log->debug(\sprintf(
@@ -284,13 +247,13 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
             ));
         }
 
-        $this->enqueueSubscriptionDropNotification(SubscriptionDropReason::userInitiated(), null);
+        $this->enqueueSubscriptionDropNotification(SubscriptionDropReason::UserInitiated, null);
 
         if (null === $timeout) {
-            return new Success();
+            return;
         }
 
-        return Promise\timeoutWithDefault($this->stopped->promise(), $timeout);
+        $this->stopped->getFuture()->await(new TimeoutCancellation($timeout));
     }
 
     private function enqueueSubscriptionDropNotification(
@@ -316,10 +279,8 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
 
     private function onEventAppeared(
         PersistentSubscriptionResolvedEvent $resolvedEvent
-    ): Promise {
+    ): void {
         $this->enqueue($resolvedEvent);
-
-        return new Success();
     }
 
     private function enqueue(PersistentSubscriptionResolvedEvent $resolvedEvent): void
@@ -329,19 +290,18 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
         if (! $this->isProcessing) {
             $this->isProcessing = true;
 
-            Loop::defer(function (): Generator {
-                yield $this->processQueue();
+            EventLoop::defer(function (): void {
+                $this->processQueue();
             });
         }
     }
 
-    /** @return Promise<void> */
-    private function processQueue(): Promise
+    private function processQueue(): void
     {
-        return call(function (): Generator {
+        async(function (): void {
             do {
                 if (null === $this->subscription) {
-                    yield new Delayed(1000);
+                    delay(1);
                 } else {
                     while (! $this->queue->isEmpty()) {
                         $e = $this->queue->dequeue();
@@ -366,7 +326,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
                         }
 
                         try {
-                            yield ($this->eventAppeared)($this, $e->event(), $e->retryCount());
+                            ($this->eventAppeared)($this, $e->event(), $e->retryCount());
 
                             if ($this->autoAck) {
                                 /** @psalm-suppress PossiblyNullReference */
@@ -387,7 +347,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
                         } catch (Exception $ex) {
                             //TODO GFY should we autonak here?
 
-                            $this->dropSubscription(SubscriptionDropReason::eventHandlerException(), $ex);
+                            $this->dropSubscription(SubscriptionDropReason::EventHandlerException, $ex);
 
                             return;
                         }
@@ -396,7 +356,7 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
             } while (! $this->queue->isEmpty() && $this->isProcessing);
 
             $this->isProcessing = false;
-        });
+        })->await();
     }
 
     private function dropSubscription(SubscriptionDropReason $reason, ?Throwable $error): void
@@ -408,20 +368,18 @@ class EventStorePersistentSubscription implements AsyncEventStorePersistentSubsc
                 $this->log->debug(\sprintf(
                     'Persistent Subscription to %s: dropping subscription, reason: %s %s',
                     $this->streamId,
-                    $reason->name(),
+                    $reason->name,
                     null === $error ? '' : $error->getMessage()
                 ));
             }
 
-            if (null !== $this->subscription) {
-                $this->subscription->unsubscribe();
-            }
+            $this->subscription?->unsubscribe();
 
             if ($this->subscriptionDropped) {
                 ($this->subscriptionDropped)($this, $reason, $error);
             }
 
-            $this->stopped->resolve(true);
+            $this->stopped->complete(true);
         }
     }
 }

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Generator;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Prooph\EventStore\Util\Guid;
@@ -24,6 +23,7 @@ class create_duplicate_persistent_subscription_group extends AsyncTestCase
     use SpecificationWithConnection;
 
     private string $stream;
+
     private PersistentSubscriptionSettings $settings;
 
     protected function setUp(): void
@@ -37,9 +37,9 @@ class create_duplicate_persistent_subscription_group extends AsyncTestCase
             ->build();
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->connection->createPersistentSubscriptionAsync(
+        $this->connection->createPersistentSubscription(
             $this->stream,
             'group32',
             $this->settings,
@@ -48,12 +48,12 @@ class create_duplicate_persistent_subscription_group extends AsyncTestCase
     }
 
     /** @test */
-    public function the_completion_fails_with_invalid_operation_exception(): Generator
+    public function the_completion_fails_with_invalid_operation_exception(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->expectException(InvalidOperationException::class);
 
-            yield $this->connection->createPersistentSubscriptionAsync(
+            $this->connection->createPersistentSubscription(
                 $this->stream,
                 'group32',
                 $this->settings,

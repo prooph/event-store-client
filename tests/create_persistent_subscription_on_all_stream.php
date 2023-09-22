@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Success;
-use Generator;
 use Prooph\EventStore\Exception\AccessDenied;
 use Prooph\EventStore\PersistentSubscriptionSettings;
 use Throwable;
@@ -37,17 +35,12 @@ class create_persistent_subscription_on_all_stream extends AsyncTestCase
             ->build();
     }
 
-    protected function when(): Generator
-    {
-        yield new Success();
-    }
-
     /** @test */
-    public function the_completion_fails_with_invalid_stream(): Generator
+    public function the_completion_fails_with_invalid_stream(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             try {
-                yield $this->connection->createPersistentSubscriptionAsync(
+                $this->connection->createPersistentSubscription(
                     '$all',
                     'shitbird',
                     $this->settings

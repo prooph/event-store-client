@@ -19,28 +19,22 @@ use Throwable;
 /** @internal */
 class TcpConnectionClosedMessage implements Message
 {
-    private TcpPackageConnection $tcpPackageConnection;
-    private ?Throwable $exception;
-
-    public function __construct(TcpPackageConnection $tcpPackageConnection, ?Throwable $exception = null)
-    {
-        $this->tcpPackageConnection = $tcpPackageConnection;
-        $this->exception = $exception;
+    public function __construct(
+        private readonly TcpPackageConnection $tcpPackageConnection,
+        private readonly ?Throwable $exception = null
+    ) {
     }
 
-    /** @psalm-pure */
     public function tcpPackageConnection(): TcpPackageConnection
     {
         return $this->tcpPackageConnection;
     }
 
-    /** @psalm-pure */
     public function exception(): ?Throwable
     {
         return $this->exception;
     }
 
-    /** @psalm-pure */
     public function __toString(): string
     {
         return 'TcpConnectionClosedMessage';

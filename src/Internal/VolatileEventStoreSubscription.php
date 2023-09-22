@@ -16,7 +16,11 @@ namespace Prooph\EventStoreClient\Internal;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStoreClient\ClientOperations\VolatileSubscriptionOperation;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 class VolatileEventStoreSubscription extends EventStoreSubscription
 {
     private VolatileSubscriptionOperation $subscriptionOperation;

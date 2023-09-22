@@ -26,18 +26,16 @@ use SplQueue;
 /** @internal  */
 class SubscriptionsManager
 {
-    private string $connectionName;
-    private ConnectionSettings $settings;
     /** @var array<string, SubscriptionItem> */
     private array $activeSubscriptions = [];
+
     private SplQueue $waitingSubscriptions;
+
     /** @var list<SubscriptionItem> */
     private array $retryPendingSubscriptions = [];
 
-    public function __construct(string $connectionName, ConnectionSettings $settings)
+    public function __construct(private string $connectionName, private ConnectionSettings $settings)
     {
-        $this->connectionName = $connectionName;
-        $this->settings = $settings;
         $this->waitingSubscriptions = new SplQueue();
     }
 
@@ -52,7 +50,7 @@ class SubscriptionsManager
 
         foreach ($this->activeSubscriptions as $subscriptionItem) {
             $subscriptionItem->operation()->dropSubscription(
-                SubscriptionDropReason::connectionClosed(),
+                SubscriptionDropReason::ConnectionClosed,
                 $connectionClosedException
             );
         }
@@ -61,14 +59,14 @@ class SubscriptionsManager
             $subscriptionItem = $this->waitingSubscriptions->dequeue();
             \assert($subscriptionItem instanceof SubscriptionItem);
             $subscriptionItem->operation()->dropSubscription(
-                SubscriptionDropReason::connectionClosed(),
+                SubscriptionDropReason::ConnectionClosed,
                 $connectionClosedException
             );
         }
 
         foreach ($this->retryPendingSubscriptions as $subscriptionItem) {
             $subscriptionItem->operation()->dropSubscription(
-                SubscriptionDropReason::connectionClosed(),
+                SubscriptionDropReason::ConnectionClosed,
                 $connectionClosedException
             );
         }
@@ -121,7 +119,7 @@ class SubscriptionsManager
 
                 if ($this->settings->failOnNoServerResponse()) {
                     $subscription->operation()->dropSubscription(
-                        SubscriptionDropReason::subscribingError(),
+                        SubscriptionDropReason::SubscribingError,
                         new OperationTimedOut($err)
                     );
                     $removeSubscriptions->enqueue($subscription);
@@ -173,7 +171,7 @@ class SubscriptionsManager
         if ($subscription->maxRetries() >= 0 && $subscription->retryCount() >= $subscription->maxRetries()) {
             $this->logDebug('RETRIES LIMIT REACHED when trying to retry %s', (string) $subscription);
             $subscription->operation()->dropSubscription(
-                SubscriptionDropReason::subscribingError(),
+                SubscriptionDropReason::SubscribingError,
                 RetriesLimitReached::with($subscription->retryCount())
             );
 

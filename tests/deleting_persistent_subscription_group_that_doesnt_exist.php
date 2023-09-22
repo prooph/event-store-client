@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Amp\Success;
-use Generator;
 use Prooph\EventStore\Exception\InvalidOperationException;
 use Prooph\EventStore\Util\Guid;
 
@@ -32,18 +30,13 @@ class deleting_persistent_subscription_group_that_doesnt_exist extends AsyncTest
         $this->stream = Guid::generateAsHex();
     }
 
-    protected function when(): Generator
-    {
-        yield new Success();
-    }
-
     /** @test */
-    public function the_delete_fails_with_argument_exception(): Generator
+    public function the_delete_fails_with_argument_exception(): void
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             $this->expectException(InvalidOperationException::class);
 
-            yield $this->connection->deletePersistentSubscriptionAsync(
+            $this->connection->deletePersistentSubscription(
                 $this->stream,
                 Guid::generateAsHex(),
                 DefaultData::adminCredentials()

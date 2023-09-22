@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient\UserManagement;
 
-use Generator;
 use Prooph\EventStore\Exception\InvalidArgumentException;
 use Prooph\EventStore\Exception\UserCommandFailed;
 use Prooph\EventStore\Transport\Http\HttpStatusCode;
@@ -23,33 +22,33 @@ use ProophTest\EventStoreClient\DefaultData;
 class change_password extends TestWithUser
 {
     /** @test */
-    public function empty_username_throws(): Generator
+    public function empty_username_throws(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        yield $this->manager->changePasswordAsync('', 'oldPassword', 'newPassword', DefaultData::adminCredentials());
+        $this->manager->changePassword('', 'oldPassword', 'newPassword', DefaultData::adminCredentials());
     }
 
     /** @test */
-    public function empty_current_password_throws(): Generator
+    public function empty_current_password_throws(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        yield $this->manager->changePasswordAsync($this->username, '', 'newPassword', DefaultData::adminCredentials());
+        $this->manager->changePassword($this->username, '', 'newPassword', DefaultData::adminCredentials());
     }
 
     /** @test */
-    public function empty_new_password_throws(): Generator
+    public function empty_new_password_throws(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        yield $this->manager->changePasswordAsync($this->username, 'oldPassword', '', DefaultData::adminCredentials());
+        $this->manager->changePassword($this->username, 'oldPassword', '', DefaultData::adminCredentials());
     }
 
     /** @test */
-    public function can_change_password(): Generator
+    public function can_change_password(): void
     {
-        yield $this->manager->changePasswordAsync(
+        $this->manager->changePassword(
             $this->username,
             'password',
             'fubar',
@@ -59,14 +58,14 @@ class change_password extends TestWithUser
         $this->expectException(UserCommandFailed::class);
 
         try {
-            yield $this->manager->changePasswordAsync(
+            $this->manager->changePassword(
                 $this->username,
                 'password',
                 'foobar',
                 new UserCredentials($this->username, 'password')
             );
         } catch (UserCommandFailed $e) {
-            $this->assertSame(HttpStatusCode::UNAUTHORIZED, $e->httpStatusCode());
+            $this->assertSame(HttpStatusCode::Unauthorized, $e->httpStatusCode());
 
             throw $e;
         }

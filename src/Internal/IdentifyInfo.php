@@ -20,22 +20,17 @@ namespace Prooph\EventStoreClient\Internal;
  */
 class IdentifyInfo
 {
-    private string $correlationId;
-    private int $timestamp;
-
-    public function __construct(string $correlationId, int $timestamp)
-    {
-        $this->correlationId = $correlationId;
-        $this->timestamp = $timestamp;
+    public function __construct(
+        private readonly string $correlationId,
+        private readonly int $timestamp
+    ) {
     }
 
-    /** @psalm-pure */
     public function correlationId(): string
     {
         return $this->correlationId;
     }
 
-    /** @psalm-pure */
     public function timestamp(): int
     {
         return $this->timestamp;

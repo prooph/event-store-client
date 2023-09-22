@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\PHPUnit\AsyncTestCase;
-use Generator;
-use Prooph\EventStore\EventReadResult;
 use Prooph\EventStore\Projections\ProjectionDetails;
 use Prooph\EventStore\Util\Guid;
 
@@ -24,27 +22,31 @@ class when_creating_continuous_projection extends AsyncTestCase
     use ProjectionSpecification;
 
     private string $projectionName;
+
     private string $streamName;
+
     private string $emittedStreamName;
+
     private string $query;
+
     private string $projectionId;
 
-    public function given(): Generator
+    public function given(): void
     {
         $id = Guid::generateAsHex();
         $this->projectionName = 'when_creating_transient_projection-' . $id;
         $this->streamName = 'test-stream-' . $id;
         $this->emittedStreamName = 'emittedStream-' . $id;
 
-        yield $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');
-        yield $this->postEvent($this->streamName, 'testEvent', '{"A": 2}');
+        $this->postEvent($this->streamName, 'testEvent', '{"A": 1}');
+        $this->postEvent($this->streamName, 'testEvent', '{"A": 2}');
 
         $this->query = $this->createStandardQuery($this->streamName);
     }
 
-    protected function when(): Generator
+    protected function when(): void
     {
-        yield $this->projectionsManager->createContinuousAsync(
+        $this->projectionsManager->createContinuous(
             $this->projectionName,
             $this->query,
             false,
@@ -54,11 +56,11 @@ class when_creating_continuous_projection extends AsyncTestCase
     }
 
     /** @test */
-    public function should_create_projection(): Generator
+    public function should_create_projection(): string
     {
-        yield $this->execute(function (): Generator {
+        $this->execute(function (): void {
             /** @var ProjectionDetails[] $allProjections */
-            $allProjections = yield $this->projectionsManager->listContinuousAsync($this->credentials);
+            $allProjections = $this->projectionsManager->listContinuous($this->credentials);
 
             $found = false;
 
@@ -66,6 +68,7 @@ class when_creating_continuous_projection extends AsyncTestCase
                 if ($projection->effectiveName() === $this->projectionName) {
                     $this->projectionId = $projection->name();
                     $found = true;
+
                     break;
                 }
             }
@@ -81,16 +84,15 @@ class when_creating_continuous_projection extends AsyncTestCase
      * @test
      * @depends should_create_projection
      */
-    public function should_have_turn_on_emit_to_stream(string $projectionId): Generator
+    public function should_have_turn_on_emit_to_stream(string $projectionId): void
     {
-        yield $this->execute(function () use ($projectionId): Generator {
-            $event = yield $this->connection->readEventAsync(
+        $this->execute(function () use ($projectionId): void {
+            $event = $this->connection->readEvent(
                 '$projections-' . $projectionId,
                 0,
                 true,
                 $this->credentials
             );
-            \assert($event instanceof EventReadResult);
             $data = $event->event()->event()->data();
             $eventData = \json_decode($data, true);
             $this->assertTrue((bool) $eventData['emitEnabled']);

@@ -13,13 +13,10 @@ declare(strict_types=1);
 
 namespace ProophTest\EventStoreClient;
 
-use Amp\Deferred;
-use Amp\Promise;
-use function Amp\Promise\timeout;
-use Amp\Success;
-use Amp\TimeoutException;
+use Amp\CancelledException;
+use Amp\DeferredFuture;
+use Amp\TimeoutCancellation;
 use Closure;
-use Generator;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ExpectedVersion;
 use Prooph\EventStore\ResolvedEvent;
@@ -29,141 +26,137 @@ use Throwable;
 
 class subscribe_should extends EventStoreConnectionTestCase
 {
-    private const TIMEOUT = 10000;
+    private const Timeout = 10;
 
     /** @test */
-    public function be_able_to_subscribe_to_non_existing_stream_and_then_catch_new_event(): Generator
+    public function be_able_to_subscribe_to_non_existing_stream_and_then_catch_new_event(): void
     {
         $stream = 'subscribe_should_be_able_to_subscribe_to_non_existing_stream_and_then_catch_created_event';
 
-        $appeared = new Deferred();
+        $appeared = new DeferredFuture();
 
-        yield $this->connection->subscribeToStreamAsync(
+        $this->connection->subscribeToStream(
             $stream,
             false,
             $this->eventAppearedResolver($appeared)
         );
 
-        yield $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
+        $this->connection->appendToStream($stream, ExpectedVersion::NoStream, [TestEvent::newTestEvent()]);
 
         try {
-            $result = yield timeout($appeared->promise(), self::TIMEOUT);
+            $result = $appeared->getFuture()->await(new TimeoutCancellation(self::Timeout));
             $this->assertTrue($result);
-        } catch (TimeoutException $e) {
+        } catch (CancelledException $e) {
             $this->fail('Appeared countdown event timed out');
         }
     }
 
     /** @test */
-    public function allow_multiple_subscriptions_to_same_stream(): Generator
+    public function allow_multiple_subscriptions_to_same_stream(): void
     {
         $stream = 'subscribe_should_allow_multiple_subscriptions_to_same_stream';
 
-        $appeared1 = new Deferred();
-        $appeared2 = new Deferred();
+        $appeared1 = new DeferredFuture();
+        $appeared2 = new DeferredFuture();
 
-        yield $this->connection->subscribeToStreamAsync(
+        $this->connection->subscribeToStream(
             $stream,
             false,
             $this->eventAppearedResolver($appeared1)
         );
 
-        yield $this->connection->subscribeToStreamAsync(
+        $this->connection->subscribeToStream(
             $stream,
             false,
             $this->eventAppearedResolver($appeared2)
         );
 
-        $this->connection->appendToStreamAsync($stream, ExpectedVersion::NO_STREAM, [TestEvent::newTestEvent()]);
+        $this->connection->appendToStream($stream, ExpectedVersion::NoStream, [TestEvent::newTestEvent()]);
 
         try {
-            $result = yield timeout($appeared1->promise(), self::TIMEOUT);
+            $result = $appeared1->getFuture()->await(new TimeoutCancellation(self::Timeout));
             $this->assertTrue($result);
-        } catch (TimeoutException $e) {
+        } catch (CancelledException $e) {
             $this->fail('Appeared1 countdown event timed out');
         }
 
         try {
-            $result = yield timeout($appeared2->promise(), self::TIMEOUT);
+            $result = $appeared2->getFuture()->await(new TimeoutCancellation(self::Timeout));
             $this->assertTrue($result);
-        } catch (TimeoutException $e) {
+        } catch (CancelledException $e) {
             $this->fail('Appeared2 countdown event timed out');
         }
     }
 
     /** @test */
-    public function call_dropped_callback_after_unsubscribe_method_call(): Generator
+    public function call_dropped_callback_after_unsubscribe_method_call(): void
     {
         $stream = 'subscribe_should_call_dropped_callback_after_unsubscribe_method_call';
 
-        $dropped = new Deferred();
+        $dropped = new DeferredFuture();
 
-        $subscription = yield $this->connection->subscribeToStreamAsync(
+        $subscription = $this->connection->subscribeToStream(
             $stream,
             false,
             function (
                 EventStoreSubscription $subscription,
                 ResolvedEvent $resolvedEvent
-            ): Promise {
-                return new Success();
+            ): void {
             },
             $this->subscriptionDroppedResolver($dropped)
         );
-        \assert($subscription instanceof EventStoreSubscription);
 
         $subscription->unsubscribe();
 
         try {
-            $result = yield timeout($dropped->promise(), self::TIMEOUT);
+            $result = $dropped->getFuture()->await(new TimeoutCancellation(self::Timeout));
             $this->assertTrue($result);
-        } catch (TimeoutException $e) {
+        } catch (CancelledException $e) {
             $this->fail('Dropdown countdown event timed out');
         }
     }
 
     /** @test */
-    public function catch_deleted_events_as_well(): Generator
+    public function catch_deleted_events_as_well(): void
     {
         $stream = 'subscribe_should_catch_created_and_deleted_events_as_well';
 
-        $appeared = new Deferred();
+        $appeared = new DeferredFuture();
 
-        yield $this->connection->subscribeToStreamAsync(
+        $this->connection->subscribeToStream(
             $stream,
             false,
             $this->eventAppearedResolver($appeared)
         );
 
-        yield $this->connection->deleteStreamAsync($stream, ExpectedVersion::NO_STREAM, true);
+        $this->connection->deleteStream($stream, ExpectedVersion::NoStream, true);
 
         try {
-            $result = yield timeout($appeared->promise(), self::TIMEOUT);
+            $result = $appeared->getFuture()->await(new TimeoutCancellation(self::Timeout));
             $this->assertTrue($result);
-        } catch (TimeoutException $e) {
+        } catch (CancelledException $e) {
             $this->fail('Appeared countdown event timed out');
         }
     }
 
-    private function eventAppearedResolver(Deferred $deferred): Closure
+    private function eventAppearedResolver(DeferredFuture $deferred): Closure
     {
         return function (
             EventStoreSubscription $subscription,
             ResolvedEvent $resolvedEvent
-        ) use ($deferred): Promise {
-            $deferred->resolve(true);
-
-            return new Success();
+        ) use ($deferred): void {
+            $deferred->complete(true);
         };
     }
 
-    private function subscriptionDroppedResolver(Deferred $deferred): Closure
+    private function subscriptionDroppedResolver(DeferredFuture $deferred): Closure
     {
         return function (
             EventStoreSubscription $subscription,
             SubscriptionDropReason $reason,
             ?Throwable $exception = null
         ) use ($deferred): void {
-            $deferred->resolve(true);
+            $deferred->complete(true);
         };
     }
 }
