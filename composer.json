@@ -35,7 +35,7 @@
     "amphp/log": "^v2.0",
     "amphp/parallel": "^v2.2.2",
     "amphp/phpunit-util": "^3.0",
-    "doctrine/instantiator": "^1.5",
+    "doctrine/instantiator": "^1.5 || ^2.0",
     "phpspec/prophecy": "^1.17",
     "phpunit/phpunit": "^9.6",
     "prooph/php-cs-fixer-config": "^0.5.0"
