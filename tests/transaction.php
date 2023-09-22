@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ProophTest\EventStoreClient;
 
 use Amp\Future;
-use Amp\Parallel\Worker\DefaultWorkerPool;
+use Amp\Parallel\Worker\ContextWorkerPool;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\Exception\StreamDeleted;
 use Prooph\EventStore\Exception\WrongExpectedVersion;
@@ -29,10 +29,7 @@ class transaction extends EventStoreConnectionTestCase
     {
         $stream = 'should_start_on_non_existing_stream_with_correct_exp_ver_and_create_stream_on_commit';
 
-        $transaction = $this->connection->startTransaction(
-            $stream,
-            ExpectedVersion::NoStream
-        );
+        $transaction = $this->connection->startTransaction($stream, ExpectedVersion::NoStream);
 
         $transaction->write([TestEvent::newTestEvent()]);
 
@@ -46,10 +43,7 @@ class transaction extends EventStoreConnectionTestCase
     {
         $stream = 'should_start_on_non_existing_stream_with_exp_ver_any_and_create_stream_on_commit';
 
-        $transaction = $this->connection->startTransaction(
-            $stream,
-            ExpectedVersion::Any
-        );
+        $transaction = $this->connection->startTransaction($stream, ExpectedVersion::Any);
 
         $transaction->write([TestEvent::newTestEvent()]);
 
@@ -63,10 +57,7 @@ class transaction extends EventStoreConnectionTestCase
     {
         $stream = 'should_fail_to_commit_non_existing_stream_with_wrong_exp_ver';
 
-        $transaction = $this->connection->startTransaction(
-            $stream,
-            1
-        );
+        $transaction = $this->connection->startTransaction($stream, 1);
 
         $transaction->write([TestEvent::newTestEvent()]);
 
@@ -80,21 +71,13 @@ class transaction extends EventStoreConnectionTestCase
     {
         $stream = 'should_do_nothing_if_commits_no_events_to_empty_stream';
 
-        $transaction = $this->connection->startTransaction(
-            $stream,
-            ExpectedVersion::NoStream
-        );
+        $transaction = $this->connection->startTransaction($stream, ExpectedVersion::NoStream);
 
         $result = $transaction->commit();
 
         $this->assertSame(-1, $result->nextExpectedVersion());
 
-        $result = $this->connection->readStreamEventsForward(
-            $stream,
-            0,
-            1,
-            false
-        );
+        $result = $this->connection->readStreamEventsForward($stream, 0, 1, false);
 
         $this->assertCount(0, $result->events());
     }
@@ -115,12 +98,7 @@ class transaction extends EventStoreConnectionTestCase
 
         $this->assertSame(-1, $result->nextExpectedVersion());
 
-        $result = $this->connection->readStreamEventsForward(
-            $stream,
-            0,
-            1,
-            false
-        );
+        $result = $this->connection->readStreamEventsForward($stream, 0, 1, false);
 
         $this->assertCount(0, $result->events());
     }
@@ -150,11 +128,11 @@ class transaction extends EventStoreConnectionTestCase
         $task1 = new ParallelTransactionTask($stream, 'trans write');
         $task2 = new ParallelTransactionTask($stream, 'plain write');
 
-        $pool = new DefaultWorkerPool();
+        $pool = new ContextWorkerPool();
 
         $results = [];
-        $results[] = $pool->submit($task1)->getResult();
-        $results[] = $pool->submit($task2)->getResult();
+        $results[] = $pool->submit($task1)->getFuture();
+        $results[] = $pool->submit($task2)->getFuture();
 
         $results = Future\awaitAll($results);
 
@@ -162,12 +140,7 @@ class transaction extends EventStoreConnectionTestCase
         $this->assertTrue($results[1][0]);
         $this->assertTrue($results[1][1]);
 
-        $slice = $this->connection->readStreamEventsForward(
-            $stream,
-            0,
-            500,
-            false
-        );
+        $slice = $this->connection->readStreamEventsForward($stream, 0, 500, false);
 
         $this->assertCount(500, $slice->events());
 
@@ -251,20 +224,12 @@ class transaction extends EventStoreConnectionTestCase
         $result1 = $transaction1->commit();
         $this->assertSame(0, $result1->nextExpectedVersion());
 
-        $transaction2 = $this->connection->startTransaction(
-            $stream,
-            ExpectedVersion::Any
-        );
+        $transaction2 = $this->connection->startTransaction($stream, ExpectedVersion::Any);
         $transaction2->write([$event]);
         $result2 = $transaction2->commit();
         $this->assertSame(0, $result2->nextExpectedVersion());
 
-        $result = $this->connection->readStreamEventsForward(
-            $stream,
-            0,
-            100,
-            false
-        );
+        $result = $this->connection->readStreamEventsForward($stream, 0, 100, false);
 
         $this->assertCount(1, $result->events());
         $this->assertTrue($event->eventId()->equals($result->events()[0]->event()->eventId()));
