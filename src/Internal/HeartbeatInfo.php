@@ -23,7 +23,7 @@ class HeartbeatInfo
     public function __construct(
         private readonly int $lastPackageNumber,
         private readonly bool $isIntervalStage,
-        private readonly int $timestamp
+        private readonly float $timestamp
     ) {
     }
 
@@ -37,7 +37,7 @@ class HeartbeatInfo
         return $this->isIntervalStage;
     }
 
-    public function timestamp(): int
+    public function timestamp(): float
     {
         return $this->timestamp;
     }

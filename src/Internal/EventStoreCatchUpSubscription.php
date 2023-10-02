@@ -485,7 +485,7 @@ abstract class EventStoreCatchUpSubscription implements EventStoreCatchUpSubscri
                 'Catch-up Subscription %s to %s: dropped subscription, reason: %s %s',
                 $this->subscriptionName,
                 $this->isSubscribedToAll ? self::AllStream : $this->streamId,
-                $reason->name(),
+                $reason->name,
                 null === $error ? '' : $error->getMessage()
             ));
         }

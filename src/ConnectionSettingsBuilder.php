@@ -231,7 +231,7 @@ class ConnectionSettingsBuilder
         return $this;
     }
 
-    public function setOperationTimeoutTo(int $operationTimeout): self
+    public function setOperationTimeoutTo(float $operationTimeout): self
     {
         if ($operationTimeout < 0) {
             throw new InvalidArgumentException('Timeout must be positive');
@@ -242,7 +242,7 @@ class ConnectionSettingsBuilder
         return $this;
     }
 
-    public function setTimeoutCheckPeriodTo(int $timeoutCheckPeriod): self
+    public function setTimeoutCheckPeriodTo(float $timeoutCheckPeriod): self
     {
         if ($timeoutCheckPeriod < 0) {
             throw new InvalidArgumentException('Timeout must be positive');
@@ -280,7 +280,7 @@ class ConnectionSettingsBuilder
         return $this;
     }
 
-    public function setHeartbeatInterval(int $interval): self
+    public function setHeartbeatInterval(float $interval): self
     {
         if ($interval < 0) {
             throw new InvalidArgumentException('Interval must be positive');

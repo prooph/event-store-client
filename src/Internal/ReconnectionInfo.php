@@ -22,7 +22,7 @@ class ReconnectionInfo
 {
     public function __construct(
         private readonly int $reconnectionAttempt,
-        private readonly int $timestamp
+        private readonly float $timestamp
     ) {
     }
 
@@ -31,7 +31,7 @@ class ReconnectionInfo
         return $this->reconnectionAttempt;
     }
 
-    public function timestamp(): int
+    public function timestamp(): float
     {
         return $this->timestamp;
     }

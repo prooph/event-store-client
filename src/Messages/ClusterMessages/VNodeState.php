@@ -13,23 +13,23 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Messages\ClusterMessages;
 
-enum VNodeState: int
+enum VNodeState: string
 {
-    case Initializing = 1;
-    case ReadOnlyLeaderless = 2;
-    case Unknown = 3;
-    case PreReadOnlyReplica = 4;
-    case PreReplica = 5;
-    case CatchingUp = 6;
-    case Clone = 7;
-    case ReadOnlyReplica = 8;
-    case Slave = 9;
-    case Follower = 10;
-    case PreMaster = 11;
-    case PreLeader = 12;
-    case Master = 13;
-    case Leader = 14;
-    case Manager = 15;
-    case ShuttingDown = 16;
-    case Shutdown = 17;
+    case Initializing = 'Initializing';
+    case ReadOnlyLeaderless = 'ReadOnlyLeaderless';
+    case Unknown = 'Unknown';
+    case PreReadOnlyReplica = 'PreReadOnlyReplica';
+    case PreReplica = 'PreReplica';
+    case CatchingUp = 'CatchingUp';
+    case Clone = 'Clone';
+    case ReadOnlyReplica = 'ReadOnlyReplica';
+    case Slave = 'Slave';
+    case Follower = 'Follower';
+    case PreMaster = 'PreMaster';
+    case PreLeader = 'PreLeader';
+    case Master = 'Master';
+    case Leader = 'Leader';
+    case Manager = 'Manager';
+    case ShuttingDown = 'ShuttingDown';
+    case Shutdown = 'Shutdown';
 }

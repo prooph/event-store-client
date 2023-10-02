@@ -261,9 +261,9 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
         $this->log->info(\sprintf(
             'Discovering: found best choice [%s, %s] (%s)',
-            (string) $normTcp,
-            null === $secTcp ? 'n/a' : (string) $secTcp,
-            (string) $node->state()
+            $normTcp,
+            null === $secTcp ? 'n/a' : $secTcp,
+            $node->state()->name
         ));
 
         return new NodeEndPoints($normTcp, $secTcp);

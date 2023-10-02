@@ -22,7 +22,7 @@ class AuthInfo
 {
     public function __construct(
         private readonly string $correlationId,
-        private readonly int $timestamp
+        private readonly float $timestamp
     ) {
     }
 
@@ -31,7 +31,7 @@ class AuthInfo
         return $this->correlationId;
     }
 
-    public function timestamp(): int
+    public function timestamp(): float
     {
         return $this->timestamp;
     }
