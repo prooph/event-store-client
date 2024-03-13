@@ -26,7 +26,7 @@
     "amphp/http-client": "^v5.0.0-beta.17",
     "amphp/byte-stream": "^v2.0.2",
     "amphp/socket": "^v2.2.0",
-    "google/protobuf": "^v3.24.3",
+    "google/protobuf": "^v3.24.3 || ^4.0.0",
     "prooph/event-store": "dev-master",
     "psr/log": "^3.0"
   },
