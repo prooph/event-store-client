@@ -173,6 +173,10 @@ class EventStoreConnectionLogicHandler
             TcpConnectionClosedMessage::class,
             function (TcpConnectionClosedMessage $message): void {
                 $this->tcpConnectionClosed($message->tcpPackageConnection());
+
+                if ($message->exception()) {
+                    throw $message->exception();
+                }
             }
         );
         $this->handler->registerHandler(

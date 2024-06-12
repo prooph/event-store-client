@@ -58,7 +58,6 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         for ($attempt = 1; $attempt <= $this->maxDiscoverAttempts; ++$attempt) {
             try {
                 $endPoints = $this->discoverEndPoint($failedTcpEndPoint);
-
                 if (null !== $endPoints) {
                     $this->log->info(\sprintf(
                         'Discovering attempt %d/%d successful: best candidate is %s',
@@ -69,7 +68,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
                     return $endPoints;
                 }
-            } catch (Exception $e) {
+            } catch (\Throwable $e) {
                 $this->log->info(\sprintf(
                     'Discovering attempt %d/%d failed with error: %s',
                     $attempt,
@@ -111,6 +110,9 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
                 return $bestNode;
             }
         }
+
+
+        return null;
     }
 
     /** @return list<GossipSeed> */
@@ -179,13 +181,14 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
     private function tryGetGossipFrom(GossipSeed $endPoint): ?ClusterInfoDto
     {
-        $uri = 'https://' . $endPoint->endPoint()->host() . ':' . $endPoint->endPoint()->port() . '/gossip?format=json';
+        $schema = $endPoint->seedOverTls ? 'https://' : 'http://';
+        $uri = $schema . $endPoint->endPoint->host() . ':' . $endPoint->endPoint->port() . '/gossip?format=json';
         $this->log->info($uri);
 
         try {
             $request = new Request($uri);
 
-            $header = $endPoint->hostHeader();
+            $header = $endPoint->hostHeader;
 
             if (! empty($header)) {
                 $headerData = \explode(':', $header);

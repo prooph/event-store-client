@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
+use Prooph\EventStore\ClientErrorEventArgs;
+use Prooph\EventStore\ClientReconnectingEventArgs;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
@@ -35,9 +37,24 @@ $connection->onClosed(function (): void {
     echo 'connection closed' . PHP_EOL;
 });
 
-$connection->connectAsync();
+$connection->onErrorOccurred(function (ClientErrorEventArgs $a): void {
+    echo 'error' . PHP_EOL;
+    var_dump($a->exception()->getMessage());
+});
 
-$slice = $connection->readStreamEventsForwardAsync(
+$connection->onReconnecting(function (ClientReconnectingEventArgs $a): void {
+    echo 'retry: ' . $a->connection()->connectionName();
+});
+
+$connection->onDisconnected(function (): void {
+    echo 'DISCONNECTED';
+});
+try {
+    $connection->connect();
+} catch (\Throwable $e) {
+    var_dump($e->getMessage()); die;
+}
+$slice = $connection->readStreamEventsForward(
     'foo-bar',
     10,
     2,
@@ -46,7 +63,7 @@ $slice = $connection->readStreamEventsForwardAsync(
 
 \var_dump($slice);
 
-$slice = $connection->readStreamEventsBackwardAsync(
+$slice = $connection->readStreamEventsBackward(
     'foo-bar',
     10,
     2,
@@ -55,15 +72,15 @@ $slice = $connection->readStreamEventsBackwardAsync(
 
 \var_dump($slice);
 
-$event = $connection->readEventAsync('foo-bar', 2, true);
+$event = $connection->readEvent('foo-bar', 2, true);
 
 \var_dump($event);
 
-$m = $connection->getStreamMetadataAsync('foo-bar');
+$m = $connection->getStreamMetadata('foo-bar');
 
 \var_dump($m);
 
-$r = $connection->setStreamMetadataAsync('foo-bar', ExpectedVersion::Any, new StreamMetadata(
+$r = $connection->setStreamMetadata('foo-bar', ExpectedVersion::Any, new StreamMetadata(
     null,
     null,
     null,
@@ -76,11 +93,11 @@ $r = $connection->setStreamMetadataAsync('foo-bar', ExpectedVersion::Any, new St
 
 \var_dump($r);
 
-$m = $connection->getStreamMetadataAsync('foo-bar');
+$m = $connection->getStreamMetadata('foo-bar');
 
 \var_dump($m);
 
-$wr = $connection->appendToStreamAsync('foo-bar', ExpectedVersion::Any, [
+$wr = $connection->appendToStream('foo-bar', ExpectedVersion::Any, [
     new EventData(EventId::generate(), 'test-type', false, 'jfkhksdfhsds', 'meta'),
     new EventData(EventId::generate(), 'test-type2', false, 'kldjfls', 'meta'),
     new EventData(EventId::generate(), 'test-type3', false, 'aaa', 'meta'),
@@ -89,14 +106,14 @@ $wr = $connection->appendToStreamAsync('foo-bar', ExpectedVersion::Any, [
 
 \var_dump($wr);
 
-$ae = $connection->readAllEventsForwardAsync(Position::start(), 2, false, new UserCredentials(
+$ae = $connection->readAllEventsForward(Position::start(), 2, false, new UserCredentials(
     'admin',
     'changeit'
 ));
 
 \var_dump($ae);
 
-$aeb = $connection->readAllEventsBackwardAsync(Position::end(), 2, false, new UserCredentials(
+$aeb = $connection->readAllEventsBackward(Position::end(), 2, false, new UserCredentials(
     'admin',
     'changeit'
 ));

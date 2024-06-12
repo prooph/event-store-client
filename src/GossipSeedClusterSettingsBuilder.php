@@ -28,40 +28,12 @@ class GossipSeedClusterSettingsBuilder
 
     private bool $preferRandomNode = false;
 
-    public function addEndPoint(EndPoint $endPoint): self
-    {
-        $this->gossipSeeds[] = new GossipSeed($endPoint);
-
-        return $this;
-    }
-
-    /**
-     * @param list<EndPoint> $endPoints
-     */
-    public function addEndPoints(array $endPoints): self
-    {
-        foreach ($endPoints as $endPoint) {
-            $this->addEndPoint($endPoint);
-        }
-
-        return $this;
-    }
-
-    public function addGossipSeed(GossipSeed $gossipSeed): self
-    {
-        $this->gossipSeeds[] = $gossipSeed;
-
-        return $this;
-    }
-
     /**
      * @param list<GossipSeed> $gossipSeeds
      */
-    public function addGossipSeeds(array $gossipSeeds): self
+    public function setGossipSeedEndPoints(array $gossipSeeds): self
     {
-        foreach ($gossipSeeds as $gossipSeed) {
-            $this->addGossipSeed($gossipSeed);
-        }
+        $this->gossipSeeds = $gossipSeeds;
 
         return $this;
     }
