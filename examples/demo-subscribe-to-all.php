@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-use Amp\Loop;
-use Amp\Promise;
-use Amp\Success;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventStoreSubscription;
 use Prooph\EventStore\ResolvedEvent;
@@ -26,43 +23,39 @@ use Throwable;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-Loop::run(function () {
-    $connection = EventStoreConnectionFactory::createFromEndPoint(
-        new EndPoint('eventstore', 1113)
-    );
+$connection = EventStoreConnectionFactory::createFromEndPoint(
+    new EndPoint('eventstore', 1113)
+);
 
-    $connection->onConnected(function (): void {
-        echo 'connected' . PHP_EOL;
-    });
-
-    $connection->onClosed(function (): void {
-        echo 'connection closed' . PHP_EOL;
-    });
-
-    yield $connection->connectAsync();
-
-    $subscription = yield $connection->subscribeToAllAsync(
-        true,
-        function (EventStoreSubscription $subscription, ResolvedEvent $resolvedEvent): Promise {
-            echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
-            echo 'data: ' . $resolvedEvent->originalEvent()->data() . PHP_EOL;
-
-            return new Success();
-        },
-        function (
-            EventStoreSubscription $subscription,
-            SubscriptionDropReason $reason,
-            ?Throwable $exception = null
-        ): void {
-            echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
-
-            if ($exception) {
-                echo 'ex: ' . $exception->getMessage() . PHP_EOL;
-            }
-        },
-        new UserCredentials('admin', 'changeit')
-    );
-
-    \assert($subscription instanceof VolatileEventStoreSubscription);
-    echo 'last event number: ' . $subscription->lastCommitPosition() . PHP_EOL;
+$connection->onConnected(function (): void {
+    echo 'connected' . PHP_EOL;
 });
+
+$connection->onClosed(function (): void {
+    echo 'connection closed' . PHP_EOL;
+});
+
+$connection->connect();
+
+$subscription = $connection->subscribeToAll(
+    true,
+    function (EventStoreSubscription $subscription, ResolvedEvent $resolvedEvent): void {
+        echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
+        echo 'data: ' . $resolvedEvent->originalEvent()->data() . PHP_EOL;
+    },
+    function (
+        EventStoreSubscription $subscription,
+        SubscriptionDropReason $reason,
+        ?Throwable $exception = null
+    ): void {
+        echo 'dropped with reason: ' . $reason->name . PHP_EOL;
+
+        if ($exception) {
+            echo 'ex: ' . $exception->getMessage() . PHP_EOL;
+        }
+    },
+    new UserCredentials('admin', 'changeit')
+);
+
+\assert($subscription instanceof VolatileEventStoreSubscription);
+echo 'last event number: ' . $subscription->lastCommitPosition() . PHP_EOL;

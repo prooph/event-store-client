@@ -13,10 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-use Amp\Loop;
-use Amp\Promise;
-use Amp\Success;
-use Prooph\EventStore\Async\EventStoreCatchUpSubscription;
+use Prooph\EventStore\EventStoreCatchUpSubscription;
 use Prooph\EventStore\CatchUpSubscriptionSettings;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\ResolvedEvent;
@@ -25,49 +22,45 @@ use Throwable;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-Loop::run(function () {
-    $builder = new ConnectionSettingsBuilder();
-    $builder->enableVerboseLogging();
-    $builder->useConsoleLogger();
+$builder = new ConnectionSettingsBuilder();
+$builder->enableVerboseLogging();
+$builder->useConsoleLogger();
 
-    $connection = EventStoreConnectionFactory::createFromEndPoint(
-        new EndPoint('eventstore', 1113),
-        $builder->build()
-    );
+$connection = EventStoreConnectionFactory::createFromEndPoint(
+    new EndPoint('eventstore', 1113),
+    $builder->build()
+);
 
-    $connection->onConnected(function (): void {
-        echo 'connected' . PHP_EOL;
-    });
-
-    $connection->onClosed(function (): void {
-        echo 'connection closed' . PHP_EOL;
-    });
-
-    yield $connection->connectAsync();
-
-    yield $connection->subscribeToStreamFromAsync(
-        'foo-bar',
-        null,
-        CatchUpSubscriptionSettings::default(),
-        function (EventStoreCatchUpSubscription $subscription, ResolvedEvent $resolvedEvent): Promise {
-            echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
-            echo 'data: ' . $resolvedEvent->originalEvent()->data() . PHP_EOL;
-
-            return new Success();
-        },
-        function (EventStoreCatchUpSubscription $subscription): void {
-            echo 'liveProcessingStarted on ' . $subscription->streamId() . PHP_EOL;
-        },
-        function (
-            EventStoreCatchUpSubscription $subscription,
-            SubscriptionDropReason $reason,
-            ?Throwable $exception = null
-        ): void {
-            echo 'dropped with reason: ' . $reason->name() . PHP_EOL;
-
-            if ($exception) {
-                echo 'ex: ' . $exception->getMessage() . PHP_EOL;
-            }
-        }
-    );
+$connection->onConnected(function (): void {
+    echo 'connected' . PHP_EOL;
 });
+
+$connection->onClosed(function (): void {
+    echo 'connection closed' . PHP_EOL;
+});
+
+$connection->connect();
+
+$connection->subscribeToStreamFrom(
+    'foo-bar',
+    null,
+    CatchUpSubscriptionSettings::default(),
+    function (EventStoreCatchUpSubscription $subscription, ResolvedEvent $resolvedEvent): void {
+        echo 'incoming event: ' . $resolvedEvent->originalEventNumber() . '@' . $resolvedEvent->originalStreamName() . PHP_EOL;
+        echo 'data: ' . $resolvedEvent->originalEvent()->data() . PHP_EOL;
+    },
+    function (EventStoreCatchUpSubscription $subscription): void {
+        echo 'liveProcessingStarted on ' . $subscription->streamId() . PHP_EOL;
+    },
+    function (
+        EventStoreCatchUpSubscription $subscription,
+        SubscriptionDropReason $reason,
+        ?Throwable $exception = null
+    ): void {
+        echo 'dropped with reason: ' . $reason->name . PHP_EOL;
+
+        if ($exception) {
+            echo 'ex: ' . $exception->getMessage() . PHP_EOL;
+        }
+    }
+);
