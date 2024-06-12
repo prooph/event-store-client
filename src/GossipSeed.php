@@ -20,19 +20,12 @@ use Prooph\EventStore\EndPoint;
  *
  * @psalm-immutable
  */
-class GossipSeed
+readonly class GossipSeed
 {
-    public function __construct(private readonly EndPoint $endPoint, private readonly string $hostHeader = '')
+    public function __construct(
+        public EndPoint $endPoint,
+        public string $hostHeader = '',
+        public bool $seedOverTls = true)
     {
-    }
-
-    public function endPoint(): EndPoint
-    {
-        return $this->endPoint;
-    }
-
-    public function hostHeader(): string
-    {
-        return $this->hostHeader;
     }
 }

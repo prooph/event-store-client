@@ -368,14 +368,14 @@ class ConnectionSettingsBuilder
     }
 
     /** @param list<EndPoint> $gossipSeeds */
-    public function setGossipSeedEndPoints(array $gossipSeeds): self
+    public function setGossipSeedEndPoints(array $gossipSeeds, bool $seedOverTls = true): self
     {
         if (empty($gossipSeeds)) {
             throw new InvalidArgumentException('Empty FakeDnsEntries collection');
         }
 
         foreach ($gossipSeeds as $seed) {
-            $this->gossipSeeds[] = new GossipSeed($seed);
+            $this->gossipSeeds[] = new GossipSeed($seed, '', $seedOverTls);
         }
 
         return $this;
