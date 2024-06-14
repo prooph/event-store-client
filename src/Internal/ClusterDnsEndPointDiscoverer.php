@@ -181,14 +181,14 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
     private function tryGetGossipFrom(GossipSeed $endPoint): ?ClusterInfoDto
     {
-        $schema = $endPoint->seedOverTls ? 'https://' : 'http://';
-        $uri = $schema . $endPoint->endPoint->host() . ':' . $endPoint->endPoint->port() . '/gossip?format=json';
+        $schema = $endPoint->seedOverTls() ? 'https://' : 'http://';
+        $uri = $schema . $endPoint->endPoint()->host() . ':' . $endPoint->endPoint()->port() . '/gossip?format=json';
         $this->log->info($uri);
 
         try {
             $request = new Request($uri);
 
-            $header = $endPoint->hostHeader;
+            $header = $endPoint->hostHeader();
 
             if (! empty($header)) {
                 $headerData = \explode(':', $header);
