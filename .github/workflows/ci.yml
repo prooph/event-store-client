@@ -1,0 +1,83 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version: [8.1, 8.2]
+        dependencies: ["", "--prefer-lowest --prefer-stable"]
+        execute-cs-check: [true, false]
+        test-coverage: [true, false]
+
+    env:
+      COMPOSER_CACHE_DIR: ${{ github.workspace }}/.composer/cache
+      PHP_CS_FIXER_CACHE_DIR: ${{ github.workspace }}/.php-cs-fixer
+      LOCAL_CACHE_DIR: ${{ github.workspace }}/.local
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: ${{ matrix.test-coverage }}
+          extensions: pcov
+          ini-values: |
+            memory_limit=-1
+          tools: composer:v2
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ env.COMPOSER_CACHE_DIR }}
+            ${{ env.PHP_CS_FIXER_CACHE_DIR }}
+            ${{ env.LOCAL_CACHE_DIR }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install EventStore
+        run: |
+          echo downloading EventStore 5.0.10
+          wget https://github.com/EventStore/Downloads/raw/master/ubuntu/EventStore-OSS-Linux-Ubuntu-16.04-v5.0.10.tar.gz
+          echo extracting event-store
+          tar xf EventStore-OSS-Linux-Ubuntu-16.04-v5.0.10.tar.gz
+          cd EventStore-OSS-Linux-Ubuntu-16.04-v5.0.10
+          echo starting event-store
+          ./run-node.sh --run-projections=all --mem-db --ext-tcp-heartbeat-interval 5000 --ext-tcp-heartbeat-timeout 1500 > /dev/null &
+          cd ..
+          mkdir -p ${{ env.PHP_CS_FIXER_CACHE_DIR }}
+
+      - name: Disable Xdebug
+        run: sudo phpdismod xdebug
+
+      - name: Self-update Composer
+        run: composer self-update
+
+      - name: Install dependencies
+        run: composer update --prefer-dist ${{ matrix.dependencies }}
+
+      - name: Run tests
+        run: |
+          if [ "${{ matrix.test-coverage }}" == "true" ]; then
+            php ./vendor/bin/phpunit --exclude-group=ignore --coverage-text --coverage-clover ./build/logs/clover.xml
+          else
+            ./vendor/bin/phpunit --exclude-group=ignore
+          fi
+
+      - name: Run CS check
+        if: ${{ matrix.execute-cs-check }} == 'true'
+        run: ./vendor/bin/php-cs-fixer fix -v --diff --dry-run
+
+      - name: Stop EventStore
+        run: wget --http-user="admin" --http-password="changeit" --post-data='' http://localhost:2113/admin/shutdown
+
+      - name: Upload coverage to Coveralls
+        if: ${{ matrix.test-coverage }} == 'true'
+        run: php vendor/bin/php-coveralls -v
