@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use Amp\ByteStream\ClosedException;
 use Amp\DeferredFuture;
 use Closure;
 use Exception;
@@ -174,7 +175,8 @@ class EventStoreConnectionLogicHandler
             function (TcpConnectionClosedMessage $message): void {
                 $this->tcpConnectionClosed($message->tcpPackageConnection());
 
-                if ($message->exception()) {
+                // if connection was closed, don't throw that exception, we do retry instead
+                if ($message->exception() && ! $message->exception() instanceof ClosedException) {
                     throw $message->exception();
                 }
             }
