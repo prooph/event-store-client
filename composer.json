@@ -29,7 +29,7 @@
     "amphp/socket": "^v2.3.1",
     "google/protobuf": "^v3.24.3",
     "prooph/event-store": "dev-master",
-    "psr/log": "^3.0"
+    "psr/log": "^2.0|^3.0"
   },
   "require-dev": {
     "amphp/file": "^3.1.0",
@@ -38,6 +38,7 @@
     "amphp/phpunit-util": "^3.0",
     "doctrine/instantiator": "^2.0",
     "friendsofphp/php-cs-fixer": "^v3.59.3",
+    "php-coveralls/php-coveralls": "2.7.0",
     "phpspec/prophecy": "^1.17",
     "phpunit/phpunit": "^9.6",
     "prooph/php-cs-fixer-config": "^0.5.0"
