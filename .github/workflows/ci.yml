@@ -15,6 +15,11 @@ jobs:
       COMPOSER_CACHE_DIR: ${{ github.workspace }}/.composer/cache
       PHP_CS_FIXER_CACHE_DIR: ${{ github.workspace }}/.php-cs-fixer
       LOCAL_CACHE_DIR: ${{ github.workspace }}/.local
+      GITHUB_REF: ${{ github.ref }}
+      GITHUB_ACTIONS: true
+      GITHUB_RUN_ID: ${{ github.run_id }}
+      GITHUB_EVENT_NAME: ${{ github.event_name }}
+      COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
     steps:
       - name: Checkout code
