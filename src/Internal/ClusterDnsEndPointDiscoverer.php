@@ -58,6 +58,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         for ($attempt = 1; $attempt <= $this->maxDiscoverAttempts; ++$attempt) {
             try {
                 $endPoints = $this->discoverEndPoint($failedTcpEndPoint);
+
                 if (null !== $endPoints) {
                     $this->log->info(\sprintf(
                         'Discovering attempt %d/%d successful: best candidate is %s',
@@ -68,7 +69,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
 
                     return $endPoints;
                 }
-            } catch (\Throwable $e) {
+            } catch (Exception $e) {
                 $this->log->info(\sprintf(
                     'Discovering attempt %d/%d failed with error: %s',
                     $attempt,
@@ -167,7 +168,7 @@ final class ClusterDnsEndPointDiscoverer implements EndPointDiscoverer
         $j = \count($members);
 
         foreach ($members as $k => $member) {
-            if ($members[$k]->state() === VNodeState::Manager) {
+            if ($members[$k]->state()->value === VNodeState::Manager) {
                 $result[--$j] = new GossipSeed(new EndPoint($members[$k]->httpAddress(), $members[$k]->httpPort()));
             } else {
                 $result[++$i] = new GossipSeed(new EndPoint($members[$k]->httpAddress(), $members[$k]->httpPort()));

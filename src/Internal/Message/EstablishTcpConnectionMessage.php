@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal\Message;
 
+use Amp\DeferredFuture;
 use Prooph\EventStoreClient\Internal\NodeEndPoints;
 
 /**
@@ -22,8 +23,13 @@ use Prooph\EventStoreClient\Internal\NodeEndPoints;
  */
 class EstablishTcpConnectionMessage implements Message
 {
-    public function __construct(private readonly NodeEndPoints $nodeEndPoints)
+    public function __construct(private readonly ?DeferredFuture $deferred, private readonly NodeEndPoints $nodeEndPoints)
     {
+    }
+
+    public function deferred(): ?DeferredFuture
+    {
+        return $this->deferred;
     }
 
     public function nodeEndPoints(): NodeEndPoints

@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient;
 
-use Prooph\EventStore\ClientErrorEventArgs;
-use Prooph\EventStore\ClientReconnectingEventArgs;
 use Prooph\EventStore\EndPoint;
 use Prooph\EventStore\EventData;
 use Prooph\EventStore\EventId;
@@ -37,23 +35,8 @@ $connection->onClosed(function (): void {
     echo 'connection closed' . PHP_EOL;
 });
 
-$connection->onErrorOccurred(function (ClientErrorEventArgs $a): void {
-    echo 'error' . PHP_EOL;
-    var_dump($a->exception()->getMessage());
-});
+$connection->connect();
 
-$connection->onReconnecting(function (ClientReconnectingEventArgs $a): void {
-    echo 'retry: ' . $a->connection()->connectionName();
-});
-
-$connection->onDisconnected(function (): void {
-    echo 'DISCONNECTED';
-});
-try {
-    $connection->connect();
-} catch (\Throwable $e) {
-    var_dump($e->getMessage()); die;
-}
 $slice = $connection->readStreamEventsForward(
     'foo-bar',
     10,

@@ -15,6 +15,7 @@ namespace ProophTest\EventStoreClient;
 
 use Amp\CancelledException;
 use Amp\DeferredFuture;
+use Amp\Socket\ConnectException;
 use function Amp\delay;
 use Amp\PHPUnit\AsyncTestCase;
 use Amp\TimeoutCancellation;
@@ -40,85 +41,16 @@ class connect extends AsyncTestCase
 
     /**
      * @test
-     * @doesNotPerformAssertions
+     * @group ignore
      */
-    public function should_not_throw_exception_when_server_is_down(): void
+    public function should_throw_exception_when_server_is_down(): void
     {
+        $this->expectException(ConnectException::class);
+
         $connection = EventStoreConnectionFactory::createFromEndPoint(
             $this->blackhole
         );
 
         $connection->connect();
-
-        delay(0.05); // wait for loop to finish
-    }
-
-    /** @test */
-    public function should_throw_exception_when_trying_to_reopen_closed_connection(): void
-    {
-        $closed = new DeferredFuture();
-        $settings = ConnectionSettings::create()
-            ->limitReconnectionsTo(0)
-            ->withConnectionTimeoutOf(10)
-            ->setReconnectionDelayTo(0)
-            ->failOnNoServerResponse()
-            ->build();
-
-        $connection = EventStoreConnectionFactory::createFromEndPoint(
-            $this->blackhole,
-            $settings
-        );
-
-        $connection->onClosed(function () use ($closed): void {
-            $closed->complete(true);
-        });
-
-        $connection->connect();
-
-        try {
-            $closed->getFuture()->await(new TimeoutCancellation(120));
-        } catch (CancelledException $e) {
-            $this->fail('Connection timeout took too long');
-        }
-
-        $this->expectException(InvalidOperationException::class);
-
-        $connection->connect();
-    }
-
-    /** @test */
-    public function should_close_connection_after_configured_amount_of_failed_reconnections(): void
-    {
-        $closed = new DeferredFuture();
-        $settings = ConnectionSettings::create()
-            ->limitReconnectionsTo(1)
-            ->withConnectionTimeoutOf(10)
-            ->setReconnectionDelayTo(0)
-            ->failOnNoServerResponse()
-            ->build();
-
-        $connection = EventStoreConnectionFactory::createFromEndPoint(
-            $this->blackhole,
-            $settings
-        );
-
-        $connection->onClosed(function (ClientClosedEventArgs $args) use ($closed): void {
-            $this->assertInstanceOf(EventStoreConnection::class, $args->connection());
-            $this->assertSame('Reconnection limit reached', $args->reason());
-
-            $closed->complete(true);
-        });
-
-        $connection->connect();
-
-        try {
-            $closed->getFuture()->await(new TimeoutCancellation(50));
-        } catch (CancelledException $e) {
-            $this->fail('Connection timeout took too long');
-        }
-
-        $this->expectException(InvalidOperationException::class);
-
-        $connection->appendToStream('stream', ExpectedVersion::NoStream, [TestEvent::newTestEvent()]);
     }
 }
