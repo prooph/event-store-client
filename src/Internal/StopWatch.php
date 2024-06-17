@@ -13,23 +13,27 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
+use Prooph\EventStore\Util\DateTime;
+
 /** @internal */
 class StopWatch
 {
-    private function __construct(private readonly float $started)
+    private function __construct(private readonly int $started)
     {
     }
 
     public static function startNew(): self
     {
-        $started = microtime(true);
+        $now = DateTime::utcNow();
+        $started = (int) \floor((float) $now->format('U.u') * 1000);
 
         return new self($started);
     }
 
-    public function elapsed(): float
+    public function elapsed(): int
     {
-        $timestamp = microtime(true);;
+        $now = DateTime::utcNow();
+        $timestamp = (int) \floor((float) $now->format('U.u') * 1000);
 
         return $timestamp - $this->started;
     }

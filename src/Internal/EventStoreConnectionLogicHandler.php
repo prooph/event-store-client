@@ -155,7 +155,7 @@ class EventStoreConnectionLogicHandler
         $this->handler->registerHandler(
             EstablishTcpConnectionMessage::class,
             function (EstablishTcpConnectionMessage $message): void {
-                $this->establishTcpConnection($message->nodeEndPoints());
+                $this->establishTcpConnection($message->deferred(), $message->nodeEndPoints());
             }
         );
         $this->handler->registerHandler(
@@ -173,12 +173,7 @@ class EventStoreConnectionLogicHandler
         $this->handler->registerHandler(
             TcpConnectionClosedMessage::class,
             function (TcpConnectionClosedMessage $message): void {
-                $this->tcpConnectionClosed($message->tcpPackageConnection());
-
-                // if connection was closed, don't throw that exception, we do retry instead
-                if ($message->exception() && ! $message->exception() instanceof ClosedException) {
-                    throw $message->exception();
-                }
+                $this->tcpConnectionClosed($message->tcpPackageConnection(), $message->exception());
             }
         );
         $this->handler->registerHandler(
@@ -211,6 +206,7 @@ class EventStoreConnectionLogicHandler
                     $this->timerTick();
                 });
                 EventLoop::unreference($this->timerTickWatcherId);
+
                 $this->endPointDiscoverer = $endPointDiscoverer;
                 $this->state = ConnectionState::Connecting;
                 $this->connectingPhase = ConnectingPhase::Reconnecting;
@@ -239,11 +235,9 @@ class EventStoreConnectionLogicHandler
     {
         $this->logDebug('discoverEndPoint');
 
-        if ($this->state !== ConnectionState::Connecting) {
-            return;
-        }
-
-        if ($this->connectingPhase !== ConnectingPhase::Reconnecting) {
+        if ($this->state !== ConnectionState::Connecting
+            || $this->connectingPhase !== ConnectingPhase::Reconnecting
+        ) {
             return;
         }
 
@@ -262,14 +256,16 @@ class EventStoreConnectionLogicHandler
             return;
         }
 
-        $this->enqueueMessage(new EstablishTcpConnectionMessage($endpoints));
-
-        $deferred?->complete();
+        $this->enqueueMessage(new EstablishTcpConnectionMessage($deferred, $endpoints));
     }
 
     /** @throws Exception */
     private function closeConnection(string $reason, ?Throwable $exception = null): void
     {
+        if ($this->timerTickWatcherId) {
+            EventLoop::cancel($this->timerTickWatcherId);
+        }
+
         if ($this->state === ConnectionState::Closed) {
             if ($exception) {
                 $this->logDebug('CloseConnection IGNORED because is ESConnection is CLOSED, reason %s, exception %s', $reason, $exception->getMessage());
@@ -283,10 +279,6 @@ class EventStoreConnectionLogicHandler
         $this->logDebug('CloseConnection, reason %s, exception %s', $reason, $exception ? $exception->getMessage() : '<none>');
 
         $this->state = ConnectionState::Closed;
-
-        if ($this->timerTickWatcherId) {
-            EventLoop::cancel($this->timerTickWatcherId);
-        }
 
         $this->operations->cleanUp();
         $this->subscriptions->cleanUp();
@@ -302,7 +294,7 @@ class EventStoreConnectionLogicHandler
     }
 
     /** @throws \Exception */
-    private function establishTcpConnection(NodeEndPoints $endPoints): void
+    private function establishTcpConnection(?DeferredFuture $deferred, NodeEndPoints $endPoints): void
     {
         $endPoint = $this->settings->useSslConnection()
             ? $endPoints->secureTcpEndPoint() ?? $endPoints->tcpEndPoint()
@@ -310,6 +302,8 @@ class EventStoreConnectionLogicHandler
 
         if (null === $endPoint) {
             $this->closeConnection('No end point to node specified');
+
+            $deferred?->complete();
 
             return;
         }
@@ -319,6 +313,8 @@ class EventStoreConnectionLogicHandler
         if ($this->state !== ConnectionState::Connecting
             || $this->connectingPhase !== ConnectingPhase::EndPointDiscovery
         ) {
+            $deferred?->complete();
+
             return;
         }
 
@@ -346,10 +342,20 @@ class EventStoreConnectionLogicHandler
             }
         );
 
-        $this->connection->connect();
+        try {
+            $this->connection->connect();
+        } catch (Throwable $e) {
+            $deferred?->error($e);
+
+            return;
+        }
 
         if (! $this->connection->isClosed()) {
             $this->connection->startReceiving();
+        }
+
+        if (! $deferred?->isComplete()) {
+            $deferred?->complete();
         }
     }
 
@@ -970,7 +976,7 @@ class EventStoreConnectionLogicHandler
         $this->state = ConnectionState::Connecting;
         $this->connectingPhase = ConnectingPhase::EndPointDiscovery;
 
-        $this->establishTcpConnection($endPoints);
+        $this->establishTcpConnection(null, $endPoints);
     }
 
     private function logDebug(string $message, string ...$parameters): void

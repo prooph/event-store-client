@@ -102,6 +102,8 @@ class connect_to_existing_persistent_subscription_with_start_from_beginning_not_
     {
         $this->expectException(CancelledException::class);
 
-        $this->resetEvent->getFuture()->await(new TimeoutCancellation(1));
+        $this->execute(function () {
+            $this->resetEvent->getFuture()->await(new TimeoutCancellation(1));
+        });
     }
 }

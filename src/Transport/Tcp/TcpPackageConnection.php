@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Prooph\EventStoreClient\Transport\Tcp;
 
 use Amp\Socket\ClientTlsContext;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Util\Test;
 use function Amp\Socket\connect;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\ConnectException;
@@ -120,6 +122,8 @@ class TcpPackageConnection
                 $e->getMessage()
             ));
             ($this->connectionClosed)($this, $e);
+
+            throw $e;
         } catch (Exception $e) {
             $this->isClosed = true;
             $this->log->debug(\sprintf(
@@ -129,6 +133,8 @@ class TcpPackageConnection
                 $e->getMessage()
             ));
             ($this->connectionClosed)($this, $e);
+
+            throw $e;
         }
 
         $this->log->debug(\sprintf(
