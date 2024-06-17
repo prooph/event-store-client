@@ -21,7 +21,7 @@ enum VNodeState: string
     case PreReadOnlyReplica = 'PreReadOnlyReplica';
     case PreReplica = 'PreReplica';
     case CatchingUp = 'CatchingUp';
-    case Clone = 'Clone';
+    case Clone_ = 'Clone';
     case ReadOnlyReplica = 'ReadOnlyReplica';
     case Slave = 'Slave';
     case Follower = 'Follower';
