@@ -75,9 +75,6 @@ jobs:
         if: ${{ matrix.execute-cs-check }} == 'true'
         run: ./vendor/bin/php-cs-fixer fix -v --diff --dry-run
 
-      - name: Stop EventStore
-        run: wget --http-user="admin" --http-password="changeit" --post-data='' http://localhost:2113/admin/shutdown
-
       - name: Upload coverage to Coveralls
         if: ${{ matrix.test-coverage }} == 'true'
         run: php vendor/bin/php-coveralls -v
