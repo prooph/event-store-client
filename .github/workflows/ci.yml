@@ -50,7 +50,7 @@ jobs:
           tar xf EventStore-OSS-Linux-Ubuntu-16.04-v5.0.10.tar.gz
           cd EventStore-OSS-Linux-Ubuntu-16.04-v5.0.10
           echo starting event-store
-          ./run-node.sh --run-projections=all --mem-db --ext-tcp-heartbeat-interval 5000 --ext-tcp-heartbeat-timeout 1500 > /dev/null &
+          ./run-node.sh --run-projections=all --mem-db --ext-tcp-heartbeat-interval 5000 --ext-tcp-heartbeat-timeout 1500 --ext-http-prefixes="http://*:2113/" --add-interface-prefixes=false > /dev/null &
           cd ..
           mkdir -p ${{ env.PHP_CS_FIXER_CACHE_DIR }}
 
