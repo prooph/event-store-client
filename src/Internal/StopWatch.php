@@ -18,22 +18,20 @@ use Prooph\EventStore\Util\DateTime;
 /** @internal */
 class StopWatch
 {
-    private function __construct(private readonly int $started)
+    private function __construct(private readonly float $started)
     {
     }
 
     public static function startNew(): self
     {
-        $now = DateTime::utcNow();
-        $started = (int) \floor((float) $now->format('U.u') * 1000);
+        $started = microtime(true);
 
         return new self($started);
     }
 
-    public function elapsed(): int
+    public function elapsed(): float
     {
-        $now = DateTime::utcNow();
-        $timestamp = (int) \floor((float) $now->format('U.u') * 1000);
+        $timestamp = microtime(true);;
 
         return $timestamp - $this->started;
     }
