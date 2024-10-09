@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Prooph\EventStoreClient\Internal;
 
-use Prooph\EventStore\Util\DateTime;
-
 /** @internal */
 class StopWatch
 {
@@ -24,14 +22,14 @@ class StopWatch
 
     public static function startNew(): self
     {
-        $started = microtime(true);
+        $started = \microtime(true);
 
         return new self($started);
     }
 
     public function elapsed(): float
     {
-        $timestamp = microtime(true);;
+        $timestamp = \microtime(true);
 
         return $timestamp - $this->started;
     }

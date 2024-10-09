@@ -83,8 +83,7 @@ class ReadAllEventsBackwardOperation extends AbstractOperation
                 $this->fail(new ServerError($response->getError()));
 
                 return new InspectionResult(InspectionDecision::EndOperation, 'Error');
-            case
-            ReadAllResult::AccessDenied:
+            case ReadAllResult::AccessDenied:
                 $this->fail(AccessDenied::toAllStream());
 
                 return new InspectionResult(InspectionDecision::EndOperation, 'AccessDenied');
