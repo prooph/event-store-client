@@ -1,6 +1,11 @@
 <?php
 
-$config = new Prooph\CS\Config\Prooph();
+$config = new class extends Prooph\CS\Config\Prooph {
+    public function getRules(): array
+    {
+        return \array_merge(parent::getRules(), ['header_comment' => false]);
+    }
+};
 $config
     ->getFinder()
     ->in(__DIR__)
