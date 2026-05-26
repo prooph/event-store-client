@@ -32,7 +32,7 @@
     "psr/log": "^2.0|^3.0"
   },
   "require-dev": {
-    "amphp/file": "^3.1.0",
+    "amphp/file": "^3.1.0 || ^4.0.0",
     "amphp/log": "^v2.0",
     "amphp/parallel": "^v2.2.9",
     "amphp/phpunit-util": "^3.0",
