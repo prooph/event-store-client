@@ -41,7 +41,7 @@
     "php-coveralls/php-coveralls": "2.7.0",
     "phpspec/prophecy": "^1.17",
     "phpunit/phpunit": "^9.6",
-    "prooph/php-cs-fixer-config": "^0.5.0"
+    "prooph/php-cs-fixer-config": "^0.5.0 || ^0.7.0"
   },
   "suggest": {
     "ext/protobuf": "for protobuf PHP extension (pecl)"
